@@ -198,8 +198,6 @@ public class Character : KinematicBody2D
 	
 	public AnimationSprite sprite;
 	
-	public string currentAnimation = "";
-	
 	public Character() {}
 	public Character(bool dummy) {this.dummy = dummy;}
 	
@@ -238,15 +236,7 @@ public class Character : KinematicBody2D
 		sprite.FlipH = DirectionToBool();
 	}
 	
-	/*public void SetDeviceIDFilterForInputManager()
-	{
-		if(Inputs is BufferInputManager im)
-		{
-			im.filterByDeviceID = true;
-			GD.Print($"setting up with device ID {teamNumber}");
-			im.deviceIDFilter.Add(teamNumber);
-		}
-	}*/
+	public void PlayAnimation(string anm) => sprite.Play(anm);
 	
 	//this function returns the appropriate state
 	public State GetState(string state)

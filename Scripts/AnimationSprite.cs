@@ -64,6 +64,9 @@ public class AnimationSprite : Sprite
 		this.Vframes = currentSheet.VFrames;
 		framePlayer.Play(currentSheet.name);
 	}
+	
+	public void Pause() => framePlayer.Stop(false);
+	public void Continue() => framePlayer.Play();
 }
 
 public readonly struct AnimationSheet

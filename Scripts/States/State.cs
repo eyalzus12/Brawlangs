@@ -89,6 +89,7 @@ public class State : Node
 	protected virtual void RepeatActions() {}
 	public virtual void OnChange() {}
 	protected virtual void LightAttack() {}
+	protected virtual void CalculateAnimation() {}
 	
 	protected void SetHorizontalAlternatingInputs()
 	{
