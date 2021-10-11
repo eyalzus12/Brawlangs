@@ -35,7 +35,6 @@ public class StunState : State
 	{
 		ch.voc.x *= (1f-ch.airFriction);
 		ch.voc.y.Lerp(ch.fallSpeed, ch.gravity);
-		//ch.TurnConditional();
 		
 		if(bounced){}
 		else if(ch.grounded)
@@ -46,7 +45,6 @@ public class StunState : State
 				r.y *= 0.95f;
 				ch.voc = r;
 				bounced = true;
-				//Force = r;
 			}
 		}
 		else if(ch.walled)
@@ -55,7 +53,6 @@ public class StunState : State
 			r.y *= 0.95f;
 			ch.voc = r;
 			bounced = true;
-			//Force = r;
 		}
 		else if(ch.ceilinged)
 		{
@@ -63,7 +60,6 @@ public class StunState : State
 			r.y *= 0.95f;
 			ch.voc = r;
 			bounced = true;
-			//Force = r;
 		}
 		
 		ch.framesSinceLastHit = 0;

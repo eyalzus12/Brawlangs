@@ -196,8 +196,10 @@ public class Character : KinematicBody2D
 		
 	public InputManager Inputs;
 	
-	public Sprite sprite;
-		
+	public AnimationSprite sprite;
+	
+	public string currentAnimation = "";
+	
 	public Character() {}
 	public Character(bool dummy) {this.dummy = dummy;}
 	

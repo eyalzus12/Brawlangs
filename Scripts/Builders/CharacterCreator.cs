@@ -78,6 +78,17 @@ public class CharacterCreator
 		dl.MarginTop = 200;
 		cl.AddChild(dl);
 		
+		//Temp animation loading
+		var spr = new AnimationSprite();
+		spr.Name = "Sprite";
+		var texture = ResourceLoader.Load<Texture>("res://first test pixel art animation walk.png");
+		spr.AddSheet(texture, "Default", 4, 4, true);
+		ch.AddChild(spr);
+		spr.InitFramePlayer();
+		ch.sprite = spr;
+		spr.Play("Default");
+		
+		/*
 		var spr = new Sprite();
 		spr.Scale = new Vector2(0.25f, 0.25f);
 		ch.AddChild(spr);
@@ -89,6 +100,7 @@ public class CharacterCreator
 		var pall = ResourceLoader.Load<Texture>("res://empty pallete.png");
 		(spr.Material as ShaderMaterial).SetShaderParam("pallete", pall);
 		ch.sprite = spr;
+		*/
 		return ch;
 	}
 }
