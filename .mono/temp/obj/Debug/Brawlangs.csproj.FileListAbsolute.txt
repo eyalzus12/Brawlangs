@@ -1,0 +1,8 @@
+C:\Users\eyalz\Desktop\godot\Brawlangs\.mono\temp\obj\Debug\Brawlangs.csprojAssemblyReference.cache
+C:\Users\eyalz\Desktop\godot\Brawlangs\.mono\temp\obj\Debug\Brawlangs.csproj.CoreCompileInputs.cache
+C:\Users\eyalz\Desktop\godot\Brawlangs\.mono\temp\obj\Debug\Brawlangs.AssemblyInfoInputs.cache
+C:\Users\eyalz\Desktop\godot\Brawlangs\.mono\temp\obj\Debug\Brawlangs.AssemblyInfo.cs
+C:\Users\eyalz\Desktop\godot\Brawlangs\.mono\temp\bin\Debug\Brawlangs.dll
+C:\Users\eyalz\Desktop\godot\Brawlangs\.mono\temp\bin\Debug\Brawlangs.pdb
+C:\Users\eyalz\Desktop\godot\Brawlangs\.mono\temp\obj\Debug\Brawlangs.dll
+C:\Users\eyalz\Desktop\godot\Brawlangs\.mono\temp\obj\Debug\Brawlangs.pdb

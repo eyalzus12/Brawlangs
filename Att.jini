@@ -1,0 +1,66 @@
+<Part0>
+{
+	Startup = 20
+
+	<Part0Frame0>
+	{
+		Length = 20
+		
+		<Part0Frame0Hitbox0>
+		{
+			SetKnockback = (0, -500)
+			VarKnockback = (0, 0)
+			Stun = 20
+			HitPause = 2
+			HitLag = 2
+			Damage = 20
+			Position = (40, 0)
+			Radius = 30
+			Height = 0
+		}
+
+		<Part0Frame0Hitbox1>
+		{
+			SetKnockback = (0, -1000)
+			VarKnockback = (0, -300)
+			Stun = 10
+			HitPause = 1
+			HitLag = 1
+			Damage = 0
+			Position = (60, 0)
+			Radius = 10
+			Height = 2
+		}
+	}
+
+	<Part0Frame1>
+	{
+		Length = 20
+	
+		<Part0Frame1Hitbox0>
+		{
+			SetKnockback = (0, -600)
+			VarKnockback = (0, -50)
+			Stun = 20
+			HitPause = 2
+			HitLag = 2
+			Damage = 20
+			Position = (60, 0)
+			Radius = 30
+			Height = 0
+		}
+
+		<Part0Frame1Hitbox1>
+		{
+			SetKnockback = (0, -1000)
+			VarKnockback = (0, -400)
+			Stun = 10
+			HitPause = 1
+			HitLag = 1
+			Damage = 0
+			Position = (100, 0)
+			Radius = 10
+			Height = 2
+		}
+	}
+}

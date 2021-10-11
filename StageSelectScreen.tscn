@@ -1,0 +1,51 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://StageSelect.cs" type="Script" id=1]
+[ext_resource path="res://ToLoadingScreenButton.cs" type="Script" id=2]
+
+[node name="Control" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="GridContainer" type="GridContainer" parent="."]
+margin_left = 94.0
+margin_top = 72.0
+margin_right = 924.0
+margin_bottom = 480.0
+custom_constants/vseparation = 50
+custom_constants/hseparation = 50
+columns = 5
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="TextEdit" type="TextEdit" parent="."]
+margin_left = 216.0
+margin_top = 520.0
+margin_right = 656.0
+margin_bottom = 560.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="."]
+margin_left = 296.0
+margin_top = 496.0
+margin_right = 565.0
+margin_bottom = 510.0
+text = "Dont touch unless I told you how to use it"
+
+[node name="Button" type="Button" parent="."]
+margin_left = 760.0
+margin_top = 512.0
+margin_right = 968.0
+margin_bottom = 560.0
+text = "Select characters to load"
+script = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}

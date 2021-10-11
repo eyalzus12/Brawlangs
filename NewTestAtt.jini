@@ -1,0 +1,130 @@
+<Part0>
+{
+	Startup = 20
+	Length = 40
+	Endlag = 10
+	
+	<Connections>
+	{
+		Next = Part1
+	}
+	
+	<Part0Hitbox0>
+	{
+		ActiveFrames = (0, 5), (10, 20)
+		SetKnockback = (0, -500)
+		VarKnockback = (0, 0)
+		Stun = 20
+		HitPause = 2
+		HitLag = 2
+		Damage = 20
+		Position = (40, 0)
+		Radius = 30
+		Height = 0
+	}
+
+	<Part0Hitbox1>
+	{
+		ActiveFrames = (5, 10), (15, 20)
+		SetKnockback = (0, -1000)
+		VarKnockback = (0, -300)
+		Stun = 10
+		HitPause = 1
+		HitLag = 1
+		Damage = 0
+		Position = (60, 0)
+		Radius = 10
+		Height = 2
+	}
+	
+	<Part0Hitbox2>
+	{
+		ActiveFrames = (20, 25), (30, 40)
+		SetKnockback = (0, -600)
+		VarKnockback = (0, -50)
+		Stun = 20
+		HitPause = 2
+		HitLag = 2
+		Damage = 20
+		Position = (60, 0)
+		Radius = 30
+		Height = 0
+	}
+
+	<Part0Hitbox3>
+	{
+		ActiveFrames = (25, 30), (35, 40)
+		SetKnockback = (0, -1000)
+		VarKnockback = (0, -400)
+		Stun = 10
+		HitPause = 1
+		HitLag = 1
+		Damage = 0
+		Position = (100, 0)
+		Radius = 10
+		Height = 2
+	}
+}
+
+<Part1>
+{
+	Startup = 20
+	Length = 40
+	Endlag = 10
+	
+	<Part1Hitbox0>
+	{
+		ActiveFrames = (0, 5), (10, 20)
+		SetKnockback = (0, -500)
+		VarKnockback = (0, 0)
+		Stun = 20
+		HitPause = 2
+		HitLag = 2
+		Damage = 20
+		Position = (40, 0)
+		Radius = 30
+		Height = 0
+	}
+
+	<Part1Hitbox1>
+	{
+		ActiveFrames = (5, 10), (15, 20)
+		SetKnockback = (0, -1000)
+		VarKnockback = (0, -300)
+		Stun = 10
+		HitPause = 1
+		HitLag = 1
+		Damage = 0
+		Position = (60, 0)
+		Radius = 10
+		Height = 2
+	}
+	
+	<Part1Hitbox2>
+	{
+		ActiveFrames = (20, 25), (30, 40)
+		SetKnockback = (0, -600)
+		VarKnockback = (0, -50)
+		Stun = 20
+		HitPause = 2
+		HitLag = 2
+		Damage = 20
+		Position = (60, 0)
+		Radius = 30
+		Height = 0
+	}
+
+	<Part1Hitbox3>
+	{
+		ActiveFrames = (25, 30), (35, 40)
+		SetKnockback = (0, -1000)
+		VarKnockback = (0, -400)
+		Stun = 10
+		HitPause = 1
+		HitLag = 1
+		Damage = 0
+		Position = (100, 0)
+		Radius = 10
+		Height = 2
+	}
+}
