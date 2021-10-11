@@ -15,6 +15,7 @@ public class EndlagState : State
 	{
 		endlag = 0;
 		att = null;
+		SetupCollisionParamaters();
 	}
 	
 	protected override void DoMovement()

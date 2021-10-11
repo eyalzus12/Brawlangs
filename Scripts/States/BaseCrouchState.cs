@@ -6,8 +6,6 @@ public class BaseCrouchState : GroundedState
 	public BaseCrouchState(): base() {}
 	public BaseCrouchState(Character link): base(link) {}
 	
-	public override void Init() {}
-	
 	protected override void DoMovement()
 	{
 		ch.TurnConditional();

@@ -34,6 +34,7 @@ public class Attack : Node2D
 		currentPart.Activate();
 		EmitSignal(nameof(AttackStarts), this);
 		var a = ch.ChangeState("Attack") as AttackState;
+		GD.Print($"connecting from attack {this}");
 		Connect("AttackEnds", a, "SetEnd");
 		a.att = this;
 		/*var scl = GetSignalConnectionList("AttackEnds");

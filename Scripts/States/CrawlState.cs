@@ -6,8 +6,6 @@ public class CrawlState : BaseCrouchState
 	public CrawlState(): base() {}
 	public CrawlState(Character link): base(link) {}
 	
-	public override void Init() {}
-	
 	protected override bool CalcStateChange()
 	{
 		if(base.CalcStateChange()) return true;

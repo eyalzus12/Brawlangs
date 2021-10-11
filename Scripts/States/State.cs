@@ -5,10 +5,10 @@ public class State : Node
 {
 	public bool actionable => IsActionable();
 	
-	protected const int DROP_THRU_BIT = 1;
-	protected const float HCF = 20f;//check force
-	protected const float VCF = 20f;//check force
-	protected const float FLOOR_ANGLE = (float)(Math.PI/2f - 0.1);
+	public const int DROP_THRU_BIT = 1;
+	public const float HCF = 20f;//check force
+	public const float VCF = 20f;//check force
+	public const float FLOOR_ANGLE = (float)(Math.PI/2f - 0.1);
 	
 	public InputManager Inputs
 	{

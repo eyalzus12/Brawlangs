@@ -19,6 +19,7 @@ public class AttackState : State
 	protected override void DoGravity()
 	{
 		if(!ch.grounded) ch.vec.y.Lerp(ch.fallSpeed, ch.gravity);
+		else ch.vec.y = VCF;
 	}
 	
 	public override void SetInputs()
@@ -35,8 +36,9 @@ public class AttackState : State
 	
 	protected override bool CalcStateChange()
 	{
-		if(ended)
+		/*if(ended)
 		{
+			GD.Print("reached endlag switch");
 			int endlag = att.currentPart.GetEndlag();
 			var s = ch.ChangeState("Endlag") as EndlagState;
 			s.endlag = endlag;
@@ -47,18 +49,29 @@ public class AttackState : State
 		else if(ch.currentAttack is null)
 		{
 			GD.Print("You thought i was a normal attack, but it was me, NULL!");
+			GD.Print($"disconnected from attack {att}");
+			att.Disconnect("AttackEnds", this, nameof(SetEnd));
 			if(!ch.downHeld) ch.Uncrouch();
 			ch.ChangeState(ch.grounded?(ch.downHeld?"Crawl":"Walk"):ch.walled?"Wall":"Air");
 		}
-		else return false;
+		else return false;*/
 		
-		return true;
+		return false;
 	}
 	
 	public void SetEnd(Attack a)
 	{
+		GD.Print("call to state");
 		ended = true;
+		GD.Print($"disconnected from attack {a}");
 		a.Disconnect("AttackEnds", this, nameof(SetEnd));
+		GD.Print("reached endlag switch");
+		int endlag = a.currentPart.GetEndlag();
+		var s = ch.ChangeState("Endlag") as EndlagState;
+		s.endlag = endlag;
+		s.att = a;
+		att = null;
+		if(!ch.downHeld) ch.Uncrouch();
 	}
 	
 	public override void OnChange()

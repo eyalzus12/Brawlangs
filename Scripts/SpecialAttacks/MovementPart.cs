@@ -13,5 +13,6 @@ public class MovementPart : AttackPart
 	public override void OnStart()
 	{
 		ch.vec = Movement * new Vector2(ch.direction, 1);
+		if(ch.grounded) ch.vec.y = State.VCF;
 	}
 }
