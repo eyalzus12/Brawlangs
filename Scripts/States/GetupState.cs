@@ -11,6 +11,7 @@ public class GetupState : GroundedState
 	public override void Init()
 	{
 		ch.Uncrouch();
+		ch.PlayAnimation("Getup");
 	}
 	
 	protected override void DoJump()

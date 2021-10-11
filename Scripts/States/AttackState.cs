@@ -10,6 +10,12 @@ public class AttackState : State
 	
 	public Attack att;
 	
+	public override void Init()
+	{
+		//ch.PlayAnimation(att.animation);
+		//figure out way to do it when the attack actually exists
+	}
+	
 	protected override void DoMovement()
 	{
 		ch.vec.x *= (1f-att.attackFriction*(ch.grounded?ch.ffric:1f));

@@ -9,6 +9,7 @@ public class CrouchState : BaseCrouchState
 	public override void Init()
 	{
 		ch.vec.x = 0;
+		ch.PlayAnimation("Crouch");
 	}
 	
 	protected override void DoMovement()

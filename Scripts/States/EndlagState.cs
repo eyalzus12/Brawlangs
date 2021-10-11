@@ -16,6 +16,8 @@ public class EndlagState : State
 		endlag = 0;
 		att = null;
 		SetupCollisionParamaters();
+		//ch.PlayAnimation(att.endlagAnimation);
+		//figure out a way to set the animation after the attack exists
 	}
 	
 	protected override void DoMovement()
