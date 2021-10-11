@@ -573,6 +573,8 @@ public class Character : KinematicBody2D
 	{
 		if(a is null) return;
 		currentAttack = a;
+		var s = ChangeState("Attack") as AttackState;
+		s.att = currentAttack;
 		currentAttack.Connect("AttackEnds", this, nameof(ResetCurrentAttack));
 		currentAttack.Start();
 	}
@@ -592,7 +594,6 @@ public class Character : KinematicBody2D
 	
 	public void ResetCurrentAttack(Attack a)
 	{
-		GD.Print("call to character");
 		currentAttack.Disconnect("AttackEnds", this, nameof(ResetCurrentAttack));
 		currentAttack = null;
 	}

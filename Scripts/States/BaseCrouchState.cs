@@ -18,17 +18,9 @@ public class BaseCrouchState : GroundedState
 	
 	protected override bool CalcStateChange()
 	{
-		bool temp = jump;
-		jump = false;//workaround to prevent transition to normal jump
 		if(base.CalcStateChange()) return true;
-		jump = temp;
-		
-		if(jump)
-			ch.ChangeState("Jump");
 		else if(!Inputs.IsActionPressed("player_down"))
 			ch.ChangeState("Getup");
-		else if(ch.InputingDirection())
-			ch.ChangeState("Crawl");
 		else return false;
 		
 		return true;

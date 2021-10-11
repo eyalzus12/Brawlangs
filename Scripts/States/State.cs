@@ -38,6 +38,8 @@ public class State : Node
 	
 	public virtual void DoPhysics(float delta)
 	{
+		if(this != ch.currentState) return;
+		
 		if(!justInit) LoopActions();
 		else justInit = false;
 		

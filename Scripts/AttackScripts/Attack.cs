@@ -30,28 +30,10 @@ public class Attack : Node2D
 	
 	public void Start()
 	{
+		EmitSignal(nameof(AttackStarts), this);
+		Connect("AttackEnds", ch.currentState, "SetEnd");
 		currentPart = start;
 		currentPart.Activate();
-		EmitSignal(nameof(AttackStarts), this);
-		var a = ch.ChangeState("Attack") as AttackState;
-		GD.Print($"connecting from attack {this}");
-		Connect("AttackEnds", a, "SetEnd");
-		a.att = this;
-		/*var scl = GetSignalConnectionList("AttackEnds");
-			
-		bool deez = false;
-		foreach(var d in scl)
-		{
-			var dict = d as Godot.Collections.Dictionary;
-			if(dict["method"].ToString() == "SetEnd")
-			{
-				deez = true;
-				break;
-			}
-		}
-			
-		if(!deez) */
-		
 		OnStart();
 	}
 	

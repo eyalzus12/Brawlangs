@@ -171,7 +171,6 @@ public class AttackPart : Node2D
 	public void cnp(string dummy="")
 	{
 		if(!active) return;
-		GD.Print("getting next part");
 		CalculateNextPart();
 	}
 	
