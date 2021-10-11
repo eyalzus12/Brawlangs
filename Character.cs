@@ -195,6 +195,8 @@ public class Character : KinematicBody2D
 	public PropertyMap prop = new PropertyMap();
 		
 	public InputManager Inputs;
+	
+	public Sprite sprite;
 		
 	public Character() {}
 	public Character(bool dummy) {this.dummy = dummy;}
@@ -230,6 +232,8 @@ public class Character : KinematicBody2D
 		
 		if(!paused || Input.IsActionJustPressed("next_frame"))
 			currentState?.DoPhysics(delta);
+			
+		sprite.FlipH = DirectionToBool();
 	}
 	
 	/*public void SetDeviceIDFilterForInputManager()
@@ -538,6 +542,10 @@ public class Character : KinematicBody2D
 		else if(direction == -1) return "Left";
 		else return "AAAAAAAAAAAAAAAAA WTF IS HAPPENING";
 	}
+	
+	public bool DirectionToBool() => (direction != 1);
+	//false = right, left = true. used for flipping sprite;
+	
 	///////////////////////////////////////////
 	////////////////Attacks////////////////////
 	public bool CanHit(Character c) => (c != this)&&(c.teamNumber!=teamNumber||friendlyFire);
@@ -549,9 +557,12 @@ public class Character : KinematicBody2D
 	{
 		var s = ChangeState("HitPause") as HitPauseState;
 		damage += d;
-		s.force = skb + damage*vkb/100f;
+		var force = skb + damage*vkb/100f;
+		s.force = force;
 		s.stunLength = stun;
 		s.hitPauseLength = hp;
+		
+		if(force.x != 0f) direction = Math.Sign(force.x);
 		
 		GD.Print($"\nLast hit was {framesSinceLastHit} frames ago");
 		

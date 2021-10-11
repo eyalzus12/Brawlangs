@@ -88,7 +88,7 @@ public class CharacterCreator
 		(spr.Material as ShaderMaterial).Shader = shader;
 		var pall = ResourceLoader.Load<Texture>("res://empty pallete.png");
 		(spr.Material as ShaderMaterial).SetShaderParam("pallete", pall);
-		
+		ch.sprite = spr;
 		return ch;
 	}
 }
