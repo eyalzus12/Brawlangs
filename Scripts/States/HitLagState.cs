@@ -14,6 +14,7 @@ public class HitLagState : State
 	{
 		hitLagLength = 0;
 		ch.ResetVelocity();
+		//pause animation
 	}
 	
 	public override void SetInputs()

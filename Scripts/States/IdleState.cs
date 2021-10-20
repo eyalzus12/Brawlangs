@@ -9,6 +9,7 @@ public class IdleState : GroundedState
 	public override void Init()
 	{
 		ch.vec.x = 0;
+		ch.PlayAnimation("Idle");
 	}
 	
 	protected override void DoMovement()

@@ -22,6 +22,7 @@ public class AnimationSprite : Sprite
 			var animationSheet = a.Value;
 			
 			var anm = new Animation();
+			anm.Step = 1/24f;
 			var frameCount = animationSheet.HFrames * animationSheet.VFrames;
 			anm.Length = frameCount * anm.Step;
 			anm.Loop = animationSheet.loop;
@@ -31,7 +32,7 @@ public class AnimationSprite : Sprite
 			anm.TrackSetPath(trc, path);
 			
 			for(int i = 0; i < frameCount; ++i)
-				anm.TrackInsertKey(trc, i/10f, i);
+				anm.TrackInsertKey(trc, i*anm.Step, i);
 		}
 	}
 	
@@ -43,6 +44,7 @@ public class AnimationSprite : Sprite
 		}
 		catch(KeyNotFoundException)
 		{
+			SetSheet(animations["Default"]);
 		}
 	}
 	
@@ -63,10 +65,16 @@ public class AnimationSprite : Sprite
 		this.Hframes = currentSheet.HFrames;
 		this.Vframes = currentSheet.VFrames;
 		framePlayer.Play(currentSheet.name);
+		framePlayer.Advance(0);
 	}
 	
 	public void Pause() => framePlayer.Stop(false);
 	public void Continue() => framePlayer.Play();
+	
+	public override void _PhysicsProcess(float delta)
+	{
+		//GD.Print($"current frame is {Frame} and physics frame {Engine.GetPhysicsFrames()}");
+	}
 }
 
 public readonly struct AnimationSheet

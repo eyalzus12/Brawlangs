@@ -6,6 +6,11 @@ public class WalkStopState : GroundedSlowdownState
 	public WalkStopState(): base() {}
 	public WalkStopState(Character link): base(link) {}
 	
+	public override void Init()
+	{
+		ch.PlayAnimation("WalkStop");
+	}
+	
 	protected override bool CalcStateChange()
 	{
 		if(base.CalcStateChange()) return true;

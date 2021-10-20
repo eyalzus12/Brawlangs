@@ -6,6 +6,11 @@ public class WalkWallState: GroundedState
 	public WalkWallState(): base() {}
 	public WalkWallState(Character link): base(link) {}
 	
+	public override void Init()
+	{
+		ch.PlayAnimation("Walk");
+	}
+	
 	protected override void DoMovement()
 	{
 		if(ch.InputingDirection())

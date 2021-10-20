@@ -18,6 +18,7 @@ public class JumpState : GroundedState
 		jumpActive = false;
 		SetupCollisionParamaters();
 		AdjustVelocity();
+		ch.PlayAnimation("JumpReady");
 	}
 	
 	protected override void LoopActions()

@@ -72,7 +72,7 @@ public class IniFile
 	public void Parse(Strl l)
 	{
 		var ll = Clean(l);
-		string section = "";
+		var section = "";
 		foreach(var s in ll)
 		{
 			if(s[0] == '[' && s[s.Length - 1] == ']')
@@ -89,28 +89,33 @@ public class IniFile
 	
 	private void Store(string key, string line)
 	{
-		var s = line.Split('=');
-		var s0 = s[0].Trim();
-		var s1 = s[1].Trim();
-		var ss1 = s1.Split(',');
+		var s = line.Split('=');//split to left side and right side
+		var s0 = s[0].Trim();//left side
+		var s1 = s[1].Trim();//right side
+		var ss1 = s1.Split(',');//split right side to parts by commas
 		var sl = new Strl();
 		
-		if(ss1.Length > 1)
+		if(ss1.Length > 1)//ensure actual list
 		{
-			for(int i = 0; i < ss1.Length; ++i)
+			for(int i = 0; i < ss1.Length; ++i)//go over thee
 			{
-				string asf = ss1[i].Trim();
-				if(asf[0] == '(')
+				var asf = ss1[i].Trim();//get first element
+				if(asf[0] == '(')//it actually a vector
 				{
-					var trim1 = ss1[i+1].Trim();
-					if(trim1[trim1.Length-1] == ')')
-						sl.Add(asf + ',' + trim1);
+					var trim1 = ss1[i+1].Trim();//get second element
+					if(trim1[trim1.Length-1] == ')')//is really a vector
+						sl.Add(asf + ',' + trim1);//add
 					else
 					{
-						var trim2 = ss1[i+2].Trim();
-						if(trim2[trim2.Length-1] == ')')
-							sl.Add(asf + ',' + trim1 + ',' + trim2);
-						//TODO: add Quat
+						var trim2 = ss1[i+2].Trim();//get third element
+						if(trim2[trim2.Length-1] == ')')//is really a vector
+							sl.Add(asf + ',' + trim1 + ',' + trim2);//add
+						else
+						{
+							var trim3 = ss1[i+3].Trim();//get fourth element
+							if(trim3[trim3.Length-1] == ')')//is really a vector
+								sl.Add(asf + ',' + trim1 + ',' + trim2 + ',' + trim3);//add
+						}
 					}
 					++i;
 				}
@@ -131,7 +136,7 @@ public class IniFile
 			case 1:
 				return Norm(l[0]);
 			default:
-				return l.Select(s => Norm(s)).ToList();
+				return l.Select(Norm).ToList();
 				/*var lo = new List<object>();
 				foreach(var s in l) lo.Add(Norm(s));
 				return lo;*/
@@ -144,6 +149,7 @@ public class IniFile
 		float f;
 		Vector2 v2 = default;
 		Vector3 v3 = default;
+		Quat q = default;
 			
 		if(string.Equals(s, "true",  StringComparison.OrdinalIgnoreCase)) return true;//represents true
 		else if(string.Equals(s, "false",  StringComparison.OrdinalIgnoreCase)) return false;//represents false
@@ -151,6 +157,7 @@ public class IniFile
 		else if(float.TryParse(s, out f)) return f;//represents a float
 		else if(s2v2(s, ref v2)) return v2;//represents a Vector2
 		else if(s2v3(s, ref v3)) return v3;//represents a Vector3
+		else if(s2q(s, ref q)) return q;//represents a Quat
 		else return s.Trim('\"');//represents a string
 	}
 	
@@ -201,7 +208,7 @@ public class IniFile
 		}
 	}
 	
-	private Strl Clean(Strl l) => l.Select(s => Clean(s)).Where(s => s != "").ToList<string>();
+	private Strl Clean(Strl l) => l.Select(Clean).Where(s => s != "").ToList<string>();
 	/*{
 		Strl ll = new Strl();
 		

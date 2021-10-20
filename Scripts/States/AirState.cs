@@ -14,7 +14,7 @@ public class AirState : State
 		Unsnap();
 		ch.onSemiSolid = false;
 		ch.onSlope = false;
-		ch.PlayAmimation("Drift");//TODO: figure out a way to queue animations, to allow a jump animation when needed
+		ch.PlayAnimation("Drift");//TODO: figure out a way to queue animations, to allow a jump animation when needed
 	}
 	
 	protected override void DoMovement()

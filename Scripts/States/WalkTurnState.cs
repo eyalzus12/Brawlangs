@@ -8,6 +8,11 @@ public class WalkTurnState : GroundedSlowdownState
 	public WalkTurnState(): base() {}
 	public WalkTurnState(Character link): base(link) {}
 	
+	public override void Init()
+	{
+		ch.PlayAnimation("Turn");
+	}
+	
 	protected override bool CalcStateChange()
 	{
 		if(!ch.grounded) ch.ChangeState("Air");

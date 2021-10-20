@@ -58,13 +58,13 @@ public static class TypeUtils
 	//detects if str matches a Quat ToString output
 	
 	public static List<object> lo(this object o) => (o as IEnumerable<object>).ToList<object>();
-	public static List<string> ls(this object o) => o.lt<string>(h => h.s());
-	public static List<float> lf(this object o) => o.lt<float>(h => h.f());
-	public static List<int> li(this object o) => o.lt<int>(h => h.i());
-	public static List<bool> lb(this object o) => o.lt<bool>(h => h.b());
-	public static List<Vector2> lv2(this object o) => o.lt<Vector2>(h => h.v2());
-	public static List<Vector3> lv3(this object o) => o.lt<Vector3>(h => h.v3());
-	public static List<Quat> lq(this object o) => o.lt<Quat>(h => h.q());
+	public static List<string> ls(this object o) => o.lt<string>(s);
+	public static List<float> lf(this object o) => o.lt<float>(f);
+	public static List<int> li(this object o) => o.lt<int>(i);
+	public static List<bool> lb(this object o) => o.lt<bool>(b);
+	public static List<Vector2> lv2(this object o) => o.lt<Vector2>(v2);
+	public static List<Vector3> lv3(this object o) => o.lt<Vector3>(v3);
+	public static List<Quat> lq(this object o) => o.lt<Quat>(q);
 		
 	public static List<T> lt<T>(this object o, Func<object, T> caster) =>
 		(o as IEnumerable<object>).Select(caster).ToList<T>();

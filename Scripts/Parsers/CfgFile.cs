@@ -43,10 +43,10 @@ public class CfgFile
 	
 	public Error Load(string path)
 	{
-		File f = new File();//create new file
+		var f = new File();//create new file
 		var er = f.Open(path, File.ModeFlags.Read);//open file
 		if(er != Error.Ok) return er;//if error, return
-		string content = f.GetAsText();//read text
+		var content = f.GetAsText();//read text
 		f.Close();//flush buffer
 		Parse(content);//parse
 		return Error.Ok;
@@ -57,7 +57,7 @@ public class CfgFile
 	
 	public void Parse(string str) => Parse(str.Split('\n'));
 	public void Parse(string[] str) => Parse(new Strl(str));
-	public void Parse(Strl l) => Clean(l).ForEach(h=>Store(h));
+	public void Parse(Strl l) => Clean(l).ForEach(Store);
 	
 	private void Store(string line)
 	{
@@ -82,7 +82,12 @@ public class CfgFile
 						var trim2 = ss1[i+2].Trim();
 						if(trim2[trim2.Length-1] == ')')
 							sl.Add(asf + ',' + trim1 + ',' + trim2);
-						//TODO: add Quat
+						else
+						{
+							var trim3 = ss1[i+3].Trim();//get fourth element
+							if(trim3[trim3.Length-1] == ')')//is really a vector
+								sl.Add(asf + ',' + trim1 + ',' + trim2 + ',' + trim3);//add
+						}
 					}
 					++i;
 				}
@@ -103,7 +108,7 @@ public class CfgFile
 			case 1:
 				return Norm(l[0]);
 			default:
-				return l.Select(s => Norm(s)).ToList();
+				return l.Select(Norm).ToList();
 		}
 	}
 	
@@ -113,6 +118,7 @@ public class CfgFile
 		float f;
 		Vector2 v2 = default;
 		Vector3 v3 = default;
+		Quat q = default;
 			
 		if(string.Equals(s, "true",  StringComparison.OrdinalIgnoreCase)) return true;//represents true
 		else if(string.Equals(s, "false",  StringComparison.OrdinalIgnoreCase)) return false;//represents false
@@ -120,6 +126,7 @@ public class CfgFile
 		else if(float.TryParse(s, out f)) return f;//represents a float
 		else if(s2v2(s, ref v2)) return v2;//represents a Vector2
 		else if(s2v3(s, ref v3)) return v3;//represents a Vector3
+		else if(s2q(s, ref q)) return q;//represents a Quat
 		else return s.Trim('\"');//represents a string
 	}
 	
@@ -170,6 +177,6 @@ public class CfgFile
 		}
 	}
 	
-	private Strl Clean(Strl l) => l.Select(s => Clean(s)).Where(s => s != "").ToList<string>();
+	private Strl Clean(Strl l) => l.Select(Clean).Where(s => s != "").ToList<string>();
 	private string Clean(string s) => s.Split(';')[0].Trim();
 }

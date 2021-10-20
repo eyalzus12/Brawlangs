@@ -11,6 +11,7 @@ public class WallState : State
 	public override void Init()
 	{
 		jump = false;
+		ch.PlayAnimation("WallIdle");
 	}
 	
 	protected override void DoMovement()

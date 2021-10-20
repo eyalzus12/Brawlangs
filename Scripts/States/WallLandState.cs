@@ -18,6 +18,7 @@ public class WallLandState : WallState
 		ch.vec.y *= ch.wallFriction * ch.wfric;
 			
 		//ch.onSemiSolid = false;
+		ch.PlayAnimation("WallLand");
 	}
 	
 	protected override bool CalcStateChange()

@@ -331,7 +331,7 @@ public class Character : KinematicBody2D
 		AddState(new CrouchState(this));
 		AddState(new CrawlState(this));
 		AddState(new CrawlWallState(this));
-		AddState(new CrouchJumpState(this));
+		//AddState(new CrouchJumpState(this));
 		
 		AddState(new StunState(this));
 		AddState(new HitPauseState(this));
@@ -346,6 +346,7 @@ public class Character : KinematicBody2D
 		--stocks;
 		if(stocks <= 0)
 		{
+			GD.Print($"Character {Name} took the L and is eliminated");
 			EmitSignal(nameof(Dead), this);
 			QueueFree();
 		}
@@ -587,12 +588,12 @@ public class Character : KinematicBody2D
 		var n = GetNode(s);
 		if(n is null)
 		{
-			GD.Print($"No attack {s} found");
+			GD.Print($"No attack {s} found. You probably forgot to add it to the loading list.");
 			return;
 		}
 		
 		if(n is Attack a) ExecuteAttack(a);
-		else GD.Print($"Node {s} found, but it isn't an attack");
+		else GD.Print($"Node {s} found, but isn't an attack. Very sussy.");
 	}
 	
 	public void ResetCurrentAttack(Attack a)

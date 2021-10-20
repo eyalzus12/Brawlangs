@@ -22,6 +22,7 @@ public class LandState : GroundedState
 		ch.fastfalling = false;
 			
 		AdjustVelocity();
+		ch.PlayAnimation("Land");
 	}
 	
 	protected override void DoJump() {}

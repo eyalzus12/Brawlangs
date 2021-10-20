@@ -19,6 +19,7 @@ public class StunState : State
 		stunLength = 0;
 		ch.vec = Vector2.Zero;
 		bounced = false;
+		ch.PlayAnimation("Stun");
 	}
 	
 	public Vector2 Force

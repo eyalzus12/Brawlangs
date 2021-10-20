@@ -17,6 +17,7 @@ public class WallJumpState : WallState
 		SetupCollisionParamaters();
 		AdjustVelocity();
 		MarkForDeletion("player_jump", true);
+		ch.PlayAnimation("WallJumpReady");//figure out a way to queue aerial jumping animation
 	}
 	
 	protected override void DoMovement() {}

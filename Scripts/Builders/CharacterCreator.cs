@@ -81,8 +81,12 @@ public class CharacterCreator
 		//Temp animation loading
 		var spr = new AnimationSprite();
 		spr.Name = "Sprite";
+		
 		var texture = ResourceLoader.Load<Texture>("res://first test pixel art animation walk.png");
 		spr.AddSheet(texture, "Default", 4, 4, true);
+		var next = ResourceLoader.Load<Texture>("res://idle.png");
+		spr.AddSheet(next, "Idle", 7, 3, false);
+		
 		ch.AddChild(spr);
 		spr.InitFramePlayer();
 		ch.sprite = spr;

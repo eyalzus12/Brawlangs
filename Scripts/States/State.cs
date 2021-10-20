@@ -216,7 +216,7 @@ public class State : Node
 				ch.ffric = fric;//get floor friction
 				ch.fbounce = bounce;//get floor bounce
 					
-				if(!ch.onSemiSolid && body is CollisionObject2D col)//if the collider IS a collider
+				if(!ch.onSemiSolid && body is CollisionObject2D col)//if the collider IS a collider, cuz trust is overrated
 				{
 					foreach(var sh in col.GetShapeOwners())//check each collision shape owners
 					{
