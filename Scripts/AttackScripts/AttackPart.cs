@@ -28,6 +28,20 @@ public class AttackPart : Node2D
 	[Export]
 	public int length = 0;
 	
+	[Export]
+	public bool hasMovement = false;
+	
+	[Export]
+	public Vector2 movement = default;
+	
+	[Export]
+	public bool hitPart = false;
+	
+	[Export]
+	public int missEndlag = 0;
+	
+	public bool hit = false;
+	
 	public AnimationPlayer hitboxPlayer;
 	public Attack att;
 	public Character ch;
@@ -80,6 +94,14 @@ public class AttackPart : Node2D
 	public virtual void Activate()
 	{
 		active = true;
+		hit = false;
+		
+		if(hasMovement)
+		{
+			ch.vec = movement * new Vector2(ch.direction, 1);
+			if(ch.grounded) ch.vec.y = State.VCF;
+		}
+		
 		OnStart();
 		//hitboxPlayer = GetNode("AttackPlayer") as AnimationPlayer;
 		//GD.Print("activating");
@@ -176,7 +198,8 @@ public class AttackPart : Node2D
 	
 	public virtual void CalculateNextPart()
 	{
-		NextPart();
+		if(hitPart) HitMissPart();
+		else NextPart();
 	}
 	
 	public void ChangePart(string part)
@@ -188,6 +211,11 @@ public class AttackPart : Node2D
 	public void NextPart()
 	{
 		ChangePart("Next");
+	}
+	
+	public void HitMissPart()
+	{
+		ChangePart(hit?"Hit":"Miss");
 	}
 	
 	public AttackPart GetConnectedPart(string name)
@@ -222,6 +250,7 @@ public class AttackPart : Node2D
 			Area2D hurtbox = entry.Key;
 			var hitChar = (Character)hurtbox.GetParent();
 			if(!ch.CanHit(hitChar) || ignoreList.Contains(hitChar)) return;
+			hit = true;
 			OnHit(hitbox, hurtbox);
 			hitChar.ApplyKnockback(ch.direction*hitbox.setKnockback,
 			ch.direction*hitbox.varKnockback, hitbox.damage, hitbox.stun,
@@ -233,5 +262,5 @@ public class AttackPart : Node2D
 		}
 	}
 	
-	public virtual int GetEndlag() => endlag;
+	public virtual int GetEndlag() => endlag + (hit?0:missEndlag);
 }

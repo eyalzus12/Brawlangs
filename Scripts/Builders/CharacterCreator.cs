@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 public class CharacterCreator
 {
@@ -8,7 +9,6 @@ public class CharacterCreator
 	
 	//public string path = "res://mario.ini";
 	public string path;
-	public IniFile inif = new IniFile();
 	
 	public CharacterCreator() {}
 	
@@ -62,11 +62,6 @@ public class CharacterCreator
 		var attCreator = new AttackCreator(attackPath);
 		attCreator.Build(ch);
 		
-		/*var input = charinif[BASE_SECTION, "Input", "Buffer"].s();
-		var inputs = (InputManager)ch.GetRootNode(input + "Input");
-		ch.Inputs = inputs;
-		foreach(var s in ch.states.Values) s.Inputs = inputs;*/
-		
 		var cl = new CanvasLayer();
 		cl.Name = "UI";
 		ch.AddChild(cl);
@@ -78,33 +73,31 @@ public class CharacterCreator
 		dl.MarginTop = 200;
 		cl.AddChild(dl);
 		
-		//Temp animation loading
+		var animationPath = charinif[BASE_SECTION, "Animations", ""].s();
+		BuildAnimations(ch, animationPath);
+		return ch;
+	}
+	
+	public void BuildAnimations(Character ch, string animationPath)
+	{
 		var spr = new AnimationSprite();
 		spr.Name = "Sprite";
 		
-		var texture = ResourceLoader.Load<Texture>("res://first test pixel art animation walk.png");
-		spr.AddSheet(texture, "Default", 4, 4, true);
-		var next = ResourceLoader.Load<Texture>("res://idle.png");
-		spr.AddSheet(next, "Idle", 7, 3, false);
+		var anminif = new IniFile();
+		anminif.Load(animationPath);
+		
+		foreach(var section in anminif.Keys)
+		{
+			var resourcePath = anminif[section, "Path", ""].s();
+			var frames = anminif[section, "Frames", new Vector2(4,4)].v2();
+			var loop = anminif[section, "Loop", true].b();
+			var texture = ResourceLoader.Load<Texture>(resourcePath);
+			spr.AddSheet(texture, section, frames.x.i(), frames.y.i(), loop);
+		}
 		
 		ch.AddChild(spr);
 		spr.InitFramePlayer();
 		ch.sprite = spr;
 		spr.Play("Default");
-		
-		/*
-		var spr = new Sprite();
-		spr.Scale = new Vector2(0.25f, 0.25f);
-		ch.AddChild(spr);
-		var texture = ResourceLoader.Load<Texture>("res://Untitled_04-10-2021_10-51-27sus.png");
-		spr.Texture = texture;
-		var shader = ResourceLoader.Load<Shader>("res://palletetest.shader");
-		spr.Material = new ShaderMaterial();
-		(spr.Material as ShaderMaterial).Shader = shader;
-		var pall = ResourceLoader.Load<Texture>("res://empty pallete.png");
-		(spr.Material as ShaderMaterial).SetShaderParam("pallete", pall);
-		ch.sprite = spr;
-		*/
-		return ch;
 	}
 }

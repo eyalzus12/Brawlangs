@@ -3,7 +3,7 @@ using System;
 
 public class HitMissMovementPart : AttackPart
 {
-	public bool hit = false;
+	//public bool hit = false;
 	public int ExtraEndlagOnMiss = 0;
 	public Vector2 Movement = Vector2.Zero;
 	
@@ -27,7 +27,7 @@ public class HitMissMovementPart : AttackPart
 	
 	public override void OnHit(Hitbox hitbox, Area2D hurtbox)
 	{
-		hit = true;
+		//hit = true;
 	}
 	
 	public override int GetEndlag() => endlag + (hit?0:ExtraEndlagOnMiss);
