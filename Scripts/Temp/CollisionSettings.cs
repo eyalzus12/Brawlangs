@@ -8,15 +8,17 @@ public readonly struct CollisionSettings
 	public readonly float HurtboxRadius;
 	public readonly float HurtboxHeight;
 	public readonly Vector2 HurtboxPosition;
+	public readonly float HurtboxRotation;
 	//public readonly UInt32 HitMask;
 	
-	public CollisionSettings(Vector2 colex, Vector2 colpos, float hbrd, float hbhe, Vector2 hbpos/*, UInt32 hm*/)
+	public CollisionSettings(Vector2 colex, Vector2 colpos, float hbrd, float hbhe, Vector2 hbpos, float hrot/*, UInt32 hm*/)
 	{
 		CollisionExtents = colex;
 		CollisionPosition = colpos;
 		HurtboxRadius = hbrd;
 		HurtboxHeight = hbhe;
 		HurtboxPosition = hbpos;
+		HurtboxRotation = hrot;
 		//HitMask = hm;
 	}
 }

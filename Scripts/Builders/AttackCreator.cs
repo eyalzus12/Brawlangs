@@ -222,7 +222,7 @@ public class AttackCreator
 		var pos = inif[section, "Position", Vector2.Zero].v2();
 		cs.Position = pos;
 		var rot = inif[section, "Rotation", 0f].f();
-		cs.Rotation = (float)(rot*Math.PI/180);
+		cs.Rotation = (float)(rot*Math.PI/180f);
 		
 		var ps = new CapsuleShape2D();
 		

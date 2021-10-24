@@ -70,7 +70,8 @@ public class CollisionCreator
 		var rd = inif[section, "HurtboxRadius", 30].f();
 		var he = inif[section, "HurtboxHeight", 16].f();
 		var hpos = inif[section, "HurtboxPosition", Vector2.Zero].v2();
-		//var rot = inif[section, "HurtboxRotation", 0f].f();//turn to rads!!!
+		var rot = inif[section, "HurtboxRotation", 0f].f();
+		rot = (float)(rot*Math.PI/180f);//to rads
 		
 		/*
 		byte mask = 0;
@@ -100,6 +101,6 @@ public class CollisionCreator
 		actualMask <<= 3;//shift to match
 		//GD.Print($"Stored Layer: {actualMask}");
 		*/
-		ch.settings.Add(section, new CollisionSettings(xt, pos, rd, he, hpos/*, rot*//*, actualMask*/));
+		ch.settings.Add(section, new CollisionSettings(xt, pos, rd, he, hpos, rot/*, actualMask*/));
 	}
 }

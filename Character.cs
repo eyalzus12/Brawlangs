@@ -437,7 +437,7 @@ public class Character : KinematicBody2D
 		hurtbox.Radius = setting.HurtboxRadius;
 		hurtbox.Height = setting.HurtboxHeight;
 		hurtbox.Position = setting.HurtboxPosition;
-		//hurtbox.Rotation = setting.HurtboxRotation;
+		hurtbox.Rotation = setting.HurtboxRotation;
 		return true;
 	}
 	
