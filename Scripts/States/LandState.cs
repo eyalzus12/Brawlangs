@@ -6,11 +6,9 @@ public class LandState : GroundedState
 	public LandState() : base() {}
 	public LandState(Character link) : base(link) {}
 	
-	public override bool IsActionable() => false;
-	
 	public override void Init()
 	{
-		if(ch.onSemiSolid && Inputs.IsActionPressed("player_down"))
+		if(ch.onSemiSolid && ch.downHeld)
 		{
 			ch.SetCollisionMaskBit(DROP_THRU_BIT, false);
 			ch.vic.y = VCF;

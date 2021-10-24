@@ -58,7 +58,7 @@ public class CollisionCreator
 		var dropext = inif["Main", "PlatDropExtents", new Vector2(32, 11)].v2();
 		(dropc.Shape as RectangleShape2D).Extents = dropext;
 		platDrop.Connect("body_entered", n, "OnSemiSolidLeave");
-		platDrop.Visible = false;
+		platDrop.Visible = true;
 	}
 	
 	public void BuildBase(Character n, string section)
@@ -68,6 +68,7 @@ public class CollisionCreator
 		var rd = inif[section, "HurtboxRadius", 30].f();
 		var he = inif[section, "HurtboxHeight", 16].f();
 		var hpos = inif[section, "HurtboxPosition", Vector2.Zero].v2();
+		//var rot = inif[section, "HurtboxRotation", 0f].f();//turn to rads!!!
 		
 		/*
 		byte mask = 0;

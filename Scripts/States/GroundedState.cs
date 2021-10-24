@@ -63,7 +63,7 @@ public class GroundedState : State
 			ch.ChangeState("Jump");
 		else if(!ch.grounded)
 			ch.ChangeState("Air");
-		else if(ch.downHeld && !ch.crouching)
+		else if(ch.downHeld && !ch.crouching && !ch.onSemiSolid)
 			ch.ChangeState("Duck");
 		else return false;
 		
@@ -72,7 +72,7 @@ public class GroundedState : State
 	
 	protected override void LoopActions()
 	{
-		if(ch.onSemiSolid && Inputs.IsActionPressed("player_down"))
+		if(ch.onSemiSolid && ch.downHeld)
 		{
 			ch.SetCollisionMaskBit(DROP_THRU_BIT, false);
 			ch.vic.y = VCF;

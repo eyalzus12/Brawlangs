@@ -287,9 +287,7 @@ public class Character : KinematicBody2D
 			return currentState;
 		}
 		
-		bool coolDebugStateThing = false;
-		
-		if(coolDebugStateThing)
+		if(false)
 		{
 			GD.Print('\n');
 			GD.Print("Character num " + teamNumber);

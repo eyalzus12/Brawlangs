@@ -73,6 +73,8 @@ public class AirState : State
 	
 	protected override bool CalcStateChange()
 	{
+		//TODO: add a downwards raycast to prevent the 2 frames of stopping on land
+		
 		if(platformCancel)//not active
 		{
 			var move = new Vector2(0f, -1000f);
