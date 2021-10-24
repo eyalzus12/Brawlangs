@@ -88,7 +88,16 @@ public class AirState : State
 		else if(ch.grounded)
 		{
 			if(platformCancel) ch.ChangeState("Jump");//not active
-			else ch.ChangeState("Land");
+			else
+			{
+				if(ch.onSemiSolid && ch.downHeld)
+				{
+					ch.SetCollisionMaskBit(DROP_THRU_BIT, false);
+					ch.vic.y = VCF;
+					SetupCollisionParamaters();
+				}
+				else ch.ChangeState("Land");
+			}
 		}
 		else return false;
 		

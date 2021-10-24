@@ -12,6 +12,7 @@ public class LandState : GroundedState
 		{
 			ch.SetCollisionMaskBit(DROP_THRU_BIT, false);
 			ch.vic.y = VCF;
+			SetupCollisionParamaters();
 			return;
 		}
 		
@@ -42,19 +43,14 @@ public class LandState : GroundedState
 			
 			if(Inputs.IsActionJustPressed("player_jump"))
 				ch.ChangeState("Jump");
-			else if(Inputs.IsActionPressed("player_down")) 
-				ch.ChangeState("Duck");
+			else if(Inputs.IsActionPressed("player_down") && !ch.onSemiSolid) 
+				ch.ChangeState(ch.InputingDirection()?ch.walled?"CrawlWall":"Crawl":"Crouch");
 			else if(ch.IsIdle())
 				ch.ChangeState("Idle");
 			else if(turn)
 				ch.ChangeState("WalkTurn");
 			else if(ch.InputingDirection())
-			{
-				if(ch.walled)
-					ch.ChangeState("WalkWall");
-				else
-					ch.ChangeState("Walk");
-			}
+				ch.ChangeState(ch.walled?"WalkWall":"Walk");
 			else
 				ch.ChangeState("WalkStop");
 			

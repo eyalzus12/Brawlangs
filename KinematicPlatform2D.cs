@@ -9,8 +9,9 @@ public class KinematicPlatform2D : KinematicBody2D
 	
 	public override void _Ready()
 	{
-		foreach(var c in getshape())
-			c.OneWayCollision = OneWay;
+		//foreach(var c in getshape())
+		//	c.OneWayCollision = OneWay;
+		getshape().ForEach(c=>c.OneWayCollision=OneWay);
 		
 		SetCollisionLayerBit(0, !FallThrough);
 		SetCollisionLayerBit(1, FallThrough);
@@ -39,8 +40,9 @@ public class KinematicPlatform2D : KinematicBody2D
 		set
 		{
 			OneWay = value;
-			foreach(var c in getshape())
-				c.OneWayCollision = value;
+			getshape().ForEach(c=>c.OneWayCollision=value);
+			//foreach(var c in getshape())
+			//	c.OneWayCollision = value;
 		}
 	}
 	

@@ -1,13 +1,13 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 public class Character : KinematicBody2D
 {
 	public const int DROP_THRU_BIT = 1;
 	protected const int CF = 30;
 	
-	public bool paused = false;
 	public string statConfigPath = "res://";
 	public string statSectionName = "Stats";
 	
@@ -226,17 +226,18 @@ public class Character : KinematicBody2D
 		++framesSinceLastHit;
 		
 		TruncateVelocityIfInsignificant();
-		if(Input.IsActionJustPressed("pause")) paused = !paused;
 		if(Input.IsActionJustPressed("reset")) Respawn();
 		currentState?.SetInputs();
-		
-		if(!paused || Input.IsActionJustPressed("next_frame"))
-			currentState?.DoPhysics(delta);
+		currentState?.DoPhysics(delta);
 			
 		sprite.FlipH = DirectionToBool();
 	}
 	
 	public void PlayAnimation(string anm) => sprite.Play(anm);
+	
+	///////////////////////////////////////////
+	///////////////States//////////////////////
+	///////////////////////////////////////////
 	
 	//this function returns the appropriate state
 	public State GetState(string state)
@@ -264,6 +265,7 @@ public class Character : KinematicBody2D
 		}
 		catch (ArgumentException)
 		{
+			GD.Print($"{name}: Attempt to add state {state}State failed because that state already exists");
 			return false;
 		}
 	}
@@ -369,7 +371,8 @@ public class Character : KinematicBody2D
 		framesSinceLastHit = 0;
 		comboCount = 0;
 		
-		foreach(var n in GetChildren()) if(n is Hitbox h) h.Active = false;
+		//foreach(var n in GetChildren()) if(n is Hitbox h) h.Active = false;
+		GetChildren().FilterType<Hitbox>().ToList<Hitbox>().ForEach(h=>h.Active=false);
 	}
 	
 	public void ResetVelocity()
@@ -402,22 +405,16 @@ public class Character : KinematicBody2D
 	
 	public string GetWallDirection()
 	{
-		if(walled)
+		if(walled) switch(direction)
 		{
-			switch(direction)
-			{
-				case 1: return "Right";
-				case -1: return "Left";
-				default: return "WTF";
-			}
+			case 1: return "Right";
+			case -1: return "Left";
+			default: return "WTF";
 		}
 		else return "None";
 	}
 	
-	public void OnSemiSolidLeave(Godot.Object body)
-	{
-		SetCollisionMaskBit(DROP_THRU_BIT, true);
-	}
+	public void OnSemiSolidLeave(Godot.Object body) => SetCollisionMaskBit(DROP_THRU_BIT, true);
 	
 	public void AttachEffect(Effect e)
 	{
@@ -427,7 +424,10 @@ public class Character : KinematicBody2D
 		//just make sure to remove
 	}
 	
-	////////////////Collision//////////////////////////
+	///////////////////////////////////////////
+	////////////////Collision//////////////////
+	///////////////////////////////////////////
+	
 	public bool ApplySettings(string setting) => ApplySettings(settings[setting]);
 	
 	public bool ApplySettings(CollisionSettings setting)
@@ -437,6 +437,7 @@ public class Character : KinematicBody2D
 		hurtbox.Radius = setting.HurtboxRadius;
 		hurtbox.Height = setting.HurtboxHeight;
 		hurtbox.Position = setting.HurtboxPosition;
+		//hurtbox.Rotation = setting.HurtboxRotation;
 		return true;
 	}
 	
@@ -486,8 +487,10 @@ public class Character : KinematicBody2D
 		crouching = false;
 	}
 	
-	//////////////////////////////////////////////
-	/////////////////Inputs///////////////////////
+	///////////////////////////////////////////
+	/////////////////Inputs////////////////////
+	///////////////////////////////////////////
+	
 	public void Turn() => direction *= -1;
 	
 	public bool InputingTurn() => (GetFutureDirection() != direction);
@@ -501,19 +504,12 @@ public class Character : KinematicBody2D
 		return true;
 	}
 	
-	public bool IsIdle()
-	{
-		return (Math.Truncate(GetVelocity().x) == 0);
-	}
-	
-	public bool IsStill()
-	{
-		return (IsIdle() && !InputingDirection());
-	}
+	public bool IsIdle() => (Math.Truncate(GetVelocity().x) == 0);
+	public bool IsStill() => (IsIdle() && !InputingDirection());
 	
 	public int GetInputDirection()
 	{
-		if(leftHeld && rightHeld) return 2;
+		if(leftHeld && rightHeld) return 0;
 		else if(rightHeld) return 1;
 		else if(leftHeld) return -1;
 		else return 0;
@@ -521,7 +517,7 @@ public class Character : KinematicBody2D
 	
 	public int GetFutureDirection()
 	{
-		if(rightHeld && leftHeld) return 2;
+		if(rightHeld && leftHeld) return 0;
 		else if(rightHeld) return 1;
 		else if(leftHeld) return -1;
 		else return direction;
@@ -539,6 +535,8 @@ public class Character : KinematicBody2D
 	
 	///////////////////////////////////////////
 	////////////////Attacks////////////////////
+	///////////////////////////////////////////
+	
 	public bool CanHit(Character c) => (c != this)&&(c.teamNumber!=teamNumber||friendlyFire);
 	
 	//public bool CanBeHit(Hitbox hit) => (hit.ch != this);
@@ -566,9 +564,8 @@ public class Character : KinematicBody2D
 	
 	public virtual void HandleHitting(Hitbox hitWith, Area2D hurtboxHit, Character charHit)
 	{
-		int hitlag = hitWith.hitlag;
 		var s = ChangeState("HitLag") as HitLagState;
-		s.hitLagLength = hitlag;
+		s.hitLagLength = hitWith.hitlag;
 	}
 	
 	public virtual void ExecuteAttack(Attack a)
@@ -584,13 +581,8 @@ public class Character : KinematicBody2D
 	public void ExecuteAttack(string s)
 	{
 		var n = GetNode(s);
-		if(n is null)
-		{
-			GD.Print($"No attack {s} found. You probably forgot to add it to the loading list.");
-			return;
-		}
-		
-		if(n is Attack a) ExecuteAttack(a);
+		if(n is null) GD.Print($"No attack {s} found. You probably forgot to add it to the loading list.");
+		else if(n is Attack a) ExecuteAttack(a);
 		else GD.Print($"Node {s} found, but isn't an attack. Very sussy.");
 	}
 	

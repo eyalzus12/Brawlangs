@@ -11,6 +11,7 @@ public class InfoLabel : Label
 	
 	public override void _Ready()
 	{
+		PauseMode = Node.PauseModeEnum.Process;
 		debugMode = false;
 		Connect();
 	}

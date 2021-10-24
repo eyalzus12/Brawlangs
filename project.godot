@@ -23,6 +23,7 @@ config/windows_native_icon="res://brawlangs.ico"
 
 PublicData="*res://PublicData.cs"
 UpdateScript="*res://UpdateScript.cs"
+PauseHandeler="*res://Scripts/PauseHandeler.cs"
 
 [debug]
 

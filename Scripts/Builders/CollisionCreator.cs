@@ -4,6 +4,8 @@ using System.Collections.Generic;
 
 public class CollisionCreator
 {
+	public const string BrawlangsServer_JoinOrBad = "https://discord.gg/ZaGfdm3bad";
+	
 	public string path = "res://mario.ini";
 	public IniFile inif = new IniFile();
 	
@@ -18,27 +20,27 @@ public class CollisionCreator
 		inif.Load(path);
 	}
 	
-	public void Build(Character n)
+	public void Build(Character ch)
 	{
 		var cs = new CollisionShape2D();
-		n.AddChild(cs);
+		ch.AddChild(cs);
 		cs.Shape = new RectangleShape2D();
 		cs.Name = "Collision";
 		
 		var hr = new Hurtbox();
-		n.AddChild(hr);
+		ch.AddChild(hr);
 		hr.Name = "Hurtbox";
 		hr.CreateCollision();
 		
-		n.collision = cs;
-		n.hurtbox = hr;
+		ch.collision = cs;
+		ch.hurtbox = hr;
 		
 		var oBase = inif["Main", "Bases", new List<string>()];
-		if(oBase is string) BuildBase(n, oBase.s());
+		if(oBase is string) BuildBase(ch, oBase.s());
 		else
 		{
 			var Bases = oBase.ls();
-			foreach(var s in Bases) BuildBase(n, s);
+			foreach(var s in Bases) BuildBase(ch, s);
 		}
 		
 		//TODO: build platform dropping
@@ -46,7 +48,7 @@ public class CollisionCreator
 		
 		var platDrop = new Area2D();
 		platDrop.Name = "PlatformDrop";
-		n.AddChild(platDrop);
+		ch.AddChild(platDrop);
 		platDrop.CollisionLayer = 0;
 		platDrop.CollisionMask = 0b10;
 		var droppos = inif["Main", "PlatDropPosition", new Vector2(0, 19)].v2();
@@ -57,11 +59,11 @@ public class CollisionCreator
 		dropc.Name = "DropCollision";
 		var dropext = inif["Main", "PlatDropExtents", new Vector2(32, 11)].v2();
 		(dropc.Shape as RectangleShape2D).Extents = dropext;
-		platDrop.Connect("body_entered", n, "OnSemiSolidLeave");
+		platDrop.Connect("body_entered", ch, "OnSemiSolidLeave");
 		platDrop.Visible = true;
 	}
 	
-	public void BuildBase(Character n, string section)
+	public void BuildBase(Character ch, string section)
 	{
 		var pos = inif[section, "CollisionPosition", Vector2.Zero].v2();
 		var xt = inif[section, "CollisionExtents", new Vector2(16f, 16f)].v2();
@@ -98,6 +100,6 @@ public class CollisionCreator
 		actualMask <<= 3;//shift to match
 		//GD.Print($"Stored Layer: {actualMask}");
 		*/
-		n.settings.Add(section, new CollisionSettings(xt, pos, rd, he, hpos/*, actualMask*/));
+		ch.settings.Add(section, new CollisionSettings(xt, pos, rd, he, hpos/*, rot*//*, actualMask*/));
 	}
 }

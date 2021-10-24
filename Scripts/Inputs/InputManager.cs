@@ -5,6 +5,11 @@ public class InputManager : Node
 {
 	public InputManager(): base() {}
 	
+	public override void _Ready()
+	{
+		PauseMode = Node.PauseModeEnum.Process;
+	}
+	
 	public virtual bool IsActionJustPressed(string str) => Input.IsActionJustPressed(str);
 	public virtual bool IsActionPressed(string str) => Input.IsActionPressed(str);
 	public virtual bool IsActionJustReleased(string str) => Input.IsActionJustReleased(str);
