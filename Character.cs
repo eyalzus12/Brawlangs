@@ -229,6 +229,25 @@ public class Character : KinematicBody2D
 		if(Input.IsActionJustPressed("reset")) Respawn();
 		currentState?.SetInputs();
 		currentState?.DoPhysics(delta);
+		
+		if(Input.IsActionJustPressed("reusable_input"))
+		{
+			var proj = new HitProjectile(this);
+			proj.setKnockback = new Vector2(100, 0);
+			proj.varKnockback = new Vector2(500, 0);
+			proj.stun = 5;
+			proj.hitpause = 3;
+			proj.damage = 10f;
+			GetParent().AddChild(proj);
+			proj.GlobalPosition = GlobalPosition;
+			proj.move = new Vector2(direction * 5, 0);
+			var cs = new CollisionShape2D();
+			proj.AddChild(cs);
+			var shape = new CircleShape2D();
+			shape.Radius = 3f;
+			cs.Shape = shape;
+			proj.Active = true;
+		}
 			
 		sprite.FlipH = DirectionToBool();
 	}
