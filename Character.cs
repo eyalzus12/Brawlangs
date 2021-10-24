@@ -289,15 +289,14 @@ public class Character : KinematicBody2D
 			return currentState;
 		}
 		
-		if(false)
-		{
-			GD.Print('\n');
-			GD.Print("Character num " + teamNumber);
-			GD.Print("New state is " + tempState?.ToString() ?? "null");
-			GD.Print("Current state is " + currentState?.ToString() ?? "null");
-			GD.Print("Prev state is " + prevState?.ToString() ?? "null");
-			GD.Print("Prev prev state is " + prevPrevState?.ToString() ?? "null");
-		}
+		#if DEBUG_STATES
+		GD.Print('\n');
+		GD.Print("Character num " + teamNumber);
+		GD.Print("New state is " + tempState?.ToString() ?? "null");
+		GD.Print("Current state is " + currentState?.ToString() ?? "null");
+		GD.Print("Prev state is " + prevState?.ToString() ?? "null");
+		GD.Print("Prev prev state is " + prevPrevState?.ToString() ?? "null");
+		#endif
 		
 		prevPrevState = prevState;
 		prevState = currentState;

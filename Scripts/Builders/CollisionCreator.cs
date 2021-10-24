@@ -27,7 +27,33 @@ public class CollisionCreator
 		cs.Shape = new RectangleShape2D();
 		cs.Name = "Collision";
 		
-		var hr = new Hurtbox();
+		var HurtboxScript = inif["Main", "HurtboxScript", ""].s();
+		Hurtbox hr = null;
+		if(HurtboxScript != "")
+		{
+			var resource = ResourceLoader.Load(HurtboxScript);
+			if(resource is null)
+			{
+				GD.Print($"Attempt to load script {HurtboxScript} failed because that file does not exist");
+				hr = new Hurtbox();
+			}
+			var script = resource as CSharpScript;
+			if(script is null)
+			{
+				GD.Print($"Attempt to load script {HurtboxScript} failed because the object in that path is not a C# script");
+				hr = new Hurtbox();
+			}
+			else
+			{
+				hr = script.New() as Hurtbox;
+				if(hr is null)
+				{
+					GD.Print($"Attempt to attach script {HurtboxScript} failed because the object in that path is not a Hurtbox script");
+					hr = new Hurtbox();
+				}
+			}
+		}
+		else hr = new Hurtbox();
 		ch.AddChild(hr);
 		hr.Name = "Hurtbox";
 		hr.CreateCollision();
@@ -43,9 +69,6 @@ public class CollisionCreator
 			foreach(var s in Bases) BuildBase(ch, s);
 		}
 		
-		//TODO: build platform dropping
-		
-		
 		var platDrop = new Area2D();
 		platDrop.Name = "PlatformDrop";
 		ch.AddChild(platDrop);
@@ -60,7 +83,7 @@ public class CollisionCreator
 		var dropext = inif["Main", "PlatDropExtents", new Vector2(32, 11)].v2();
 		(dropc.Shape as RectangleShape2D).Extents = dropext;
 		platDrop.Connect("body_entered", ch, "OnSemiSolidLeave");
-		platDrop.Visible = true;
+		platDrop.Visible = false;
 	}
 	
 	public void BuildBase(Character ch, string section)
