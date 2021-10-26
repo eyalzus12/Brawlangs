@@ -33,6 +33,9 @@ public class DebugLabel : InfoLabel
 		Add("Frame", ch.currentState.frameCount);
 		Add("Attack", (ch.currentState is AttackState a)?a.att.Name:"None");
 		Newline();
+		Add("PlayedAnimation", ch.sprite.currentSheet.name);
+		Add("QueuedAnimation", ch.sprite.queuedSheet?.name ?? "None");
+		Newline();
 		Add("Vel",  ch.GetRoundedVelocity());
 		Add("Pos", ch.GetRoundedPosition());
 		Newline();
