@@ -14,7 +14,10 @@ public class AirState : State
 		Unsnap();
 		ch.onSemiSolid = false;
 		ch.onSlope = false;
-		ch.PlayAnimation("Drift");//TODO: figure out a way to queue animations, to allow a jump animation when needed
+		if(ch.sprite.currentSheet.name == "Jump")
+			ch.QueueAnimation("Drift");
+		else
+			ch.PlayAnimation("Drift");
 	}
 	
 	protected override void DoMovement()
@@ -51,6 +54,8 @@ public class AirState : State
 			ch.vec.y = -ch.doubleJumpHeight;
 			ch.jumpCounter++;
 			ch.fastfalling = false;
+			ch.PlayAnimation("Jump");
+			ch.QueueAnimation("Drift");
 		}
 	}
 	

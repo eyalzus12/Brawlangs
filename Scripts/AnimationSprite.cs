@@ -7,6 +7,7 @@ public class AnimationSprite : Sprite
 	public Dictionary<string, AnimationSheet> animations = new Dictionary<string, AnimationSheet>();
 	
 	public AnimationSheet currentSheet;
+	public AnimationSheet? queuedSheet;
 	public AnimationPlayer framePlayer;
 	
 	public void InitFramePlayer()
@@ -34,6 +35,8 @@ public class AnimationSprite : Sprite
 			for(int i = 0; i < frameCount; ++i)
 				anm.TrackInsertKey(trc, i*anm.Step, i);
 		}
+		
+		framePlayer.Connect("animation_finished", this, nameof(AnimationFinished));
 	}
 	
 	public void Play(string animation)
@@ -46,6 +49,25 @@ public class AnimationSprite : Sprite
 		{
 			SetSheet(animations["Default"]);
 		}
+	}
+	
+	public void Queue(string animation)
+	{
+		try
+		{
+			QueueSheet(animations[animation]);
+		}
+		catch(KeyNotFoundException)
+		{
+			QueueSheet(animations["Default"]);
+		}
+	}
+	
+	public void AnimationFinished(string anm = "")
+	{
+		if(queuedSheet is null) return;
+		SetSheet((AnimationSheet)queuedSheet);
+		queuedSheet = null;
 	}
 	
 	public void AddSheet(Texture texture, string name, int HFrames, int VFrames, bool loop)
@@ -66,6 +88,11 @@ public class AnimationSprite : Sprite
 		this.Vframes = currentSheet.VFrames;
 		framePlayer.Play(currentSheet.name);
 		framePlayer.Advance(0);
+	}
+	
+	public void QueueSheet(AnimationSheet sheet)
+	{
+		queuedSheet = sheet;
 	}
 	
 	public void Pause() => framePlayer.Stop(false);

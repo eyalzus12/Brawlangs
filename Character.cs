@@ -253,6 +253,7 @@ public class Character : KinematicBody2D
 	}
 	
 	public void PlayAnimation(string anm) => sprite.Play(anm);
+	public void QueueAnimation(string anm) => sprite.Queue(anm);
 	
 	///////////////////////////////////////////
 	///////////////States//////////////////////
