@@ -19,6 +19,7 @@ public class WallLandState : WallState
 			
 		//ch.onSemiSolid = false;
 		ch.PlayAnimation("WallLand");
+		ch.ApplySettings("Wall");
 	}
 	
 	protected override bool CalcStateChange()

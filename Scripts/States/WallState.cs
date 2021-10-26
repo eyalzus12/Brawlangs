@@ -46,12 +46,16 @@ public class WallState : State
 	{
 		if(ch.grounded)
 			ch.ChangeState("Land");
-		else if(jump)
-			ch.ChangeState("WallJump");
 		else if(!ch.walled)
 			ch.ChangeState("Air");
-		else return false;
+		else 
+		{
+			if(jump) ch.ChangeState("WallJump");
+			else return false;
+			return true;
+		}
 		
+		ch.ApplySettings("Normal");
 		return true;
 	}
 	

@@ -17,7 +17,8 @@ public class WallJumpState : WallState
 		SetupCollisionParamaters();
 		AdjustVelocity();
 		MarkForDeletion("player_jump", true);
-		ch.PlayAnimation("WallJumpReady");//figure out a way to queue aerial jumping animation
+		ch.PlayAnimation("WallJumpReady");
+		ch.QueueAnimation("WallJump");
 	}
 	
 	protected override void DoMovement() {}
@@ -42,6 +43,7 @@ public class WallJumpState : WallState
 			ch.ChangeState("Air");
 		else return false;
 		
+		ch.ApplySettings("Normal");
 		return true;
 	}
 }
