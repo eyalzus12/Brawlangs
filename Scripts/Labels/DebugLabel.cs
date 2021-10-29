@@ -36,6 +36,17 @@ public class DebugLabel : InfoLabel
 		Add("PlayedAnimation", ch.sprite.currentSheet.name);
 		Add("QueuedAnimation", ch.sprite.queuedSheet?.name ?? "None");
 		Newline();
+		Add("CollisionSetting", ch.currentSetting.Name);
+		Newline();
+		Add("CollisionExtents", (ch.collision.Shape as RectangleShape2D).Extents);
+		Add("CollisionPosition", ch.collision.Position);
+		Add("CollisionRotation", Math.Round(ch.collision.Rotation * 180f / Math.PI, 2));
+		Newline();
+		Add("HurtboxRadius", ch.hurtbox.Shape.Radius);
+		Add("HurtboxHeight", ch.hurtbox.Shape.Height);
+		Add("HurtboxPosition", ch.hurtbox.col.Position);
+		Add("HurtboxRotation", Math.Round(ch.hurtbox.col.Rotation * 180f / Math.PI, 2));
+		Newline();
 		Add("Vel",  ch.GetRoundedVelocity());
 		Add("Pos", ch.GetRoundedPosition());
 		Newline();

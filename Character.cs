@@ -186,13 +186,15 @@ public class Character : KinematicBody2D
 	
 	public Dictionary<string, State> states = new Dictionary<string, State>();
 		
-	public string currentSetting = "Normal";
+	public CollisionSettings currentSetting = default;
 	public CollisionShape2D collision;
 	public Hurtbox hurtbox;
 	public Dictionary<string, CollisionSettings> settings = new Dictionary<string, CollisionSettings>();
 		
 	public List<string> StatList = new List<string>();
 	public PropertyMap prop = new PropertyMap();
+	
+	public Vector2 OriginalCollisionPosition = default;
 		
 	public InputManager Inputs;
 	
@@ -250,6 +252,9 @@ public class Character : KinematicBody2D
 		}
 			
 		sprite.FlipH = DirectionToBool();
+		
+		collision?.SetDeferred("position", OriginalCollisionPosition*new Vector2(direction, 1));
+		//collision?.SetDeferred("rotation", ogrot*direction);
 	}
 	
 	public void PlayAnimation(string anm) => sprite.Play(anm);
@@ -451,12 +456,15 @@ public class Character : KinematicBody2D
 	
 	public bool ApplySettings(CollisionSettings setting)
 	{
+		currentSetting = setting;
 		(collision.Shape as RectangleShape2D).Extents = setting.CollisionExtents;
-		collision.Position = setting.CollisionPosition;
+		var posval = setting.CollisionPosition*new Vector2(direction, 1);
+		collision?.SetDeferred("position", posval);
+		OriginalCollisionPosition = setting.CollisionPosition;
 		hurtbox.Radius = setting.HurtboxRadius;
 		hurtbox.Height = setting.HurtboxHeight;
-		hurtbox.Position = setting.HurtboxPosition;
-		hurtbox.Rotation = setting.HurtboxRotation;
+		hurtbox.CollisionPosition = setting.HurtboxPosition;
+		hurtbox.CollisionRotation = setting.HurtboxRotation;
 		return true;
 	}
 	

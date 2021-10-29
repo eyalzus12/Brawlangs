@@ -124,6 +124,6 @@ public class CollisionCreator
 		actualMask <<= 3;//shift to match
 		//GD.Print($"Stored Layer: {actualMask}");
 		*/
-		ch.settings.Add(section, new CollisionSettings(xt, pos, rd, he, hpos, rot/*, actualMask*/));
+		ch.settings.Add(section, new CollisionSettings(section, xt, pos, rd, he, hpos, rot/*, actualMask*/));
 	}
 }

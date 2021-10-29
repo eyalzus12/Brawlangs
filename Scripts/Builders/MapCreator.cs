@@ -70,10 +70,12 @@ public class MapCreator
 		
 		n.AddChild(sp);
 		
-		var cp = inif[section, "Collision", section+"col"].s();
-		BuildCollision(cp, sp);
-		var sr = inif[section, "Sprite", section+"sprite"].s();
-		BuildSprite(sr, sp);
+		var cp = inif[section, "Collision", section+"col"];
+		if(cp is string) BuildCollision(cp.s(), sp);
+		else foreach(var s in cp.ls()) BuildCollision(s, sp);
+		var sr = inif[section, "Sprite", section+"sprite"];
+		if(sr is string) BuildSprite(sr.s(), sp);
+		else foreach(var ss in sr.ls()) BuildCollision(ss, sp);
 		
 		return true;
 	}

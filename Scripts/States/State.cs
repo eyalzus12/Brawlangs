@@ -188,6 +188,22 @@ public class State : Node
 			var bounce = (float)(body.Get("PlatformBounce")??0f);//get bounce
 			var cling = (bool)(body.Get("Clingable")??true);//get if clingable
 			
+			bool oneway = false;
+			if(!ch.onSemiSolid && body is CollisionObject2D col)//if the collider IS a collider, cuz trust is overrated
+			{
+				foreach(var sh in col.GetShapeOwners())//check each collision shape owners
+				{
+					uint shid = Convert.ToUInt32(sh);//convert int to uint
+					if(col.IsShapeOwnerOneWayCollisionEnabled(shid))//name goes brrr
+					{
+						oneway = true;//set that shape is one way
+						break;
+					}
+				}
+			}
+			
+			var fallthrough = (bool)(body.Get("FallThroughPlatform")??oneway);//get if can fall through
+			
 			if(norm == Vector2.Right || norm == Vector2.Left)
 			//Wall if straight right or left
 			{
@@ -215,19 +231,7 @@ public class State : Node
 				ch.onSlope = (norm != Vector2.Up);//get if you're on a slope, based on if the floor is straight
 				ch.ffric = fric;//get floor friction
 				ch.fbounce = bounce;//get floor bounce
-					
-				if(!ch.onSemiSolid && body is CollisionObject2D col)//if the collider IS a collider, cuz trust is overrated
-				{
-					foreach(var sh in col.GetShapeOwners())//check each collision shape owners
-					{
-						uint shid = Convert.ToUInt32(sh);//convert int to uint
-						if(col.IsShapeOwnerOneWayCollisionEnabled(shid))//name goes brrr
-						{
-							ch.onSemiSolid = true;//set that shape is one way
-							break;
-						}
-					}
-				}
+				ch.onSemiSolid = fallthrough;
 			}
 		}
 	}

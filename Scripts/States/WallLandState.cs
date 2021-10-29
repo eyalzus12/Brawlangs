@@ -24,7 +24,12 @@ public class WallLandState : WallState
 	
 	protected override bool CalcStateChange()
 	{
-		if(!ch.walled) ch.ChangeState("Air");
+		if(!ch.walled)
+		{
+			ch.ChangeState("Air");
+			ch.ApplySettings("Normal");
+			//for some reason this causes weird behavior.
+		}
 		else if(frameCount >= ch.wallLand) ch.ChangeState("Wall");
 		else return false;
 		
