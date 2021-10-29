@@ -16,11 +16,6 @@ public class HitMissPart : AttackPart
 		hit = false;
 	}
 	
-	public override void CalculateNextPart()
-	{
-		ChangePart(hit?"Hit":"Miss");
-	}
-	
 	public override void OnHit(Hitbox hitbox, Area2D hurtbox)
 	{
 		//hit = true;

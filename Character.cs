@@ -232,7 +232,7 @@ public class Character : KinematicBody2D
 		currentState?.SetInputs();
 		currentState?.DoPhysics(delta);
 		
-		if(Input.IsActionJustPressed("reusable_input"))
+		if(Inputs.IsActionJustPressed("player_special_attack"))
 		{
 			var proj = new HitProjectile(this);
 			proj.setKnockback = new Vector2(100, 0);

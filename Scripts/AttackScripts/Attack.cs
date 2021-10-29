@@ -7,6 +7,8 @@ public class Attack : Node2D
 	public AttackPart currentPart;
 	public Character ch;
 	
+	public int frameCount = 0;
+	
 	[Signal]
 	public delegate void AttackStarts(Attack a);
 	[Signal]
@@ -24,12 +26,14 @@ public class Attack : Node2D
 	
 	public override void _Ready()
 	{
+		frameCount = 0;
 		ch = GetParent() as Character;
 		Init();
 	}
 	
 	public void Start()
 	{
+		frameCount = 0;
 		EmitSignal(nameof(AttackStarts), this);
 		Connect("AttackEnds", ch.currentState, "SetEnd");
 		currentPart = start;
@@ -57,6 +61,7 @@ public class Attack : Node2D
 	
 	public override void _PhysicsProcess(float delta)
 	{
+		++frameCount;
 		Loop();
 	}
 	

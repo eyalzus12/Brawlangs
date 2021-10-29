@@ -8,7 +8,7 @@ public class AttackPart : Node2D
 {
 	public PartDir dir = new PartDir();
 	public List<Hitbox> hitboxes = new List<Hitbox>();
-	public int currentFrame = 0;
+	public int frameCount = 0;
 	
 	public HashSet<Character> ignoreList = new HashSet<Character>();
 	public Dictionary<Area2D, Hitbox> hitList = new Dictionary<Area2D, Hitbox>();
@@ -48,6 +48,7 @@ public class AttackPart : Node2D
 	
 	public override void _Ready()
 	{
+		frameCount = 0;
 		att = GetParent() as Attack;
 		ch = att.ch;
 		ConnectSignals();
@@ -95,7 +96,7 @@ public class AttackPart : Node2D
 	{
 		active = true;
 		hit = false;
-		
+		frameCount = 0;
 		if(hasMovement)
 		{
 			ch.vec = movement * new Vector2(ch.direction, 1);
@@ -115,6 +116,7 @@ public class AttackPart : Node2D
 	
 	public override void _PhysicsProcess(float delta)
 	{
+		++frameCount;
 		if(!active) return;
 		Loop();
 		ActualHit(/*activator*/);
@@ -193,29 +195,22 @@ public class AttackPart : Node2D
 	public void cnp(string dummy="")
 	{
 		if(!active) return;
-		CalculateNextPart();
+		ChangePart(GetNextPart());
 	}
 	
-	public virtual void CalculateNextPart()
+	/*public virtual void CalculateNextPart()
 	{
 		if(hitPart) HitMissPart();
 		else NextPart();
-	}
+	}*/
+	
+	public virtual string GetNextPart() => hitPart?hit?"Hit":"Miss":"Next";
 	
 	public void ChangePart(string part)
 	{
+		if(part == "") return;
 		var changeTo = GetConnectedPart(part);
 		att.SetPart(changeTo);
-	}
-	
-	public void NextPart()
-	{
-		ChangePart("Next");
-	}
-	
-	public void HitMissPart()
-	{
-		ChangePart(hit?"Hit":"Miss");
 	}
 	
 	public AttackPart GetConnectedPart(string name)

@@ -17,37 +17,56 @@ public class DebugLabel : InfoLabel
 	
 	public override void UpdateLabel()
 	{
-		if(ch is null || ch.dummy) return;
-		
+		if(ch is null) return;
+		Add("Name", ch.Name);
+		Add("Script", ch.GetType().Name);
+		Newline();
 		Add("Fastfalling", ch.fastfalling);
 		Add("Crouch", ch.crouching);
-		Add("Soft", ch.onSemiSolid);
+		Add("FallThrough", ch.onSemiSolid);
 		Add("Slope", ch.onSlope);
-		Add("Dir", ch.GetStringDirection());
+		Add("Direction", ch.GetStringDirection());
 		Newline();
 		Add("Ground", ch.grounded);
 		Add("Wall", ch.walled);
 		Add("Ceil", ch.ceilinged);
 		Newline();
 		Add("State", ch.currentState);
-		Add("Frame", ch.currentState.frameCount);
-		Add("Attack", (ch.currentState is AttackState a)?a.att.Name:"None");
+		Add("PrevState", ch.prevState);
+		Add("PrevPrevState", ch.prevPrevState);
+		Add("StateFrame", ch.currentState.frameCount);
+		Newline();
+		var attack = (ch.currentState is AttackState a)?a.att:null;
+		Add("Attack", attack?.Name??"None");
+		Add("AttackFrame", attack?.frameCount??0);
+		Add("AttackScript", attack?.GetType()?.Name??"None");
+		Newline();
+		var part = attack?.currentPart??null;
+		Add("AttackPart", part?.Name??"None");
+		Add("AttackPartFrame", part?.frameCount??0);
+		Add("AttackPartHit", part?.hit??false);
+		Add("NextPart", part?.GetNextPart()??"None");
+		Add("PartScript", part?.GetType()?.Name??"None");
 		Newline();
 		Add("PlayedAnimation", ch.sprite.currentSheet.name);
-		Add("QueuedAnimation", ch.sprite.queuedSheet?.name ?? "None");
+		Add("QueuedAnimation", ch.sprite.queuedSheet?.name??"None");
+		Add("AnimationLooping", ch.sprite.currentSheet.loop);
 		Add("AnimationFrame", ch.sprite.Frame);
 		Add("AnimationCoord", ch.sprite.FrameCoords);
 		Newline();
 		Add("CollisionSetting", ch.currentSetting.Name);
 		Newline();
-		Add("CollisionExtents", (ch.collision.Shape as RectangleShape2D).Extents);
+		var ext = (ch.collision.Shape as RectangleShape2D).Extents;
+		Add("CollisionWidth", ext.x);
+		Add("CollisionHeight", ext.y);
 		Add("CollisionPosition", ch.collision.Position);
-		Add("CollisionRotation", Math.Round(ch.collision.Rotation * 180f / Math.PI, 2));
+		//Add("CollisionRotation", Math.Round(ch.collision.Rotation * 180f / Math.PI, 2));
 		Newline();
 		Add("HurtboxRadius", ch.hurtbox.Shape.Radius);
 		Add("HurtboxHeight", ch.hurtbox.Shape.Height);
 		Add("HurtboxPosition", ch.hurtbox.col.Position);
 		Add("HurtboxRotation", Math.Round(ch.hurtbox.col.Rotation * 180f / Math.PI, 2));
+		Add("HurtboxScript", ch.hurtbox.GetType().Name);
 		Newline();
 		Add("Vel",  ch.GetRoundedVelocity());
 		Add("Pos", ch.GetRoundedPosition());
@@ -77,6 +96,7 @@ public class DebugLabel : InfoLabel
 		Newline();
 		Add("Falling Through", !ch.GetCollisionMaskBit(1));
 		Add("Jumps Used", ch.jumpCounter);
+		//Add("Wall jumps used", ch.wallJumpCounter);
 		Newline();
 		Add("FPS", Engine.GetFramesPerSecond());
 	}
