@@ -35,6 +35,8 @@ public class DebugLabel : InfoLabel
 		Newline();
 		Add("PlayedAnimation", ch.sprite.currentSheet.name);
 		Add("QueuedAnimation", ch.sprite.queuedSheet?.name ?? "None");
+		Add("AnimationFrame", ch.sprite.Frame);
+		Add("AnimationCoord", ch.sprite.FrameCoords);
 		Newline();
 		Add("CollisionSetting", ch.currentSetting.Name);
 		Newline();
