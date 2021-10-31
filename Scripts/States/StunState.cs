@@ -85,14 +85,15 @@ public class StunState : State
 	protected override bool CalcStateChange()
 	{
 		if(frameCount >= stunLength)
-		{
-			ch.vec = ch.voc;
-			Force = Vector2.Zero;
-			
 			ch.ChangeState(ch.grounded?"Idle":ch.walled?"Wall":"Air");
-		}
 		else return false;
 		
 		return true;
+	}
+	
+	public override void OnChange()
+	{
+		ch.vec = ch.voc;
+		Force = Vector2.Zero;
 	}
 }

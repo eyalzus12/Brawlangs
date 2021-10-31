@@ -9,10 +9,7 @@ public class DebugLabel : InfoLabel
 	public override void Connect()
 	{
 		ch = GetParent() as Character;
-		if(ch is null)
-		{
-			ch = (GetParent().GetParent()) as Character;
-		}
+		if(ch is null) ch = GetParent().GetParent() as Character;
 	}
 	
 	public override void UpdateLabel()
@@ -46,7 +43,7 @@ public class DebugLabel : InfoLabel
 		Add("AttackPartFrame", part?.frameCount??0);
 		Add("AttackPartHit", part?.hit??false);
 		Add("NextPart", part?.GetNextPart()??"None");
-		Add("PartScript", part?.GetType()?.Name??"None");
+		Add("AttackPartScript", part?.GetType()?.Name??"None");
 		Newline();
 		Add("PlayedAnimation", ch.sprite.currentSheet.name);
 		Add("QueuedAnimation", ch.sprite.queuedSheet?.name??"None");

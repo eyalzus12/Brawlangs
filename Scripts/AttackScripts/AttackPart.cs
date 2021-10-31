@@ -66,10 +66,7 @@ public class AttackPart : Node2D
 	
 	public void ConnectSignals()
 	{
-		foreach(var h in hitboxes)
-		{
-			h.Connect("HitboxHit", this, nameof(HandleHit));
-		}
+		hitboxes.ForEach(h => h.Connect("HitboxHit", this, nameof(HandleHit)));
 	}
 	
 	public void LoadExtraProperty<T>(string s)
@@ -166,7 +163,7 @@ public class AttackPart : Node2D
 	public virtual void Stop()
 	{
 		//GD.Print(hitboxes.Count);
-		foreach(var h in hitboxes) h.Active = false;
+		hitboxes.ForEach(h => h.Active = false);
 		active = false;
 		OnEnd();
 		ignoreList.Clear();
@@ -244,7 +241,7 @@ public class AttackPart : Node2D
 			Hitbox hitbox = entry.Value;
 			Area2D hurtbox = entry.Key;
 			var hitChar = (Character)hurtbox.GetParent();
-			if(!ch.CanHit(hitChar) || ignoreList.Contains(hitChar)) return;
+			if(!ch.CanHit(hitChar) || ignoreList.Contains(hitChar)) continue;
 			hit = true;
 			OnHit(hitbox, hurtbox);
 			hitChar.ApplyKnockback(ch.direction*hitbox.setKnockback,

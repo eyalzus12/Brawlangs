@@ -618,10 +618,7 @@ public class Character : KinematicBody2D
 	
 	public void ResetCurrentAttack(Attack a)
 	{
-		if(currentAttack != null)
-		{
-			currentAttack.Disconnect("AttackEnds", this, nameof(ResetCurrentAttack));
-		}
+		if(currentAttack != null) currentAttack.Disconnect("AttackEnds", this, nameof(ResetCurrentAttack));
 		currentAttack = null;
 	}
 	///////////////////////////////////////////
