@@ -54,6 +54,11 @@ public class MapBase : Node2D
 				var cr = new CharacterCreator(s);
 				var c = cr.Build(this);
 				c.teamNumber = i-1;
+				var numberlabel = new DamageLabel(false);
+				numberlabel.MarginTop = -75f;
+				numberlabel.Text = c.teamNumber.ToString();
+				c.AddChild(numberlabel);
+				numberlabel.ch = c;
 				//c.dummy = data.GetOrDefault($"LoadedCharacter{i}Dummy", false).b();
 				c.Respawn();
 				

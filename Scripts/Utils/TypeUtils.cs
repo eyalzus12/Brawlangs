@@ -9,6 +9,7 @@ public static class TypeUtils
 	public static bool b(this object o) => Convert.ToBoolean(o);
 	public static int i(this object o) => Convert.ToInt32(o);
 	public static string s(this object o) => (string)o;
+	public static object ob(this object o) => o;
 	
 	public const string NUMBER_REGEX = @"-?\d+(?:\.\d+)?";
 	
@@ -57,7 +58,7 @@ public static class TypeUtils
 	public static bool is_q(this object o) => o.RegexMatch(Q_REGEX);
 	//detects if str matches a Quat ToString output
 	
-	public static List<object> lo(this object o) => (o as IEnumerable<object>).ToList<object>();
+	public static List<object> lo(this object o) => o.lt<object>(ob);//(o as IEnumerable<object>).ToList<object>();
 	public static List<string> ls(this object o) => o.lt<string>(s);
 	public static List<float> lf(this object o) => o.lt<float>(f);
 	public static List<int> li(this object o) => o.lt<int>(i);

@@ -38,6 +38,9 @@ margin_top = 496.0
 margin_right = 565.0
 margin_bottom = 510.0
 text = "Dont touch unless I told you how to use it"
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="Button" type="Button" parent="."]
 margin_left = 760.0
