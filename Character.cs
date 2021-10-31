@@ -598,10 +598,13 @@ public class Character : KinematicBody2D
 	public virtual void ExecuteAttack(Attack a)
 	{
 		if(a is null) return;
+		if(currentAttack != null) ResetCurrentAttack(null);
+		
 		currentAttack = a;
+		currentAttack.Connect("AttackEnds", this, nameof(ResetCurrentAttack));
 		var s = ChangeState("Attack") as AttackState;
 		s.att = currentAttack;
-		currentAttack.Connect("AttackEnds", this, nameof(ResetCurrentAttack));
+		
 		currentAttack.Start();
 	}
 	
@@ -615,7 +618,10 @@ public class Character : KinematicBody2D
 	
 	public void ResetCurrentAttack(Attack a)
 	{
-		currentAttack.Disconnect("AttackEnds", this, nameof(ResetCurrentAttack));
+		if(currentAttack != null)
+		{
+			currentAttack.Disconnect("AttackEnds", this, nameof(ResetCurrentAttack));
+		}
 		currentAttack = null;
 	}
 	///////////////////////////////////////////

@@ -23,7 +23,8 @@ public class EndlagState : State
 	protected override void DoMovement()
 	{
 		if(att is null) return;
-		ch.vec.x *= 1f-(att.attackFriction*(ch.grounded?ch.ffric:1f));
+		var friction = att?.attackFriction ?? 0f;
+		ch.vec.x *= 1f-friction*(ch.grounded?ch.ffric:1f);
 	}
 	
 	protected override void DoGravity()

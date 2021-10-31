@@ -6,7 +6,6 @@ public class ArtemisPart : AttackPart
 	public float ForwardSpeed = 0f;
 	public float BackSpeed = 0f;
 	public int MoveLength = 0;
-	public int frameCount = 0;
 	
 	public override void Init()
 	{
@@ -15,21 +14,14 @@ public class ArtemisPart : AttackPart
 		LoadExtraProperty<int>("MoveLength");
 	}
 	
-	public override void OnStart()
-	{
-		frameCount = 0;
-	}
-	
 	public override void Loop()
 	{
 		if(frameCount < startup) {}
 		else if(frameCount < startup + MoveLength)
 			ch.vuc.x = ForwardSpeed * ch.direction;
 		else if(frameCount < startup + MoveLength + Math.Round(MoveLength*ForwardSpeed/BackSpeed))
-			ch.vuc.x = BackSpeed * -ch.direction;
+			ch.vuc.x = -BackSpeed * ch.direction;
 		else ch.vuc = Vector2.Zero;
-		
-		++frameCount;
 	}
 	
 	public override void OnEnd()

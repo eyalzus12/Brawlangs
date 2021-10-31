@@ -18,7 +18,9 @@ public class AttackState : State
 	
 	protected override void DoMovement()
 	{
-		ch.vec.x *= (1f-att.attackFriction*(ch.grounded?ch.ffric:1f));
+		if(att is null) return;
+		var friction = att?.attackFriction ?? 0f;
+		ch.vec.x *= (1f-friction*(ch.grounded?ch.ffric:1f));
 	}
 	
 	protected override void DoGravity()
@@ -42,6 +44,7 @@ public class AttackState : State
 	public void SetEnd(Attack a)
 	{
 		a.Disconnect("AttackEnds", this, nameof(SetEnd));
+		a.connected = null;
 		int endlag = a.currentPart.GetEndlag();
 		var s = ch.ChangeState("Endlag") as EndlagState;
 		s.endlag = endlag;

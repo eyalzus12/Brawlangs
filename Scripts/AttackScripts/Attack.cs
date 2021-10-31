@@ -9,6 +9,8 @@ public class Attack : Node2D
 	
 	public int frameCount = 0;
 	
+	public State connected = null;
+	
 	[Signal]
 	public delegate void AttackStarts(Attack a);
 	[Signal]
@@ -35,7 +37,9 @@ public class Attack : Node2D
 	{
 		frameCount = 0;
 		EmitSignal(nameof(AttackStarts), this);
+		if(connected != null) Disconnect("AttackEnds", connected, "SetEnd");
 		Connect("AttackEnds", ch.currentState, "SetEnd");
+		connected = ch.currentState;
 		currentPart = start;
 		currentPart.Activate();
 		OnStart();
