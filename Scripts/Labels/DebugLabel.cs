@@ -91,6 +91,17 @@ public class DebugLabel : InfoLabel
 		Add("Down", ch.downHeld);
 		Add("Up", ch.upHeld);
 		Newline();
+		Add("LeftInput", ch.Inputs.IsActionPressed("player_left"));
+		Add("RightInput", ch.Inputs.IsActionPressed("player_right"));
+		Add("DownInput", ch.Inputs.IsActionPressed("player_down"));
+		Add("UpInput", ch.Inputs.IsActionPressed("player_up"));
+		Newline();
+		Add("JumpInput", ch.Inputs.IsActionPressed("player_jump"));
+		Newline();
+		Add("LightAttackInput", ch.Inputs.IsActionPressed("player_light_attack"));
+		//Add("HeavyAttackInput", ch.Inputs.IsActionPressed("player_heavy_attack"));
+		Add("SpecialAttackInpit", ch.Inputs.IsActionPressed("player_special_attack"));
+		Newline();
 		Add("Falling Through", !ch.GetCollisionMaskBit(1));
 		Add("Jumps Used", ch.jumpCounter);
 		//Add("Wall jumps used", ch.wallJumpCounter);
