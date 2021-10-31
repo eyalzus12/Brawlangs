@@ -4,6 +4,9 @@ using System.Linq;
 
 public class MapBase : Node2D
 {
+	[Export]
+	public Rect2 BlastZones = BlastZone.CalcRect(new Vector2(512, 300), new Vector2(2000, 1200));
+	
 	public override void _Ready()
 	{
 		/*var loaded1 = (PackedScene)ResourceLoader
@@ -65,7 +68,7 @@ public class MapBase : Node2D
 		AddChild(camera);
 		camera.Current = true;
 		
-		var bz = new BlastZone(new Vector2(512, 300), new Vector2(2000, 1200));
+		var bz = new BlastZone(BlastZones);
 		AddChild(bz);
 	}
 	

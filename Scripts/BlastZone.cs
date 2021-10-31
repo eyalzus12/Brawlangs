@@ -19,6 +19,11 @@ public class BlastZone : Node2D
 		Bounds = CalcRect(Center, Limits);
 	}
 	
+	public BlastZone(Rect2 rect)
+	{
+		Bounds = rect;
+	}
+	
 	public override void _Ready()
 	{
 		Reset();
@@ -51,7 +56,7 @@ public class BlastZone : Node2D
 		}
 	}
 	
-	private Rect2 CalcRect(Vector2 Center, Vector2 Lengths)
+	public static Rect2 CalcRect(Vector2 Center, Vector2 Lengths)
 	{
 		var TopLeft = Center-Lengths;
 		var BottomRight = Center+Lengths;
