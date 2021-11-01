@@ -59,6 +59,15 @@ public class MapBase : Node2D
 				numberlabel.Text = c.teamNumber.ToString();
 				c.AddChild(numberlabel);
 				numberlabel.ch = c;
+				
+				var shaderResource = ResourceLoader.Load("res://whitetolcolor.shader");
+				var shader = shaderResource as Shader;
+				var material = new ShaderMaterial();
+				material.Shader = shader;
+				c.sprite.Material = material;
+				(c.sprite.Material as ShaderMaterial).SetShaderParam("color", (i==1)?(new Vector3(0, 0, 1)):(new Vector3(1, 0, 0)));
+				
+				
 				//c.dummy = data.GetOrDefault($"LoadedCharacter{i}Dummy", false).b();
 				c.Respawn();
 				
