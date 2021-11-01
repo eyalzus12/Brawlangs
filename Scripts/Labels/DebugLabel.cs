@@ -100,7 +100,8 @@ public class DebugLabel : InfoLabel
 		Newline();
 		Add("LightAttackInput", ch.Inputs.IsActionPressed("player_light_attack"));
 		//Add("HeavyAttackInput", ch.Inputs.IsActionPressed("player_heavy_attack"));
-		Add("SpecialAttackInpit", ch.Inputs.IsActionPressed("player_special_attack"));
+		Add("SpecialAttackInput", ch.Inputs.IsActionPressed("player_special_attack"));
+		Add("TauntAttackInput", ch.Inputs.IsActionPressed("player_taunt_attack"));
 		Newline();
 		Add("Jumps Used", ch.jumpCounter);
 		//Add("Wall jumps used", ch.wallJumpCounter);
