@@ -14,11 +14,15 @@ public class MatchCamera : Camera2D
 	[Export]
 	public Vector2 limits = new Vector2(700, 500);//how far away from the screen center the camera is allowed to see into
 	[Export]
-	public Vector2 middle = new Vector2(448, 304);//center of screen
+	public Vector2 middle = new Vector2(512, 300);//new Vector2(448, 304);//center of screen
 	[Export]
 	public float interpolationWeight = 0.01f;//how interpolated the zoom and offset is
 	[Export]
 	public float baseZoom = 1.5f;//multiplier for CalculateZoom
+	[Export]
+	public float startZoomMult = 1.3f;
+	[Export]
+	public Vector2 startOffsetOffset = new Vector2(0, -500);
 	
 	public Rect2 cameraRect = new Rect2();
 	public Rect2 viewportRect = new Rect2();
@@ -34,6 +38,9 @@ public class MatchCamera : Camera2D
 	
 	public void Reset()
 	{
+		Offset = middle+startOffsetOffset;
+		Zoom = new Vector2(baseZoom,baseZoom)*startZoomMult;
+		
 		//TODO: linq
 		foreach(var n in GetParent().GetChildren()) if(n is Character c)
 		{
@@ -50,12 +57,14 @@ public class MatchCamera : Camera2D
 			//go over the followed characters, expanding the rect to them
 			//the code here makes the expanded rect get more expanded the further you go from the center
 			//being linear from 0 (no expand) to 1 (full expand)
-			var pos = followed[i].Position;
-			var x = pos.x-middle.x;
-			var exX = x*Math.Abs(x/limits.x)+middle.x;
-			var y = pos.y-middle.y;
-			var exY = y*Math.Abs(y/limits.y)+middle.y;
-			cameraRect = cameraRect.Expand(new Vector2(exX, exY));
+			
+			var pos = followed[i].Position;//get position
+			var rpos = pos-middle;//get position relative to center
+			var frac = rpos/limits;//get position fraction
+			var afrac = frac.Abs();//get absoulte position fraction
+			var nrpos = rpos*afrac;//get new relative position
+			var npos = rpos+middle;//get new posiiton
+			cameraRect = cameraRect.Expand(npos);//expand rect to position
 		}
 		cameraRect.Position -= middle;//get position relative to center
 		cameraRect = cameraRect.Limit(limits.x, limits.y);//limit the rectangle to the limits
@@ -80,12 +89,12 @@ public class MatchCamera : Camera2D
 	{
 		//debug draw of camera rect
 		if(!debugMode) return;
-		DrawRect(cameraRect, new Color(1, 1, 1), false);
-		DrawCircle(cameraRect.Center(), 5, new Color(1, 1, 1));
+		var White = new Color(1, 1, 1);
+		var Red = new Color(1, 0, 0);
+		DrawRect(cameraRect, White, false);
+		DrawCircle(cameraRect.Center(), 5, White);
+		DrawCircle(middle, 5, Red);
 	}
 	
-	public void CharacterGone(Node2D who)
-	{
-		followed.Remove(who);
-	}
+	public void CharacterGone(Node2D who) => followed.Remove(who);
 }

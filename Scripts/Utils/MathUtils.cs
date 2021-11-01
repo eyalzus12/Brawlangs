@@ -50,4 +50,6 @@ public static class MathUtils
 	
 	public static int AddIf(this int i, int j, bool predicate) => i + (predicate?0:j);
 	public static int SubIf(this int i, int j, bool predicate) => i - (predicate?0:j);
+	
+	public static Vector2 Abs(this Vector2 v) => new Vector2(Math.Abs(v.x), Math.Abs(v.y));
 }
