@@ -60,8 +60,7 @@ public class MapBase : Node2D
 				c.AddChild(numberlabel);
 				numberlabel.ch = c;
 				
-				var shaderResource = ResourceLoader.Load("res://whitetolcolor.shader");
-				var shader = shaderResource as Shader;
+				var shader = ResourceLoader.Load<Shader>("res://whitetolcolor.shader");
 				var material = new ShaderMaterial();
 				material.Shader = shader;
 				c.sprite.Material = material;
