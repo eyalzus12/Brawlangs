@@ -84,7 +84,7 @@ public class CollisionCreator
 		var dropext = inif["Main", "PlatDropExtents", new Vector2(32, 11)].v2();
 		(dropc.Shape as RectangleShape2D).Extents = dropext;
 		
-		platDrop.Visible = false;í ½í·¿í ½
+		platDrop.Visible = false;
 	}
 	
 	public void BuildBase(Character ch, string section)
