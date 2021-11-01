@@ -72,6 +72,7 @@ public class CollisionCreator
 		var platDrop = new Area2D();
 		platDrop.Name = "PlatformDrop";
 		ch.AddChild(platDrop);
+		platDrop.Connect("body_exited", ch, "OnSemiSolidLeave");
 		platDrop.CollisionLayer = 0;
 		platDrop.CollisionMask = 0b10;
 		var droppos = inif["Main", "PlatDropPosition", new Vector2(0, 19)].v2();
@@ -82,7 +83,7 @@ public class CollisionCreator
 		dropc.Name = "DropCollision";
 		var dropext = inif["Main", "PlatDropExtents", new Vector2(32, 11)].v2();
 		(dropc.Shape as RectangleShape2D).Extents = dropext;
-		platDrop.Connect("body_entered", ch, "OnSemiSolidLeave");
+		
 		platDrop.Visible = false;
 	}
 	
