@@ -102,7 +102,6 @@ public class DebugLabel : InfoLabel
 		//Add("HeavyAttackInput", ch.Inputs.IsActionPressed("player_heavy_attack"));
 		Add("SpecialAttackInpit", ch.Inputs.IsActionPressed("player_special_attack"));
 		Newline();
-		Add("Falling Through", !ch.GetCollisionMaskBit(1));
 		Add("Jumps Used", ch.jumpCounter);
 		//Add("Wall jumps used", ch.wallJumpCounter);
 		Newline();
