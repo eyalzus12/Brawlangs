@@ -5,19 +5,8 @@ using System.Linq;
 public class DamageCalculator
 {
 	
-	public readonly static float[][] VALUES = {
-		new float[]{1f},
-		new float[]{0.4f,0.6f},
-		new float[]{0.33f,0.33f,0.33f}
-	};
-	
-	public readonly static int[] ORDER = {2, 1, 0};
-	//210: white -> yellow -> red -> black
-	///201; white -> yellow -> green -> black
-	//120: white -> megenta -> red -> black
-	//102: white -> megenta -> blue -> black
-	//021 white -> cyan -> green -> black
-	//012 white -> cyan -> blue -> black 
+	public readonly static float[] VALUES = {1f, 0.4f,0.6f,0.33f,0.33f,0.33f};
+	public readonly static int[] ORDER = {2, 1, 1, 0, 0, 0};
 	
 	public const float MAX_DAMAGE = 300f;
 	
