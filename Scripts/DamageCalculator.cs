@@ -12,6 +12,12 @@ public class DamageCalculator
 	};
 	
 	public readonly static int[] ORDER = {2, 1, 0};
+	//210: white -> yellow -> red -> black
+	///201; white -> yellow -> green -> black
+	//120: white -> megenta -> red -> black
+	//102: white -> megenta -> blue -> black
+	//021 white -> cyan -> green -> black
+	//012 white -> cyan -> blue -> black 
 	
 	public const float MAX_DAMAGE = 300f;
 	
