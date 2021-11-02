@@ -572,8 +572,8 @@ public class Character : KinematicBody2D
 		, int stun, int hp)
 	{
 		var s = ChangeState("HitPause") as HitPauseState;
-		damage += d;
-		var force = skb + damage*vkb/100f;
+		damage += d * damageTakenMult;
+		var force = (skb + damage*vkb/100f)*knockbackTakenMult;
 		s.force = force;
 		s.stunLength = stun;
 		s.hitPauseLength = hp;
