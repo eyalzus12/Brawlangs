@@ -16,7 +16,7 @@ public class DamageLabel : Label
 	
 	public override void _Ready()
 	{
-		var shaderResource = ResourceLoader.Load(PATH);
+		/*var shaderResource = ResourceLoader.Load(PATH);
 		if(shaderResource is null)
 		{
 			GD.Print($"Failed to load shader at position {PATH} because it does not exist");
@@ -33,13 +33,14 @@ public class DamageLabel : Label
 		var material = new ShaderMaterial();
 		this.Material = material;
 		mat = material;
-		mat.Shader = shader;
+		mat.Shader = shader;*/
 	}
 	
 	public override void _Process(float delta)
 	{
 		if(ch is null) return;
-		mat.SetShaderParam("damage", ch.damage);
+		//mat.SetShaderParam("damage", ch.damage);
+		AddColorOverride("font_color", DamageCalculator.DamageToColor(ch.damage));
 		if(DynamicText)
 		{
 			Text = $"{ch.damage.ToString()} / {ch.stocks}";

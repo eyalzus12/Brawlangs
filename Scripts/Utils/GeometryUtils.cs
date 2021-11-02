@@ -11,6 +11,19 @@ public static class GeometryUtils
 			(float)Math.Round(v.x, point),
 			(float)Math.Round(v.y, point)
 		);
+		
+	public static Vector3 Round(this Vector3 v, int point = 0) => new Vector3(
+			(float)Math.Round(v.x, point),
+			(float)Math.Round(v.y, point),
+			(float)Math.Round(v.z, point)
+		);
+		
+	public static Quat Round(this Quat q, int point = 0) => new Quat(
+			(float)Math.Round(q.x, point),
+			(float)Math.Round(q.y, point),
+			(float)Math.Round(q.z, point),
+			(float)Math.Round(q.w, point)
+		);
 	
 	public static Vector2 TiltToNormal(this Vector2 v, Vector2 normal)
 	{
