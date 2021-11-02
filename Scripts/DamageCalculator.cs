@@ -17,7 +17,7 @@ public class DamageCalculator
 	{
 		var color = new Color(1f, 1f, 1f, 1f);
 		
-		foreach(var i in ORDER) for(int j = 0; j < VALUES[i].Length && damage > 0f; ++j, damage -= jump)
+		/*foreach(var i in ORDER) for(int j = 0; j < VALUES[i].Length && damage > 0f; ++j, damage -= jump)
 		{
 			var reduce = VALUES[i][j] * Math.Min(damage/jump, 1f);
 			switch(i)
@@ -26,6 +26,20 @@ public class DamageCalculator
 				case 1: color.g -= reduce; break;
 				case 2: color.b -= reduce; break;
 				default: GD.Print("Improper color index {ORDER}"); break;
+			}
+			
+			return color.Inverted();
+		}*/
+		
+		for(int i = 0; i < length && damage > 0f; ++i, damage -= jump)
+		{
+			var reduce = MULTIPLIERS[i] * Math.Min(damage/jump, 1f);
+			switch(ORDER[i])
+			{
+				case 0: color.r -= reduce; break;
+				case 1: color.g -= reduce; break;
+				case 2: color.b -= reduce; break;
+				default: GD.Print("Improper value for color index {ORDER[i]} at index {i}"); break;
 			}
 		}
 		
