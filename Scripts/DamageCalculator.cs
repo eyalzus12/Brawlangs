@@ -10,16 +10,16 @@ public class DamageCalculator
 	
 	public const float MAX_DAMAGE = 300f;
 	
-	public static int length = VALUES.Length;
-	public static float jump = MAX_DAMAGE/length;
+	public static readonly int length = VALUES.Length;
+	public static readonly float step = MAX_DAMAGE/length;
 	
 	public static Color DamageToColor(float damage)
 	{
 		var color = new Color(1f, 1f, 1f, 1f);
 		
-		for(int i = 0; i < length && damage > 0f; ++i, damage -= jump)
+		for(int i = 0; i < length && damage > 0f; ++i, damage -= step)
 		{
-			var reduce = VALUES[i] * Math.Min(damage/jump, 1f);
+			var reduce = VALUES[i] * Math.Min(damage/step, 1f);
 			switch(ORDER[i])
 			{
 				case 0: color.r -= reduce; break;
