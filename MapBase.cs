@@ -64,7 +64,17 @@ public class MapBase : Node2D
 				var material = new ShaderMaterial();
 				material.Shader = shader;
 				c.sprite.Material = material;
-				(c.sprite.Material as ShaderMaterial).SetShaderParam("color", (i==1)?(new Vector3(0, 0, 1)):(new Vector3(1, 0, 0)));
+				var blue = new Vector3(0, 0, 1);
+				var red = new Vector3(1, 0, 0);
+				var green = new Vector3(0, 1, 0);
+				var yellow = new Vector3(1, 1, 0);
+				var megenta = new Vector3(1, 0, 1);
+				var cyan = new Vector3(0, 1, 1);
+				var grey = new Vector3(0.5f, 0.5f, 0.5f);
+				var pink = new Vector3(1, 0.5f, 0.5f);
+				Vector3[] colorlist = {blue, red, green, yellow, megenta, cyan, grey, pink};
+				
+				(c.sprite.Material as ShaderMaterial).SetShaderParam("color", colorlist[i-1]);
 				
 				
 				//c.dummy = data.GetOrDefault($"LoadedCharacter{i}Dummy", false).b();
