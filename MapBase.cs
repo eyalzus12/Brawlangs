@@ -5,7 +5,7 @@ using System.Linq;
 public class MapBase : Node2D
 {
 	[Export]
-	public Rect2 BlastZones = BlastZone.CalcRect(new Vector2(512, 300), new Vector2(2000, 1200));
+	public Rect2 BlastZones = BlastZone.CalcRect(new Vector2(512, 300), new Vector2(1500, 1200));
 	
 	public override void _Ready()
 	{
