@@ -22,7 +22,8 @@ public class WaypointMovingPlatform2D : MovingPlatform2D
 	
 	public override void Loop()
 	{
-		if(frameCount >= WayPoints[Index].z)
+		if(Index >= WayPoints.Count) return;
+		else if(frameCount >= WayPoints[Index].z)
 		{
 			++Index;
 			frameCount = 0;
