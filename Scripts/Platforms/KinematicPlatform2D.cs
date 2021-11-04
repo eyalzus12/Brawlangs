@@ -7,6 +7,8 @@ public class KinematicPlatform2D : KinematicBody2D
 {
 	public KinematicPlatform2D() {}
 	
+	//public Dictionary<string, Type> LoadExtraProperties = new Dictionary<string, Type>();
+	
 	public override void _Ready()
 	{
 		//foreach(var c in getshape())
@@ -56,6 +58,8 @@ public class KinematicPlatform2D : KinematicBody2D
 			SetCollisionLayerBit(1, value);
 		}
 	}
+	
+	//public void LoadExtraProperty<T>(string s) => LoadExtraProperties.Add(s, typeof(T));
 	
 	private List<CollisionShape2D> getshape() => GetChildren().Enumerable().FilterType<CollisionShape2D>().ToList();
 }
