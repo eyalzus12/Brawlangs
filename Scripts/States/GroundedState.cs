@@ -44,10 +44,30 @@ public class GroundedState : State
 	{
 		if(jump || !IsActionable()) return;
 		
-		if(ch.upHeld) ch.ExecuteAttack("Nlight");
-		else if(ch.downHeld) ch.ExecuteAttack("Dlight");
-		else if(ch.rightHeld || ch.leftHeld) ch.ExecuteAttack("Slight");
-		else ch.ExecuteAttack("Nlight");
+		if(ch.upHeld) ch.ExecuteAttack("NLight");
+		else if(ch.downHeld) ch.ExecuteAttack("DLight");
+		else if(ch.rightHeld || ch.leftHeld) ch.ExecuteAttack("SLight");
+		else ch.ExecuteAttack("NLight");
+	}
+	
+	protected override void HeavyAttack()
+	{
+		if(jump || !IsActionable()) return;
+		
+		if(ch.upHeld) ch.ExecuteAttack("NStrong");
+		else if(ch.downHeld) ch.ExecuteAttack("DStrong");
+		else if(ch.rightHeld || ch.leftHeld) ch.ExecuteAttack("SStrong");
+		else ch.ExecuteAttack("NStrong");
+	}
+	
+	protected override void SpecialAttack()
+	{
+		if(jump || !IsActionable()) return;
+		
+		if(ch.upHeld) ch.ExecuteAttack("NSpecial");
+		else if(ch.downHeld) ch.ExecuteAttack("DSpecial");
+		else if(ch.rightHeld || ch.leftHeld) ch.ExecuteAttack("SSpecial");
+		else ch.ExecuteAttack("NSpecial");
 	}
 	
 	public override void SetInputs()

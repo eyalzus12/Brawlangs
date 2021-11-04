@@ -52,6 +52,10 @@ public class State : Node
 			DoJump();
 		if(Inputs.IsActionJustPressed("player_light_attack"))
 			LightAttack();
+		if(Inputs.IsActionJustPressed("player_heavy_attack"))
+			HeavyAttack();
+		//if(Inputs.IsActionJustPressed("player_heavy_attack"))
+		//	HeavyAttack();
 		
 		var norm = ch.grounded?ch.fnorm:Vector2.Zero;
 		var v = ch.GetVelocity().TiltToNormal(norm);
@@ -89,6 +93,8 @@ public class State : Node
 	protected virtual void RepeatActions() {}
 	public virtual void OnChange() {}
 	protected virtual void LightAttack() {}
+	protected virtual void HeavyAttack() {}
+	protected virtual void SpecialAttack() {}
 	
 	protected void SetHorizontalAlternatingInputs()
 	{

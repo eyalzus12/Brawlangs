@@ -1,10 +1,13 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Text;
+using System.Linq;
+using Godict = Godot.Collections.Dictionary;
 
 public class PropertyMap
 {
-	Dictionary<string, object> dict;
+	public Dictionary<string, object> dict;
 	
 	public PropertyMap() => Reset();
 	public void Reset() => dict = new Dictionary<string, object>();
@@ -19,61 +22,46 @@ public class PropertyMap
 	
 	public void LoadProperties(Godot.Object obj)
 	{
-		//TODO?: use linq ForEach
 		foreach(var entry in dict)
 			obj.Set(entry.Key, entry.Value);
 	}
 	
 	public void StoreProperties(Godot.Object obj, List<string> propertyList)
 	{
-		foreach(Godot.Collections.Dictionary d in obj.GetPropertyList())
+		foreach(Godict d in obj.GetPropertyList())
 		{
-			string name = d["name"] as string;
+			var name = d["name"].s();
 			if(propertyList.Contains(name)) Add(name, obj.Get(name));
 		}
 	}
 	
 	public bool ReadFromConfigFile(string path, string sectionName)
 	{
-		IniFile ini = new IniFile();
+		var cfg = new CfgFile();
 		
-		if(ini.Load(path) != Error.Ok)
+		if(cfg.Load(path) != Error.Ok)
 		{
 			GD.Print($"failed to read property file \"{path}\"");
 			return false;
 		}
 		
-		foreach(string key in ini[sectionName].Keys)
-			Add(key, ini[sectionName, key]);
-			
+		dict = cfg.dict;
 		return true;
 	}
 	
 	public bool ConfigFileToPropertyList(Godot.Object obj, string path, 
 		string sectionName, List<string> propertyList)
 	{
-		bool res = ReadFromConfigFile(path, sectionName);
-		
-		//TODO?: use linq ToList
-		foreach(string k in dict.Keys)
-			propertyList.Add(k);
-			
+		var res = ReadFromConfigFile(path, sectionName);
+		propertyList = dict.Keys.ToList();
 		return res;
 	}
 	
 	public override string ToString()
 	{
-		//TODO: use a StringBuilder
-		var res = "";
-		
+		var res = new StringBuilder();
 		foreach(var entry in dict)
-		{
-			res += "{" + 
-						entry.Key + ", " +
-						entry.Value.ToString() +
-					"}\n";
-		}
-		
-		return res;
+			res.Append($"{{{entry.Key}, {entry.Value.ToString()}}}\n");
+		return res.ToString();
 	}
 }

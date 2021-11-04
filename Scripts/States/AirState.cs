@@ -64,10 +64,30 @@ public class AirState : State
 	{
 		if(!IsActionable()) return;
 		
-		if(ch.upHeld) ch.ExecuteAttack("Nair");
-		else if(ch.downHeld) ch.ExecuteAttack("Dair");
-		else if(ch.rightHeld || ch.leftHeld) ch.ExecuteAttack("Sair");
-		else ch.ExecuteAttack("Nair");
+		if(ch.upHeld) ch.ExecuteAttack("NAir");
+		else if(ch.downHeld) ch.ExecuteAttack("DAir");
+		else if(ch.rightHeld || ch.leftHeld) ch.ExecuteAttack("SAir");
+		else ch.ExecuteAttack("NAir");
+	}
+	
+	protected override void HeavyAttack()
+	{
+		if(!IsActionable()) return;
+		
+		if(ch.upHeld) ch.ExecuteAttack("NSlam");
+		else if(ch.downHeld) ch.ExecuteAttack("DSlam");
+		else if(ch.rightHeld || ch.leftHeld) ch.ExecuteAttack("SSlam");
+		else ch.ExecuteAttack("NSlam");
+	}
+	
+	protected override void SpecialAttack()
+	{
+		if(!IsActionable()) return;
+		
+		if(ch.upHeld) ch.ExecuteAttack("NSpecial");
+		else if(ch.downHeld) ch.ExecuteAttack("DSpecial");
+		else if(ch.rightHeld || ch.leftHeld) ch.ExecuteAttack("SSpecial");
+		else ch.ExecuteAttack("NSpecial");
 	}
 	
 	public override void SetInputs()
