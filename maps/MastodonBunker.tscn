@@ -3,9 +3,9 @@
 [ext_resource path="res://MapBase.cs" type="Script" id=1]
 [ext_resource path="res://MapArt/TestMap/AllSides.png" type="Texture" id=2]
 [ext_resource path="res://MapArt/TestMap/icon.png" type="Texture" id=3]
-[ext_resource path="res://MovementPath2D.cs" type="Script" id=4]
-[ext_resource path="res://KinematicPlatform2D.cs" type="Script" id=5]
-[ext_resource path="res://StaticPlatform2D.cs" type="Script" id=6]
+[ext_resource path="res://Scripts/Legacy/MovementPath2D.cs" type="Script" id=4]
+[ext_resource path="res://Scripts/Platforms/KinematicPlatform2D.cs" type="Script" id=5]
+[ext_resource path="res://Scripts/Platforms/StaticPlatform2D.cs" type="Script" id=6]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 240, 122.88 )

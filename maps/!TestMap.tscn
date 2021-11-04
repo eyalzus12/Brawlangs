@@ -1,7 +1,7 @@
 [gd_scene load_steps=44 format=2]
 
 [ext_resource path="res://MapBase.cs" type="Script" id=1]
-[ext_resource path="res://MovementPlayer.cs" type="Script" id=2]
+[ext_resource path="res://Scripts/Legacy/MovementPlayer.cs" type="Script" id=2]
 [ext_resource path="res://MovingPlatformAnimations/TestMovingPlatform5Anm.tres" type="Animation" id=3]
 [ext_resource path="res://MovingPlatformAnimations/TestMovingSemiSolidPlatform2Anm.tres" type="Animation" id=4]
 [ext_resource path="res://MovingPlatformAnimations/TestMovingPlatform3Anm.tres" type="Animation" id=5]
