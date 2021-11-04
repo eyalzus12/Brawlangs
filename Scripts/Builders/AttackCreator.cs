@@ -45,6 +45,7 @@ public class AttackCreator
 		//GD.Print(section, ", ", start);
 		var AttackScript = inif[section, "Script", ""].s();
 		//GD.Print($"Loading script {PartScript}");
+		var charge = inif[section, "Charge", false].b();
 		Attack a;
 		if(AttackScript != "")
 		{
@@ -70,24 +71,40 @@ public class AttackCreator
 				}
 			}
 		}
-		else a = new Attack();
+		else
+		{
+			if(charge) a = new ChargeableAttack();
+			else a = new Attack();
+		}
 		n.AddChild(a);
+		
+		if(charge)
+		{
+			var chargepart = new ChargePart();
+			a.AddChild(chargepart);
+			chargepart.MaxCharge = inif[section, "MaxCharge", 60].i();
+			var input = inif[section, "Input", "heavy"].s().ToLower();
+			chargepart.input = $"player_{input}_attack";
+			(a as ChargeableAttack).charge = chargepart;
+		}
+		
 		var fric = inif[section, "Friction", 1f].f();
 		a.attackFriction = fric;
 		a.Name = section;
 		var StartPartSection = inif[section, "StartPart", ""].s();
 		
 		object oPartSections = inif[section, "Parts", new List<string>()];
-		if(oPartSections is string)
-			BuildPart(a, oPartSections.s(), StartPartSection);
+		if(oPartSections is string PartSection)
+			BuildPart(a, PartSection, StartPartSection);
 		else
 		{
 			var PartSections = oPartSections.ls();
-			foreach(var s in PartSections) BuildPart(a, s, StartPartSection);
+			foreach(var s in PartSections)
+				BuildPart(a, s, StartPartSection);
 		}
 	}
 	
-	public void BuildPart(Attack a, string section, string start)
+	public AttackPart BuildPart(Attack a, string section, string start)
 	{
 		//GD.Print(section, ", ", start);
 		var PartScript = inif[section, "Script", ""].s();
@@ -160,6 +177,8 @@ public class AttackCreator
 			var prop = inif[section, s, null].cast(load[s], $"loading extra properties for part {section}");
 			ap.Set/*Deferred*/(s, prop);
 		}
+		
+		return ap;
 	}
 	
 	public void BuildHitbox(AttackPart ap, string section)

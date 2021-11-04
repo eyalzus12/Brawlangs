@@ -33,7 +33,7 @@ public class Attack : Node2D
 		Init();
 	}
 	
-	public void Start()
+	public virtual void Start()
 	{
 		frameCount = 0;
 		EmitSignal(nameof(AttackStarts), this);
@@ -47,20 +47,22 @@ public class Attack : Node2D
 	
 	public void SetPart(AttackPart newPart)
 	{
+		//GD.Print($"Part set to {newPart}. current is {currentPart}");
 		if(newPart is null) Stop();
 		else if(currentPart != newPart)
 		{
-			currentPart.Stop();
+			if(currentPart != null) currentPart.Stop();
 			currentPart = newPart;
 			currentPart.Activate();
 		}
 	}
 	
-	public void Stop()
+	public virtual void Stop()
 	{
 		OnEnd();
-		currentPart.Stop();
+		if(currentPart != null) currentPart.Stop();
 		EmitSignal(nameof(AttackEnds), this);
+		currentPart = null;
 	}
 	
 	public override void _PhysicsProcess(float delta)

@@ -113,8 +113,8 @@ public class AttackPart : Node2D
 	
 	public override void _PhysicsProcess(float delta)
 	{
-		++frameCount;
 		if(!active) return;
+		++frameCount;
 		Loop();
 		ActualHit(/*activator*/);
 		hitList.Clear();

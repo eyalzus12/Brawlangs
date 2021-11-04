@@ -99,7 +99,7 @@ public class DebugLabel : InfoLabel
 		Add("JumpInput", ch.Inputs.IsActionPressed("player_jump"));
 		Newline();
 		Add("LightAttackInput", ch.Inputs.IsActionPressed("player_light_attack"));
-		//Add("HeavyAttackInput", ch.Inputs.IsActionPressed("player_heavy_attack"));
+		Add("HeavyAttackInput", ch.Inputs.IsActionPressed("player_heavy_attack"));
 		Add("SpecialAttackInput", ch.Inputs.IsActionPressed("player_special_attack"));
 		//Add("TauntAttackInput", ch.Inputs.IsActionPressed("player_taunt_attack"));
 		Newline();

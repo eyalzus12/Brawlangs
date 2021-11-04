@@ -138,6 +138,7 @@ public class BufferInputManager : InputManager
 	
 	public override void _PhysicsProcess(float delta)
 	{
+		//if(GetTree().Paused) return;
 		foreach(var buff in buffer.Values)
 		{
 			if(buff.markedForDeletion) buff.Delete();
@@ -148,7 +149,7 @@ public class BufferInputManager : InputManager
 	public override string ToString()
 	{
 		var res = new StringBuilder();
-		foreach(var entry in buffer) res.Append($"{{{entry.Key}, {entry.Value.ToString()}_{playerDeviceNumber}}}\n");
+		foreach(var entry in buffer) res.Append($"{{{entry.Key}, {entry.Value.ToString()}}}\n");
 		return res.ToString();
 	}
 	
