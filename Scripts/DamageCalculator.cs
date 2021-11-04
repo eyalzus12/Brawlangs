@@ -18,10 +18,11 @@ public class DamageCalculator
 	{
 		var color = new Color(0f, 0f, 0f, 1f);//black
 		
-		for(int i = 0; i < VALUES.Length && damage > 0f; ++i)
+		foreach(var val in VALUES)
 		{
-			var step = VALUES[i].Item1;//how much to go until next addition
-			var amount = VALUES[i].Item2;//how much to add by step
+			if(damage <= 0f) break;
+			var step = val.Item1;//how much to go until next addition
+			var amount = val.Item2;//how much to add by step
 			color += amount * Math.Min(damage/step, 1f);//add
 			damage -= step;//next addition
 		}
