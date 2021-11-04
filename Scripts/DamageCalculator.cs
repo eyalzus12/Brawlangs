@@ -4,31 +4,28 @@ using System.Linq;
 
 public class DamageCalculator
 {
-	
-	public readonly static float[] VALUES = {1f, 0.4f,0.6f,0.33f,0.33f,0.33f};
-	public readonly static int[] ORDER = {2, 1, 1, 0, 0, 0};
-	
-	public const float MAX_DAMAGE = 300f;
-	
-	public static readonly int length = VALUES.Length;
-	public static readonly float step = MAX_DAMAGE/length;
+	public readonly static (float,Color)[] VALUES = 
+	{
+		(50f, new Color(0f, 0f, 1f)),
+		(50f, new Color(0f, 0.4f, 0f)),
+		(50f, new Color(0f, 0.6f, 0f)),
+		(50f, new Color(64f/255f, 0f, 0f)),
+		(50f, new Color(0.2f, 0f, 0f)),
+		(50f, new Color(66f/255f, 0f, 0f))
+	};
 	
 	public static Color DamageToColor(float damage)
 	{
-		var color = new Color(1f, 1f, 1f, 1f);
+		var color = new Color(0f, 0f, 0f, 1f);//black
 		
-		for(int i = 0; i < length && damage > 0f; ++i, damage -= step)
+		for(int i = 0; i < VALUES.Length && damage > 0f; ++i)
 		{
-			var reduce = VALUES[i] * Math.Min(damage/step, 1f);
-			switch(ORDER[i])
-			{
-				case 0: color.r -= reduce; break;
-				case 1: color.g -= reduce; break;
-				case 2: color.b -= reduce; break;
-				default: GD.Print("Improper value for color index {ORDER[i]} at index {i}"); break;
-			}
+			var step = VALUES[i].Item1;//how much to go until next addition
+			var amount = VALUES[i].Item2;//how much to add by step
+			color += amount * Math.Min(damage/step, 1f);//add
+			damage -= step;//next addition
 		}
 		
-		return color;
+		return color.Inverted();//make all that addition a reduction
 	}
 }
