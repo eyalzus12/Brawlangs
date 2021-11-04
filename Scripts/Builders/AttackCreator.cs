@@ -155,7 +155,7 @@ public class AttackCreator
 		var hp = inif[section, "HitVar", false].b();
 		ap.hitPart = hp;
 		
-		var oHitboxSections = inif[section, "HitboxSections", null];
+		var oHitboxSections = inif[section, "Hitboxes", null];
 		if(oHitboxSections is string)
 			BuildHitbox(ap, oHitboxSections.s());
 		else if(oHitboxSections.NotNull())
@@ -164,7 +164,7 @@ public class AttackCreator
 			foreach(var s in HitboxSections) BuildHitbox(ap, s);
 		}
 		
-		var ConnectionSection = inif[section, "ConnectionSection", ""].s();
+		var ConnectionSection = inif[section, "Connections", ""].s();
 		//get connection section
 		if(ConnectionSection != "") cn.Add(section, (ConnectionSection, a));
 		//request connection for later
