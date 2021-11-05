@@ -52,4 +52,7 @@ public static class MathUtils
 	public static int SubIf(this int i, int j, bool predicate) => i - (predicate?0:j);
 	
 	public static Vector2 Abs(this Vector2 v) => new Vector2(Math.Abs(v.x), Math.Abs(v.y));
+	public static Vector2 Max(this Vector2 v1, Vector2 v2) => new Vector2(Math.Max(v1.x,v2.x), Math.Max(v1.y,v2.y));
+	public static Vector2 Max(this Vector2 v1, float f1, float f2) => new Vector2(Math.Max(v1.x,f1), Math.Max(v1.y,f2));
+	public static Vector2 Diagonal(this float f) => new Vector2(f,f);
 }

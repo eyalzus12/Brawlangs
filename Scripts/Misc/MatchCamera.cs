@@ -52,13 +52,13 @@ public class MatchCamera : Camera2D
 	public override void _Process(float delta)
 	{
 		cameraRect = new Rect2(middle, Vector2.Zero);
-		for(var i = 0; i < followed.Count; ++i)
+		foreach(var ch in followed)
 		{
 			//go over the followed characters, expanding the rect to them
 			//the code here makes the expanded rect get more expanded the further you go from the center
 			//being linear from 0 (no expand) to 1 (full expand)
 			
-			var pos = followed[i].Position;//get position
+			var pos = ch.Position;//get position
 			var rpos = pos-middle;//get position relative to center
 			var frac = rpos/limits;//get position fraction
 			var afrac = frac.Abs();//get absoulte position fraction
@@ -79,10 +79,9 @@ public class MatchCamera : Camera2D
 	public Vector2 CalculateZoom(Rect2 rect, Vector2 size)
 	{
 		//calculates the correct zoom for the camera rect and viewport size
-		var maxX = Math.Max(1, rect.Size.x/size.x + zoomOffset);
-		var maxY = Math.Max(1, rect.Size.y/size.y + zoomOffset);
-		var maxZoom = Math.Max(maxX, maxY);
-		return new Vector2(maxZoom, maxZoom);
+		var zoomVector = (rect.Size/size + zoomOffset.Diagonal()).Max(1,1);
+		var maxZoom = Math.Max(zoomVector.x, zoomVector.y);
+		return maxZoom.Diagonal();
 	}
 	
 	public override void _Draw()
