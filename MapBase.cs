@@ -1,50 +1,18 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 public class MapBase : Node2D
 {
 	[Export]
-	public Rect2 BlastZones = BlastZone.CalcRect(new Vector2(512, 300), new Vector2(1500, 1200));
+	public Rect2 BlastZones = BlastZone.CalcRect(new Vector2(512, 300), new Vector2(1500, 1000));
 	
 	public override void _Ready()
 	{
-		/*var loaded1 = (PackedScene)ResourceLoader
-			.Load("res://Character.tscn");
-		
-		Character instance1 = (Character)(loaded1?.Instance());
-		
-		var loaded2 = (PackedScene)ResourceLoader
-			.Load("res://TestCharacter.tscn");
-				
-		Character instance2 = (Character)(loaded2?.Instance());
-		instance2.dummy = true;
-		
-		object path_obj = this.GetData("ini_path");
-		if(!(path_obj is null))
-		{
-			string path = (string)path_obj;
-			instance1.statConfigPath = path;
-			instance2.statConfigPath = path;
-		}
-		
-		
-		GetTree().Root.CallDeferred("add_child", instance1);
-		GetTree().Root.CallDeferred("add_child", instance2);*/
-		
-		/*var cr1 = new CharacterCreator("res://inicharactertest.ini");
-		var c1 = cr1.Build(this);
-		c1.teamNumber = 0;
-		c1.Respawn();
-		
-		var cr2 = new CharacterCreator("res://inicharactertest - Copy.ini");
-		var c2 = cr2.Build(this);
-		c2.teamNumber = 1;
-		c2.dummy = true;
-		c2.Respawn();*/
-		
 		var data = this.GetPublicData();
 		data.Add("CurrentInfoLabelCharacter", 0);
+		var chars = new List<Character>();
 		foreach(var i in 1.To(8))
 		{
 			object o = "";
@@ -75,17 +43,16 @@ public class MapBase : Node2D
 				Vector3[] colorlist = {blue, red, green, yellow, megenta, cyan, grey, pink};
 				
 				(c.sprite.Material as ShaderMaterial).SetShaderParam("color", colorlist[i-1]);
-				
-				
-				//c.dummy = data.GetOrDefault($"LoadedCharacter{i}Dummy", false).b();
 				c.Respawn();
 				
 				var im = new BufferInputManager(c.teamNumber);
 				c.AddChild(im);
 				c.Inputs = im;
-				//c.SetDeviceIDFilterForInputManager();
+				chars.Add(c);
 			}
 		}
+		
+		SetDamageLabelLocations(chars.ToArray());
 		
 		var camera = new MatchCamera();
 		AddChild(camera);
@@ -93,6 +60,35 @@ public class MapBase : Node2D
 		
 		var bz = new BlastZone(BlastZones);
 		AddChild(bz);
+	}
+	
+	public const float MARGIN = 50f;
+	public const float CENTER_OFFSET = 100f;
+	public void SetDamageLabelLocations(Character[] characters)
+	{
+		var windowsize = OS.WindowSize;
+		var topleft = Vector2.Zero;
+		var bottomright = windowsize;
+		var bottomleft = new Vector2(topleft.x, bottomright.y);
+		var leftedge = new Vector2(bottomleft.x,bottomleft.y-CENTER_OFFSET);
+		var rightedge = new Vector2(bottomright.x,bottomright.y-CENTER_OFFSET);
+		var counts = new int[]{characters.Length};
+		var locations = counts.GetLabelLocations(leftedge,rightedge,MARGIN);
+		var cl = new CanvasLayer();
+		cl.Name = "UI";
+		AddChild(cl);
+		for(int i = 0; i < characters.Length; ++i)
+		{
+			var ch = characters[i];
+			var v = locations[i];
+			var lb = new DebugLabel();
+			lb.ch = ch;
+			cl.AddChild(lb);
+			var dl = new DamageLabel();
+			dl.ch = ch;
+			dl.RectPosition = v;
+			cl.AddChild(dl);
+		}
 	}
 	
 	public override void _Process(float delta)

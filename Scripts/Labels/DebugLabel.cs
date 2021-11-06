@@ -4,12 +4,12 @@ using System;
 
 public class DebugLabel : InfoLabel
 {
-	Character ch;
+	public Character ch = null;
 	
 	public override void Connect()
 	{
-		ch = GetParent() as Character;
-		if(ch is null) ch = GetParent().GetParent() as Character;
+		//ch = GetParent() as Character;
+		//if(ch is null) ch = GetParent().GetParent() as Character;
 	}
 	
 	public override void UpdateLabel()

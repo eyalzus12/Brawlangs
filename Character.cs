@@ -126,9 +126,13 @@ public class Character : KinematicBody2D
 	[Export]
 	public float knockbackTakenMult = 1f;
 	[Export]
+	public int stunTakenMult = 1;
+	[Export]
 	public float damageDoneMult = 1f;
 	[Export]
 	public float knockbackDoneMult = 1f;
+	[Export]
+	public int stunDoneMult = 1;
 	////////////////////////////////////////////
 	public int direction = 1;//1 for right -1 for left
 	
@@ -568,14 +572,13 @@ public class Character : KinematicBody2D
 	
 	//public bool CanBeHit(Hitbox hit) => (hit.ch != this);
 	
-	public virtual void ApplyKnockback(Vector2 skb, Vector2 vkb, float d
-		, int stun, int hp)
+	public virtual void ApplyKnockback(Vector2 skb, Vector2 vkb, float d, int stun, int hp)
 	{
 		var s = ChangeState("HitPause") as HitPauseState;
 		damage += d * damageTakenMult;
-		var force = (skb + damage*vkb/100f)*knockbackTakenMult;
+		var force = (skb + damage*vkb/100f) * knockbackTakenMult;
 		s.force = force;
-		s.stunLength = stun;
+		s.stunLength = stun * stunTakenMult;
 		s.hitPauseLength = hp;
 		
 		if(force.x != 0f) direction = Math.Sign(force.x);

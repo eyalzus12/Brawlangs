@@ -1,5 +1,7 @@
 using Godot;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 public static class GeometryUtils
 {
@@ -86,4 +88,39 @@ public static class GeometryUtils
 		v.x.Clamp(mx, Mx),
 		v.y.Clamp(my, My)
 	);
+	
+	public static (Vector2,Vector2)[] SplitToParts(Vector2 v1, Vector2 v2, int amount, float margin)
+	{
+		v1 = v1.MoveToward(v2, margin);
+		v2 = v2.MoveToward(v1, margin);
+		var result = new (Vector2,Vector2)[amount];
+		var length = v1.DistanceTo(v2);
+		var partlength = length/amount;
+		var leftedge = v1;
+		for(int i = 0; i < amount; ++i)
+		{
+			var rightedge = leftedge.MoveToward(v2, partlength);
+			result[i] = (leftedge, rightedge);
+			leftedge = rightedge;
+		}
+		return result;
+	}
+	
+	public static Vector2 CenterBetween(Vector2 v1, Vector2 v2) => (v1+v2)/2f;
+	
+	public static Vector2[] PartCenters(this (Vector2,Vector2)[] vs) => vs.Select(p=>CenterBetween(p.Item1, p.Item2)).ToArray();
+	
+	public static Vector2[] GetLabelLocations(this int[] playercounts, Vector2 left, Vector2 right, float margin)
+	{
+		var result = new List<Vector2>();
+		var teamparts = SplitToParts(left, right, playercounts.Length, margin);
+		for(int i = 0; i < teamparts.Length; ++i)
+		{
+			var teampart = teamparts[i];
+			var playercount = playercounts[i];
+			var locationsforteam = SplitToParts(teampart.Item1, teampart.Item2, playercount, margin).PartCenters();
+			foreach(var l in locationsforteam) result.Add(l);
+		}
+		return result.ToArray();
+	}
 }

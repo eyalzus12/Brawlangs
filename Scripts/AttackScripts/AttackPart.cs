@@ -244,9 +244,11 @@ public class AttackPart : Node2D
 			if(!ch.CanHit(hitChar) || ignoreList.Contains(hitChar)) continue;
 			hit = true;
 			OnHit(hitbox, hurtbox);
-			hitChar.ApplyKnockback(ch.direction*hitbox.setKnockback*ch.knockbackDoneMult,
-			ch.direction*hitbox.varKnockback*ch.knockbackDoneMult, hitbox.damage*ch.damageDoneMult, hitbox.stun,
-				hitbox.hitpause);
+			var skb = new Vector2(ch.direction,1)*hitbox.setKnockback*ch.knockbackDoneMult;
+			var vkb = new Vector2(ch.direction,1)*hitbox.varKnockback*ch.knockbackDoneMult;
+			var damage = hitbox.damage*ch.damageDoneMult;
+			var stun = hitbox.stun*ch.stunDoneMult;
+			hitChar.ApplyKnockback(skb, vkb, damage, stun, hitbox.hitpause);
 			ignoreList.Add(hitChar);
 			GD.Print($"{hitChar} was hit by {hitbox.Name}");
 			att.OnHit(hitbox, hurtbox);

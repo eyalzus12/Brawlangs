@@ -20,7 +20,7 @@ public class DamageLabel : Label
 		if(DynamicText)
 		{
 			Text = $"{ch.damage.ToString()} / {ch.stocks}";
-			Visible = (this.GetDataOrDefault("CurrentInfoLabelCharacter",0).i() == ch.teamNumber);
+			//Visible = (this.GetDataOrDefault("CurrentInfoLabelCharacter",0).i() == ch.teamNumber);
 		}
 	}
 }

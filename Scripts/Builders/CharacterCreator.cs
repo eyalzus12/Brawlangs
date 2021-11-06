@@ -62,7 +62,7 @@ public class CharacterCreator
 		var attCreator = new AttackCreator(attackPath);
 		attCreator.Build(ch);
 		
-		var cl = new CanvasLayer();
+		/*var cl = new CanvasLayer();
 		cl.Name = "UI";
 		ch.AddChild(cl);
 		var lb = new DebugLabel();
@@ -71,7 +71,7 @@ public class CharacterCreator
 		dl.ch = ch;
 		dl.MarginLeft = 1000;
 		dl.MarginTop = 200;
-		cl.AddChild(dl);
+		cl.AddChild(dl);*/
 		
 		var animationPath = charinif[BASE_SECTION, "Animations", ""].s();
 		BuildAnimations(ch, animationPath);
