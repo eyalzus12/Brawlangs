@@ -34,8 +34,9 @@ public class StunState : State
 	
 	protected override void RepeatActions()
 	{
-		ch.voc.x *= (1f-ch.airFriction);
-		ch.voc.y.Lerp(ch.fallSpeed, ch.gravity);
+		var friction = ch.grounded?ch.groundFriction*ch.ffric:ch.airFriction;
+		ch.voc.x *= (1f-friction);
+		if(!ch.grounded) ch.voc.y.Lerp(ch.fallSpeed, ch.gravity);
 		
 		if(bounced){}
 		else if(ch.grounded)

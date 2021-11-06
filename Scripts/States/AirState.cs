@@ -95,12 +95,11 @@ public class AirState : State
 		SetHorizontalAlternatingInputs();
 		SetFastFallInput();
 		SetDownHoldingInput();
+		SetUpHoldingInput();
 	}
 	
 	protected override bool CalcStateChange()
 	{
-		//TODO: add a downwards raycast to prevent the 2 frames of stopping on land
-		
 		if(platformCancel)//not active
 		{
 			var move = new Vector2(0f, -1000f);
@@ -109,6 +108,9 @@ public class AirState : State
 			ch.SetCollisionMaskBit(DROP_THRU_BIT, true);
 			GD.Print(ch.MoveAndCollide(move));
 		}
+		
+		if(ch.currentAttack != null) return true;
+		//trick other states into not switching during an attack
 		
 		if(ch.walled) ch.ChangeState("WallLand");
 		else if(ch.grounded)

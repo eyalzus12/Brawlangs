@@ -146,8 +146,6 @@ public class AttackCreator
 		ap.length = ln;
 		var el = inif[section, "Endlag", 0].i();
 		ap.endlag = el;
-		var hm = inif[section, "Moves", false].b();
-		ap.hasMovement = hm;
 		var mv = inif[section, "Movement", Vector2.Zero].v2();
 		ap.movement = mv;
 		var me = inif[section, "MissEndlag", 0].i();

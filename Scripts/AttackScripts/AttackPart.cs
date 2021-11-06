@@ -29,9 +29,6 @@ public class AttackPart : Node2D
 	public int length = 0;
 	
 	[Export]
-	public bool hasMovement = false;
-	
-	[Export]
 	public Vector2 movement = default;
 	
 	[Export]
@@ -94,16 +91,15 @@ public class AttackPart : Node2D
 		active = true;
 		hit = false;
 		frameCount = 0;
-		if(hasMovement)
-		{
+		if(movement != Vector2.Zero)
 			ch.vec = movement * new Vector2(ch.direction, 1);
-			if(ch.grounded) ch.vec.y = State.VCF;
-		}
 		
 		OnStart();
 		//hitboxPlayer = GetNode("AttackPlayer") as AnimationPlayer;
 		//GD.Print("activating");
 		hitboxPlayer.Play("HitboxActivation");
+		hitList.Clear();
+		ignoreList.Clear();
 	}
 	
 	public virtual void Pause()
@@ -117,7 +113,6 @@ public class AttackPart : Node2D
 		++frameCount;
 		Loop();
 		ActualHit(/*activator*/);
-		hitList.Clear();
 	}
 	
 	public void BuildHitboxAnimator()
@@ -163,10 +158,13 @@ public class AttackPart : Node2D
 	public virtual void Stop()
 	{
 		//GD.Print(hitboxes.Count);
+		hitboxPlayer.Stop(true);
 		hitboxes.ForEach(h => h.Active = false);
 		active = false;
 		OnEnd();
+		hitList.Clear();
 		ignoreList.Clear();
+		hit = false;
 	}
 	
 	public virtual void Loop()
@@ -236,6 +234,7 @@ public class AttackPart : Node2D
 	
 	public virtual void ActualHit(/*(Hitbox, Area2D) info*/)
 	{
+		if(!active) return;
 		foreach(var entry in hitList)
 		{
 			Hitbox hitbox = entry.Value;
@@ -254,6 +253,7 @@ public class AttackPart : Node2D
 			att.OnHit(hitbox, hurtbox);
 			ch.HandleHitting(hitbox, hurtbox, hitChar);
 		}
+		hitList.Clear();
 	}
 	
 	public virtual int GetEndlag() => endlag + (hit?0:missEndlag);
