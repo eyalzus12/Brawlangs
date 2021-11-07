@@ -42,7 +42,7 @@ public class GroundedState : State
 	
 	protected override void LightAttack()
 	{
-		if(jump || !IsActionable()) return;
+		if(jump || !IsActionable() || ch.currentAttack != null) return;
 		
 		if(ch.upHeld) ch.ExecuteAttack("NLight");
 		else if(ch.downHeld) ch.ExecuteAttack("DLight");
@@ -52,7 +52,7 @@ public class GroundedState : State
 	
 	protected override void HeavyAttack()
 	{
-		if(jump || !IsActionable()) return;
+		if(jump || !IsActionable() || ch.currentAttack != null) return;
 		
 		if(ch.upHeld) ch.ExecuteAttack("NStrong");
 		else if(ch.downHeld) ch.ExecuteAttack("DStrong");
@@ -62,7 +62,7 @@ public class GroundedState : State
 	
 	protected override void SpecialAttack()
 	{
-		if(jump || !IsActionable()) return;
+		if(jump || !IsActionable() || ch.currentAttack != null) return;
 		
 		if(ch.upHeld) ch.ExecuteAttack("NSpecial");
 		else if(ch.downHeld) ch.ExecuteAttack("DSpecial");

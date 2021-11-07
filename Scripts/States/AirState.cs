@@ -62,7 +62,7 @@ public class AirState : State
 	
 	protected override void LightAttack()
 	{
-		if(!IsActionable()) return;
+		if(!IsActionable() || ch.currentAttack != null) return;
 		
 		if(ch.upHeld) ch.ExecuteAttack("NAir");
 		else if(ch.downHeld) ch.ExecuteAttack("DAir");
@@ -72,7 +72,7 @@ public class AirState : State
 	
 	protected override void HeavyAttack()
 	{
-		if(!IsActionable()) return;
+		if(!IsActionable() || ch.currentAttack != null) return;
 		
 		if(ch.upHeld) ch.ExecuteAttack("NSlam");
 		else if(ch.downHeld) ch.ExecuteAttack("DSlam");
@@ -82,7 +82,7 @@ public class AirState : State
 	
 	protected override void SpecialAttack()
 	{
-		if(!IsActionable()) return;
+		if(!IsActionable() || ch.currentAttack != null) return;
 		
 		if(ch.upHeld) ch.ExecuteAttack("NSpecial");
 		else if(ch.downHeld) ch.ExecuteAttack("DSpecial");
