@@ -106,6 +106,7 @@ public class DebugLabel : InfoLabel
 		Add("SpecialAttackInput", GetInputString("player_special_attack"));
 		//Add("TauntAttackInput", GetInputString("player_taunt_attack"));
 		Newline();
+		Newline();
 		Add("Buffer", "\n"+ch.Inputs.ToString());
 		Newline();
 		Add("FPS", Engine.GetFramesPerSecond());
