@@ -164,7 +164,6 @@ public class AttackPart : Node2D
 		OnEnd();
 		hitList.Clear();
 		ignoreList.Clear();
-		hit = false;
 	}
 	
 	public virtual void Loop()

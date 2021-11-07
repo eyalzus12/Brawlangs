@@ -62,18 +62,9 @@ public class MapBase : Node2D
 		AddChild(bz);
 	}
 	
-	public const float MARGIN = 50f;
-	public const float CENTER_OFFSET = 100f;
 	public void SetDamageLabelLocations(Character[] characters)
 	{
-		var windowsize = OS.WindowSize;
-		var topleft = Vector2.Zero;
-		var bottomright = windowsize;
-		var bottomleft = new Vector2(topleft.x, bottomright.y);
-		var leftedge = new Vector2(bottomleft.x,bottomleft.y-CENTER_OFFSET);
-		var rightedge = new Vector2(bottomright.x,bottomright.y-CENTER_OFFSET);
-		var counts = new int[]{characters.Length};
-		var locations = counts.GetLabelLocations(leftedge,rightedge,MARGIN);
+		var locations = GetDamageLabelLocations();
 		var cl = new CanvasLayer();
 		cl.Name = "UI";
 		AddChild(cl);
@@ -89,6 +80,20 @@ public class MapBase : Node2D
 			dl.RectPosition = v;
 			cl.AddChild(dl);
 		}
+	}
+	
+	public const float MARGIN = 50f;
+	public const float CENTER_OFFSET = 100f;
+	public Vector2[] GetDamageLabelLocations()
+	{
+		var windowsize = new Vector2(1024, 600);
+		var topleft = Vector2.Zero;
+		var bottomright = windowsize;
+		var bottomleft = new Vector2(topleft.x, bottomright.y);
+		var leftedge = new Vector2(bottomleft.x,bottomleft.y-CENTER_OFFSET);
+		var rightedge = new Vector2(bottomright.x,bottomright.y-CENTER_OFFSET);
+		var counts = new int[]{characters.Length};
+		return counts.GetLabelLocations(leftedge,rightedge,MARGIN);
 	}
 	
 	public override void _Process(float delta)
