@@ -41,7 +41,7 @@ public class AttackState : State
 	
 	protected override void RepeatActions()
 	{
-		if(ch.walled) ch.jumpCounter = 0;
+		if(ch.walled && ch.wallJumpCounter < ch.wallJumpNum) ch.jumpCounter = 0;
 	}
 	
 	public void SetEnd(Attack a)

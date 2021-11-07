@@ -20,6 +20,8 @@ public class WallLandState : WallState
 		//ch.onSemiSolid = false;
 		ch.PlayAnimation("WallLand");
 		ch.ApplySettings("Wall");
+		
+		ch.wallJumpCounter++;
 	}
 	
 	protected override bool CalcStateChange()

@@ -91,23 +91,33 @@ public class DebugLabel : InfoLabel
 		Add("Down", ch.downHeld);
 		Add("Up", ch.upHeld);
 		Newline();
-		Add("LeftInput", ch.Inputs.IsActionPressed("player_left"));
-		Add("RightInput", ch.Inputs.IsActionPressed("player_right"));
-		Add("DownInput", ch.Inputs.IsActionPressed("player_down"));
-		Add("UpInput", ch.Inputs.IsActionPressed("player_up"));
+		Add("Air jumps Used", ch.jumpCounter);
+		Add("Wall touches", ch.wallJumpCounter);
 		Newline();
-		Add("JumpInput", ch.Inputs.IsActionPressed("player_jump"));
+		Add("LeftInput",GetInputString("player_left"));
+		Add("RightInput", GetInputString("player_right"));
+		Add("DownInput", GetInputString("player_down"));
+		Add("UpInput", GetInputString("player_up"));
 		Newline();
-		Add("LightAttackInput", ch.Inputs.IsActionPressed("player_light_attack"));
-		Add("HeavyAttackInput", ch.Inputs.IsActionPressed("player_heavy_attack"));
-		Add("SpecialAttackInput", ch.Inputs.IsActionPressed("player_special_attack"));
-		//Add("TauntAttackInput", ch.Inputs.IsActionPressed("player_taunt_attack"));
+		Add("JumpInput", GetInputString("player_jump"));
 		Newline();
-		Add("Jumps Used", ch.jumpCounter);
-		//Add("Wall jumps used", ch.wallJumpCounter);
+		Add("LightAttackInput", GetInputString("player_light_attack"));
+		Add("HeavyAttackInput", GetInputString("player_heavy_attack"));
+		Add("SpecialAttackInput", GetInputString("player_special_attack"));
+		//Add("TauntAttackInput", GetInputString("player_taunt_attack"));
+		Newline();
+		Add("Buffer", "\n"+ch.Inputs.ToString());
 		Newline();
 		Add("FPS", Engine.GetFramesPerSecond());
+		Add("Physics frame", Engine.GetPhysicsFrames());
+		Add("Debug build", OS.IsDebugBuild());
 	}
 	
 	protected override bool EnsureCorrectAppearence() => (this.GetDataOrDefault("CurrentInfoLabelCharacter",0).i() == ch.teamNumber);
+	
+	private string GetInputString(string s) =>
+		ch.Inputs.IsActionJustPressed(s)?"Pressed":
+		ch.Inputs.IsActionPressed(s)?"Held":
+		ch.Inputs.IsActionJustReleased(s)?"Released":
+		"Free";
 }

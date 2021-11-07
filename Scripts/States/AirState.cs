@@ -112,7 +112,7 @@ public class AirState : State
 		if(ch.currentAttack != null) return true;
 		//trick other states into not switching during an attack
 		
-		if(ch.walled) ch.ChangeState("WallLand");
+		if(ch.walled && ch.wallJumpCounter < ch.wallJumpNum) ch.ChangeState("WallLand");
 		else if(ch.grounded)
 		{
 			if(platformCancel) ch.ChangeState("Jump");//not active

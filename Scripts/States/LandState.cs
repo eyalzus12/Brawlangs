@@ -18,6 +18,7 @@ public class LandState : GroundedState
 		
 		ch.vac = Vector2.Zero;
 		ch.jumpCounter = 0;
+		ch.wallJumpCounter = 0;
 		ch.fastfalling = false;
 			
 		AdjustVelocity();
