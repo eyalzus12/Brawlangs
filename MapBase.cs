@@ -64,7 +64,8 @@ public class MapBase : Node2D
 	
 	public void SetDamageLabelLocations(Character[] characters)
 	{
-		var locations = GetDamageLabelLocations();
+		var counts = new int[]{characters.Length};
+		var locations = GetDamageLabelLocations(counts);
 		var cl = new CanvasLayer();
 		cl.Name = "UI";
 		AddChild(cl);
@@ -84,15 +85,16 @@ public class MapBase : Node2D
 	
 	public const float MARGIN = 50f;
 	public const float CENTER_OFFSET = 100f;
-	public Vector2[] GetDamageLabelLocations()
+	public Vector2[] GetDamageLabelLocations(int[] counts)
 	{
-		var windowsize = new Vector2(1024, 600);
+		var width = ProjectSettings.GetSetting("display/window/size/width").f();
+		var height = ProjectSettings.GetSetting("display/window/size/height").f();
+		var windowsize = new Vector2(width, height);
 		var topleft = Vector2.Zero;
 		var bottomright = windowsize;
 		var bottomleft = new Vector2(topleft.x, bottomright.y);
 		var leftedge = new Vector2(bottomleft.x,bottomleft.y-CENTER_OFFSET);
 		var rightedge = new Vector2(bottomright.x,bottomright.y-CENTER_OFFSET);
-		var counts = new int[]{characters.Length};
 		return counts.GetLabelLocations(leftedge,rightedge,MARGIN);
 	}
 	
