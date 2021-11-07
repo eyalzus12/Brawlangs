@@ -63,6 +63,9 @@ public class Character : KinematicBody2D
 	public float jumpHeight = 400f;
 	//how high you jump
 	[Export]
+	public float shorthopHeight = 200f;
+	//how high you shorthop
+	[Export]
 	public float doubleJumpHeight = 600f;
 	//how high you jump in the air
 	[Export]

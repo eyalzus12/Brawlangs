@@ -29,8 +29,8 @@ public class JumpState : GroundedState
 		if(frameCount >= ch.jumpSquat)
 		{
 			jumpActive = true;
-			ch.vec.x *= (1f-Math.Abs(ch.fnorm.x));
-			ch.vec.y = -ch.jumpHeight;
+			//ch.vec.x *= (1f-Math.Abs(ch.fnorm.x));
+			ch.vec.y = -(Inputs.IsActionPressed("player_jump")?ch.jumpHeight:ch.shorthopHeight);
 			Unsnap();
 		}
 	}

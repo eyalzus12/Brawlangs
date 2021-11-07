@@ -6,13 +6,13 @@ using System.Linq;
 
 public class BufferInputManager : InputManager
 {
-	protected const string CONFIG_PATH = "res://buffer.ini";
+	protected const string CONFIG_PATH = "res://buffer.cfg";
 	protected const string LENGTH_SECTION = "length";
 		
 	public Dictionary<string, BufferInfo> buffer = 
 		new Dictionary<string, BufferInfo>();
 		
-	IniFile config = new IniFile();
+	CfgFile config = new CfgFile();
 	
 	//public bool filterByDeviceID = false;
 	//public HashSet<int> deviceIDFilter = new HashSet<int>();
@@ -41,9 +41,9 @@ public class BufferInputManager : InputManager
 		
 		//GD.Print(config.ToString());
 		
-		foreach(var key in config[LENGTH_SECTION].Keys)
+		foreach(var key in config.Keys)
 		{
-			var res = config[LENGTH_SECTION, key, 1].i();
+			int res = config[key, 1].i();
 			buffer.Add($"{key}_{playerDeviceNumber}", new BufferInfo(res));
 		}
 	}
@@ -53,14 +53,6 @@ public class BufferInputManager : InputManager
 		if(@event is InputEventMouseMotion) return;
 		//yeets the input if it's a mouse motion
 		//because fuck mouse motions
-		//GD.Print($"Input {@event.AsText()} has device id {@event.Device}");
-		//GD.Print("filtering by:");
-		//foreach(var i in deviceIDFilter) GD.Print(i);
-		//GD.Print($"is {filterByDeviceID}");
-		//GD.Print($"contain is {deviceIDFilter.Contains(@event.Device)}");
-		//if(filterByDeviceID && !deviceIDFilter.Contains(@event.Device)) return;
-		//yeets the input if it doesn't have the proper device ID
-		//GD.Print("passed input");
 		foreach(string action in InputMap.GetActions())
 		{
 			if(InputMap.ActionHasEvent(action, @event))
