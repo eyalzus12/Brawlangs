@@ -48,6 +48,8 @@ public class GroundedState : State
 		else if(ch.downHeld) ch.ExecuteAttack("DLight");
 		else if(ch.rightHeld || ch.leftHeld) ch.ExecuteAttack("SLight");
 		else ch.ExecuteAttack("NLight");
+		
+		MarkForDeletion("player_light_attack", true);
 	}
 	
 	protected override void HeavyAttack()
@@ -58,6 +60,8 @@ public class GroundedState : State
 		else if(ch.downHeld) ch.ExecuteAttack("DStrong");
 		else if(ch.rightHeld || ch.leftHeld) ch.ExecuteAttack("SStrong");
 		else ch.ExecuteAttack("NStrong");
+		
+		MarkForDeletion("player_heavy_attack", true);
 	}
 	
 	protected override void SpecialAttack()
@@ -68,6 +72,8 @@ public class GroundedState : State
 		else if(ch.downHeld) ch.ExecuteAttack("DSpecial");
 		else if(ch.rightHeld || ch.leftHeld) ch.ExecuteAttack("SSpecial");
 		else ch.ExecuteAttack("NSpecial");
+		
+		MarkForDeletion("player_special_attack", true);
 	}
 	
 	public override void SetInputs()

@@ -68,6 +68,8 @@ public class AirState : State
 		else if(ch.downHeld) ch.ExecuteAttack("DAir");
 		else if(ch.rightHeld || ch.leftHeld) ch.ExecuteAttack("SAir");
 		else ch.ExecuteAttack("NAir");
+		
+		MarkForDeletion("player_light_attack", true);
 	}
 	
 	protected override void HeavyAttack()
@@ -78,6 +80,8 @@ public class AirState : State
 		else if(ch.downHeld) ch.ExecuteAttack("DSlam");
 		else if(ch.rightHeld || ch.leftHeld) ch.ExecuteAttack("SSlam");
 		else ch.ExecuteAttack("NSlam");
+		
+		MarkForDeletion("player_heavy_attack", true);
 	}
 	
 	protected override void SpecialAttack()
@@ -88,6 +92,8 @@ public class AirState : State
 		else if(ch.downHeld) ch.ExecuteAttack("DSpecial");
 		else if(ch.rightHeld || ch.leftHeld) ch.ExecuteAttack("SSpecial");
 		else ch.ExecuteAttack("NSpecial");
+		
+		MarkForDeletion("player_special_attack", true);
 	}
 	
 	public override void SetInputs()

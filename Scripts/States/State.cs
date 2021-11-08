@@ -54,8 +54,8 @@ public class State : Node
 			LightAttack();
 		if(Inputs.IsActionJustPressed("player_heavy_attack"))
 			HeavyAttack();
-		//if(Inputs.IsActionJustPressed("player_heavy_attack"))
-		//	HeavyAttack();
+		//if(Inputs.IsActionJustPressed("player_special_attack"))
+		//	SpecialAttack();
 		
 		var norm = ch.grounded?ch.fnorm:Vector2.Zero;
 		var v = ch.GetVelocity().TiltToNormal(norm);

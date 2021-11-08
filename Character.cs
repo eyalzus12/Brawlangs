@@ -256,6 +256,7 @@ public class Character : KinematicBody2D
 			shape.Radius = 3f;
 			cs.Shape = shape;
 			proj.Active = true;
+			Inputs.MarkForDeletion("player_special_attack", true);
 		}
 			
 		sprite.FlipH = DirectionToBool();
