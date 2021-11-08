@@ -3,6 +3,8 @@ using System;
 
 public class AttackState : State
 {
+	public bool touched = false;
+	
 	public AttackState() : base() {}
 	public AttackState(Character link) : base(link) {}
 	
@@ -12,6 +14,7 @@ public class AttackState : State
 	
 	public override void Init()
 	{
+		touched = false;
 		//ch.PlayAnimation(att.animation);
 		//figure out way to do it when the attack actually exists
 	}
@@ -41,10 +44,13 @@ public class AttackState : State
 	
 	protected override void RepeatActions()
 	{
-		if(ch.walled && ch.wallJumpCounter < ch.wallJumpNum)
+		if(ch.walled && ch.wallJumpCounter < ch.wallJumpNum && !touched)
 		{
 			ch.jumpCounter = 0;
+			ch.wallJumpCounter++;
+			touched = true;
 		}
+		
 		if(ch.grounded)
 		{
 			ch.jumpCounter = 0;

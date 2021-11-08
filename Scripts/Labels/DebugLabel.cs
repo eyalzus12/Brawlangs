@@ -28,10 +28,10 @@ public class DebugLabel : InfoLabel
 		Add("Wall", ch.walled);
 		Add("Ceil", ch.ceilinged);
 		Newline();
-		Add("State", ch.currentState);
-		Add("PrevState", ch.prevState);
-		Add("PrevPrevState", ch.prevPrevState);
-		Add("StateFrame", ch.currentState.frameCount);
+		Add("State", ch.currentState?.ToString()??"None");
+		Add("PrevState", ch.prevState?.ToString()??"None");
+		Add("PrevPrevState", ch.prevPrevState?.ToString()??"None");
+		Add("StateFrame", ch.currentState?.frameCount??0);
 		Newline();
 		var attack = (ch.currentState is AttackState a)?a.att:null;
 		Add("Attack", attack?.Name??"None");

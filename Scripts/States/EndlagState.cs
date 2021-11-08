@@ -44,18 +44,13 @@ public class EndlagState : State
 		if(frameCount >= endlag)
 		{
 			if(!ch.downHeld) ch.Uncrouch();
-			ch.ChangeState
-			(
-				ch.grounded?
-				(
-					ch.downHeld?
-					"Crawl"
-					:"Walk"
-				)
-				:(ch.walled && ch.wallJumpCounter < ch.wallJumpNum)?
-				"WallLand"
-				:"Air"
-			);
+			
+			if(ch.walled && ch.wallJumpCounter < ch.wallJumpNum)
+			{
+				ch.wallJumpCounter--;
+				ch.ChangeState("WallLand");
+			}
+			else ch.ChangeState(ch.grounded?ch.downHeld?"Crawl":"Walk":"Air");
 		}
 		else return false;
 		
