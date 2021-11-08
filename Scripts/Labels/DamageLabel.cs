@@ -15,7 +15,7 @@ public class DamageLabel : Label
 	
 	public override void _Process(float delta)
 	{
-		if(ch is null) return;
+		if(ch is null || !Godot.Object.IsInstanceValid(ch)) return;
 		AddColorOverride("font_color", DamageCalculator.DamageToColor(ch.damage));
 		if(DynamicText)
 		{

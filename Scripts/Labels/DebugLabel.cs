@@ -14,7 +14,7 @@ public class DebugLabel : InfoLabel
 	
 	public override void UpdateLabel()
 	{
-		if(ch is null) return;
+		if(ch is null || !Godot.Object.IsInstanceValid(ch)) return;
 		Add("Name", ch.Name);
 		Add("Script", ch.GetType().Name);
 		Newline();
