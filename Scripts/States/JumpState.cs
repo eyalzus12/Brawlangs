@@ -30,7 +30,7 @@ public class JumpState : GroundedState
 		{
 			jumpActive = true;
 			//ch.vec.x *= (1f-Math.Abs(ch.fnorm.x));
-			ch.vec.y = -(Inputs.IsActionPressed("player_jump")?ch.jumpHeight:ch.shorthopHeight);
+			ch.vec.y = -(Inputs.IsActionReallyPressed("player_jump")?ch.jumpHeight:ch.shorthopHeight);
 			Unsnap();
 		}
 	}

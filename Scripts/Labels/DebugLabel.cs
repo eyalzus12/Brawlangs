@@ -20,9 +20,10 @@ public class DebugLabel : InfoLabel
 		Newline();
 		Add("Fastfalling", ch.fastfalling);
 		Add("Crouch", ch.crouching);
-		Add("FallThrough", ch.onSemiSolid);
+		Add("OnSemiSolid", ch.onSemiSolid);
 		Add("Slope", ch.onSlope);
 		Add("Direction", ch.GetStringDirection());
+		Add("FallingThrough", !ch.GetCollisionMaskBit(1));
 		Newline();
 		Add("Ground", ch.grounded);
 		Add("Wall", ch.walled);
@@ -52,6 +53,7 @@ public class DebugLabel : InfoLabel
 		Add("AnimationCoord", ch.sprite.FrameCoords);
 		Newline();
 		Add("CollisionSetting", ch.currentSetting.Name);
+		Add("CollisionMask", ch.CollisionMask);
 		Newline();
 		var ext = (ch.collision.Shape as RectangleShape2D).Extents;
 		Add("CollisionWidth", ext.x);

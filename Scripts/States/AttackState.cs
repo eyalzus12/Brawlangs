@@ -15,6 +15,8 @@ public class AttackState : State
 	public override void Init()
 	{
 		touched = false;
+		if(Inputs.IsActionPressed("player_down") && !ch.grounded)
+			ch.SetCollisionMaskBit(DROP_THRU_BIT, false);
 		//ch.PlayAnimation(att.animation);
 		//figure out way to do it when the attack actually exists
 	}
@@ -44,6 +46,11 @@ public class AttackState : State
 	
 	protected override void RepeatActions()
 	{
+		if(Inputs.IsActionJustPressed("player_down") && !ch.grounded)
+			ch.SetCollisionMaskBit(DROP_THRU_BIT, false);
+		if(Inputs.IsActionJustReleased("player_down"))
+			ch.SetCollisionMaskBit(DROP_THRU_BIT, true);
+		
 		if(ch.walled && ch.wallJumpCounter < ch.wallJumpNum && !touched)
 		{
 			ch.jumpCounter = 0;
@@ -60,8 +67,10 @@ public class AttackState : State
 	
 	public void SetEnd(Attack a)
 	{
+		ch.SetCollisionMaskBit(DROP_THRU_BIT, true);
 		a.Disconnect("AttackEnds", this, nameof(SetEnd));
 		a.connected = null;
+		ch.SetCollisionMaskBit(DROP_THRU_BIT, true);
 		int endlag = a.currentPart.GetEndlag();
 		var s = ch.ChangeState("Endlag") as EndlagState;
 		s.endlag = endlag;

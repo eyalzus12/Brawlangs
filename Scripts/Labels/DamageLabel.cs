@@ -15,12 +15,14 @@ public class DamageLabel : Label
 	
 	public override void _Process(float delta)
 	{
-		if(ch is null || !Godot.Object.IsInstanceValid(ch)) return;
-		AddColorOverride("font_color", DamageCalculator.DamageToColor(ch.damage));
-		if(DynamicText)
+		if(ch is null || !Godot.Object.IsInstanceValid(ch))
 		{
-			Text = $"{ch.damage.ToString()} / {ch.stocks}";
-			//Visible = (this.GetDataOrDefault("CurrentInfoLabelCharacter",0).i() == ch.teamNumber);
+			if(DynamicText) Text = "0/0";
+		}
+		else 
+		{
+			AddColorOverride("font_color", DamageCalculator.DamageToColor(ch.damage));
+			if(DynamicText) Text = $"{ch.damage.ToString()} / {ch.stocks}";
 		}
 	}
 }
