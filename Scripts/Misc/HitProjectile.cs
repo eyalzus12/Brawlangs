@@ -18,5 +18,6 @@ public class HitProjectile : Projectile2D
 		ch.ApplyKnockback(Math.Sign(move.x)*setKnockback,
 		Math.Sign(move.x)*varKnockback, damage, stun, hitpause);
 		GD.Print($"{ch} was hit by a projectile {this.ToString()}");
+		Destruct();
 	}
 }

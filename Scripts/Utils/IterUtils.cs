@@ -89,4 +89,6 @@ public static class IterUtils
 		//TOOD: create
 		return @default;
 	}
+	
+	public static Vector2 Avg(this IEnumerable<Vector2> e) => e.Aggregate(Vector2.Zero,(a,v)=>a+v)/e.Count();
 }
