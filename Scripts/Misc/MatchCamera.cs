@@ -12,7 +12,7 @@ public class MatchCamera : Camera2D
 	[Export]
 	public bool debugMode = false;
 	[Export]
-	public Vector2 limits = new Vector2(1000, 700);//how far away from the screen center the camera is allowed to see into
+	public Vector2 limits = new Vector2(700, 700);//how far away from the screen center the camera is allowed to see into
 	[Export]
 	public Vector2 middle = new Vector2(512, 300);//new Vector2(448, 304);//center of screen
 	[Export]
@@ -70,9 +70,9 @@ public class MatchCamera : Camera2D
 			
 			var pos = ch.Position;//get position
 			var rpos = pos-OffsetPos;//get position relative to middle
-			var frac = (rpos/limits).Min(1,1);//get position fraction
-			//var afrac = frac.Abs();//get absoulte position fraction
-			var afrac = 2*frac.Abs()-frac*frac;//get absoulte position fraction
+			var frac = (rpos/limits);//.Min(1,1).Max(-1,-1);//get position fraction
+			var afrac = frac.Abs();//get absoulte position fraction
+			//var afrac = 2*frac.Abs()-frac*frac;//get absoulte position fraction
 			var nrpos = rpos*afrac;//get new relative position
 			var npos = nrpos+OffsetPos;//get new posiiton
 			cameraRect = cameraRect.Expand(npos);//expand rect to position
@@ -83,7 +83,7 @@ public class MatchCamera : Camera2D
 		cameraRect.Position += middle;//get new position
 		Offset = Offset.LinearInterpolate(cameraRect.Center(), interpolationWeight);
 		//interpolate between the desired position and the current one, to smoothen it out
-		Zoom = Zoom.LinearInterpolate(baseZoom*CalculateZoom(cameraRect, viewportRect.Size), interpolationWeight);
+		Zoom = Zoom.LinearInterpolate(CalculateZoom(cameraRect, viewportRect.Size), interpolationWeight);
 		//interpolate between the desired zoom and the current one, to smoothen it out
 		if(debugMode) Update();
 	}
@@ -92,7 +92,7 @@ public class MatchCamera : Camera2D
 	{
 		//calculates the correct zoom for the camera rect and viewport size
 		var zoomVector = (rect.Size/size + zoomOffset.Diagonal()).Max(1,1);
-		var maxZoom = Math.Max(zoomVector.x, zoomVector.y);
+		var maxZoom = baseZoom*Math.Max(zoomVector.x, zoomVector.y);
 		return maxZoom.Diagonal();
 	}
 	
@@ -104,7 +104,11 @@ public class MatchCamera : Camera2D
 		var White = new Color(1, 1, 1);
 		var Red = new Color(1, 0, 0);
 		var Blue = new Color(0, 0, 1);
+		
+		var limitRect = BlastZone.CalcRect(middle, limits);
 		DrawRect(cameraRect, Red, false);
+		DrawRect(limitRect, Red, false);
+		DrawRect(viewportRect, White, false);
 		DrawCircle(cameraRect.Center(), 5, Red);
 		DrawCircle(middle, 5, White);
 		DrawCircle(OffsetPos, 5, Blue);
