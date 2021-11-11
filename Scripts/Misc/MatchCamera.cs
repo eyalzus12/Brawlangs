@@ -85,7 +85,7 @@ public class MatchCamera : Camera2D
 		//interpolate between the desired position and the current one, to smoothen it out
 		Zoom = Zoom.LinearInterpolate(CalculateZoom(cameraRect, viewportRect.Size), interpolationWeight);
 		//interpolate between the desired zoom and the current one, to smoothen it out
-		if(debugMode) Update();
+		Update();
 	}
 	
 	public Vector2 CalculateZoom(Rect2 rect, Vector2 size)

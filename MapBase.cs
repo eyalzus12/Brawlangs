@@ -22,27 +22,27 @@ public class MapBase : Node2D
 				var cr = new CharacterCreator(s);
 				var c = cr.Build(this);
 				c.teamNumber = i-1;
-				var numberlabel = new DamageLabel(false);
+				/*var numberlabel = new DamageLabel(false);
 				numberlabel.MarginTop = -75f;
 				numberlabel.Text = c.teamNumber.ToString();
 				c.AddChild(numberlabel);
-				numberlabel.ch = c;
+				numberlabel.ch = c;*/
 				
 				var shader = ResourceLoader.Load<Shader>("res://colormult.shader");
 				var material = new ShaderMaterial();
 				material.Shader = shader;
 				c.sprite.Material = material;
-				var blue = new Vector3(0, 0, 1);
-				var red = new Vector3(1, 0, 0);
-				var green = new Vector3(0, 1, 0);
-				var yellow = new Vector3(1, 1, 0);
-				var megenta = new Vector3(1, 0, 1);
-				var cyan = new Vector3(0, 1, 1);
-				var grey = new Vector3(0.5f, 0.5f, 0.5f);
-				var pink = new Vector3(1, 0.5f, 0.5f);
-				Vector3[] colorlist = {blue, red, green, yellow, megenta, cyan, grey, pink};
+				var blue = new Color(0, 0, 1);
+				var red = new Color(1, 0, 0);
+				var green = new Color(0, 1, 0);
+				var yellow = new Color(1, 1, 0);
+				var megenta = new Color(1, 0, 1);
+				var cyan = new Color(0, 1, 1);
+				var grey = new Color(0.5f, 0.5f, 0.5f);
+				var pink = new Color(1, 0.5f, 0.5f);
+				Color[] colorlist = {blue, red, green, yellow, megenta, cyan, grey, pink};
 				
-				(c.sprite.Material as ShaderMaterial).SetShaderParam("color", colorlist[i-1]);
+				c.Modulate = colorlist[i-1];
 				c.Respawn();
 				
 				var im = new BufferInputManager(c.teamNumber);

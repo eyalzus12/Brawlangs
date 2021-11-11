@@ -123,4 +123,15 @@ public static class GeometryUtils
 		}
 		return result.ToArray();
 	}
+	
+	public static void DrawCapsuleShape(CanvasItem ci, CapsuleShape2D shape, Vector2 position, float rotation, Color color)
+	{
+		var height = shape.Height;
+		var radius = shape.Radius;
+		ci.DrawSetTransform(position, rotation, new Vector2(1,1));
+		var middleRect = BlastZone.CalcRect(Vector2.Zero, new Vector2(radius, height/2));
+		ci.DrawRect(middleRect, color);
+		ci.DrawCircle(new Vector2(0, height/2), radius, color);
+		ci.DrawCircle(new Vector2(0, -height/2), radius, color);
+	}
 }
