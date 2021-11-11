@@ -202,7 +202,7 @@ public class AttackPart : Node2D
 	
 	public void ChangePart(string part)
 	{
-		if(part == "") return;
+		if(!active || part == "") return;
 		var changeTo = GetConnectedPart(part);
 		att.SetPart(changeTo);
 	}

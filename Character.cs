@@ -389,6 +389,7 @@ public class Character : KinematicBody2D
 	{
 		GD.Print("\nRespawning...");
 		Inputs?.MarkAllForDeletion();
+		currentAttack?.Stop();
 		ApplySettings("Normal");
 		ChangeState("Air");
 		Position = new Vector2(500f,260f);
