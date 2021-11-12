@@ -58,5 +58,29 @@ public class Hurtbox : Area2D
 	{
 		col?.SetDeferred("position", originalPosition*new Vector2(ch.direction, 1));
 		col?.SetDeferred("rotation", originalRotation*ch.direction);
+		Update();
+	}
+	
+	public override void _Draw()
+	{
+		GeometryUtils.DrawCapsuleShape(this,
+			Shape, //shape
+			originalPosition*new Vector2(ch.direction, 1), //position
+			originalRotation*ch.direction, //rotation
+			new Color(1,1,1)); //color
+		
+		/*
+		var oval = shape.Shape as CapsuleShape2D;
+		var height = oval.Height;
+		var radius = oval.Radius;
+		var color = new Color(1,1,1);
+		var position = originalPosition*new Vector2(ch.direction, 1);
+		var rotation = originalRotation*ch.direction;
+		DrawSetTransform(position, rotation, new Vector2(1,1));
+		var middleRect = BlastZone.CalcRect(Vector2.Zero, new Vector2(radius, height/2));
+		DrawRect(middleRect, color);
+		DrawCircle(new Vector2(0, height/2), radius, color);
+		DrawCircle(new Vector2(0, -height/2), radius, color);
+		*/
 	}
 }

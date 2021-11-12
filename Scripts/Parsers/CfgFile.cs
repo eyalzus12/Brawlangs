@@ -61,45 +61,53 @@ public class CfgFile
 	
 	private void Store(string line)
 	{
-		var s = line.Split('=');
-		var s0 = s[0].Trim();
-		var s1 = s[1].Trim();
-		var ss1 = s1.Split(',');
-		var sl = new Strl();
+		var leftright = line.Split('=');//split to left side and right side
+		var left = leftright[0].Trim();//left side
+		var right = leftright[1].Trim();//right side
+		var parts = right.Split(',');//split right side to parts by commas
+		var store = new Strl();
 		
-		if(ss1.Length > 1)
+		if(parts.Length > 1)//ensure actual list
 		{
-			for(int i = 0; i < ss1.Length; ++i)
+			for(int i = 0; i < parts.Length; ++i)//go over thee
 			{
-				string asf = ss1[i].Trim();
-				if(asf[0] == '(')
+				var element = parts[i].Trim();//get first element
+				if(element[0] == '(')//probably a vector
 				{
-					var trim1 = ss1[i+1].Trim();
-					if(trim1[trim1.Length-1] == ')')
-						sl.Add(asf + ',' + trim1);
+					var trim1 = parts[i+1].Trim();//get second element
+					if(trim1[trim1.Length-1] == ')')//is really a vector
+					{
+						store.Add(element + ',' + trim1);//add
+						i += 1;
+					}
 					else
 					{
-						var trim2 = ss1[i+2].Trim();
-						if(trim2[trim2.Length-1] == ')')
-							sl.Add(asf + ',' + trim1 + ',' + trim2);
+						var trim2 = parts[i+2].Trim();//get third element
+						if(trim2[trim2.Length-1] == ')')//is really a vector
+						{
+							store.Add(element + ',' + trim1 + ',' + trim2);//add
+							i += 2;
+						}
 						else
 						{
-							var trim3 = ss1[i+3].Trim();//get fourth element
+							var trim3 = parts[i+3].Trim();//get fourth element
 							if(trim3[trim3.Length-1] == ')')//is really a vector
-								sl.Add(asf + ',' + trim1 + ',' + trim2 + ',' + trim3);//add
-						}
-					}
-					++i;
-				}
-				else sl.Add(asf);
-			}
-		}
-		else sl.Add(s1);
+							{
+								store.Add(element + ',' + trim1 + ',' + trim2 + ',' + trim3);//add
+								i += 3;
+							}
+						}//end of Quat else
+					}//end of Vector3 else
+				}//end of Vector check
+				else store.Add(element);
+			}//end of for loop
+		}//end of list check
+		else store.Add(right);
 		
-		dict.Add(s0, Norm(sl));
+		dict.Add(left, Norm(store));
 	}
 	
-	private object Norm(Strl l)//turn to real values
+	private object Norm(Strl l)
 	{
 		switch(l.Count)
 		{
@@ -109,6 +117,9 @@ public class CfgFile
 				return Norm(l[0]);
 			default:
 				return l.Select(Norm).ToList();
+				/*var lo = new List<object>();
+				foreach(var s in l) lo.Add(Norm(s));
+				return lo;*/
 		}
 	}
 	
@@ -116,28 +127,36 @@ public class CfgFile
 	{
 		int i;
 		float f;
-		Vector2 v2 = default;
-		Vector3 v3 = default;
-		Quat q = default;
+		Vector2 v2;
+		Vector3 v3;
+		Quat q;
 			
 		if(string.Equals(s, "true",  StringComparison.OrdinalIgnoreCase)) return true;//represents true
 		else if(string.Equals(s, "false",  StringComparison.OrdinalIgnoreCase)) return false;//represents false
 		else if(int.TryParse(s, out i)) return i;//represents a number
 		else if(float.TryParse(s, out f)) return f;//represents a float
-		else if(s2v2(s, ref v2)) return v2;//represents a Vector2
-		else if(s2v3(s, ref v3)) return v3;//represents a Vector3
-		else if(s2q(s, ref q)) return q;//represents a Quat
+		else if(s2v2(s, out v2)) return v2;//represents a Vector2
+		else if(s2v3(s, out v3)) return v3;//represents a Vector3
+		else if(s2q(s, out q)) return q;//represents a Quat
 		else return s.Trim('\"');//represents a string
 	}
 	
-	private bool s2v2(string s, ref Vector2 v)
+	private bool s2v2(string s, out Vector2 v)
 	{
 		var st = s.Trim();
-		if(st[0] != '(' || st[st.Length-1] != ')') return false;
+		if(st[0] != '(' || st[st.Length-1] != ')')
+		{
+			v = default;
+			return false;
+		}
 		else
 		{
 			string[] ss = st.Substring(1, st.Length-2).Split(',');
-			if(ss.Length != 2) return false;
+			if(ss.Length != 2)
+			{
+				v = default;
+				return false;
+			}
 			float x = float.Parse(ss[0].Trim());
 			float y = float.Parse(ss[1].Trim());
 			v = new Vector2(x, y);
@@ -145,14 +164,22 @@ public class CfgFile
 		}
 	}
 	
-	private bool s2v3(string s, ref Vector3 v)
+	private bool s2v3(string s, out Vector3 v)
 	{
 		var st = s.Trim();
-		if(st[0] != '(' || st[st.Length-1] != ')') return false;
+		if(st[0] != '(' || st[st.Length-1] != ')')
+		{
+			v = default;
+			return false;
+		}
 		else
 		{
 			string[] ss = st.Substring(1, st.Length-2).Split(',');
-			if(ss.Length != 3) return false;
+			if(ss.Length != 3)
+			{
+				v = default;
+				return false;
+			}
 			float x = float.Parse(ss[0].Trim());
 			float y = float.Parse(ss[1].Trim());
 			float z = float.Parse(ss[2].Trim());
@@ -161,13 +188,21 @@ public class CfgFile
 		}
 	}
 	
-	private bool s2q(string s, ref Quat q)
+	private bool s2q(string s, out Quat q)
 	{
-		if(s[0] != ')' || s[s.Length-1] != '(') return false;
+		if(s[0] != '(' || s[s.Length-1] != ')')
+		{
+			q = default;
+			return false;
+		}
 		else
 		{
 			string[] ss = s.Substring(1, s.Length-2).Split(',');
-			if(ss.Length != 4) return false;
+			if(ss.Length != 4)
+			{
+				q = default;
+				return false;
+			}
 			float x = float.Parse(ss[0].Trim());
 			float y = float.Parse(ss[1].Trim());
 			float z = float.Parse(ss[2].Trim());
@@ -178,5 +213,17 @@ public class CfgFile
 	}
 	
 	private Strl Clean(Strl l) => l.Select(Clean).Where(s => s != "").ToList<string>();
+	/*{
+		Strl ll = new Strl();
+		
+		foreach(var s in l)
+		{
+			string h = Clean(s);
+			if(h != "") ll.Add(h);
+		}
+		
+		return ll;
+	}*/
+	
 	private string Clean(string s) => s.Split(';')[0].Trim();
 }

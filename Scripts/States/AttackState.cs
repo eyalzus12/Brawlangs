@@ -16,6 +16,11 @@ public class AttackState : State
 	{
 		touched = false;
 		ch.SetCollisionMaskBit(DROP_THRU_BIT, !ch.downHeld);
+		if(ch.grounded)
+		{
+			if(ch.downHeld) ch.Crouch();
+			else ch.Uncrouch();
+		}
 		//ch.PlayAnimation(att.animation);
 		//figure out way to do it when the attack actually exists
 	}
