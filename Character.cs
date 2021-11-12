@@ -248,12 +248,14 @@ public class Character : KinematicBody2D
 			proj.hitpause = 3;
 			proj.damage = 10f;
 			GetParent().AddChild(proj);
+			proj.Modulate = Modulate;
 			proj.GlobalPosition = GlobalPosition;
 			proj.move = new Vector2(direction * 5, 0);
 			var cs = new CollisionShape2D();
 			proj.AddChild(cs);
 			var shape = new CircleShape2D();
 			shape.Radius = 3f;
+			proj.radius = shape.Radius;
 			cs.Shape = shape;
 			proj.Active = true;
 			Inputs.MarkForDeletion("player_special_attack", true);
