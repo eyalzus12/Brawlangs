@@ -28,6 +28,12 @@ public class EndlagState : State
 		ch.vec.x *= 1f-friction*(ch.grounded?ch.ffric:1f);
 	}
 	
+	protected override void RepeatActions()
+	{
+		if(Inputs.IsActionReallyJustReleased("player_down"))
+			ch.SetCollisionMaskBit(DROP_THRU_BIT, true);
+	}
+	
 	protected override void DoGravity()
 	{
 		if(!ch.grounded) ch.vec.y.Lerp(ch.fallSpeed, ch.gravity);

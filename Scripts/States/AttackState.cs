@@ -49,7 +49,7 @@ public class AttackState : State
 			ch.SetCollisionMaskBit(DROP_THRU_BIT, false);
 		if(Inputs.IsActionReallyJustReleased("player_down"))
 			ch.SetCollisionMaskBit(DROP_THRU_BIT, true);
-		SetupCollisionParamaters();
+		//SetupCollisionParamaters();
 		if(ch.walled && ch.wallJumpCounter < ch.wallJumpNum && !touched)
 		{
 			ch.jumpCounter = 0;
