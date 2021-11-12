@@ -447,7 +447,11 @@ public class Character : KinematicBody2D
 		else return "None";
 	}
 	
-	public void OnSemiSolidLeave(Godot.Object body) => SetCollisionMaskBit(DROP_THRU_BIT, true);
+	public void OnSemiSolidLeave(Godot.Object body) 
+	{
+		if(currentState is AttackState || currentState is EndlagState) return;
+		SetCollisionMaskBit(DROP_THRU_BIT, true);
+	}
 	
 	public void AttachEffect(Effect e)
 	{

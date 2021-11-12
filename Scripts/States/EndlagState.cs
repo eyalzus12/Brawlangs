@@ -16,8 +16,7 @@ public class EndlagState : State
 		endlag = 0;
 		att = null;
 		SetupCollisionParamaters();
-		if(Inputs.IsActionPressed("player_down") && !ch.grounded)
-			ch.SetCollisionMaskBit(DROP_THRU_BIT, false);
+		ch.SetCollisionMaskBit(DROP_THRU_BIT, !ch.downHeld);
 		//ch.PlayAnimation(att.endlagAnimation);
 		//figure out a way to set the animation after the attack exists
 	}
@@ -45,8 +44,8 @@ public class EndlagState : State
 	{
 		if(frameCount >= endlag)
 		{
-			ch.SetCollisionMaskBit(DROP_THRU_BIT, true);
-			if(!ch.downHeld) ch.Uncrouch();
+			ch.SetCollisionMaskBit(DROP_THRU_BIT, !ch.downHeld);
+			if(!ch.downHeld&&ch.grounded) ch.Uncrouch();
 			
 			if(ch.walled && ch.wallJumpCounter < ch.wallJumpNum)
 			{
