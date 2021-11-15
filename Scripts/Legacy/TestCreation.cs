@@ -9,47 +9,7 @@ public class TestCreation : MapBase
 	
 	public override void _Ready()
 	{
-		var data = this.GetPublicData();
-		data.Add("CurrentInfoLabelCharacter", 0);
-		var chars = new List<Character>();
-		foreach(var i in 1.To(8))
-		{
-			object o = "";
-			if(data.TryGet("LoadedCharacter" + i, out o))
-			{
-				var s = o.s();
-				var cr = new CharacterCreator(s);
-				var c = cr.Build(this);
-				c.teamNumber = i-1;
-				var numberlabel = new DamageLabel(false);
-				numberlabel.MarginTop = -75f;
-				numberlabel.Text = c.teamNumber.ToString();
-				c.AddChild(numberlabel);
-				numberlabel.ch = c;
-				var shader = ResourceLoader.Load<Shader>("res://colormult.shader");
-				var material = new ShaderMaterial();
-				material.Shader = shader;
-				c.sprite.Material = material;
-				var blue = new Vector3(0, 0, 1);
-				var red = new Vector3(1, 0, 0);
-				var green = new Vector3(0, 1, 0);
-				var yellow = new Vector3(1, 1, 0);
-				var megenta = new Vector3(1, 0, 1);
-				var cyan = new Vector3(0, 1, 1);
-				var grey = new Vector3(0.5f, 0.5f, 0.5f);
-				var pink = new Vector3(1, 0.5f, 0.5f);
-				Vector3[] colorlist = {blue, red, green, yellow, megenta, cyan, grey, pink};
-				
-				(c.sprite.Material as ShaderMaterial).SetShaderParam("color", colorlist[i-1]);
-				c.Respawn();
-				
-				var im = new BufferInputManager(c.teamNumber);
-				c.AddChild(im);
-				c.Inputs = im;
-				chars.Add(c);
-			}
-		}
-		SetDamageLabelLocations(chars.ToArray());
+		LoadCharacters();
 		new MapCreator(PATH).Build(this);
 	}
 	
