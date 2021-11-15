@@ -8,7 +8,20 @@ public class MapBase : Node2D
 	[Export]
 	public Rect2 BlastZones = BlastZone.CalcRect(new Vector2(512, 300), new Vector2(1500, 1000));
 	
+	public const string PACK_EXT = "zip";
+	
 	public override void _Ready()
+	{
+		LoadCharacters();
+		var camera = new MatchCamera();
+		AddChild(camera);
+		camera.Current = true;
+		
+		var bz = new BlastZone(BlastZones);
+		AddChild(bz);
+	}
+	
+	public void LoadCharacters()
 	{
 		var data = this.GetPublicData();
 		data.Add("CurrentInfoLabelCharacter", 0);
@@ -19,47 +32,45 @@ public class MapBase : Node2D
 			if(data.TryGet("LoadedCharacter" + i, out o))
 			{
 				var s = o.s();
-				var cr = new CharacterCreator(s);
-				var c = cr.Build(this);
-				c.teamNumber = i-1;
-				/*var numberlabel = new DamageLabel(false);
-				numberlabel.MarginTop = -75f;
-				numberlabel.Text = c.teamNumber.ToString();
-				c.AddChild(numberlabel);
-				numberlabel.ch = c;*/
-				
-				/*var shader = ResourceLoader.Load<Shader>("res://colormult.shader");
-				var material = new ShaderMaterial();
-				material.Shader = shader;
-				c.sprite.Material = material;*/
-				var blue = new Color(0, 0, 1);
-				var red = new Color(1, 0, 0);
-				var green = new Color(0, 1, 0);
-				var yellow = new Color(1, 1, 0);
-				var megenta = new Color(1, 0, 1);
-				var cyan = new Color(0, 1, 1);
-				var grey = new Color(0.5f, 0.5f, 0.5f);
-				var pink = new Color(1, 0.5f, 0.5f);
-				Color[] colorlist = {blue, red, green, yellow, megenta, cyan, grey, pink};
-				
-				c.Modulate = colorlist[i-1];
-				c.Respawn();
-				
-				var im = new BufferInputManager(c.teamNumber);
-				c.AddChild(im);
-				c.Inputs = im;
-				chars.Add(c);
+				var ch = PathToCharacter(s, i);
+				chars.Add(ch);
 			}
 		}
 		
 		SetDamageLabelLocations(chars.ToArray());
+	}
+	
+	public Character PathToCharacter(string path, int i)
+	{
+		if(StringUtils.GetExtension(path) == PACK_EXT)
+		{
+			ProjectSettings.LoadResourcePack(path, false);
+			var foldertree = path.Split('/');
+			var filename = foldertree[foldertree.Length-1];
+			var charname = StringUtils.RemoveExtension(filename);
+			path = $"res://{charname}/{charname}.cfg";
+		}
 		
-		var camera = new MatchCamera();
-		AddChild(camera);
-		camera.Current = true;
-		
-		var bz = new BlastZone(BlastZones);
-		AddChild(bz);
+		var cr = new CharacterCreator(path);
+		var c = cr.Build(this);
+		c.teamNumber = i-1;
+		var blue = new Color(0, 0, 1);
+		var red = new Color(1, 0, 0);
+		var green = new Color(0, 1, 0);
+		var yellow = new Color(1, 1, 0);
+		var megenta = new Color(1, 0, 1);
+		var cyan = new Color(0, 1, 1);
+		var grey = new Color(0.5f, 0.5f, 0.5f);
+		var pink = new Color(1, 0.5f, 0.5f);
+		Color[] colorlist = {blue, red, green, yellow, megenta, cyan, grey, pink};
+				
+		c.Modulate = colorlist[i-1];
+		c.Respawn();
+				
+		var im = new BufferInputManager(c.teamNumber);
+		c.AddChild(im);
+		c.Inputs = im;
+		return c;
 	}
 	
 	public void SetDamageLabelLocations(Character[] characters)
