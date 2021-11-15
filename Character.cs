@@ -146,6 +146,7 @@ public class Character : KinematicBody2D
 	public int framesSinceLastHit = 0;
 	public int comboCount = 0;
 	
+	public Vector2[] vs = new Vector2[7]{Vector2.Zero,Vector2.Zero,Vector2.Zero,Vector2.Zero,Vector2.Zero,Vector2.Zero,Vector2.Zero};
 	public Vector2 vec = new Vector2();//normal velocity from movement
 	public Vector2 vac = new Vector2();//speed transferred from moving platforms
 	public Vector2 vic = new Vector2();//momentary force
@@ -233,7 +234,7 @@ public class Character : KinematicBody2D
 	public override void _PhysicsProcess(float delta)
 	{
 		++framesSinceLastHit;
-		
+		StoreVelocities();
 		TruncateVelocityIfInsignificant();
 		if(Input.IsActionJustPressed("reset")) Respawn();
 		currentState?.SetInputs();
@@ -374,6 +375,10 @@ public class Character : KinematicBody2D
 		AddState(new EndlagState(this));
 	}
 	
+	///////////////////////////////////////////
+	///////////////Misc////////////////////////
+	///////////////////////////////////////////
+	
 	public void Die()
 	{
 		GD.Print($"Character {Name} died with {stocks} stocks");
@@ -407,35 +412,49 @@ public class Character : KinematicBody2D
 		comboCount = 0;
 		
 		//foreach(var n in GetChildren()) if(n is Hitbox h) h.Active = false;
-		GetChildren().FilterType<Hitbox>().ToList<Hitbox>().ForEach(h=>h.Active=false);
+		//GetChildren().FilterType<Hitbox>().ToList<Hitbox>().ForEach(h=>h.Active=false);
+	}
+	
+	public void StoreVelocities()
+	{
+		vs[0] = vec;
+		vs[1] = vac;
+		vs[2] = vic;
+		vs[3] = voc;
+		vs[4] = vuc;
+		vs[5] = vyc;
+		vs[6] = vwc;
+	}
+	
+	public void LoadVelocities()
+	{
+		vec = vs[0];
+		vac = vs[1];
+		vic = vs[2];
+		voc = vs[3];
+		vuc = vs[4];
+		vyc = vs[5];
+		vwc = vs[6];
 	}
 	
 	public void ResetVelocity()
 	{
-		vec = Vector2.Zero;
-		vac = Vector2.Zero;
-		vic = Vector2.Zero;
-		voc = Vector2.Zero;
-		vuc = Vector2.Zero;
-		vyc = Vector2.Zero;
-		vwc = Vector2.Zero;
+		for(int i = 0; i < vs.Length; ++i)
+			vs[i] = Vector2.Zero;
+		LoadVelocities();
 	}
 	
 	private void TruncateVelocityIfInsignificant()
 	{
-		vec.TruncateIfInsignificant();
-		vac.TruncateIfInsignificant();
-		vic.TruncateIfInsignificant();
-		voc.TruncateIfInsignificant();
-		vuc.TruncateIfInsignificant();
-		vyc.TruncateIfInsignificant();
-		vwc.TruncateIfInsignificant();
+		for(int i = 0; i < vs.Length; ++i)
+			vs[i].TruncateIfInsignificant();
+		LoadVelocities();
 	}
 	
 	public override string ToString() => name;
 	
-	public Vector2 GetVelocity() => vac+vec+vic+voc+vuc+vyc;
-	public Vector2 GetRoundedVelocity() => GetVelocity().Round(); 
+	public Vector2 GetVelocity() => vs.Aggregate(Vector2.Zero, (a,v)=>a+v);
+	public Vector2 GetRoundedVelocity() => GetVelocity().Round();
 	public Vector2 GetRoundedPosition() => Position.Round();
 	
 	public string GetWallDirection()

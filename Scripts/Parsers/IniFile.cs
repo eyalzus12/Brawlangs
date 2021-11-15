@@ -16,8 +16,13 @@ public class IniFile
 {
 	public IniDictionary dict;
 	
-	public IniFile() => dict = new IniDictionary();
-	public void Reset() => dict = new IniDictionary();
+	public IniFile() => Reset();
+	
+	public void Reset()
+	{
+		dict = new IniDictionary();
+		dict.Add("", new Dictionary<string,object>());
+	}
 	
 	public int Count => dict.Count;
 	public IniDictionary.KeyCollection Keys => dict.Keys;

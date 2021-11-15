@@ -22,6 +22,7 @@ public class DamageLabel : Label
 		}*/
 		else 
 		{
+			Visible = true;
 			AddColorOverride("font_color", DamageCalculator.DamageToColor(ch.damage));
 			if(DynamicText) Text = $"{ch.damage.ToString()} / {ch.stocks}";
 		}

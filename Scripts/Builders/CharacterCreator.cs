@@ -5,9 +5,6 @@ using System.Linq;
 
 public class CharacterCreator
 {
-	public const string BASE_SECTION = "Main";
-	
-	//public string path = "res://mario.ini";
 	public string path;
 	
 	public CharacterCreator() {}
@@ -22,9 +19,9 @@ public class CharacterCreator
 		//create actual character
 		var ch = new Character();
 		//open ini file
-		var charinif = new IniFile();
+		var charinif = new CfgFile();
 		charinif.Load(path);
-		var name = charinif[BASE_SECTION, "Name", ""].s();
+		var name = charinif["Name", ""].s();
 		//load name
 		ch.Name = name;
 		n.AddChild(ch);
@@ -44,20 +41,20 @@ public class CharacterCreator
 		}*/
 		
 		//find stat file path
-		var statPath = charinif[BASE_SECTION, "Stats", ""].s();
+		var statPath = charinif["Stats", ""].s();
 		//load properties from stat file
 		var prop = new PropertyMap();
 		prop.ReadFromConfigFile(statPath, "Stats");
 		prop.LoadProperties(ch);
 		
 		//find collision file path
-		var collisionPath = charinif[BASE_SECTION, "Collision", ""].s();
+		var collisionPath = charinif["Collision", ""].s();
 		//create collision
 		var collCreator = new CollisionCreator(collisionPath);
 		collCreator.Build(ch);
 		
 		//find attack file path
-		var attackPath = charinif[BASE_SECTION, "Attacks", ""].s();
+		var attackPath = charinif["Attacks", ""].s();
 		//create attacks
 		var attCreator = new AttackCreator(attackPath);
 		attCreator.Build(ch);
@@ -73,7 +70,7 @@ public class CharacterCreator
 		dl.MarginTop = 200;
 		cl.AddChild(dl);*/
 		
-		var animationPath = charinif[BASE_SECTION, "Animations", ""].s();
+		var animationPath = charinif["Animations", ""].s();
 		BuildAnimations(ch, animationPath);
 		return ch;
 	}
@@ -85,9 +82,10 @@ public class CharacterCreator
 		
 		var anminif = new IniFile();
 		anminif.Load(animationPath);
-		
+		//GD.Print(anminif.ToString());
 		foreach(var section in anminif.Keys)
 		{
+			if(section == "") continue;
 			var resourcePath = anminif[section, "Path", ""].s();
 			var frames = anminif[section, "Frames", new Vector2(4,4)].v2();
 			var loop = anminif[section, "Loop", true].b();

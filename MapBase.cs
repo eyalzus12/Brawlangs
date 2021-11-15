@@ -28,10 +28,10 @@ public class MapBase : Node2D
 				c.AddChild(numberlabel);
 				numberlabel.ch = c;*/
 				
-				var shader = ResourceLoader.Load<Shader>("res://colormult.shader");
+				/*var shader = ResourceLoader.Load<Shader>("res://colormult.shader");
 				var material = new ShaderMaterial();
 				material.Shader = shader;
-				c.sprite.Material = material;
+				c.sprite.Material = material;*/
 				var blue = new Color(0, 0, 1);
 				var red = new Color(1, 0, 0);
 				var green = new Color(0, 1, 0);
@@ -72,12 +72,13 @@ public class MapBase : Node2D
 		for(int i = 0; i < characters.Length; ++i)
 		{
 			var ch = characters[i];
+			GD.Print(ch);
 			var v = locations[i];
+			GD.Print(v);
 			var lb = new DebugLabel();
 			lb.ch = ch;
 			cl.AddChild(lb);
-			var dl = new DamageLabel();
-			dl.ch = ch;
+			var dl = new DamageLabel(ch);
 			dl.RectPosition = v;
 			cl.AddChild(dl);
 		}

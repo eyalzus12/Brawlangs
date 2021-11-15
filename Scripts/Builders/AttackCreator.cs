@@ -13,7 +13,6 @@ public class AttackCreator
 	
 	public AttackCreator()
 	{
-		inif.Load(path);
 		cn = new Conn();
 	}
 	
@@ -27,7 +26,7 @@ public class AttackCreator
 	public void Build(Node2D n)
 	{
 		cn = new Conn();
-		var oAttacks = inif["Main", "AttackSections", new List<string>()];
+		var oAttacks = inif["", "AttackSections", new List<string>()];
 		if(oAttacks is string)
 			BuildAttack(n, oAttacks.s());
 		else

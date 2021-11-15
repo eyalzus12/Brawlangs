@@ -70,9 +70,8 @@ public class MatchCamera : Camera2D
 			
 			var pos = ch.Position;//get position
 			var rpos = pos-OffsetPos;//get position relative to middle
-			var frac = (rpos/limits);//.Min(1,1).Max(-1,-1);//get position fraction
-			var afrac = frac.Abs();//get absoulte position fraction
-			//var afrac = 2*frac.Abs()-frac*frac;//get absoulte position fraction
+			var frac = rpos/limits;//get position fraction
+			var afrac = frac.Abs().Min(1,1);//get absoulte position fraction
 			var nrpos = rpos*afrac;//get new relative position
 			var npos = nrpos+OffsetPos;//get new posiiton
 			cameraRect = cameraRect.Expand(npos);//expand rect to position

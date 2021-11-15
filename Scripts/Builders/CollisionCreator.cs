@@ -6,13 +6,10 @@ public class CollisionCreator
 {
 	public const string BrawlangsServer_JoinOrBad = "https://discord.gg/ZaGfdm3bad";
 	
-	public string path = "res://mario.ini";
 	public IniFile inif = new IniFile();
+	public string path;
 	
-	public CollisionCreator()
-	{
-		inif.Load(path);
-	}
+	public CollisionCreator() {}
 	
 	public CollisionCreator(string path)
 	{
@@ -27,7 +24,7 @@ public class CollisionCreator
 		cs.Shape = new RectangleShape2D();
 		cs.Name = "Collision";
 		
-		var HurtboxScript = inif["Main", "HurtboxScript", ""].s();
+		var HurtboxScript = inif["", "HurtboxScript", ""].s();
 		Hurtbox hr = null;
 		if(HurtboxScript != "")
 		{
@@ -61,7 +58,7 @@ public class CollisionCreator
 		ch.collision = cs;
 		ch.hurtbox = hr;
 		
-		var oBase = inif["Main", "Bases", new List<string>()];
+		var oBase = inif["", "Bases", new List<string>()];
 		if(oBase is string) BuildBase(ch, oBase.s());
 		else
 		{
@@ -75,13 +72,13 @@ public class CollisionCreator
 		platDrop.Connect("body_exited", ch, "OnSemiSolidLeave");
 		platDrop.CollisionLayer = 0;
 		platDrop.CollisionMask = 0b10;
-		var droppos = inif["Main", "PlatDropPosition", new Vector2(0, 19)].v2();
+		var droppos = inif["", "PlatDropPosition", new Vector2(0, 19)].v2();
 		platDrop.Position = droppos;
 		var dropc = new CollisionShape2D();
 		platDrop.AddChild(dropc);
 		dropc.Shape = new RectangleShape2D();
 		dropc.Name = "DropCollision";
-		var dropext = inif["Main", "PlatDropExtents", new Vector2(32, 11)].v2();
+		var dropext = inif["", "PlatDropExtents", new Vector2(32, 11)].v2();
 		(dropc.Shape as RectangleShape2D).Extents = dropext;
 		
 		platDrop.Visible = false;

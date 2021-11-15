@@ -29,7 +29,7 @@ __meta__ = {
 [node name="LineEdit" type="LineEdit" parent="VSplitContainer/Load1"]
 margin_right = 1024.0
 margin_bottom = 24.0
-text = "res://inicharactertest.ini"
+text = "res://inicharactertest.cfg"
 script = ExtResource( 1 )
 
 [node name="Label" type="Label" parent="VSplitContainer/Load1"]
@@ -61,7 +61,7 @@ __meta__ = {
 [node name="LineEdit" type="LineEdit" parent="VSplitContainer/Load2"]
 margin_right = 1024.0
 margin_bottom = 24.0
-text = "res://inicharactertest.ini"
+text = "res://inicharactertest.cfg"
 script = ExtResource( 1 )
 
 [node name="Label" type="Label" parent="VSplitContainer/Load2"]
