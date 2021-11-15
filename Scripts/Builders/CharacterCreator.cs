@@ -18,7 +18,7 @@ public class CharacterCreator
 	{
 		//create actual character
 		var ch = new Character();
-		//open ini file
+		//open cfg file
 		var charinif = new CfgFile();
 		charinif.Load(path);
 		var name = charinif["Name", ""].s();
@@ -87,9 +87,22 @@ public class CharacterCreator
 		{
 			if(section == "") continue;
 			var resourcePath = anminif[section, "Path", ""].s();
+			
+			/*var image = new Image();
+			var err = image.Load(resourcePath);
+			if(err != Error.Ok)
+			{
+				GD.Print($"failed to load animation sheet {resourcePath}. error is {err}");
+				continue;
+			}
+			
+			var texture = new ImageTexture();
+			texture.CreateFromImage(image, 0b11);*/
+			
 			var frames = anminif[section, "Frames", new Vector2(4,4)].v2();
 			var loop = anminif[section, "Loop", true].b();
-			var texture = ResourceLoader.Load<Texture>(resourcePath);
+			//var texture = ResourceLoader.Load<Texture>(resourcePath);
+			var texture = (Texture)GD.Load(resourcePath);
 			spr.AddSheet(texture, section, frames.x.i(), frames.y.i(), loop);
 		}
 		

@@ -2,13 +2,14 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO.Compression;
 
 public class MapBase : Node2D
 {
 	[Export]
 	public Rect2 BlastZones = BlastZone.CalcRect(new Vector2(512, 300), new Vector2(1500, 1000));
 	
-	public const string PACK_EXT = "zip";
+	public const string PACK_EXT = ".zip";
 	
 	public override void _Ready()
 	{
@@ -32,7 +33,7 @@ public class MapBase : Node2D
 			if(data.TryGet("LoadedCharacter" + i, out o))
 			{
 				var s = o.s();
-				var ch = PathToCharacter(s, i);
+				var ch = PathToCharacter(s, i, data);
 				chars.Add(ch);
 			}
 		}
@@ -40,15 +41,29 @@ public class MapBase : Node2D
 		SetDamageLabelLocations(chars.ToArray());
 	}
 	
-	public Character PathToCharacter(string path, int i)
+	public Character PathToCharacter(string path, int i, PublicData data)
 	{
 		if(StringUtils.GetExtension(path) == PACK_EXT)
 		{
-			ProjectSettings.LoadResourcePack(path, false);
+			var modfolderpath = StringUtils.GlobalizePath("res://LoadedMods");
+			var zippath = StringUtils.GlobalizePath(path);
+			ZipFile.ExtractToDirectory(zippath, modfolderpath);
+			
+			//ProjectSettings.LoadResourcePack(path, false);
 			var foldertree = path.Split('/');
 			var filename = foldertree[foldertree.Length-1];
 			var charname = StringUtils.RemoveExtension(filename);
-			path = $"res://{charname}/{charname}.cfg";
+			path = $"res://LoadedMods/{charname}/{charname}.cfg";
+			
+			var folderpath = StringUtils.GlobalizePath($"res://LoadedMods/{charname}");
+			object o = null;
+			if(data.TryGet("ModResiduals", out o))
+			{
+				var residualList = o.ls();
+				residualList.Add(folderpath);
+				data.AddOverride("ModResiduals", residualList);
+			}
+			else data.Add("ModResiduals", new List<string>(new string[]{folderpath}));
 		}
 		
 		var cr = new CharacterCreator(path);
@@ -83,9 +98,7 @@ public class MapBase : Node2D
 		for(int i = 0; i < characters.Length; ++i)
 		{
 			var ch = characters[i];
-			GD.Print(ch);
 			var v = locations[i];
-			GD.Print(v);
 			var lb = new DebugLabel();
 			lb.ch = ch;
 			cl.AddChild(lb);
@@ -132,17 +145,36 @@ public class MapBase : Node2D
 		
 		if(Input.IsActionJustPressed("exit_game"))
 		{
+			Cleanup();
+			
 			GetTree()
 				.CallDeferred("change_scene",
 				ProjectSettings
 				.GetSetting("application/run/main_scene"));
-					
+		}
+	}
+	
+	public override void _Notification(int what)
+	{
+		if(what == MainLoop.NotificationWmQuitRequest)
+		{
 			Cleanup();
+			GetTree().Quit();
 		}
 	}
 	
 	public void Cleanup()
 	{
+		var data = this.GetPublicData();
+		object o = null;
+		if(data.TryGet("ModResiduals", out o))
+		{
+			var reslist = o.ls();
+			foreach(var s in reslist)
+				System.IO.Directory.Delete(s, true);
+			data.Remove("ModResiduals");
+		}
+		
 		GetTree().Root.GetChildren().FilterType<Character>().ToList().ForEach(ch => ch.CallDeferred("queue_free"));
 	}
 }

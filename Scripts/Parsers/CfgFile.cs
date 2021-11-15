@@ -15,7 +15,7 @@ public class CfgFile
 {
 	public CfgDictionary dict;
 	
-	public CfgFile() {dict = new CfgDictionary();}
+	public CfgFile() => Reset();
 	public void Reset() {dict = new CfgDictionary();}
 	
 	public int Count => dict.Count;
@@ -44,6 +44,11 @@ public class CfgFile
 	public Error Load(string path)
 	{
 		var f = new File();//create new file
+		if(!f.FileExists(path))
+		{
+			GD.Print($"failed to load cfg file {path}, as it does not exist");
+			return Error.FileNotFound;
+		}
 		var er = f.Open(path, File.ModeFlags.Read);//open file
 		if(er != Error.Ok) return er;//if error, return
 		var content = f.GetAsText();//read text
