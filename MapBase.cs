@@ -33,7 +33,7 @@ public class MapBase : Node2D
 			if(data.TryGet("LoadedCharacter" + i, out o))
 			{
 				var s = o.s();
-				var ch = PathToCharacter(s, i, data);
+				var ch = PathToCharacter(s, i);
 				chars.Add(ch);
 			}
 		}
@@ -41,31 +41,10 @@ public class MapBase : Node2D
 		SetDamageLabelLocations(chars.ToArray());
 	}
 	
-	public Character PathToCharacter(string path, int i, PublicData data)
+	public Character PathToCharacter(string path, int i)
 	{
-		if(StringUtils.GetExtension(path) == PACK_EXT)
-		{
-			var modfolderpath = StringUtils.GlobalizePath("res://LoadedMods");
-			var zippath = StringUtils.GlobalizePath(path);
-			ZipFile.ExtractToDirectory(zippath, modfolderpath);
-			
-			//ProjectSettings.LoadResourcePack(path, false);
-			var foldertree = path.Split('/');
-			var filename = foldertree[foldertree.Length-1];
-			var charname = StringUtils.RemoveExtension(filename);
-			path = $"res://LoadedMods/{charname}/{charname}.cfg";
-			
-			var folderpath = StringUtils.GlobalizePath($"res://LoadedMods/{charname}");
-			object o = null;
-			if(data.TryGet("ModResiduals", out o))
-			{
-				var residualList = o.ls();
-				residualList.Add(folderpath);
-				data.AddOverride("ModResiduals", residualList);
-			}
-			else data.Add("ModResiduals", new List<string>(new string[]{folderpath}));
-		}
-		
+		var charname = path.SplitByLast('/')[1];
+		path = $"{path}/{charname}.cfg";
 		var cr = new CharacterCreator(path);
 		var c = cr.Build(this);
 		c.teamNumber = i-1;
@@ -165,7 +144,7 @@ public class MapBase : Node2D
 	
 	public void Cleanup()
 	{
-		var data = this.GetPublicData();
+		/*var data = this.GetPublicData();
 		object o = null;
 		if(data.TryGet("ModResiduals", out o))
 		{
@@ -173,7 +152,7 @@ public class MapBase : Node2D
 			foreach(var s in reslist)
 				System.IO.Directory.Delete(s, true);
 			data.Remove("ModResiduals");
-		}
+		}*/
 		
 		GetTree().Root.GetChildren().FilterType<Character>().ToList().ForEach(ch => ch.CallDeferred("queue_free"));
 	}

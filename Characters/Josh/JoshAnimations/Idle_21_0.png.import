@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/wall land.png-9d7bb7c1f715759241a1aeddd92b0871.stex"
+path="res://.import/Idle_21_0.png-13a4354c2d8670350c4dffed0a15f2ea.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://joshnimations/wall land.png"
-dest_files=[ "res://.import/wall land.png-9d7bb7c1f715759241a1aeddd92b0871.stex" ]
+source_file="res://Characters/Josh/JoshAnimations/Idle_21_0.png"
+dest_files=[ "res://.import/Idle_21_0.png-13a4354c2d8670350c4dffed0a15f2ea.stex" ]
 
 [params]
 
@@ -20,7 +20,7 @@ compress/hdr_mode=0
 compress/bptc_ldr=0
 compress/normal_map=0
 flags/repeat=0
-flags/filter=false
+flags/filter=true
 flags/mipmaps=false
 flags/anisotropic=false
 flags/srgb=2

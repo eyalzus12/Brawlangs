@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/first test pixel art animation walk.png-33e012a065cc385d94f1b63d00364f4a.stex"
+path="res://.import/WallJumpReady_1_1.png-e2d93128c14372986f8e2adb08ad2be5.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://joshnimations/first test pixel art animation walk.png"
-dest_files=[ "res://.import/first test pixel art animation walk.png-33e012a065cc385d94f1b63d00364f4a.stex" ]
+source_file="res://Characters/Josh/JoshAnimations/WallJumpReady_1_1.png"
+dest_files=[ "res://.import/WallJumpReady_1_1.png-e2d93128c14372986f8e2adb08ad2be5.stex" ]
 
 [params]
 

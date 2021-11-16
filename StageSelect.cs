@@ -26,7 +26,7 @@ public class StageSelect : Control
 		//GD.Print(this.GetPublicData().ToString());
 	}
 	
-	public void ImportFromPath(String path)
+	public void ImportFromPath(string path)
 	{
 		var dir = new Directory();
 		

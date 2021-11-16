@@ -29,86 +29,87 @@ public class CharacterCreator
 		ch.CollisionLayer = 0b100;
 		ch.CollisionMask = 0b011;
 		
-		/*var oCanHitSlots = charinif[BASE_SECTION, "CanHit", new List<int>()];
-		if(oCanHitSlots is int)
-		{
-			ch.CollisionLayer = 0;
-			ch.SetCollisionLayerBit(oCanHitSlots.i() + 2)
-		}
-		else
-		{
-			
-		}*/
-		
-		//find stat file path
-		var statPath = charinif["Stats", ""].s();
+		var directoryPath = path.SplitByLast('/')[0];
+		//find stat file name
+		var statFile = charinif["Stats", ""].s();
 		//load properties from stat file
 		var prop = new PropertyMap();
-		prop.ReadFromConfigFile(statPath, "Stats");
+		prop.ReadFromConfigFile($"{directoryPath}/{statFile}.cfg", "Stats");
 		prop.LoadProperties(ch);
 		
-		//find collision file path
-		var collisionPath = charinif["Collision", ""].s();
+		//find collision file name
+		var collisionFile = charinif["Collision", ""].s();
 		//create collision
-		var collCreator = new CollisionCreator(collisionPath);
+		var collCreator = new CollisionCreator($"{directoryPath}/{collisionFile}.ini");
 		collCreator.Build(ch);
 		
-		//find attack file path
-		var attackPath = charinif["Attacks", ""].s();
+		//find attack file name
+		var attackFile = charinif["Attacks", ""].s();
 		//create attacks
-		var attCreator = new AttackCreator(attackPath);
+		var attCreator = new AttackCreator($"{directoryPath}/{attackFile}.ini");
 		attCreator.Build(ch);
 		
-		/*var cl = new CanvasLayer();
-		cl.Name = "UI";
-		ch.AddChild(cl);
-		var lb = new DebugLabel();
-		cl.AddChild(lb);
-		var dl = new DamageLabel();
-		dl.ch = ch;
-		dl.MarginLeft = 1000;
-		dl.MarginTop = 200;
-		cl.AddChild(dl);*/
-		
-		var animationPath = charinif["Animations", ""].s();
-		BuildAnimations(ch, animationPath);
+		//find animation folder name
+		var animationsFolder = charinif["Animations", ""].s();
+		//create animations
+		BuildAnimations(ch, $"{directoryPath}/{animationsFolder}");
 		return ch;
 	}
 	
-	public void BuildAnimations(Character ch, string animationPath)
+	public void BuildAnimations(Character ch, string animationsFolder)
 	{
 		var spr = new AnimationSprite();
 		spr.Name = "Sprite";
 		
-		var anminif = new IniFile();
-		anminif.Load(animationPath);
-		//GD.Print(anminif.ToString());
-		foreach(var section in anminif.Keys)
+		var dir = new Directory();
+		
+		if(dir.Open(animationsFolder) == Error.Ok)
 		{
-			if(section == "") continue;
-			var resourcePath = anminif[section, "Path", ""].s();
+			dir.ListDirBegin(true);
+			string file;
 			
-			/*var image = new Image();
-			var err = image.Load(resourcePath);
-			if(err != Error.Ok)
+			while((file = dir.GetNext()) != "")
 			{
-				GD.Print($"failed to load animation sheet {resourcePath}. error is {err}");
-				continue;
+				if(!dir.CurrentIsDir() && StringUtils.GetExtension(file) == ".png")
+				{
+					var filename = StringUtils.RemoveExtension(file);
+					var resourcePath = $"{animationsFolder}/{filename}.png";
+					var parts = filename.Split('_');
+					var animationName = parts[0];
+					var frames = int.Parse(parts[1]);
+					var loop = int.Parse(parts[2]).b();
+					var texture = GenerateTextureFromPath(resourcePath);
+					if(texture is null) continue;
+					spr.AddSheet(texture, animationName, frames, loop);
+				}
 			}
-			
-			var texture = new ImageTexture();
-			texture.CreateFromImage(image, 0b11);*/
-			
-			var frames = anminif[section, "Frames", new Vector2(4,4)].v2();
-			var loop = anminif[section, "Loop", true].b();
-			//var texture = ResourceLoader.Load<Texture>(resourcePath);
-			var texture = (Texture)GD.Load(resourcePath);
-			spr.AddSheet(texture, section, frames.x.i(), frames.y.i(), loop);
 		}
 		
 		ch.AddChild(spr);
 		spr.InitFramePlayer();
 		ch.sprite = spr;
 		spr.Play("Default");
+	}
+	
+	public Texture GenerateTextureFromPath(string path)
+	{
+		if(path.StartsWith("res://"))//local
+		{
+			return ResourceLoader.Load<Texture>(path);
+		}
+		else
+		{
+			var image = new Image();
+			var err = image.Load(path);
+			if(err != Error.Ok)
+			{
+				GD.Print($"failed to load animation sheet {path}. error is {err}");
+				return null;
+			}
+		
+			var texture = new ImageTexture();
+			texture.CreateFromImage(image, 0b11);
+			return texture;
+		}
 	}
 }

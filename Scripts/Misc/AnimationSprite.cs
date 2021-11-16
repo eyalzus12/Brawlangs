@@ -24,7 +24,7 @@ public class AnimationSprite : Sprite
 			
 			var anm = new Animation();
 			anm.Step = 1/24f;
-			var frameCount = animationSheet.HFrames * animationSheet.VFrames;
+			var frameCount = animationSheet.frames;
 			anm.Length = frameCount * anm.Step;
 			anm.Loop = animationSheet.loop;
 			framePlayer.AddAnimation(animationName, anm);
@@ -70,9 +70,9 @@ public class AnimationSprite : Sprite
 		queuedSheet = null;
 	}
 	
-	public void AddSheet(Texture texture, string name, int HFrames, int VFrames, bool loop)
+	public void AddSheet(Texture texture, string name, int frames, bool loop)
 	{
-		AddSheet(new AnimationSheet(texture, name, HFrames, VFrames, loop));
+		AddSheet(new AnimationSheet(texture, name, frames, loop));
 	}
 	
 	public void AddSheet(AnimationSheet sheet)
@@ -84,8 +84,7 @@ public class AnimationSprite : Sprite
 	{
 		currentSheet = sheet;
 		this.Texture = currentSheet.texture;
-		this.Hframes = currentSheet.HFrames;
-		this.Vframes = currentSheet.VFrames;
+		this.Hframes = currentSheet.frames;
 		framePlayer.Play(currentSheet.name);
 		framePlayer.Advance(0);
 	}
@@ -108,16 +107,14 @@ public readonly struct AnimationSheet
 {
 	public readonly Texture texture;
 	public readonly string name;
-	public readonly int HFrames;
-	public readonly int VFrames;
+	public readonly int frames;
 	public readonly bool loop;
 	
-	public AnimationSheet(Texture texture, string name, int HFrames, int VFrames, bool loop)
+	public AnimationSheet(Texture texture, string name, int frames, bool loop)
 	{
 		this.texture = texture;
 		this.name = name;
-		this.HFrames = HFrames;
-		this.VFrames = VFrames;
+		this.frames = frames;
 		this.loop = loop;
 	}
 }

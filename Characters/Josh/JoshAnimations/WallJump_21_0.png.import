@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/idle.png-f04d45c398b7aaf02762bef7a13f573f.stex"
+path="res://.import/WallJump_21_0.png-ba682a38a0dd6c55a95d5d17ace98ab9.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://joshnimations/idle.png"
-dest_files=[ "res://.import/idle.png-f04d45c398b7aaf02762bef7a13f573f.stex" ]
+source_file="res://Characters/Josh/JoshAnimations/WallJump_21_0.png"
+dest_files=[ "res://.import/WallJump_21_0.png-ba682a38a0dd6c55a95d5d17ace98ab9.stex" ]
 
 [params]
 

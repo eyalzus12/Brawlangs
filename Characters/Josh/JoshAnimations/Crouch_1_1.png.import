@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/crouchig.png-b77b5b1f94489433c7bd9489ffbe10bb.stex"
+path="res://.import/Crouch_1_1.png-fe1eecacf5bde36f5e9f57501a3ed1c8.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://joshnimations/crouchig.png"
-dest_files=[ "res://.import/crouchig.png-b77b5b1f94489433c7bd9489ffbe10bb.stex" ]
+source_file="res://Characters/Josh/JoshAnimations/Crouch_1_1.png"
+dest_files=[ "res://.import/Crouch_1_1.png-fe1eecacf5bde36f5e9f57501a3ed1c8.stex" ]
 
 [params]
 
@@ -20,7 +20,7 @@ compress/hdr_mode=0
 compress/bptc_ldr=0
 compress/normal_map=0
 flags/repeat=0
-flags/filter=false
+flags/filter=true
 flags/mipmaps=false
 flags/anisotropic=false
 flags/srgb=2

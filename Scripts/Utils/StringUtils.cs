@@ -20,4 +20,16 @@ public static class StringUtils
 			return OS.GetExecutablePath().GetBaseDir().PlusFile(filename);
 		}
 	}
+	
+	public static string[] SplitByLast(this string s, char c)
+	{
+		int idx = s.LastIndexOf(c);
+		var result = new string[2]{"",""};
+		if (idx != -1)
+		{
+			result[0] = s.Substring(0, idx);
+			result[1] = s.Substring(idx + 1);
+		}
+		return result;
+	}
 }
