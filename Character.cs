@@ -604,12 +604,23 @@ public class Character : KinematicBody2D
 	
 	public virtual void ApplyKnockback(Vector2 skb, Vector2 vkb, float d, int stun, int hp)
 	{
-		var s = ChangeState("HitPause") as HitPauseState;
 		damage += d * damageTakenMult;
 		var force = (skb + damage*vkb/100f) * knockbackTakenMult;
-		s.force = force;
-		s.stunLength = stun * stunTakenMult;
-		s.hitPauseLength = hp;
+		var stunlen = stun * stunTakenMult;
+		
+		if(hp > 0)
+		{
+			var s = ChangeState("HitPause") as HitPauseState;
+			s.force = force;
+			s.stunLength = stunlen;
+			s.hitPauseLength = hp;
+		}
+		else if(stunlen > 0)
+		{
+			var s = ChangeState("Stun") as StunState;
+			s.Force = force;
+			s.stunLength = stunlen;
+		}
 		
 		if(force.x != 0f) direction = Math.Sign(force.x);
 		
@@ -624,8 +635,11 @@ public class Character : KinematicBody2D
 	
 	public virtual void HandleHitting(Hitbox hitWith, Area2D hurtboxHit, Character charHit)
 	{
-		var s = ChangeState("HitLag") as HitLagState;
-		s.hitLagLength = hitWith.hitlag;
+		if(hitWith.hitlag > 0)
+		{
+			var s = ChangeState("HitLag") as HitLagState;
+			s.hitLagLength = hitWith.hitlag;
+		}
 	}
 	
 	public virtual void ExecuteAttack(Attack a)

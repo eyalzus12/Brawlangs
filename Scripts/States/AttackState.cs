@@ -74,9 +74,22 @@ public class AttackState : State
 		a.Disconnect("AttackEnds", this, nameof(SetEnd));
 		a.connected = null;
 		int endlag = a.currentPart.GetEndlag();
-		var s = ch.ChangeState("Endlag") as EndlagState;
-		s.endlag = endlag;
-		s.att = a;
+		if(endlag > 0)
+		{
+			var s = ch.ChangeState("Endlag") as EndlagState;
+			s.endlag = endlag;
+			s.att = a;
+		}
+		else
+		{
+			if(ch.walled && ch.wallJumpCounter < ch.wallJumpNum)
+			{
+				if(touched) ch.wallJumpCounter--;
+				ch.ChangeState("WallLand");
+			}
+			else ch.ChangeState(ch.grounded?ch.downHeld?"Crawl":"Walk":"Air");
+		}
+		
 		att = null;
 		ch.SetCollisionMaskBit(DROP_THRU_BIT, !ch.downHeld);
 		if(!ch.downHeld&&ch.grounded) ch.Uncrouch();

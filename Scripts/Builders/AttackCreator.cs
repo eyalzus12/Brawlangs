@@ -44,7 +44,7 @@ public class AttackCreator
 		//GD.Print(section, ", ", start);
 		var AttackScript = inif[section, "Script", ""].s();
 		//GD.Print($"Loading script {PartScript}");
-		var charge = inif[section, "Charge", false].b();
+		//var charge = inif[section, "Charge", false].b();
 		Attack a;
 		if(AttackScript != "")
 		{
@@ -70,14 +70,10 @@ public class AttackCreator
 				}
 			}
 		}
-		else
-		{
-			if(charge) a = new ChargeableAttack();
-			else a = new Attack();
-		}
+		else a = new Attack();
 		n.AddChild(a);
 		
-		if(charge)
+		/*if(charge)
 		{
 			var chargepart = new ChargePart();
 			a.AddChild(chargepart);
@@ -85,7 +81,7 @@ public class AttackCreator
 			var input = inif[section, "Input", "heavy"].s().ToLower();
 			chargepart.input = $"player_{input}_attack";
 			(a as ChargeableAttack).charge = chargepart;
-		}
+		}*/
 		
 		var fric = inif[section, "Friction", 1f].f();
 		a.attackFriction = fric;
