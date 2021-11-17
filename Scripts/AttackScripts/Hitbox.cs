@@ -29,6 +29,8 @@ public class Hitbox : Area2D
 	[Export]
 	public Vector3 stunMult = new Vector3(0f, 1f, 1f);
 	
+	public KnockbackSetting knockbackSetting;
+	
 	public Dictionary<string, float> stateKnockbackMult;
 	public Dictionary<string, float> stateDamageMult;
 	public Dictionary<string, float> stateStunMult;
@@ -159,4 +161,27 @@ public class Hitbox : Area2D
 	public virtual float GetKnockbackMultiplier(Character c) => TeamMult(c, knockbackMult) * StateMult(c, stateKnockbackMult);
 	public virtual float GetDamageMultiplier(Character c) => TeamMult(c, damageMult) * StateMult(c, stateDamageMult);
 	public virtual int GetStunMultiplier(Character c) => (int)(TeamMult(c, stunMult) * StateMult(c, stateStunMult));
+	
+	public virtual Vector2 KnockbackDir(Character hitter, Character hitee)
+	{
+		switch(knockbackSetting)
+		{
+			case KnockbackSetting.Directional:
+				return new Vector2(hitter.direction,1);
+			case KnockbackSetting.Away:
+				var difference = hitter.Position-hitee.Position;
+				return new Vector2(Math.Sign(difference.x), Math.Sign(difference.y));
+			case KnockbackSetting.Exact:
+				return Vector2.One;
+			default:
+				return new Vector2(hitter.direction,1);
+		}
+	}
+	
+	public enum KnockbackSetting
+	{
+		Directional,
+		Away,
+		Exact
+	}
 }

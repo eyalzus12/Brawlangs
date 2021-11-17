@@ -226,6 +226,11 @@ public class AttackCreator
 		if(af.is_v2()) h.activeFrames = new List<Vector2> {af.v2()};
 		else h.activeFrames = af.lv2();
 		
+		var kt = inif[section, "KnockbackType", "Directional"].s();
+		Hitbox.KnockbackSetting ks;
+		Enum.TryParse<Hitbox.KnockbackSetting>(kt, out ks);
+		h.knockbackSetting = ks;
+		
 		var kmu = inif[section, "KnockbackMultiplier", new Vector3(0,1,1)].v3();
 		h.knockbackMult = kmu;
 		var dmu = inif[section, "DamageMultiplier", new Vector3(0,1,1)].v3();

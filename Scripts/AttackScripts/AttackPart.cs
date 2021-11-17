@@ -264,7 +264,7 @@ public class AttackPart : Node2D
 			if(!ch.CanHit(hitChar) || ignoreList.Contains(hitChar)) continue;
 			hit = true;
 			OnHit(hitbox, hurtbox);
-			var dirvec = new Vector2(ch.direction,1)*ch.knockbackDoneMult*hitbox.GetKnockbackMultiplier(hitChar);
+			var dirvec = hitbox.KnockbackDir(ch, hitChar)*ch.knockbackDoneMult*hitbox.GetKnockbackMultiplier(hitChar);
 			var skb = dirvec*hitbox.setKnockback;
 			var vkb = dirvec*hitbox.varKnockback;
 			var damage = hitbox.damage*ch.damageDoneMult*hitbox.GetDamageMultiplier(hitChar);
