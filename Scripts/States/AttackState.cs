@@ -35,7 +35,7 @@ public class AttackState : State
 	
 	protected override void DoGravity()
 	{
-		if(att.currentPart != null && att.currentPart.movement != Vector2.Zero) return;
+		if(att.currentPart != null && att.currentPart.movement.y != 0f) return;
 		
 		if(!ch.grounded) ch.vec.y.Lerp(ch.fallSpeed, ch.gravity);
 		else ch.vec.y = VCF;

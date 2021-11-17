@@ -12,9 +12,16 @@ public class HitLagState : State
 	
 	public override void Init()
 	{
-		hitLagLength = 0;
 		ch.ResetVelocity();
 		//pause animation
+		ch.fastfalling = false;
+		ch.currentAttack.currentPart.Pause();
+	}
+	
+	protected override void DoGravity()
+	{
+		if(ch.grounded) ch.vec.y = VCF;
+		else if(ch.fastfalling) ch.vec.y.Lerp(ch.fastFallSpeed, ch.fastFallGravity);
 	}
 	
 	public override void SetInputs()
@@ -22,11 +29,17 @@ public class HitLagState : State
 		SetHorizontalAlternatingInputs();
 		SetDownHoldingInput();
 		SetUpHoldingInput();
+		SetFastFallInput();
 	}
 	
 	protected override bool CalcStateChange()
 	{
-		if(frameCount >= hitLagLength) ch.ChangeState("Attack");
+		if(frameCount >= hitLagLength)
+		{
+			ch.ChangeState("Attack");
+			ch.currentAttack.currentPart.Resume();
+			hitLagLength = 0;
+		}
 		else return false;
 		
 		return true;

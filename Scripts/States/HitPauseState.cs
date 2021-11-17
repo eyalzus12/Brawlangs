@@ -15,8 +15,6 @@ public class HitPauseState : State
 	public override void Init()
 	{
 		ch.Uncrouch();
-		stunLength = 0;
-		hitPauseLength = 0;
 		ch.ResetVelocity();
 	}
 	
@@ -35,6 +33,8 @@ public class HitPauseState : State
 			s.Force = force;
 			s.stunLength = stunLength;
 			force = Vector2.Zero;
+			stunLength = 0;
+			hitPauseLength = 0;
 		}
 		else return false;
 		

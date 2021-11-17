@@ -17,8 +17,6 @@ public class AttackPart : Node2D
 	
 	public bool active = false;
 	
-	public (Hitbox, Area2D) activator;
-	
 	[Export]
 	public int startup = 0;
 	
@@ -30,9 +28,6 @@ public class AttackPart : Node2D
 	
 	[Export]
 	public Vector2 movement = default;
-	
-	[Export]
-	public bool hitPart = false;
 	
 	[Export]
 	public int missEndlag = 0;
@@ -91,6 +86,7 @@ public class AttackPart : Node2D
 		active = true;
 		hit = false;
 		frameCount = 0;
+		
 		if(movement != Vector2.Zero)
 			ch.vec = movement * new Vector2(ch.direction, 1);
 		
@@ -102,17 +98,12 @@ public class AttackPart : Node2D
 		ignoreList.Clear();
 	}
 	
-	public virtual void Pause()
-	{
-		hitboxPlayer.Stop(false);
-	}
-	
 	public override void _PhysicsProcess(float delta)
 	{
 		if(!active) return;
 		++frameCount;
 		Loop();
-		ActualHit(/*activator*/);
+		ActualHit();
 	}
 	
 	public void BuildHitboxAnimator()
@@ -166,6 +157,16 @@ public class AttackPart : Node2D
 		ignoreList.Clear();
 	}
 	
+	public virtual void Pause()
+	{
+		hitboxPlayer.Stop();
+	}
+	
+	public virtual void Resume()
+	{
+		hitboxPlayer.Play();
+	}
+	
 	public virtual void Loop()
 	{
 		
@@ -198,9 +199,30 @@ public class AttackPart : Node2D
 		else NextPart();
 	}*/
 	
-	public virtual string GetNextPart() => hitPart?hit?"Hit":"Miss":"Next";
+	private List<string> Describe(Character c)
+	{
+		var l = new List<string>();
+		if(c.ceilinged) l.Add("Ceiling");
+		if(c.walled) l.Add("Wall");
+		if(c.grounded) l.Add("Grounded");
+		else l.Add("Aerial");
+		if(true) l.Add("");
+		return l;
+	}
 	
-	public void ChangePart(string part)
+	public virtual string GetNextPart()
+	{
+		foreach(var property in Describe(ch))
+		{
+			if(hit && dir.ContainsKey($"{property}Hit")) return $"{property}Hit";
+			if(dir.ContainsKey($"{property}Miss")) return $"{property}Miss";
+			if(property != "" && dir.ContainsKey(property)) return property;
+		}
+		
+		return "Next";
+	}
+	
+	public virtual void ChangePart(string part)
 	{
 		if(!active || part == "") return;
 		var changeTo = GetConnectedPart(part);
@@ -242,10 +264,11 @@ public class AttackPart : Node2D
 			if(!ch.CanHit(hitChar) || ignoreList.Contains(hitChar)) continue;
 			hit = true;
 			OnHit(hitbox, hurtbox);
-			var skb = new Vector2(ch.direction,1)*hitbox.setKnockback*ch.knockbackDoneMult;
-			var vkb = new Vector2(ch.direction,1)*hitbox.varKnockback*ch.knockbackDoneMult;
-			var damage = hitbox.damage*ch.damageDoneMult;
-			var stun = hitbox.stun*ch.stunDoneMult;
+			var dirvec = new Vector2(ch.direction,1)*ch.knockbackDoneMult*hitbox.GetKnockbackMultiplier(hitChar);
+			var skb = dirvec*hitbox.setKnockback;
+			var vkb = dirvec*hitbox.varKnockback;
+			var damage = hitbox.damage*ch.damageDoneMult*hitbox.GetDamageMultiplier(hitChar);
+			var stun = hitbox.stun*ch.stunDoneMult*hitbox.GetStunMultiplier(hitChar);
 			hitChar.ApplyKnockback(skb, vkb, damage, stun, hitbox.hitpause);
 			ignoreList.Add(hitChar);
 			GD.Print($"{hitChar} was hit by {hitbox.Name}");

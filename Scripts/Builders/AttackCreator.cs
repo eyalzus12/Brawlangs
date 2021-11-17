@@ -149,8 +149,6 @@ public class AttackCreator
 		ap.movement = mv;
 		var me = inif[section, "MissEndlag", 0].i();
 		ap.missEndlag = me;
-		var hp = inif[section, "HitVar", false].b();
-		ap.hitPart = hp;
 		
 		var oHitboxSections = inif[section, "Hitboxes", null];
 		if(oHitboxSections is string)
@@ -227,6 +225,49 @@ public class AttackCreator
 		var af = inif[section, "ActiveFrames", new List<Vector2>()];
 		if(af.is_v2()) h.activeFrames = new List<Vector2> {af.v2()};
 		else h.activeFrames = af.lv2();
+		
+		var kmu = inif[section, "KnockbackMultiplier", new Vector3(0,1,1)].v3();
+		h.knockbackMult = kmu;
+		var dmu = inif[section, "DamageMultiplier", new Vector3(0,1,1)].v3();
+		h.damageMult = dmu;
+		var smu = inif[section, "StunMultiplier", new Vector3(0,1,1)].v3();
+		h.stunMult = smu;
+		
+		var kms = inif[section, "KnockbackStateMultipliers", ""].s();
+		if(kms != "")
+		{
+			h.stateKnockbackMult = new Dictionary<string, float>();
+			foreach(var entry in inif[kms])
+			{
+				var stateName = entry.Key;
+				var mult = entry.Value.f();
+				h.stateKnockbackMult.Add(stateName, mult);
+			}
+		}
+		
+		var dms = inif[section, "DamageStateMultipliers", ""].s();
+		if(dms != "")
+		{
+			h.stateDamageMult = new Dictionary<string, float>();
+			foreach(var entry in inif[dms])
+			{
+				var stateName = entry.Key;
+				var mult = entry.Value.f();
+				h.stateDamageMult.Add(stateName, mult);
+			}
+		}
+		
+		var sms = inif[section, "StunStateMultipliers", ""].s();
+		if(sms != "")
+		{
+			h.stateStunMult = new Dictionary<string, float>();
+			foreach(var entry in inif[sms])
+			{
+				var stateName = entry.Key;
+				var mult = entry.Value.f();
+				h.stateStunMult.Add(stateName, mult);
+			}
+		}
 		
 		ap.AddChild(h);
 		ap.hitboxes.Add(h);

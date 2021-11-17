@@ -22,6 +22,16 @@ public class Hitbox : Area2D
 	public float damage = 0f;
 	[Export]
 	public int hitPriority = 0;
+	[Export]
+	public Vector3 knockbackMult = new Vector3(0f, 1f, 1f);
+	[Export]
+	public Vector3 damageMult = new Vector3(0f, 1f, 1f);
+	[Export]
+	public Vector3 stunMult = new Vector3(0f, 1f, 1f);
+	
+	public Dictionary<string, float> stateKnockbackMult;
+	public Dictionary<string, float> stateDamageMult;
+	public Dictionary<string, float> stateStunMult;
 	
 	public List<Vector2> activeFrames = new List<Vector2>();
 	public Character ch;
@@ -123,4 +133,30 @@ public class Hitbox : Area2D
 	}
 	
 	public virtual void Loop() {}
+	
+	private float TeamMult(Character c, Vector3 chooseFrom)
+	{
+		if(c == ch) return knockbackMult.x;
+		else if(c.teamNumber == ch.teamNumber) return knockbackMult.y;
+		else return knockbackMult.z;
+	}
+	
+	private float StateMult(Character c, Dictionary<string, float> chooseFrom)
+	{
+		if(chooseFrom is null) return 1f;
+		
+		var f = 1f;
+		
+		for(var t = c.currentState.GetType(); t.Name != "State"; t = t.BaseType)
+		{
+			if(chooseFrom.TryGetValue(t.Name.Replace("State", ""), out f))
+				return f;
+		}
+		
+		return 1f;
+	}
+	
+	public virtual float GetKnockbackMultiplier(Character c) => TeamMult(c, knockbackMult) * StateMult(c, stateKnockbackMult);
+	public virtual float GetDamageMultiplier(Character c) => TeamMult(c, damageMult) * StateMult(c, stateDamageMult);
+	public virtual int GetStunMultiplier(Character c) => (int)(TeamMult(c, stunMult) * StateMult(c, stateStunMult));
 }
