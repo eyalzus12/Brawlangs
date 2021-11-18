@@ -53,6 +53,8 @@ public class EndlagState : State
 			ch.SetCollisionMaskBit(DROP_THRU_BIT, !ch.downHeld);
 			if(!ch.downHeld&&ch.grounded) ch.Uncrouch();
 			
+			ch.fastfalling = ch.downHeld;
+			
 			if(ch.walled && ch.wallJumpCounter < ch.wallJumpNum)
 			{
 				if((ch.GetState("Attack") as AttackState).touched) ch.wallJumpCounter--;

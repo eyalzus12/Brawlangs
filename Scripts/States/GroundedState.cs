@@ -12,6 +12,7 @@ public class GroundedState : State
 	{
 		base.ForcedInit();
 		jump = false;
+		ch.fastfalling = false;
 	}
 	
 	protected override void DoMovement()

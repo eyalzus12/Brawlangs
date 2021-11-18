@@ -169,7 +169,9 @@ public class Hitbox : Area2D
 			case KnockbackSetting.Directional:
 				return new Vector2(hitter.direction,1);
 			case KnockbackSetting.Away:
-				var difference = hitter.Position-hitee.Position;
+				var difference = hitee.Position-hitter.Position;
+				if(difference.x == 0) difference.x = 1;
+				if(difference.y == 0) difference.y = 1;
 				return new Vector2(Math.Sign(difference.x), Math.Sign(difference.y));
 			case KnockbackSetting.Exact:
 				return Vector2.One;
