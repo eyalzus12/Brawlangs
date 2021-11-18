@@ -9,8 +9,6 @@ public class MapBase : Node2D
 	[Export]
 	public Rect2 BlastZones = BlastZone.CalcRect(new Vector2(512, 300), new Vector2(1500, 1000));
 	
-	public const string PACK_EXT = ".zip";
-	
 	public override void _Ready()
 	{
 		LoadCharacters();

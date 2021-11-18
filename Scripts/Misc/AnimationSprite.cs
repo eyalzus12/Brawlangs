@@ -10,6 +10,11 @@ public class AnimationSprite : Sprite
 	public AnimationSheet? queuedSheet;
 	public AnimationPlayer framePlayer;
 	
+	public AnimationSprite()
+	{
+		currentSheet = new AnimationSheet(null, "", 0, false);
+	}
+	
 	public void InitFramePlayer()
 	{
 		var fplayer = new AnimationPlayer();
@@ -47,7 +52,11 @@ public class AnimationSprite : Sprite
 		}
 		catch(KeyNotFoundException)
 		{
-			SetSheet(animations["Default"]);
+			try
+			{
+				SetSheet(animations["Default"]);
+			}
+			catch(KeyNotFoundException) {}
 		}
 	}
 	
@@ -59,7 +68,11 @@ public class AnimationSprite : Sprite
 		}
 		catch(KeyNotFoundException)
 		{
-			QueueSheet(animations["Default"]);
+			try
+			{
+				QueueSheet(animations["Default"]);
+			}
+			catch(KeyNotFoundException) {}
 		}
 	}
 	

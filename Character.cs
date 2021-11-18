@@ -486,7 +486,21 @@ public class Character : KinematicBody2D
 	////////////////Collision//////////////////
 	///////////////////////////////////////////
 	
-	public bool ApplySettings(string setting) => ApplySettings(settings[setting]);
+	public bool ApplySettings(string setting)
+	{
+		try
+		{
+			return ApplySettings(settings[setting]);
+		}
+		catch(KeyNotFoundException)
+		{
+			try
+			{
+				return ApplySettings(settings["Normal"]);
+			}
+			catch(KeyNotFoundException) {return false;}
+		}
+	}
 	
 	public bool ApplySettings(CollisionSettings setting)
 	{

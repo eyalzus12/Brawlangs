@@ -61,28 +61,22 @@ public class CharacterCreator
 		var spr = new AnimationSprite();
 		spr.Name = "Sprite";
 		
-		var dir = new Directory();
-		
-		if(dir.Open(animationsFolder) == Error.Ok)
+		var files = ListPostImportDirectoryFiles(animationsFolder).Distinct().ToList();
+		foreach(var file in files)
 		{
-			dir.ListDirBegin(true);
-			string file;
-			
-			while((file = dir.GetNext()) != "")
+			var filename = StringUtils.RemoveExtension(file);
+			var resourcePath = $"{animationsFolder}/{file}";
+			var parts = filename.Split('_');
+			var animationName = parts[0];
+			var frames = int.Parse(parts[1]);
+			var loop = int.Parse(parts[2]).b();
+			var texture = GenerateTextureFromPath(resourcePath);
+			if(texture is null)
 			{
-				if(!dir.CurrentIsDir() && StringUtils.GetExtension(file) == ".png")
-				{
-					var filename = StringUtils.RemoveExtension(file);
-					var resourcePath = $"{animationsFolder}/{filename}.png";
-					var parts = filename.Split('_');
-					var animationName = parts[0];
-					var frames = int.Parse(parts[1]);
-					var loop = int.Parse(parts[2]).b();
-					var texture = GenerateTextureFromPath(resourcePath);
-					if(texture is null) continue;
-					spr.AddSheet(texture, animationName, frames, loop);
-				}
+				GD.Print($"failed to load animation {animationName} from path {resourcePath}");
+				continue;
 			}
+			spr.AddSheet(texture, animationName, frames, loop);
 		}
 		
 		ch.AddChild(spr);
@@ -97,7 +91,7 @@ public class CharacterCreator
 		{
 			return ResourceLoader.Load<Texture>(path);
 		}
-		else
+		else//remote
 		{
 			var image = new Image();
 			var err = image.Load(path);
@@ -111,5 +105,53 @@ public class CharacterCreator
 			texture.CreateFromImage(image, 0b11);
 			return texture;
 		}
+	}
+	
+	public static List<string> ListPostImportDirectoryFiles(string path)
+	{
+		var tempArray = ListDirectoryFiles(path);
+		var fileArray = new List<string>();
+		foreach(var file in tempArray)
+		{
+			if(file.EndsWith(".import"))
+			{
+				var filename = file.Replace(".import", "");
+				fileArray.Add(filename);
+			}
+			else if(file.EndsWith(".png"))
+			{
+				fileArray.Add(file);
+			}
+		}
+		
+		return fileArray;
+	}
+	
+	public static List<string> ListDirectoryFiles(string path)
+	{
+		var files = new List<string>();
+		var dir = new Directory();
+		var er = dir.Open(path);
+		if(er == Error.Ok)
+		{
+			dir.ListDirBegin();
+			string file;
+			
+			while((file = dir.GetNext()) != "")
+			{
+				if(!dir.CurrentIsDir() && file[0] != '.')
+				{
+					files.Add(file);
+				}
+			}
+			
+			dir.ListDirEnd();
+		}
+		else
+		{
+			GD.Print($"Error opening folder {path}. error is {er}");
+		}
+		
+		return files;
 	}
 }
