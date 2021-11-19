@@ -5,6 +5,7 @@ public static class Utils
 {
 	public static Node Root(this Node n) => n.GetTree().Root;
 	public static Node GetRootNode(this Node n, string s) => n.Root().GetNode(s);
+	public static T GetRootNode<T>(this Node n, string s) where T : Node => (T)(n.GetRootNode(s));
 	
 	public static bool NotNull(this object o) => !(o is null);
 	

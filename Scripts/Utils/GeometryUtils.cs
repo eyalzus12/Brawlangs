@@ -128,7 +128,7 @@ public static class GeometryUtils
 	{
 		var height = shape.Height;
 		var radius = shape.Radius;
-		ci.DrawSetTransform(position, rotation, new Vector2(1,1));
+		ci.DrawSetTransform(position, rotation, Vector2.One);
 		var middleRect = BlastZone.CalcRect(Vector2.Zero, new Vector2(radius, height/2));
 		ci.DrawRect(middleRect, color);
 		ci.DrawCircle(new Vector2(0, height/2), radius, color);

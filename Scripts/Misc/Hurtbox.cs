@@ -63,11 +63,13 @@ public class Hurtbox : Area2D
 	
 	public override void _Draw()
 	{
+		if(!this.GetRootNode<UpdateScript>("UpdateScript").debugCollision) return;
+		ZIndex = 2;
 		GeometryUtils.DrawCapsuleShape(this,
 			Shape, //shape
 			originalPosition*new Vector2(ch.direction, 1), //position
 			originalRotation*ch.direction, //rotation
-			new Color(1,1,1)); //color
+			GetDrawColor()); //color
 		
 		/*
 		var oval = shape.Shape as CapsuleShape2D;
@@ -83,4 +85,6 @@ public class Hurtbox : Area2D
 		DrawCircle(new Vector2(0, -height/2), radius, color);
 		*/
 	}
+	
+	public virtual Color GetDrawColor() => new Color(0,1,0,1);
 }

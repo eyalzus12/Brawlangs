@@ -16,11 +16,13 @@ public class AttackState : State
 	{
 		touched = false;
 		ch.SetCollisionMaskBit(DROP_THRU_BIT, !ch.downHeld);
-		if(ch.grounded)
+		
+		/*if(ch.grounded)
 		{
-			if(ch.downHeld) ch.Crouch();
-			else ch.Uncrouch();
-		}
+			if(!ch.crouching && ch.downHeld) ch.Crouch();
+			else if(ch.crouching && !ch.downHeld) ch.Uncrouch();
+		}*/
+		
 		//ch.PlayAnimation(att.animation);
 		//figure out way to do it when the attack actually exists
 	}
@@ -35,10 +37,14 @@ public class AttackState : State
 	
 	protected override void DoGravity()
 	{
-		if(att.currentPart != null && att.currentPart.movement.y != 0f) return;
+		if(att.currentPart != null && Math.Abs(att.currentPart.movement.y) > 1f) return;
 		
 		if(!ch.grounded) ch.vec.y.Lerp(ch.fallSpeed, ch.gravity);
-		else ch.vec.y = VCF;
+		else
+		{
+			ch.vec.y = VCF;
+			snapVector = -VCF * ch.fnorm;
+		}
 	}
 	
 	public override void SetInputs()
@@ -87,11 +93,23 @@ public class AttackState : State
 				if(touched) ch.wallJumpCounter--;
 				ch.ChangeState("WallLand");
 			}
-			else ch.ChangeState(ch.grounded?ch.downHeld?"Crawl":"Walk":"Air");
+			else if(ch.grounded)
+			{
+				if(ch.downHeld)
+				{
+					if(ch.crouching) ch.ChangeState("Crawl");
+					else ch.ChangeState("Duck");
+				}
+				else
+				{
+					if(ch.crouching) ch.ChangeState("Getup");
+					else ch.ChangeState("Walk");
+				}
+			}
+			else ch.ChangeState("Air");
 		}
 		
 		att = null;
 		ch.SetCollisionMaskBit(DROP_THRU_BIT, !ch.downHeld);
-		if(!ch.downHeld&&ch.grounded) ch.Uncrouch();
 	}
 }

@@ -19,7 +19,7 @@ public class CollisionCreator
 	
 	public void Build(Character ch)
 	{
-		var cs = new CollisionShape2D();
+		var cs = new CharacterCollision();
 		ch.AddChild(cs);
 		cs.Shape = new RectangleShape2D();
 		cs.Name = "Collision";

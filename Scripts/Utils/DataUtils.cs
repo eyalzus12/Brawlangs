@@ -14,5 +14,5 @@ public static class DataUtils
 	public static void ClearData(this Node n) => n.GetPublicData().Clear();
 	public static int DataCount(this Node n) => n.GetPublicData().Count;
 	public static bool DataEmpty(this Node n) => n.GetPublicData().Empty;
-	public static PublicData GetPublicData(this Node n) => (PublicData)n.GetRootNode("PublicData");
+	public static PublicData GetPublicData(this Node n) => n.GetRootNode<PublicData>("PublicData");
 }

@@ -114,7 +114,7 @@ public class MapCreator
 		sp.Scale = scl;
 		var te = inif[section, "Texture", "res://icon.png"].s();
 		sp.Texture = ResourceLoader.Load(te) as Texture;
-		var zz = inif[section, "Z", 0].i();
+		var zz = inif[section, "Z", 1].i();
 		sp.ZIndex = zz;
 		
 		n.AddChild(sp);

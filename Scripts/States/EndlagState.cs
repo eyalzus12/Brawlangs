@@ -51,7 +51,6 @@ public class EndlagState : State
 		if(frameCount >= endlag)
 		{
 			ch.SetCollisionMaskBit(DROP_THRU_BIT, !ch.downHeld);
-			if(!ch.downHeld&&ch.grounded) ch.Uncrouch();
 			
 			ch.fastfalling = ch.downHeld;
 			
@@ -60,7 +59,23 @@ public class EndlagState : State
 				if((ch.GetState("Attack") as AttackState).touched) ch.wallJumpCounter--;
 				ch.ChangeState("WallLand");
 			}
-			else ch.ChangeState(ch.grounded?ch.downHeld?"Crawl":"Walk":"Air");
+			else
+			{
+				if(ch.grounded)
+				{
+					if(ch.downHeld)
+					{
+						if(ch.crouching) ch.ChangeState("Crawl");
+						else ch.ChangeState("Duck");
+					}
+					else
+					{
+						if(ch.crouching) ch.ChangeState("Getup");
+						else ch.ChangeState("Walk");
+					}
+				}
+				else ch.ChangeState("Air");
+			}
 		}
 		else return false;
 		

@@ -216,6 +216,8 @@ public class AttackCreator
 		h.damage = dm;
 		var pr = inif[section, "Priority", 0].i();
 		h.hitPriority = pr;
+		var cm = inif[section, "MomentumCarry", 0f].f();
+		h.momentumCarry = cm;
 		h.Name = section;
 		
 		var af = inif[section, "ActiveFrames", new List<Vector2>()];

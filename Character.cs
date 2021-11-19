@@ -249,7 +249,7 @@ public class Character : KinematicBody2D
 			proj.hitpause = 3;
 			proj.damage = 10f;
 			GetParent().AddChild(proj);
-			proj.Modulate = Modulate;
+			proj.SelfModulate = (new Color(1,0.1f,0.1f,1));
 			proj.GlobalPosition = GlobalPosition;
 			proj.move = new Vector2(direction * 5, 0);
 			var cs = new CollisionShape2D();

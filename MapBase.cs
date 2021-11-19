@@ -56,7 +56,8 @@ public class MapBase : Node2D
 		var pink = new Color(1, 0.5f, 0.5f);
 		Color[] colorlist = {blue, red, green, yellow, megenta, cyan, grey, pink};
 				
-		c.Modulate = colorlist[i-1];
+		c.SelfModulate = colorlist[i-1];
+		c.sprite.SelfModulate = c.SelfModulate;
 		c.Respawn();
 				
 		var im = new BufferInputManager(c.teamNumber);

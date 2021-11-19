@@ -265,7 +265,7 @@ public class AttackPart : Node2D
 			hit = true;
 			OnHit(hitbox, hurtbox);
 			var dirvec = hitbox.KnockbackDir(ch, hitChar)*ch.knockbackDoneMult*hitbox.GetKnockbackMultiplier(hitChar);
-			var skb = dirvec*hitbox.setKnockback;
+			var skb = dirvec*hitbox.setKnockback + hitbox.momentumCarry*ch.GetVelocity();
 			var vkb = dirvec*hitbox.varKnockback;
 			var damage = hitbox.damage*ch.damageDoneMult*hitbox.GetDamageMultiplier(hitChar);
 			var stun = hitbox.stun*ch.stunDoneMult*hitbox.GetStunMultiplier(hitChar);

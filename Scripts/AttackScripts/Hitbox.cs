@@ -28,6 +28,8 @@ public class Hitbox : Area2D
 	public Vector3 damageMult = new Vector3(0f, 1f, 1f);
 	[Export]
 	public Vector3 stunMult = new Vector3(0f, 1f, 1f);
+	[Export]
+	public float momentumCarry = 0f;
 	
 	public KnockbackSetting knockbackSetting;
 	
@@ -113,11 +115,13 @@ public class Hitbox : Area2D
 	
 	public override void _Draw()
 	{
+		//if(!(UpdateScript)n.GetRootNode("UpdateScript").debugCollision) return;
+		ZIndex = 4;
 		GeometryUtils.DrawCapsuleShape(this,
 			shape.Shape as CapsuleShape2D, //shape
 			originalPosition*new Vector2(ch.direction, 1), //position
 			originalRotation*ch.direction, //rotation
-			new Color(1,1,1)); //color
+			GetDrawColor()); //color
 		
 		/*
 		var oval = shape.Shape as CapsuleShape2D;
@@ -177,6 +181,17 @@ public class Hitbox : Area2D
 				return Vector2.One;
 			default:
 				return new Vector2(hitter.direction,1);
+		}
+	}
+	
+	public virtual Color GetDrawColor()
+	{
+		if(stun == 0 && hitpause == 0 && hitlag == 0) return new Color(0.9f,0.9f,0.9f,1);
+		switch(knockbackSetting)
+		{
+			case KnockbackSetting.Directional: return new Color(1,0.1f,0.1f,1);
+			case KnockbackSetting.Away: return new Color(1,0.3f,0.1f,1);
+			default: return new Color(0.5f,0.5f,0,1);
 		}
 	}
 	
