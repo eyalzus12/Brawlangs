@@ -29,7 +29,7 @@ public class Hitbox : Area2D
 	[Export]
 	public Vector3 stunMult = new Vector3(0f, 1f, 1f);
 	[Export]
-	public float momentumCarry = 0f;
+	public Vector2 momentumCarry = Vector2.Zero;
 	
 	public KnockbackSetting knockbackSetting;
 	
@@ -142,9 +142,9 @@ public class Hitbox : Area2D
 	
 	private float TeamMult(Character c, Vector3 chooseFrom)
 	{
-		if(c == ch) return knockbackMult.x;
-		else if(c.teamNumber == ch.teamNumber) return knockbackMult.y;
-		else return knockbackMult.z;
+		if(c == ch) return chooseFrom.x;
+		else if(c.teamNumber == ch.teamNumber) return chooseFrom.y;
+		else return chooseFrom.z;
 	}
 	
 	private float StateMult(Character c, Dictionary<string, float> chooseFrom)
@@ -168,15 +168,18 @@ public class Hitbox : Area2D
 	
 	public virtual Vector2 KnockbackDir(Character hitter, Character hitee)
 	{
+		var difference = hitee.Position-hitter.Position;
 		switch(knockbackSetting)
 		{
 			case KnockbackSetting.Directional:
 				return new Vector2(hitter.direction,1);
 			case KnockbackSetting.Away:
-				var difference = hitee.Position-hitter.Position;
 				if(difference.x == 0) difference.x = 1;
 				if(difference.y == 0) difference.y = 1;
 				return new Vector2(Math.Sign(difference.x), Math.Sign(difference.y));
+			case KnockbackSetting.Angled:
+				if(difference == Vector2.Zero) return difference;
+				return difference.Normalized();
 			case KnockbackSetting.Exact:
 				return Vector2.One;
 			default:
@@ -189,9 +192,10 @@ public class Hitbox : Area2D
 		if(stun == 0 && hitpause == 0 && hitlag == 0) return new Color(0.9f,0.9f,0.9f,1);
 		switch(knockbackSetting)
 		{
-			case KnockbackSetting.Directional: return new Color(1,0.1f,0.1f,1);
-			case KnockbackSetting.Away: return new Color(1,0.3f,0.1f,1);
-			default: return new Color(0.5f,0.5f,0,1);
+			case KnockbackSetting.Directional: return new Color(1, 0.1f, 0.1f, 1);
+			case KnockbackSetting.Away: return new Color(1, 0.3f, 0.1f, 1);
+			case KnockbackSetting.Angled: return new Color(0.7f, 0.7f, 0.1f, 1);
+			default: return new Color(0.5f, 0.5f, 0, 1);
 		}
 	}
 	
@@ -199,6 +203,7 @@ public class Hitbox : Area2D
 	{
 		Directional,
 		Away,
+		Angled,
 		Exact
 	}
 }

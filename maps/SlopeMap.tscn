@@ -1,8 +1,10 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://MapBase.cs" type="Script" id=1]
 [ext_resource path="res://Scripts/Platforms/StaticPlatform2D.cs" type="Script" id=2]
 [ext_resource path="res://MapArt/TestMap/AllSidesSlope.png" type="Texture" id=3]
+[ext_resource path="res://MapArt/TestMap/ThreeSides.png" type="Texture" id=4]
+[ext_resource path="res://MapArt/TestMap/icon.png" type="Texture" id=5]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 256, 32 )
@@ -17,18 +19,32 @@ script = ExtResource( 2 )
 polygon = PoolVector2Array( -100, 0, -100, 300, 612, 300, 612, 0, 448, 0, 256, 300, 64, 0 )
 
 [node name="Sprite" type="Sprite" parent="StaticBody2D/CollisionPolygon2D"]
-visible = false
-position = Vector2( 384, 152 )
-scale = Vector2( 3.90625, 4.6875 )
+position = Vector2( 352.75, 150.692 )
+scale = Vector2( 2.977, 4.65913 )
 texture = ExtResource( 3 )
 
+[node name="Sprite3" type="Sprite" parent="StaticBody2D/CollisionPolygon2D"]
+position = Vector2( 531.323, 149.345 )
+rotation = -1.5708
+scale = Vector2( 4.7, 2.6 )
+texture = ExtResource( 4 )
+
+[node name="Sprite4" type="Sprite" parent="StaticBody2D/CollisionPolygon2D"]
+position = Vector2( -16.602, 149.294 )
+rotation = 1.5708
+scale = Vector2( 4.7, 2.6 )
+texture = ExtResource( 4 )
+
 [node name="Sprite2" type="Sprite" parent="StaticBody2D/CollisionPolygon2D"]
-visible = false
-position = Vector2( 128, 152 )
-scale = Vector2( 3.90625, 4.6875 )
+position = Vector2( 160.39, 150.11 )
+scale = Vector2( 2.95313, 4.6875 )
 texture = ExtResource( 3 )
 flip_h = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
 position = Vector2( 256, 544 )
 shape = SubResource( 1 )
+
+[node name="Sprite" type="Sprite" parent="StaticBody2D/CollisionShape2D"]
+scale = Vector2( 8, 1 )
+texture = ExtResource( 5 )

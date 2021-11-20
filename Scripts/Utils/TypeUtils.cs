@@ -11,52 +11,38 @@ public static class TypeUtils
 	public static string s(this object o) => (string)o;
 	public static object ob(this object o) => o;
 	
-	public const string NUMBER_REGEX = @"-?\d+(?:\.\d+)?";
-	
 	public static Vector2 v2(this object o)//aslkfjhakusdfghausjkfhsakuh
 	{
-		string str = o.ToString();
+		var str = o.ToString();
 		str = str.Substring(1, str.Length-2);//turns to string and cuts ()
-		var split = str.Split(' ');//split by the space
-		var x = float.Parse(split[0]);//parse x
-		var y = float.Parse(split[1]);//parse y
+		var split = str.Split(',');//split by the space
+		var x = float.Parse(split[0].Trim());//parse x
+		var y = float.Parse(split[1].Trim());//parse y
 		return new Vector2(x, y);//uses the parts
 	}
-
-	public static string V2_REGEX = $@"^\({NUMBER_REGEX},? {NUMBER_REGEX}\)$";
-	public static bool is_v2(this object o) => o.RegexMatch(V2_REGEX);
-	//detects if str matches a Vector2 ToString output
 	
 	public static Vector3 v3(this object o)
 	{
-		string str = o.ToString();
+		var str = o.ToString();
 		str = str.Substring(1, str.Length-2);//turns to string and cuts ()
-		var split = str.Split(' ');//split by the space
-		var x = float.Parse(split[0]);//parse x
-		var y = float.Parse(split[1]);//parse y
-		var z = float.Parse(split[2]);//parse z
+		var split = str.Split(',');//split by the space
+		var x = float.Parse(split[0].Trim());//parse x
+		var y = float.Parse(split[1].Trim());//parse y
+		var z = float.Parse(split[2].Trim());//parse z
 		return new Vector3(x, y, z);//uses the parts
 	}
 	
-	public static string V3_REGEX = $@"^\({NUMBER_REGEX},? {NUMBER_REGEX},? {NUMBER_REGEX}\)$";
-	public static bool is_v3(this object o) => o.RegexMatch(V3_REGEX);
-	//detects if str matches a Vector3 ToString output
-	
 	public static Quat q(this object o)
 	{
-		string str = o.ToString();
+		var str = o.ToString();
 		str = str.Substring(1, str.Length-2);//turns to string and cuts ()
-		var split = str.Split(' ');//split by the space
-		var x = float.Parse(split[0]);//parse x
-		var y = float.Parse(split[1]);//parse y
-		var z = float.Parse(split[2]);//parse z
-		var w = float.Parse(split[3]);//parse w
+		var split = str.Split(',');//split by the space
+		var x = float.Parse(split[0].Trim());//parse x
+		var y = float.Parse(split[1].Trim());//parse y
+		var z = float.Parse(split[2].Trim());//parse z
+		var w = float.Parse(split[3].Trim());//parse w
 		return new Quat(x, y, z, w);//uses the parts
 	}
-	
-	public static string Q_REGEX = $@"^\({NUMBER_REGEX},? {NUMBER_REGEX},? {NUMBER_REGEX},? {NUMBER_REGEX}\)$";
-	public static bool is_q(this object o) => o.RegexMatch(Q_REGEX);
-	//detects if str matches a Quat ToString output
 	
 	public static List<object> lo(this object o) => o.lt<object>(ob);//(o as IEnumerable<object>).ToList<object>();
 	public static List<string> ls(this object o) => o.lt<string>(s);

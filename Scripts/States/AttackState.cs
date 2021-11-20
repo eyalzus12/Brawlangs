@@ -43,7 +43,8 @@ public class AttackState : State
 		else
 		{
 			ch.vec.y = VCF;
-			snapVector = -VCF * ch.fnorm;
+			if(att.currentPart.movement.y > 0) snapVector = -VCF * ch.fnorm;
+			else Unsnap();
 		}
 	}
 	

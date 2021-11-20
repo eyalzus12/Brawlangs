@@ -216,12 +216,12 @@ public class AttackCreator
 		h.damage = dm;
 		var pr = inif[section, "Priority", 0].i();
 		h.hitPriority = pr;
-		var cm = inif[section, "MomentumCarry", 0f].f();
+		var cm = inif[section, "MomentumCarry", Vector2.Zero].v2();
 		h.momentumCarry = cm;
 		h.Name = section;
 		
 		var af = inif[section, "ActiveFrames", new List<Vector2>()];
-		if(af.is_v2()) h.activeFrames = new List<Vector2> {af.v2()};
+		if(af is Vector2) h.activeFrames = new List<Vector2> {af.v2()};
 		else h.activeFrames = af.lv2();
 		
 		var kt = inif[section, "KnockbackType", "Directional"].s();
