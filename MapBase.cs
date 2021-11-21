@@ -37,6 +37,9 @@ public class MapBase : Node2D
 		}
 		
 		SetDamageLabelLocations(chars.ToArray());
+		var dh = new DeathHandeler(chars);
+		AddChild(dh);
+		dh.Connect("MatchEnds", this, nameof(MatchEnd));
 	}
 	
 	public Character PathToCharacter(string path, int i)
@@ -139,6 +142,16 @@ public class MapBase : Node2D
 			Cleanup();
 			GetTree().Quit();
 		}
+	}
+	
+	public void MatchEnd()
+	{
+		Cleanup();
+			
+		GetTree()
+			.CallDeferred("change_scene",
+			ProjectSettings
+			.GetSetting("application/run/main_scene"));
 	}
 	
 	public void Cleanup()
