@@ -1,0 +1,30 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://ResultsLabel.cs" type="Script" id=1]
+[ext_resource path="res://ToMainMenuButton.cs" type="Script" id=2]
+
+[node name="Base" type="Node2D"]
+
+[node name="ResultsLabel" type="Label" parent="."]
+margin_left = 56.0
+margin_top = 48.0
+margin_right = 66.0
+margin_bottom = 62.0
+rect_min_size = Vector2( 10, 10 )
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Button" type="Button" parent="."]
+margin_left = 440.0
+margin_top = 500.0
+margin_right = 598.0
+margin_bottom = 520.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Go Back To Main Menu"
+script = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}

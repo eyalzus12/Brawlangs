@@ -3,7 +3,7 @@ using System;
 
 public class TestNewBuilders : Node2D
 {
-	public override void _Ready()
+	/*public override void _Ready()
 	{
 		var cr1 = new CharacterCreator("res://inicharactertest.ini");
 		cr1.Build(this);
@@ -26,7 +26,7 @@ public class TestNewBuilders : Node2D
 		
 		//var dmg = (GetNode("UI").GetNode("DMG")) as DamageLabel;
 		//dmg.ch = c2;
-	}
+	}*/
 	
 	public override void _Process(float delta)
 	{

@@ -8,70 +8,75 @@ public class DeathHandeler : Node
 	[Signal]
 	public delegate void MatchEnds();
 	
-	public List<Character> characters;
-	public Stack<Character> winList;
-	public int count;
+	public List<string> diedThisFrame;
+	public List<List<string>> diedTotal;
+	public List<Character> exists;
+	public int count = 0;
 	
 	public DeathHandeler()
 	{
-		characters = new List<Character>();
+		diedThisFrame = new List<string>();
+		diedTotal = new List<List<string>>();
+		exists = new List<Character>();
 		count = 0;
-		winList = new Stack<Character>();
-	}
-	public DeathHandeler(IEnumerable<Character> cr)
-	{
-		characters = new List<Character>(cr);
-		count = characters.Count;
-		winList = new Stack<Character>();
-		ConnectToDeath();
 	}
 	
-	public void ConnectToDeath()
+	public DeathHandeler(IEnumerable<Character> cr)
 	{
-		foreach(var c in characters)
+		diedThisFrame = new List<string>();
+		diedTotal = new List<List<string>>();
+		exists = new List<Character>(cr);
+		count = 0;
+		foreach(var c in cr)
+		{
 			c.Connect("Dead", this, nameof(CharacterDead));
+			++count;
+		}
 	}
 	
 	public void CharacterDead(Node2D who)
 	{
 		if(who is Character charGone)
 		{
-			characters.Remove(charGone);
-			winList.Push(charGone);
-			if(characters.Count <= 1)
+			var log = Log(charGone, count);
+			diedThisFrame.Add(log);
+			exists.Remove(charGone);
+		}
+	}
+	
+	public override void _PhysicsProcess(float delta)
+	{
+		diedTotal.Add(new List<string>(diedThisFrame));
+		count -= diedThisFrame.Count;
+		diedThisFrame.Clear();
+		if(count <= 1)
+		{
+			if(count == 1) 
 			{
-				if(characters.Count == 1) winList.Push(characters[0]);
-				HandleEndOfMatch();
+				var left = exists[0];
+				var log = Log(left, 1);
+				var toAdd = new List<string>(new string[]{log});
+				diedTotal.Add(toAdd);
 			}
+			HandleEndOfMatch();
 		}
 	}
 	
 	public virtual void HandleEndOfMatch()
 	{
+		diedTotal.Reverse();
+		this.GetPublicData().Add("GameResults", diedTotal);
 		EmitSignal(nameof(MatchEnds));
-		var sb = new StringBuilder();
+		/*var sb = new StringBuilder();
 		sb.Append("\n");
 		for(int i = 1; winList.Count > 0; ++i)
 		{
 			var ch = winList.Pop();
-			sb.Append($"Character {ch.Name} of team {ch.teamNumber} is {IntToWord(i)} place\n");
+			if(!Godot.Object.IsInstanceValid(ch)) ch = null;
+			sb.Append($"Character {ch?.Name} of team {ch?.teamNumber} is {StringUtils.IntToWord(i)} place\n");
 		}
-		GD.Print(sb.ToString());
+		GD.Print(sb.ToString());*/
 	}
 	
-	private string IntToWord(int i)
-	{
-		string suffix(int num)
-		{
-			switch(num)
-			{
-				case 1: return "st";
-				case 2: return "nd";
-				case 3: return "rd";
-				default: return "th";
-			}
-		}
-		
-		return i+suffix(i);
-	}
+	public string Log(Character c, int logcount) => $"Character {c.Name} from team {c.teamNumber} placed {StringUtils.IntToWord(logcount)}";
 }

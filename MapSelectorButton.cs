@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class MapSelectorButton : Button
+public class MapSelectorButton : OnPressButton
 {
 	[Export]
 	public string dest = "FallBackMap";
@@ -16,12 +16,7 @@ public class MapSelectorButton : Button
 		this.path = path;
 	}
 
-	public override void _Ready()
-	{
-		Connect("pressed", this, nameof(OnPress));
-	}
-
-	public void OnPress()
+	public override void OnPress()
 	{
 		var te = GetParent().GetParent().GetNode<TextEdit>("TextEdit");
 		var str = te.Text;

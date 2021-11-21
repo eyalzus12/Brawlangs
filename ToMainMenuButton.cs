@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class SelectScreenExitButton : OnPressButton
+public class ToMainMenuButton : OnPressButton
 {
 	public override void _PhysicsProcess(float delta)
 	{

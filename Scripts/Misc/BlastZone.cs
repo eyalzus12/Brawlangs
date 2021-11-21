@@ -66,6 +66,6 @@ public class BlastZone : Node2D
 	
 	public void CharacterGone(Node2D who)
 	{
-		characters.Remove(who as Character);
+		if(who is Character c) characters.Remove(c);
 	}
 }

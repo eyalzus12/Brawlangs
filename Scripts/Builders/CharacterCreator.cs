@@ -14,7 +14,7 @@ public class CharacterCreator
 		this.path = path;
 	}
 	
-	public Character Build(Node2D n)
+	public Character Build(Node2D n, int teamNum)
 	{
 		//create actual character
 		var ch = new Character();
@@ -23,7 +23,7 @@ public class CharacterCreator
 		charinif.Load(path);
 		var name = charinif["Name", ""].s();
 		//load name
-		ch.Name = name;
+		ch.Name = name + teamNum;
 		n.AddChild(ch);
 		
 		ch.CollisionLayer = 0b100;
@@ -53,6 +53,8 @@ public class CharacterCreator
 		var animationsFolder = charinif["Animations", ""].s();
 		//create animations
 		BuildAnimations(ch, $"{directoryPath}/{animationsFolder}");
+		
+		ch.teamNumber = teamNum;
 		return ch;
 	}
 	

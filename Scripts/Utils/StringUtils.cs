@@ -32,4 +32,20 @@ public static class StringUtils
 		}
 		return result;
 	}
+	
+	public static string IntToWord(int i) => i + IntToWordSuffix(i);
+	
+	public static string IntToWordSuffix(int i)
+	{
+		var s = i.ToString();
+		var c = s.FromEnd(1);
+		var lastnum = (int)(c-'0');
+		switch(lastnum)
+		{
+			case 1: return "st";
+			case 2: return "nd";
+			case 3: return "rd";
+			default: return "th";
+		}
+	}
 }
