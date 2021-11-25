@@ -33,6 +33,7 @@ public static class GeometryUtils
 		
 		Vector2 norm = normal.Normalized();
 		Vector2 tilt = norm.ClockwisePerpendicular();
+		
 		return (norm * -v.y) + (tilt * v.x);
 	}
 	

@@ -11,10 +11,6 @@ public class KinematicPlatform2D : KinematicBody2D
 	
 	public override void _Ready()
 	{
-		//foreach(var c in getshape())
-		//	c.OneWayCollision = OneWay;
-		getshape().ForEach(c=>c.OneWayCollision=OneWay);
-		
 		SetCollisionLayerBit(0, !FallThrough);
 		SetCollisionLayerBit(1, FallThrough);
 		
@@ -32,21 +28,7 @@ public class KinematicPlatform2D : KinematicBody2D
 	[Export]
 	public bool Clingable = true;
 	[Export]
-	public bool OneWay = false;
-	[Export]
 	public bool FallThrough = false;
-	
-	public bool OneWayPlatform
-	{
-		get => OneWay;
-		set
-		{
-			OneWay = value;
-			getshape().ForEach(c=>c.OneWayCollision=value);
-			//foreach(var c in getshape())
-			//	c.OneWayCollision = value;
-		}
-	}
 	
 	public bool FallThroughPlatform
 	{

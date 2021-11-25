@@ -17,8 +17,11 @@ public class JumpState : GroundedState
 		ch.vac = Vector2.Zero;
 		jump = false;
 		jumpActive = false;
-		SetupCollisionParamaters();
-		AdjustVelocity();
+		if(ch.currentAttack is null)
+		{
+			SetupCollisionParamaters();
+			AdjustVelocity();
+		}
 		ch.PlayAnimation("JumpReady");
 		ch.QueueAnimation("Jump");
 	}
@@ -31,7 +34,9 @@ public class JumpState : GroundedState
 		{
 			jumpActive = true;
 			//ch.vec.x *= (1f-Math.Abs(ch.fnorm.x));
-			ch.vec.y = -(Inputs.IsActionReallyPressed("player_jump")?ch.jumpHeight:ch.shorthopHeight);
+			var height = Inputs.IsActionReallyPressed("player_jump")?ch.jumpHeight:ch.shorthopHeight;
+			ch.fnorm = new Vector2(0,-1);
+			ch.vec.y = -height;
 			Unsnap();
 		}
 	}
@@ -45,7 +50,16 @@ public class JumpState : GroundedState
 	
 	protected override bool CalcStateChange()
 	{
-		if(jumpActive) return base.CalcStateChange();
+		if(ch.currentAttack != null) return true;
+		//trick other states into not switching during an attack
+		
+		if(!ch.grounded)
+		{
+			ch.ApplySettings("Normal");
+			ch.ChangeState("Air");
+		}
 		else return false;
+		
+		return true;
 	}
 }

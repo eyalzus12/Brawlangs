@@ -76,6 +76,11 @@ public class AttackState : State
 		}
 	}
 	
+	protected override void LoopActions()
+	{
+		SetupCollisionParamaters();
+	}
+	
 	public void SetEnd(Attack a)
 	{
 		a.Disconnect("AttackEnds", this, nameof(SetEnd));

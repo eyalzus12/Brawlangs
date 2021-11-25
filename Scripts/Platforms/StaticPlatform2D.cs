@@ -35,14 +35,4 @@ public class StaticPlatform2D : StaticBody2D
 			SetCollisionLayerBit(1, value);
 		}
 	}
-	
-	/*private List<CollisionShape2D> getshape()
-	{
-		List<CollisionShape2D> l = new List<CollisionShape2D>();
-		
-		foreach(Node n in GetChildren())
-			if(n is CollisionShape2D c)
-				l.Add(c);
-		return l;
-	}*/
 }

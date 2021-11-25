@@ -415,7 +415,7 @@ public class Character : KinematicBody2D
 		//GetChildren().FilterType<Hitbox>().ToList<Hitbox>().ForEach(h=>h.Active=false);
 	}
 	
-	public void StoreVelocities()
+	public virtual void StoreVelocities()
 	{
 		vs[0] = vec;
 		vs[1] = vac;
@@ -426,7 +426,7 @@ public class Character : KinematicBody2D
 		vs[6] = vwc;
 	}
 	
-	public void LoadVelocities()
+	public virtual void LoadVelocities()
 	{
 		vec = vs[0];
 		vac = vs[1];
@@ -437,14 +437,14 @@ public class Character : KinematicBody2D
 		vwc = vs[6];
 	}
 	
-	public void ResetVelocity()
+	public virtual void ResetVelocity()
 	{
 		for(int i = 0; i < vs.Length; ++i)
 			vs[i] = Vector2.Zero;
 		LoadVelocities();
 	}
 	
-	private void TruncateVelocityIfInsignificant()
+	public virtual void TruncateVelocityIfInsignificant()
 	{
 		for(int i = 0; i < vs.Length; ++i)
 			vs[i].TruncateIfInsignificant();
@@ -596,13 +596,6 @@ public class Character : KinematicBody2D
 		else if(rightHeld) return 1;
 		else if(leftHeld) return -1;
 		else return direction;
-	}
-	
-	public string GetStringDirection()
-	{
-		if(direction == 1) return "Right";
-		else if(direction == -1) return "Left";
-		else return "AAAAAAAAAAAAAAAAA WTF IS HAPPENING";
 	}
 	
 	public bool DirectionToBool() => (direction != 1);

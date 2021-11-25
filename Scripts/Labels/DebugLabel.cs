@@ -17,14 +17,19 @@ public class DebugLabel : InfoLabel
 		if(ch is null || !Godot.Object.IsInstanceValid(ch)) return;
 		Add("Name", ch.Name);
 		Add("Script", ch.GetType().Name);
+		Add("TeamNumber", ch.teamNumber);
+		Newline();
+		Add("Damage", Math.Round(ch.damage,2));
+		Add("Stocks", ch.stocks);
 		Newline();
 		Add("Fastfalling", ch.fastfalling);
 		Add("Crouch", ch.crouching);
-		Add("OnSemiSolid", ch.onSemiSolid);
-		Add("Slope", ch.onSlope);
-		Add("Direction", ch.GetStringDirection());
 		Add("FallingThrough", !ch.GetCollisionMaskBit(1));
+		Add("FacingDirection", GetStringDirection(ch.direction));
+		Add("Idle", ch.IsIdle());
 		Newline();
+		Add("SemiSolid", ch.onSemiSolid);
+		Add("Slope", ch.onSlope);
 		Add("Ground", ch.grounded);
 		Add("Wall", ch.walled);
 		Add("Ceil", ch.ceilinged);
@@ -84,9 +89,6 @@ public class DebugLabel : InfoLabel
 		Add("Cfric", ch.ffric);
 		Add("Cbounce", ch.fbounce);
 		Newline();
-		Add("Damage", Math.Round(ch.damage,2));
-		Add("Stocks", ch.stocks);
-		Newline();
 		Add("Left", ch.leftHeld);
 		Add("Right", ch.rightHeld);
 		Add("Down", ch.downHeld);
@@ -122,4 +124,15 @@ public class DebugLabel : InfoLabel
 		ch.Inputs.IsActionPressed(s)?"Held":
 		ch.Inputs.IsActionJustReleased(s)?"Released":
 		"Free";
+		
+	private string GetStringDirection(int dir)
+	{
+		switch(dir)
+		{
+			case 1: return "Right";
+			case -1: return "Left";
+			case 0: return "None";
+			default: return "ERROR";
+		}
+	}
 }

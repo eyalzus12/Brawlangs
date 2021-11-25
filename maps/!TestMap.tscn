@@ -1,4 +1,4 @@
-[gd_scene load_steps=44 format=2]
+[gd_scene load_steps=46 format=2]
 
 [ext_resource path="res://MapBase.cs" type="Script" id=1]
 [ext_resource path="res://Legacy/MovementPlayer.cs" type="Script" id=2]
@@ -19,6 +19,8 @@
 [ext_resource path="res://MovingPlatformAnimations/TestMovingPlatform2Anm.tres" type="Animation" id=17]
 [ext_resource path="res://MapArt/TestMap/AllSides.png" type="Texture" id=18]
 [ext_resource path="res://icon.png" type="Texture" id=19]
+[ext_resource path="res://Scripts/Platforms/StaticPlatform2D.cs" type="Script" id=20]
+[ext_resource path="res://Scripts/Platforms/KinematicPlatform2D.cs" type="Script" id=21]
 
 [sub_resource type="ConvexPolygonShape2D" id=1]
 points = PoolVector2Array( 64, 64, 0, 64, 0, 0, 64, 0 )
@@ -319,6 +321,9 @@ tile_data = PoolIntArray( -2097023, -536870906, 0, -2097022, -1610612734, 0, -20
 position = Vector2( 1488, 40 )
 collision_layer = 2
 collision_mask = 0
+script = ExtResource( 20 )
+Clingable = false
+FallThrough = true
 
 [node name="Sprite" type="Sprite" parent="SemiSolidPlatform1"]
 scale = Vector2( 4, 0.125 )
@@ -332,6 +337,9 @@ one_way_collision = true
 position = Vector2( -120, 88 )
 collision_layer = 2
 collision_mask = 0
+script = ExtResource( 20 )
+Clingable = false
+FallThrough = true
 
 [node name="Sprite" type="Sprite" parent="SemiSolidPlatform2"]
 scale = Vector2( 4, 0.125 )
@@ -345,6 +353,9 @@ one_way_collision = true
 position = Vector2( -480, -432 )
 collision_layer = 2
 collision_mask = 0
+script = ExtResource( 20 )
+Clingable = false
+FallThrough = true
 
 [node name="Sprite" type="Sprite" parent="SemiSolidPlatform3"]
 rotation = 0.261799
@@ -536,6 +547,10 @@ __meta__ = {
 position = Vector2( -1200, -552 )
 collision_mask = 0
 motion/sync_to_physics = true
+script = ExtResource( 21 )
+Clingable = false
+OneWay = true
+FallThrough = true
 
 [node name="Sprite" type="Sprite" parent="MovingPlatform7"]
 rotation = -0.279253
