@@ -25,6 +25,8 @@ public class MatchCamera : Camera2D
 	public Vector2 startOffsetOffset = new Vector2(0, -500);
 	[Export]
 	public float maxCenterOffset = 100f;
+	[Export]
+	public float maxZoom = 3f;
 	
 	public Vector2 OffsetPos;
 	
@@ -91,8 +93,9 @@ public class MatchCamera : Camera2D
 	{
 		//calculates the correct zoom for the camera rect and viewport size
 		var zoomVector = (rect.Size/size + zoomOffset.Diagonal()).Max(1,1);
-		var maxZoom = baseZoom*Math.Max(zoomVector.x, zoomVector.y);
-		return maxZoom.Diagonal();
+		var maxZoomFactor = baseZoom*Math.Max(zoomVector.x, zoomVector.y);
+		var zoomResult = Math.Min(maxZoomFactor, maxZoom);
+		return zoomResult.Diagonal();
 	}
 	
 	public override void _Draw()

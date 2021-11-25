@@ -50,6 +50,7 @@ public class EndlagState : State
 	{
 		if(frameCount >= endlag)
 		{
+			ch.TurnConditional();
 			ch.SetCollisionMaskBit(DROP_THRU_BIT, !ch.downHeld);
 			
 			ch.fastfalling = ch.downHeld;

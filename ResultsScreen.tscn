@@ -3,7 +3,10 @@
 [ext_resource path="res://ResultsLabel.cs" type="Script" id=1]
 [ext_resource path="res://ToMainMenuButton.cs" type="Script" id=2]
 
-[node name="Base" type="Node2D"]
+[node name="Base" type="Control"]
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="ResultsLabel" type="Label" parent="."]
 margin_left = 56.0

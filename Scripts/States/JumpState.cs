@@ -12,6 +12,7 @@ public class JumpState : GroundedState
 	
 	public override void Init()
 	{
+		ch.TurnConditional();
 		MarkForDeletion("player_jump", true);
 		ch.vac = Vector2.Zero;
 		jump = false;

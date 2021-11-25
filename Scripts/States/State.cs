@@ -188,7 +188,7 @@ public class State : Node
 			var collision = ch.GetSlideCollision(i);//get current collision
 			var vel = collision.ColliderVelocity;//get collision velocity
 			var norm = collision.Normal;//get the collision normal
-			
+			//if(ch.grounded && ch.teamNumber == 0) GD.Print(norm);
 			var body = collision.Collider;//get body
 			var fric = (float)(body.Get("PlatformFriction")??1f);//get friction
 			var bounce = (float)(body.Get("PlatformBounce")??0f);//get bounce
@@ -241,6 +241,8 @@ public class State : Node
 			}
 		}
 	}
+	
+	//private IEnumerable<KinematicCollision2D> 
 	
 	public string VerySecretMethod() => base.ToString();
 }

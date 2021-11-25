@@ -22,8 +22,9 @@ public class GroundedState : State
 	
 	protected void DoInputMovement()
 	{
-		float sped = ch.direction * ch.groundSpeed * (2-ch.ffric);
-		float acc = ch.direction * ch.groundAcceleration * ch.ffric;
+		var dir = ch.GetInputDirection();
+		float sped = dir * ch.groundSpeed * (2-ch.ffric);
+		float acc = dir * ch.groundAcceleration * ch.ffric;
 		
 		ch.vec.x.Lerp(sped, acc);
 	}
@@ -112,6 +113,8 @@ public class GroundedState : State
 	
 	protected override void AdjustVelocity()
 	{
+		SetupCollisionParamaters();
+		
 		if(ch.fvel.y > 0)
 			ch.vec.y = ch.fvel.y;
 		else ch.vec.y = 0;
