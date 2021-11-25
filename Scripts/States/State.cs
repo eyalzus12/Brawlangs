@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 
 public class State : Node
 {
@@ -183,18 +184,17 @@ public class State : Node
 		ch.onSemiSolid = false;//reset semi solid
 		ch.onSlope = false;//reset slope
 		
-		for(int i = 0; i < ch.GetSlideCount(); ++i)
+		foreach(var collision in GetSlideCollisions())
 		{
-			var collision = ch.GetSlideCollision(i);//get current collision
 			var vel = collision.ColliderVelocity;//get collision velocity
 			var norm = collision.Normal;//get the collision normal
 			//if(ch.grounded && ch.teamNumber == 0) GD.Print(norm);
 			var body = collision.Collider;//get body
-			var fric = (float)(body.Get("PlatformFriction")??1f);//get friction
-			var bounce = (float)(body.Get("PlatformBounce")??0f);//get bounce
-			var cling = (bool)(body.Get("Clingable")??true);//get if clingable
+			var fric = body.GetProp<float>("PlatformFriction", 1f);//get friction
+			var bounce = body.GetProp<float>("PlatformBounce", 0f);//get bounce
+			var cling = body.GetProp<bool>("Clingable", true);//get if clingable
 			
-			bool oneway = false;
+			var oneway = false;
 			if(!ch.onSemiSolid && body is CollisionObject2D col)//if the collider IS a collider, cuz trust is overrated
 			{
 				foreach(var sh in col.GetShapeOwners())//check each collision shape owners
@@ -208,7 +208,7 @@ public class State : Node
 				}
 			}
 			
-			var fallthrough = (bool)(body.Get("FallThroughPlatform")??oneway);//get if can fall through
+			var fallthrough = body.GetProp<bool>("FallThroughPlatform", oneway);//get if can fall through
 			
 			if(norm == Vector2.Right || norm == Vector2.Left)
 			//Wall if straight right or left
@@ -242,7 +242,10 @@ public class State : Node
 		}
 	}
 	
-	//private IEnumerable<KinematicCollision2D> 
+	private IEnumerable<KinematicCollision2D> GetSlideCollisions()
+	{
+		for(int i = 0; i < ch.GetSlideCount(); ++i) yield return ch.GetSlideCollision(i);
+	}
 	
 	public string VerySecretMethod() => base.ToString();
 }
