@@ -87,9 +87,6 @@ public class GroundedState : State
 	
 	protected override bool CalcStateChange()
 	{
-		if(ch.currentAttack != null) return true;
-		//trick other states into not switching during an attack
-		
 		if(jump)
 			ch.ChangeState("Jump");
 		else if(!ch.grounded)

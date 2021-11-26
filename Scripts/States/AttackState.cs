@@ -14,6 +14,7 @@ public class AttackState : State
 	
 	public override void Init()
 	{
+		Unsnap();
 		touched = false;
 		ch.SetCollisionMaskBit(DROP_THRU_BIT, !ch.downHeld);
 		
@@ -37,15 +38,22 @@ public class AttackState : State
 	
 	protected override void DoGravity()
 	{
-		if(att.currentPart != null && Math.Abs(att.currentPart.movement.y) > 1f) return;
-		
-		if(!ch.grounded) ch.vec.y.Lerp(ch.fallSpeed, ch.gravity);
-		else
+		if(att.currentPart != null && Math.Abs(att.currentPart.movement.y) > 1f) 
 		{
-			ch.vec.y = VCF;
-			if(att.currentPart.movement.y > 0) snapVector = -VCF * ch.fnorm;
+			Unsnap();
+			return;
+		}
+		
+		if(ch.grounded)
+		{
+			if(att.currentPart.movement.y >= 0)
+			{
+				ch.vec.y = VCF;
+				snapVector = -VCF * ch.fnorm;
+			}
 			else Unsnap();
 		}
+		else ch.vec.y.Lerp(ch.fallSpeed, ch.gravity);
 	}
 	
 	public override void SetInputs()

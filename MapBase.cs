@@ -6,16 +6,19 @@ using System.Linq;
 public class MapBase : Node2D
 {
 	[Export]
-	public Rect2 BlastZones = BlastZone.CalcRect(new Vector2(512, 300), new Vector2(1500, 1000));
+	public Vector2 BlastZones = new Vector2(2300, 2000);
+	[Export]
+	public Vector2 CameraLimits = new Vector2(1300, 1000);
 	
 	public override void _Ready()
 	{
 		LoadCharacters();
 		var camera = new MatchCamera();
+		camera.limits = CameraLimits;
 		AddChild(camera);
 		camera.Current = true;
 		
-		var bz = new BlastZone(BlastZones);
+		var bz = new BlastZone(Vector2.Zero, BlastZones);
 		AddChild(bz);
 	}
 	
@@ -133,6 +136,14 @@ public class MapBase : Node2D
 			Cleanup();
 			GetTree().Quit();
 		}
+	}
+	
+	public override void _PhysicsProcess(float delta) => Update();
+	
+	public override void _Draw()
+	{
+		if(!this.GetRootNode<UpdateScript>("UpdateScript").debugCollision) return;
+		DrawRect(BlastZone.CalcRect(Vector2.Zero, BlastZones), new Color(1,0,1), false);
 	}
 	
 	public void MatchEnd()

@@ -290,6 +290,8 @@ public class Character : KinematicBody2D
 		}
 	}
 	
+	public T GetState<T>(string state) where T: State => (T)GetState(state);
+	
 	public bool HasState(string state) => states.ContainsKey(state);
 	
 	public bool AddState(State state)
@@ -399,7 +401,7 @@ public class Character : KinematicBody2D
 		currentAttack?.Stop();
 		ApplySettings("Normal");
 		ChangeState("Air");
-		Position = new Vector2(500f,260f);
+		Position = Vector2.Zero;
 		fastfalling = false;
 		crouching = false;
 		jumpCounter = 0;

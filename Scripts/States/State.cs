@@ -53,10 +53,13 @@ public class State : Node
 			DoJump();
 		if(Inputs.IsActionJustPressed("player_light_attack"))
 			LightAttack();
+		if(this != ch.currentState) return;
 		if(Inputs.IsActionJustPressed("player_heavy_attack"))
 			HeavyAttack();
+		if(this != ch.currentState) return;
 		//if(Inputs.IsActionJustPressed("player_special_attack"))
 		//	SpecialAttack();
+		//if(this != ch.currentState) return;
 		
 		var norm = ch.grounded?ch.fnorm:Vector2.Zero;
 		var v = ch.GetVelocity().TiltToNormal(norm);
@@ -190,6 +193,7 @@ public class State : Node
 			var norm = collision.Normal;//get the collision normal
 			//if(ch.grounded && ch.teamNumber == 0) GD.Print(norm);
 			var body = collision.Collider;//get body
+			if(body is null || !Godot.Object.IsInstanceValid(body)) continue;//ensure not removed
 			var fric = body.GetProp<float>("PlatformFriction", 1f);//get friction
 			var bounce = body.GetProp<float>("PlatformBounce", 0f);//get bounce
 			var cling = body.GetProp<bool>("Clingable", true);//get if clingable

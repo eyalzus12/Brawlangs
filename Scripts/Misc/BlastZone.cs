@@ -11,7 +11,7 @@ public class BlastZone : Node2D
 	
 	public BlastZone()
 	{
-		Bounds = CalcRect(new Vector2(512, 300), new Vector2(2000, 1200));
+		Bounds = CalcRect(Vector2.Zero, new Vector2(2300, 2000));
 	}
 	
 	public BlastZone(Vector2 Center, Vector2 Limits)

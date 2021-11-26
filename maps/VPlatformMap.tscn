@@ -12,10 +12,11 @@ extents = Vector2( 320, 64 )
 extents = Vector2( 128, 8 )
 
 [node name="Base" type="Node2D"]
+position = Vector2( 512, 300 )
 script = ExtResource( 2 )
 
 [node name="StaticBody2D" type="StaticBody2D" parent="."]
-position = Vector2( 512, 400 )
+position = Vector2( 0, 100 )
 collision_mask = 2147483648
 
 [node name="Sprite" type="Sprite" parent="StaticBody2D"]
@@ -26,7 +27,7 @@ texture = ExtResource( 1 )
 shape = SubResource( 1 )
 
 [node name="StaticBody2D2" type="StaticBody2D" parent="."]
-position = Vector2( 512, 250 )
+position = Vector2( 0, -50 )
 collision_layer = 2
 collision_mask = 0
 
@@ -39,7 +40,7 @@ shape = SubResource( 2 )
 one_way_collision = true
 
 [node name="StaticBody2D3" type="StaticBody2D" parent="."]
-position = Vector2( 256, 150 )
+position = Vector2( -256, -150 )
 collision_layer = 2
 collision_mask = 0
 
@@ -52,7 +53,7 @@ shape = SubResource( 2 )
 one_way_collision = true
 
 [node name="StaticBody2D4" type="StaticBody2D" parent="."]
-position = Vector2( 768, 150 )
+position = Vector2( 256, -150 )
 collision_layer = 2
 collision_mask = 0
 

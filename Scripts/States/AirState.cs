@@ -99,8 +99,8 @@ public class AirState : State
 	public override void SetInputs()
 	{
 		SetHorizontalAlternatingInputs();
-		SetFastFallInput();
 		SetDownHoldingInput();
+		SetFastFallInput();
 		SetUpHoldingInput();
 	}
 	
@@ -114,9 +114,6 @@ public class AirState : State
 			ch.SetCollisionMaskBit(DROP_THRU_BIT, true);
 			GD.Print(ch.MoveAndCollide(move));
 		}
-		
-		if(ch.currentAttack != null) return true;
-		//trick other states into not switching during an attack
 		
 		if(ch.walled && ch.wallJumpCounter < ch.wallJumpNum) ch.ChangeState("WallLand");
 		else if(ch.grounded)

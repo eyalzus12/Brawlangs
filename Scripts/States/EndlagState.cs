@@ -53,29 +53,27 @@ public class EndlagState : State
 			ch.TurnConditional();
 			ch.SetCollisionMaskBit(DROP_THRU_BIT, !ch.downHeld);
 			
-			ch.fastfalling = ch.downHeld;
-			
-			if(ch.walled && ch.wallJumpCounter < ch.wallJumpNum)
+			if(ch.grounded)
 			{
-				if((ch.GetState("Attack") as AttackState).touched) ch.wallJumpCounter--;
+				if(ch.downHeld)
+				{
+					if(ch.crouching) ch.ChangeState("Crawl");
+					else ch.ChangeState("Duck");
+				}
+				else
+				{
+					if(ch.crouching) ch.ChangeState("Getup");
+					else ch.ChangeState("Walk");
+				}
+			}
+			else if(ch.walled && ch.wallJumpCounter < ch.wallJumpNum)
+			{
+				if(ch.GetState<AttackState>("Attack").touched) ch.wallJumpCounter--;
 				ch.ChangeState("WallLand");
 			}
 			else
 			{
-				if(ch.grounded)
-				{
-					if(ch.downHeld)
-					{
-						if(ch.crouching) ch.ChangeState("Crawl");
-						else ch.ChangeState("Duck");
-					}
-					else
-					{
-						if(ch.crouching) ch.ChangeState("Getup");
-						else ch.ChangeState("Walk");
-					}
-				}
-				else ch.ChangeState("Air");
+				ch.ChangeState("Air");
 			}
 		}
 		else return false;
