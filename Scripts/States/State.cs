@@ -186,9 +186,10 @@ public class State : Node
 	{
 		ch.onSemiSolid = false;//reset semi solid
 		ch.onSlope = false;//reset slope
-		
+		ch.aerial = true;
 		foreach(var collision in GetSlideCollisions())
 		{
+			ch.aerial = false;
 			var vel = collision.ColliderVelocity;//get collision velocity
 			var norm = collision.Normal;//get the collision normal
 			//if(ch.grounded && ch.teamNumber == 0) GD.Print(norm);

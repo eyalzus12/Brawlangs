@@ -5,7 +5,10 @@ public class StunState : State
 {
 	public int stunLength = 0;
 	public Vector2 force = Vector2.Zero;
-	//public bool bounced = false;
+	public const float BOUNCE_FACTOR = 0.95f;
+	
+	public int framesSinceLastBounce = 0;
+	public const int BOUNCE_PERIOD = 2;
 	
 	public StunState() : base() {}
 	public StunState(Character link) : base(link) {}
@@ -17,7 +20,7 @@ public class StunState : State
 		SetupCollisionParamaters();
 		stunLength = 0;
 		ch.vec = Vector2.Zero;
-		//bounced = false;
+		framesSinceLastBounce = 0;
 		ch.PlayAnimation("Stun");
 	}
 	
@@ -33,19 +36,17 @@ public class StunState : State
 	
 	protected override void RepeatActions()
 	{
+		++framesSinceLastBounce;
 		var friction = ch.grounded?ch.groundFriction*ch.ffric:ch.airFriction;
 		ch.voc.x *= (1f-friction);
 		if(!ch.grounded) ch.voc.y.Lerp(ch.fallSpeed, ch.gravity);
 		
-		if(!bounced)
+		if(framesSinceLastBounce >= BOUNCE_PERIOD && !ch.aerial && (!ch.grounded || ch.voc.y > VCF))
 		{
-			if(!ch.grounded || ch.voc.y > VCF)
-			{
-				var r = ch.voc.Bounce(ch.fnorm);
-				r.y *= 0.95f;
-				ch.voc = r;
-				bounced = true;
-			}
+			var r = ch.voc.Bounce(ch.Norm);
+			r.y *= BOUNCE_FACTOR;
+			ch.voc = r;
+			framesSinceLastBounce = 0;
 		}
 	}
 	

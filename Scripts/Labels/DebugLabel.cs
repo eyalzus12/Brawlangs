@@ -31,6 +31,7 @@ public class DebugLabel : InfoLabel
 		Add("Ground", ch.grounded);
 		Add("Wall", ch.walled);
 		Add("Ceil", ch.ceilinged);
+		Add("Air", ch.aerial);
 		Add("SemiSolid", ch.onSemiSolid);
 		Add("Slope", ch.onSlope);
 		Newline();

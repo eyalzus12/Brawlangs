@@ -170,6 +170,10 @@ public class Character : KinematicBody2D
 	public float cfric = 1f;//ceiling friction
 	public float cbounce = 1f;//ceiling bounce
 	
+	public Vector2 Norm => grounded?fnorm:walled?wnorm:ceilinged?cnorm:Vector2.Zero;
+	public Vector2 PlatVel => grounded?fvel:walled?wvel:ceilinged?cvel:Vector2.Zero;
+	public float PlatFric => grounded?ffric:walled?wfric:ceilinged?cfric:1f;
+	
 	public bool fastfalling = false;//wether or not fastfalling
 	public uint jumpCounter = 0;//how many air jumps have been used
 	public uint wallJumpCounter = 0;//how many wall jumps have been used
@@ -177,6 +181,7 @@ public class Character : KinematicBody2D
 	public bool grounded = false;//is on ground
 	public bool walled = false;//is on wall
 	public bool ceilinged = false;//is touching ceiling
+	public bool aerial = false;//is in air
 	public bool crouching = false;//is currently crouching
 	public bool onSemiSolid = false;//is currently on a semi solid platform
 	public bool onSlope = false;//is currently on a slope
