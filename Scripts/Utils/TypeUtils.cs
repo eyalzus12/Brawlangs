@@ -106,4 +106,35 @@ public static class TypeUtils
 	}
 	
 	public static object cast<T>(this object o, string debug) => o.cast(typeof(T), debug);
+	
+	public const string PATH_IDENTIFIER = "mod://";
+	public static T LoadScript<T>(string path, T @default, string name, string relative="res://Scripts") where T : Node
+	{
+		if(path == "") return @default;
+		
+		if(path.StartsWith(PATH_IDENTIFIER)) path = relative + "/" + path.Substring(PATH_IDENTIFIER.Length);
+		
+		var resource = ResourceLoader.Load(path);
+		if(resource is null)
+		{
+			GD.Print($"Attempt to load script {path} failed because that file does not exist");
+			return @default;
+		}
+		
+		var script = resource as CSharpScript;
+		if(script is null)
+		{
+			GD.Print($"Attempt to load script {path} failed because the object in that path is not a C# script");
+			return @default;
+		}
+		
+		var o = script.New() as T;
+		if(o is null)
+		{
+			GD.Print($"Attempt to attach script {path} failed because the object in that path is not {name.AAN()} script");
+			return @default;
+		}
+			
+			return o;
+	}
 }

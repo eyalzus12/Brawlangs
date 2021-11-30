@@ -5,7 +5,7 @@ using Conn = System.Collections.Generic.Dictionary<string, (string, Attack)>;
 
 public class AttackCreator
 {
-	public string path = "res://mario.ini";
+	public string path;
 	public IniFile inif = new IniFile();
 	
 	private Conn cn = new Conn();
@@ -41,47 +41,10 @@ public class AttackCreator
 	
 	public void BuildAttack(Node n, string section)
 	{
-		//GD.Print(section, ", ", start);
 		var AttackScript = inif[section, "Script", ""].s();
-		//GD.Print($"Loading script {PartScript}");
-		//var charge = inif[section, "Charge", false].b();
-		Attack a;
-		if(AttackScript != "")
-		{
-			var resource = ResourceLoader.Load(AttackScript);
-			if(resource is null)
-			{
-				GD.Print($"Attempt to load script {AttackScript} failed because that file does not exist");
-				a = new Attack();
-			}
-			var script = resource as CSharpScript;
-			if(script is null)
-			{
-				GD.Print($"Attempt to load script {AttackScript} failed because the object in that path is not a C# script");
-				a = new Attack();
-			}
-			else
-			{
-				a = script.New() as Attack;
-				if(a is null)
-				{
-					GD.Print($"Attempt to attach script {AttackScript} failed because the object in that path is not an AttackPart script");
-					a = new Attack();
-				}
-			}
-		}
-		else a = new Attack();
+		var baseFolder = path.SplitByLast('/')[0];
+		var a = TypeUtils.LoadScript<Attack>(AttackScript, new Attack(), "Attack", baseFolder);
 		n.AddChild(a);
-		
-		/*if(charge)
-		{
-			var chargepart = new ChargePart();
-			a.AddChild(chargepart);
-			chargepart.MaxCharge = inif[section, "MaxCharge", 60].i();
-			var input = inif[section, "Input", "heavy"].s().ToLower();
-			chargepart.input = $"player_{input}_attack";
-			(a as ChargeableAttack).charge = chargepart;
-		}*/
 		
 		var fric = inif[section, "Friction", 1f].f();
 		a.attackFriction = fric;
@@ -101,35 +64,9 @@ public class AttackCreator
 	
 	public AttackPart BuildPart(Attack a, string section, string start)
 	{
-		//GD.Print(section, ", ", start);
 		var PartScript = inif[section, "Script", ""].s();
-		//GD.Print($"Loading script {PartScript}");
-		AttackPart ap;
-		if(PartScript != "")
-		{
-			var resource = ResourceLoader.Load(PartScript);
-			if(resource is null)
-			{
-				GD.Print($"Attempt to load script {PartScript} failed because that file does not exist");
-				ap = new AttackPart();
-			}
-			var script = resource as CSharpScript;
-			if(script is null)
-			{
-				GD.Print($"Attempt to load script {PartScript} failed because the object in that path is not a C# script");
-				ap = new AttackPart();
-			}
-			else
-			{
-				ap = script.New() as AttackPart;
-				if(ap is null)
-				{
-					GD.Print($"Attempt to attach script {PartScript} failed because the object in that path is not an AttackPart script");
-					ap = new AttackPart();
-				}
-			}
-		}
-		else ap = new AttackPart();
+		var baseFolder = path.SplitByLast('/')[0];
+		var ap = TypeUtils.LoadScript<AttackPart>(PartScript, new AttackPart(), "AttackPart", baseFolder);
 		
 		ap.Name = section;
 		a.AddChild(ap);
@@ -175,32 +112,8 @@ public class AttackCreator
 	public void BuildHitbox(AttackPart ap, string section)
 	{
 		var HitboxSctipt = inif[section, "Script", ""].s();
-		Hitbox h;
-		if(HitboxSctipt != "")
-		{
-			var resource = ResourceLoader.Load(HitboxSctipt);
-			if(resource is null)
-			{
-				GD.Print($"Attempt to load script {HitboxSctipt} failed because that file does not exist");
-				h = new Hitbox();
-			}
-			var script = resource as CSharpScript;
-			if(script is null)
-			{
-				GD.Print($"Attempt to load script {HitboxSctipt} failed because the object in that path is not a C# script");
-				h = new Hitbox();
-			}
-			else
-			{
-				h = script.New() as Hitbox;
-				if(h is null)
-				{
-					GD.Print($"Attempt to attach script {HitboxSctipt} failed because the object in that path is not a Hitbox script");
-					h = new Hitbox();
-				}
-			}
-		}
-		else h = new Hitbox();
+		var baseFolder = path.SplitByLast('/')[0];
+		var h = TypeUtils.LoadScript<Hitbox>(HitboxSctipt, new Hitbox(), "Hitbox", baseFolder);
 		
 		var sk = inif[section, "SetKnockback", Vector2.Zero].v2();
 		h.setKnockback = sk;

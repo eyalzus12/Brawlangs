@@ -102,23 +102,20 @@ public class AttackState : State
 		}
 		else
 		{
-			if(ch.walled && ch.wallJumpCounter < ch.wallJumpNum)
+			ch.TurnConditional();
+			ch.SetCollisionMaskBit(DROP_THRU_BIT, true);
+			
+			if(ch.grounded)
 			{
-				if(touched) ch.wallJumpCounter--;
-				ch.ChangeState("WallLand");
+				ch.jumpCounter = 0;
+				ch.wallJumpCounter = 0;
+				if(ch.crouching) ch.ChangeState(ch.downHeld?"Crawl":"Getup");
+				else ch.ChangeState(ch.downHeld?"Duck":"Walk");
 			}
-			else if(ch.grounded)
+			else if(ch.walled && ch.wallJumpCounter < ch.wallJumpNum)
 			{
-				if(ch.downHeld)
-				{
-					if(ch.crouching) ch.ChangeState("Crawl");
-					else ch.ChangeState("Duck");
-				}
-				else
-				{
-					if(ch.crouching) ch.ChangeState("Getup");
-					else ch.ChangeState("Walk");
-				}
+				if(ch.GetState<AttackState>("Attack").touched) ch.wallJumpCounter--;
+				ch.ChangeState("WallLand");
 			}
 			else ch.ChangeState("Air");
 		}

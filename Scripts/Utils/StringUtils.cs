@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Text.RegularExpressions;
+using System.Collections.Generic;
 
 public static class StringUtils
 {
@@ -47,5 +48,13 @@ public static class StringUtils
 			case 3: return "rd";
 			default: return "th";
 		}
+	}
+	
+	public readonly static HashSet<char> VOWELS = new HashSet<char>(new char[]{'a','A','e','E','i','I','o','O','u','U'});
+	public static string AAN(this string s)
+	{
+		var firstchar = s[0];
+		if(VOWELS.Contains(firstchar)) return $"an {s}";
+		else return $"a {s}";
 	}
 }

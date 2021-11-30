@@ -25,32 +25,8 @@ public class CollisionCreator
 		cs.Name = "Collision";
 		
 		var HurtboxScript = inif["", "HurtboxScript", ""].s();
-		Hurtbox hr = null;
-		if(HurtboxScript != "")
-		{
-			var resource = ResourceLoader.Load(HurtboxScript);
-			if(resource is null)
-			{
-				GD.Print($"Attempt to load script {HurtboxScript} failed because that file does not exist");
-				hr = new Hurtbox();
-			}
-			var script = resource as CSharpScript;
-			if(script is null)
-			{
-				GD.Print($"Attempt to load script {HurtboxScript} failed because the object in that path is not a C# script");
-				hr = new Hurtbox();
-			}
-			else
-			{
-				hr = script.New() as Hurtbox;
-				if(hr is null)
-				{
-					GD.Print($"Attempt to attach script {HurtboxScript} failed because the object in that path is not a Hurtbox script");
-					hr = new Hurtbox();
-				}
-			}
-		}
-		else hr = new Hurtbox();
+		var baseFolder = path.SplitByLast('/')[0];
+		var hr = TypeUtils.LoadScript<Hurtbox>(HurtboxScript, new Hurtbox(), "Hurtbox", baseFolder);
 		ch.AddChild(hr);
 		hr.Name = "Hurtbox";
 		hr.CreateCollision();
