@@ -244,28 +244,6 @@ public class Character : KinematicBody2D
 		if(Input.IsActionJustPressed("reset")) Respawn();
 		currentState?.SetInputs();
 		currentState?.DoPhysics(delta);
-		
-		if(Inputs.IsActionJustPressed("player_special_attack"))
-		{
-			var proj = new HitProjectile(this);
-			proj.setKnockback = new Vector2(100, 0);
-			proj.varKnockback = new Vector2(500, 0);
-			proj.stun = 5;
-			proj.hitpause = 3;
-			proj.damage = 10f;
-			GetParent().AddChild(proj);
-			proj.SelfModulate = (new Color(1,0.1f,0.1f,1));
-			proj.GlobalPosition = GlobalPosition;
-			proj.move = new Vector2(direction * 5, 0);
-			var cs = new CollisionShape2D();
-			proj.AddChild(cs);
-			var shape = new CircleShape2D();
-			shape.Radius = 3f;
-			proj.radius = shape.Radius;
-			cs.Shape = shape;
-			proj.Active = true;
-			Inputs.MarkForDeletion("player_special_attack", true);
-		}
 			
 		sprite.FlipH = DirectionToBool();
 		
@@ -682,5 +660,12 @@ public class Character : KinematicBody2D
 		if(currentAttack != null) currentAttack.Disconnect("AttackEnds", this, nameof(ResetCurrentAttack));
 		currentAttack = null;
 	}
+	
+	public virtual void EmitProjectile(Projectile2D proj)
+	{
+		GetParent().AddChild(proj);
+		proj.Active = true;
+	}
+	
 	///////////////////////////////////////////
 }

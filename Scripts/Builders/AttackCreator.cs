@@ -43,7 +43,7 @@ public class AttackCreator
 	{
 		var AttackScript = inif[section, "Script", ""].s();
 		var baseFolder = path.SplitByLast('/')[0];
-		var a = TypeUtils.LoadScript<Attack>(AttackScript, new Attack(), "Attack", baseFolder);
+		var a = TypeUtils.LoadScript<Attack>(AttackScript, new Attack(), baseFolder);
 		n.AddChild(a);
 		
 		var fric = inif[section, "Friction", 1f].f();
@@ -66,7 +66,7 @@ public class AttackCreator
 	{
 		var PartScript = inif[section, "Script", ""].s();
 		var baseFolder = path.SplitByLast('/')[0];
-		var ap = TypeUtils.LoadScript<AttackPart>(PartScript, new AttackPart(), "AttackPart", baseFolder);
+		var ap = TypeUtils.LoadScript<AttackPart>(PartScript, new AttackPart(), baseFolder);
 		
 		ap.Name = section;
 		a.AddChild(ap);
@@ -113,7 +113,7 @@ public class AttackCreator
 	{
 		var HitboxSctipt = inif[section, "Script", ""].s();
 		var baseFolder = path.SplitByLast('/')[0];
-		var h = TypeUtils.LoadScript<Hitbox>(HitboxSctipt, new Hitbox(), "Hitbox", baseFolder);
+		var h = TypeUtils.LoadScript<Hitbox>(HitboxSctipt, new Hitbox(), baseFolder);
 		
 		var sk = inif[section, "SetKnockback", Vector2.Zero].v2();
 		h.setKnockback = sk;

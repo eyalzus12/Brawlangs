@@ -108,33 +108,44 @@ public static class TypeUtils
 	public static object cast<T>(this object o, string debug) => o.cast(typeof(T), debug);
 	
 	public const string PATH_IDENTIFIER = "mod://";
-	public static T LoadScript<T>(string path, T @default, string name, string relative="res://Scripts") where T : Node
+	public static T LoadScript<T>(string path, T @default, string relative="res://Scripts") where T : Node, new()
 	{
 		if(path == "") return @default;
-		
+		var typeName = typeof(T).Name;
 		if(path.StartsWith(PATH_IDENTIFIER)) path = relative + "/" + path.Substring(PATH_IDENTIFIER.Length);
 		
 		var resource = ResourceLoader.Load(path);
-		if(resource is null)
+		if(resource is object)
 		{
-			GD.Print($"Attempt to load script {path} failed because that file does not exist");
-			return @default;
+			if(resource is CSharpScript script)
+			{
+				/*var h = new T();
+				return h.SafelySetScript<T>(script);*/;
+				Directory.Copy(path, "res://Scripts");
+				var o = script.New();
+				if(o is object)
+				{
+					if(o is T t)
+					{
+						return t;
+					}
+					else GD.Print($"Attempt to load script {path} failed because the object in that path is not {typeName.AAN()} script");
+				}
+				else GD.Print($"Attempt to construct script {path} failed because the constructor returned null for some reason");
+			}
+			else GD.Print($"Attempt to load script {path} failed because the object in that path is not a C# script");
 		}
+		else GD.Print($"Attempt to load script {path} failed because that file does not exist");
 		
-		var script = resource as CSharpScript;
-		if(script is null)
-		{
-			GD.Print($"Attempt to load script {path} failed because the object in that path is not a C# script");
-			return @default;
-		}
-		
-		var o = script.New() as T;
-		if(o is null)
-		{
-			GD.Print($"Attempt to attach script {path} failed because the object in that path is not {name.AAN()} script");
-			return @default;
-		}
-			
-			return o;
+		return @default;
+	}
+	
+	public static T SafelySetScript<T>(this Godot.Object obj, Resource resource) where T : Godot.Object
+	{
+		var godotObjectId = obj.GetInstanceId();
+		// Replaces old C# instance with a new one. Old C# instance is disposed.
+		obj.SetScript(resource);
+		// Get the new C# instance
+		return GD.InstanceFromId(godotObjectId) as T;
 	}
 }

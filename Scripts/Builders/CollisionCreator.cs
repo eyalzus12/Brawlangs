@@ -26,7 +26,7 @@ public class CollisionCreator
 		
 		var HurtboxScript = inif["", "HurtboxScript", ""].s();
 		var baseFolder = path.SplitByLast('/')[0];
-		var hr = TypeUtils.LoadScript<Hurtbox>(HurtboxScript, new Hurtbox(), "Hurtbox", baseFolder);
+		var hr = TypeUtils.LoadScript<Hurtbox>(HurtboxScript, new Hurtbox(), baseFolder);
 		ch.AddChild(hr);
 		hr.Name = "Hurtbox";
 		hr.CreateCollision();
