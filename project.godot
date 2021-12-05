@@ -12,6 +12,7 @@ config_version=4
 
 config/name="Brawlangs"
 run/main_scene="res://StageSelectScreen.tscn"
+boot_splash/image="res://toki pona mage.png"
 config/icon="res://brawlangs.ico"
 config/windows_native_icon="res://brawlangs.ico"
 
@@ -34,6 +35,10 @@ gdscript/warnings/unsafe_call_argument=true
 
 window/stretch/mode="2d"
 window/stretch/aspect="expand"
+
+[editor]
+
+search_in_file_extensions=PoolStringArray( "gd", "shader", "cs" )
 
 [input]
 
@@ -517,6 +522,11 @@ debug_collision={
 
 file_logging/enable_file_logging=true
 
+[node]
+
+name_num_separator=1
+
 [rendering]
 
 environment/default_environment="res://default_env.tres"
+quality/dynamic_fonts/use_oversampling=false

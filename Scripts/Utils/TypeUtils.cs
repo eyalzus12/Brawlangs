@@ -119,9 +119,21 @@ public static class TypeUtils
 		{
 			if(resource is CSharpScript script)
 			{
+				/*if(!path.StartsWith("res://"))
+				{
+					var filename = path.SplitByLast('/')[1];
+					var newthing = "res://Scripts/"+filename;
+					GD.Print(newthing);
+					
+					var f = new File();
+					f.Open(newthing, File.ModeFlags.Write);
+					f.Close();
+					GD.Print(new Directory().Copy(path, newthing));
+				}*/
+				
 				/*var h = new T();
-				return h.SafelySetScript<T>(script);*/;
-				Directory.Copy(path, "res://Scripts");
+				return h.SafelySetScript<T>(script);*/
+				
 				var o = script.New();
 				if(o is object)
 				{

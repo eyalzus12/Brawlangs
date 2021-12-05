@@ -62,8 +62,6 @@ public class AirState : State
 	
 	protected override void LightAttack()
 	{
-		if(!IsActionable() || ch.currentAttack != null) return;
-		
 		if(ch.upHeld) ch.ExecuteAttack("NAir");
 		else if(ch.downHeld) ch.ExecuteAttack("DAir");
 		else if(ch.rightHeld || ch.leftHeld) ch.ExecuteAttack("SAir");
@@ -74,8 +72,6 @@ public class AirState : State
 	
 	protected override void HeavyAttack()
 	{
-		if(!IsActionable() || ch.currentAttack != null) return;
-		
 		if(ch.upHeld) ch.ExecuteAttack("NSlam");
 		else if(ch.downHeld) ch.ExecuteAttack("DSlam");
 		else if(ch.rightHeld || ch.leftHeld) ch.ExecuteAttack("SSlam");
@@ -86,14 +82,22 @@ public class AirState : State
 	
 	protected override void SpecialAttack()
 	{
-		if(!IsActionable() || ch.currentAttack != null) return;
-		
-		if(ch.upHeld) ch.ExecuteAttack("NSpecial");
+		if(ch.upHeld) ch.ExecuteAttack("USpecial");
 		else if(ch.downHeld) ch.ExecuteAttack("DSpecial");
 		else if(ch.rightHeld || ch.leftHeld) ch.ExecuteAttack("SSpecial");
 		else ch.ExecuteAttack("NSpecial");
 		
 		MarkForDeletion("player_special_attack", true);
+	}
+	
+	protected override void Taunt()
+	{
+		if(ch.upHeld) ch.ExecuteAttack("UTaunt");
+		else if(ch.downHeld) ch.ExecuteAttack("DTaunt");
+		else if(ch.rightHeld || ch.leftHeld) ch.ExecuteAttack("STaunt");
+		else ch.ExecuteAttack("NTaunt");
+		
+		MarkForDeletion("player_taunt", true);
 	}
 	
 	public override void SetInputs()

@@ -51,14 +51,19 @@ public class State : Node
 		
 		if(Inputs.IsActionJustPressed("player_jump"))
 			DoJump();
-		if(Inputs.IsActionJustPressed("player_light_attack"))
-			LightAttack();
-		if(this != ch.currentState) return;
-		if(Inputs.IsActionJustPressed("player_heavy_attack"))
-			HeavyAttack();
-		if(this != ch.currentState) return;
-		if(Inputs.IsActionJustPressed("player_special_attack"))
-			SpecialAttack();
+		
+		if(IsActionable() && ch.currentAttack is null)
+		{
+			if(Inputs.IsActionJustPressed("player_light_attack"))
+				LightAttack();
+			else if(Inputs.IsActionJustPressed("player_heavy_attack"))
+				HeavyAttack();
+			else if(Inputs.IsActionJustPressed("player_special_attack"))
+				SpecialAttack();
+			/*else if(Inputs.IsActionJustPressed("player_taunt"))
+				Taunt();*/
+		}
+		
 		if(this != ch.currentState) return;
 		
 		var norm = ch.grounded?ch.fnorm:Vector2.Zero;
@@ -99,6 +104,7 @@ public class State : Node
 	protected virtual void LightAttack() {}
 	protected virtual void HeavyAttack() {}
 	protected virtual void SpecialAttack() {}
+	protected virtual void Taunt() {}
 	
 	protected void SetHorizontalAlternatingInputs()
 	{

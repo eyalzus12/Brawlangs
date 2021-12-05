@@ -106,7 +106,7 @@ public class DebugLabel : InfoLabel
 		Add("LightAttackInput", GetInputString("player_light_attack"));
 		Add("HeavyAttackInput", GetInputString("player_heavy_attack"));
 		Add("SpecialAttackInput", GetInputString("player_special_attack"));
-		//Add("TauntAttackInput", GetInputString("player_taunt_attack"));
+		//Add("TauntAttackInput", GetInputString("player_taunt"));
 		Newline();
 		Newline();
 		Add("Buffer", "\n"+ch.Inputs.ToString());
@@ -114,6 +114,7 @@ public class DebugLabel : InfoLabel
 		Add("FPS", Engine.GetFramesPerSecond());
 		Add("Physics frame", Engine.GetPhysicsFrames());
 		Add("Debug build", OS.IsDebugBuild());
+		Add("OS", OS.GetName());
 	}
 	
 	protected override bool EnsureCorrectAppearence() => (this.GetDataOrDefault("CurrentInfoLabelCharacter",0).i() == ch.teamNumber);

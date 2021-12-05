@@ -44,7 +44,7 @@ public class GroundedState : State
 	
 	protected override void LightAttack()
 	{
-		if(jump || !IsActionable() || ch.currentAttack != null) return;
+		if(jump) return;
 		
 		if(ch.upHeld) ch.ExecuteAttack("NLight");
 		else if(ch.downHeld) ch.ExecuteAttack("DLight");
@@ -56,7 +56,7 @@ public class GroundedState : State
 	
 	protected override void HeavyAttack()
 	{
-		if(jump || !IsActionable() || ch.currentAttack != null) return;
+		if(jump) return;
 		
 		if(ch.upHeld) ch.ExecuteAttack("NStrong");
 		else if(ch.downHeld) ch.ExecuteAttack("DStrong");
@@ -68,15 +68,27 @@ public class GroundedState : State
 	
 	protected override void SpecialAttack()
 	{
-		if(jump || !IsActionable() || ch.currentAttack != null) return;
+		if(jump) return;
 		
-		if(ch.upHeld) ch.ExecuteAttack("NSpecial");
+		if(ch.upHeld) ch.ExecuteAttack("USpecial");
 		else if(ch.downHeld) ch.ExecuteAttack("DSpecial");
 		else if(ch.rightHeld || ch.leftHeld) ch.ExecuteAttack("SSpecial");
 		else ch.ExecuteAttack("NSpecial");
 		
 		MarkForDeletion("player_special_attack", true);
 	}
+	
+	/*protected override void Taunt()
+	{
+		if(jump || !IsActionable() || ch.currentAttack != null) return;
+		
+		if(ch.upHeld) ch.ExecuteAttack("UTaunt");
+		else if(ch.downHeld) ch.ExecuteAttack("DTaunt");
+		else if(ch.rightHeld || ch.leftHeld) ch.ExecuteAttack("STaunt");
+		else ch.ExecuteAttack("NTaunt");
+		
+		MarkForDeletion("player_taunt", true);
+	}*/
 	
 	public override void SetInputs()
 	{
