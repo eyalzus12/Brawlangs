@@ -78,7 +78,7 @@ public class GroundedState : State
 		MarkForDeletion("player_special_attack", true);
 	}
 	
-	/*protected override void Taunt()
+	protected override void Taunt()
 	{
 		if(jump || !IsActionable() || ch.currentAttack != null) return;
 		
@@ -88,7 +88,7 @@ public class GroundedState : State
 		else ch.ExecuteAttack("NTaunt");
 		
 		MarkForDeletion("player_taunt", true);
-	}*/
+	}
 	
 	public override void SetInputs()
 	{

@@ -37,6 +37,8 @@ public class Hitbox : Area2D
 	public Dictionary<string, float> stateDamageMult;
 	public Dictionary<string, float> stateStunMult;
 	
+	public Dictionary<string, Type> LoadExtraProperties = new Dictionary<string, Type>();
+	
 	public List<Vector2> activeFrames = new List<Vector2>();
 	public Character ch;
 	
@@ -75,6 +77,11 @@ public class Hitbox : Area2D
 	}
 	
 	public virtual void Init() {}
+	
+	public void LoadExtraProperty<T>(string s)
+	{
+		LoadExtraProperties.Add(s, typeof(T));
+	}
 	
 	public virtual void Reload()
 	{

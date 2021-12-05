@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 
 public class Attack : Node2D
 {
@@ -10,6 +11,8 @@ public class Attack : Node2D
 	public int frameCount = 0;
 	
 	public State connected = null;
+	
+	public Dictionary<string, Type> LoadExtraProperties = new Dictionary<string, Type>();
 	
 	[Signal]
 	public delegate void AttackStarts(Attack a);
@@ -76,4 +79,9 @@ public class Attack : Node2D
 	public virtual void Loop() {}
 	public virtual void OnEnd() {}
 	public virtual void OnHit(Hitbox hitbox, Area2D hurtbox) {}
+	
+	public void LoadExtraProperty<T>(string s)
+	{
+		LoadExtraProperties.Add(s, typeof(T));
+	}
 }

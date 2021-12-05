@@ -60,6 +60,13 @@ public class AttackCreator
 			foreach(var s in PartSections)
 				BuildPart(a, s, StartPartSection);
 		}
+		
+		var load = a.LoadExtraProperties;
+		foreach(var s in load.Keys)
+		{
+			var prop = inif[section, s, null].cast(load[s], $"loading extra properties for attack {section}");
+			a.Set/*Deferred*/(s, prop);
+		}
 	}
 	
 	public AttackPart BuildPart(Attack a, string section, string start)
@@ -183,6 +190,13 @@ public class AttackCreator
 				var mult = entry.Value.f();
 				h.stateStunMult.Add(stateName, mult);
 			}
+		}
+		
+		var load = h.LoadExtraProperties;
+		foreach(var s in load.Keys)
+		{
+			var prop = inif[section, s, null].cast(load[s], $"loading extra properties for hitbox {section}");
+			h.Set/*Deferred*/(s, prop);
 		}
 		
 		ap.AddChild(h);

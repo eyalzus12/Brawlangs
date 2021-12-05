@@ -60,8 +60,8 @@ public class State : Node
 				HeavyAttack();
 			else if(Inputs.IsActionJustPressed("player_special_attack"))
 				SpecialAttack();
-			/*else if(Inputs.IsActionJustPressed("player_taunt"))
-				Taunt();*/
+			else if(Inputs.IsActionJustPressed("player_taunt"))
+				Taunt();
 		}
 		
 		if(this != ch.currentState) return;

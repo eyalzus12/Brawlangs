@@ -36,6 +36,7 @@ public class StunState : State
 	
 	protected override void RepeatActions()
 	{
+		ch.framesSinceLastHit = 0;
 		++framesSinceLastBounce;
 		var friction = ch.grounded?ch.groundFriction*ch.ffric:ch.airFriction;
 		ch.voc.x *= (1f-friction);
