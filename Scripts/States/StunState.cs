@@ -22,7 +22,6 @@ public class StunState : State
 		ch.vec = Vector2.Zero;
 		framesSinceLastBounce = 0;
 		ch.PlayAnimation("Stun");
-		ch.SetCollisionMaskBit(DROP_THRU_BIT, Force.y > 0);
 	}
 	
 	public Vector2 Force
@@ -37,6 +36,8 @@ public class StunState : State
 	
 	protected override void RepeatActions()
 	{
+		if(frameCount == 1) ch.SetCollisionMaskBit(DROP_THRU_BIT, Force.y <= 0);
+		
 		ch.framesSinceLastHit = 0;
 		++framesSinceLastBounce;
 		var friction = ch.grounded?ch.groundFriction*ch.ffric:ch.airFriction;
