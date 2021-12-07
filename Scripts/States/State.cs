@@ -100,7 +100,7 @@ public class State : Node
 	protected virtual bool CalcStateChange() => false;
 	protected virtual void LoopActions() {}
 	protected virtual void RepeatActions() {}
-	public virtual void OnChange() {}
+	public virtual void OnChange(State newState) {}
 	protected virtual void LightAttack() {}
 	protected virtual void HeavyAttack() {}
 	protected virtual void SpecialAttack() {}

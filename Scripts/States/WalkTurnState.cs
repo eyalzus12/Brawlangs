@@ -15,7 +15,7 @@ public class WalkTurnState : GroundedSlowdownState
 	
 	protected override bool CalcStateChange()
 	{
-		if(ch.currentAttack != null) return false;
+		//if(ch.currentAttack != null) return false;
 		if(!ch.grounded) ch.ChangeState("Air");
 		else if(frameCount >= ch.walkTurn + Math.Round(TURNING_MULT*(1-ch.ffric))) ch.ChangeState("Walk");
 		else return false;

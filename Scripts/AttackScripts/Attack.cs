@@ -9,6 +9,7 @@ public class Attack : Node2D
 	public Character ch;
 	
 	public int frameCount = 0;
+	public bool active = false;
 	
 	public State connected = null;
 	
@@ -39,13 +40,14 @@ public class Attack : Node2D
 	public virtual void Start()
 	{
 		frameCount = 0;
+		active = true;
 		EmitSignal(nameof(AttackStarts), this);
 		if(connected != null) Disconnect("AttackEnds", connected, "SetEnd");
 		Connect("AttackEnds", ch.currentState, "SetEnd");
 		connected = ch.currentState;
 		currentPart = start;
-		currentPart.Activate();
 		OnStart();
+		currentPart.Activate();
 	}
 	
 	public void SetPart(AttackPart newPart)
@@ -62,6 +64,7 @@ public class Attack : Node2D
 	
 	public virtual void Stop()
 	{
+		active = false;
 		OnEnd();
 		if(currentPart != null) currentPart.Stop();
 		EmitSignal(nameof(AttackEnds), this);
@@ -79,6 +82,7 @@ public class Attack : Node2D
 	public virtual void Loop() {}
 	public virtual void OnEnd() {}
 	public virtual void OnHit(Hitbox hitbox, Area2D hurtbox) {}
+	public virtual bool CanActivate() => true;
 	
 	public void LoadExtraProperty<T>(string s)
 	{

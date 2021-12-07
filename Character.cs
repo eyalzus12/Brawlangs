@@ -302,7 +302,7 @@ public class Character : KinematicBody2D
 			return null;
 		}
 		
-		currentState?.OnChange();
+		currentState?.OnChange(tempState);
 		
 		if(currentState == tempState)
 		{
@@ -636,7 +636,8 @@ public class Character : KinematicBody2D
 	
 	public virtual void ExecuteAttack(Attack a)
 	{
-		if(a is null) return;
+		if(a is null || !a.CanActivate()) return;
+		
 		if(currentAttack != null) ResetCurrentAttack(null);
 		
 		currentAttack = a;
@@ -657,7 +658,8 @@ public class Character : KinematicBody2D
 	
 	public void ResetCurrentAttack(Attack a)
 	{
-		if(currentAttack != null) currentAttack.Disconnect("AttackEnds", this, nameof(ResetCurrentAttack));
+		if(currentAttack is null) return;
+		currentAttack.Disconnect("AttackEnds", this, nameof(ResetCurrentAttack));
 		currentAttack = null;
 	}
 	

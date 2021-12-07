@@ -40,7 +40,7 @@ public class DebugLabel : InfoLabel
 		Add("PrevPrevState", ch.prevPrevState?.ToString()??"None");
 		Add("StateFrame", ch.currentState?.frameCount??0);
 		Newline();
-		var attack = (ch.currentState is AttackState a)?a.att:null;
+		var attack = ch.currentAttack;
 		Add("Attack", attack?.Name??"None");
 		Add("AttackFrame", attack?.frameCount??0);
 		Add("AttackScript", attack?.GetType()?.Name??"None");

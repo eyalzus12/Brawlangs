@@ -22,6 +22,7 @@ public class StunState : State
 		ch.vec = Vector2.Zero;
 		framesSinceLastBounce = 0;
 		ch.PlayAnimation("Stun");
+		ch.SetCollisionMaskBit(DROP_THRU_BIT, Force.y > 0);
 	}
 	
 	public Vector2 Force
@@ -70,7 +71,7 @@ public class StunState : State
 		return true;
 	}
 	
-	public override void OnChange()
+	public override void OnChange(State newState)
 	{
 		ch.vec = ch.voc;
 		Force = Vector2.Zero;

@@ -9,6 +9,9 @@ public class EndlagState : State
 	public int endlag = 0;
 	public Attack att = null;
 	
+	[Signal]
+	public delegate void JumpsRestored();
+	
 	public override bool IsActionable() => false;
 	
 	public override void Init()
@@ -57,6 +60,7 @@ public class EndlagState : State
 			{
 				ch.jumpCounter = 0;
 				ch.wallJumpCounter = 0;
+				EmitSignal(nameof(JumpsRestored));
 				if(ch.crouching) ch.ChangeState(ch.downHeld?"Crawl":"Getup");
 				else ch.ChangeState(ch.downHeld?"Duck":"Walk");
 			}

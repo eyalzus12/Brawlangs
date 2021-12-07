@@ -8,6 +8,9 @@ public class AttackState : State
 	public AttackState() : base() {}
 	public AttackState(Character link) : base(link) {}
 	
+	[Signal]
+	public delegate void JumpsRestored();
+	
 	public override bool IsActionable() => false;
 	
 	public Attack att;
@@ -63,8 +66,9 @@ public class AttackState : State
 		SetUpHoldingInput();
 	}
 	
-	protected override void RepeatActions()
+	protected override void LoopActions()
 	{
+		SetupCollisionParamaters();
 		if(Inputs.IsActionReallyJustPressed("player_down"))
 			ch.SetCollisionMaskBit(DROP_THRU_BIT, false);
 		if(Inputs.IsActionReallyJustReleased("player_down"))
@@ -81,18 +85,24 @@ public class AttackState : State
 		{
 			ch.jumpCounter = 0;
 			ch.wallJumpCounter = 0;
+			EmitSignal(nameof(JumpsRestored));
 		}
-	}
-	
-	protected override void LoopActions()
-	{
-		SetupCollisionParamaters();
 	}
 	
 	public void SetEnd(Attack a)
 	{
 		a.Disconnect("AttackEnds", this, nameof(SetEnd));
 		a.connected = null;
+		
+		if(a.active)
+		{
+			a.active = false;
+			a.OnEnd();
+			if(a.currentPart != null) a.currentPart.Stop();
+			ch.ResetCurrentAttack(a);
+			a.currentPart = null;
+		}
+		
 		int endlag = a.currentPart.GetEndlag();
 		if(endlag > 0)
 		{
@@ -109,6 +119,8 @@ public class AttackState : State
 			{
 				ch.jumpCounter = 0;
 				ch.wallJumpCounter = 0;
+				EmitSignal(nameof(JumpsRestored));
+				
 				if(ch.crouching) ch.ChangeState(ch.downHeld?"Crawl":"Getup");
 				else ch.ChangeState(ch.downHeld?"Duck":"Walk");
 			}
@@ -122,5 +134,19 @@ public class AttackState : State
 		
 		att = null;
 		ch.SetCollisionMaskBit(DROP_THRU_BIT, !ch.downHeld);
+	}
+	
+	public override void OnChange(State newState)
+	{
+		if(newState is StunState || newState is HitPauseState)
+		{
+			att.Disconnect("AttackEnds", this, nameof(SetEnd));
+			att.connected = null;
+			att.active = false;
+			att.OnEnd();
+			if(att.currentPart != null) att.currentPart.Stop();
+			ch.ResetCurrentAttack(att);
+			att.currentPart = null;
+		}
 	}
 }

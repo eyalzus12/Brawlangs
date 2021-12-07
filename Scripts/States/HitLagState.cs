@@ -44,4 +44,20 @@ public class HitLagState : State
 		
 		return true;
 	}
+	
+	public override void OnChange(State newState)
+	{
+		if(newState is StunState || newState is HitPauseState)
+		{
+			var att = ch.currentAttack;
+			if(att is null) return;
+			att.Disconnect("AttackEnds", ch.GetState("Attack"), "SetEnd");
+			att.connected = null;
+			att.active = false;
+			att.OnEnd();
+			if(att.currentPart != null) att.currentPart.Stop();
+			ch.ResetCurrentAttack(att);
+			att.currentPart = null;
+		}
+	}
 }

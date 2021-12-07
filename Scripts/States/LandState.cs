@@ -6,6 +6,9 @@ public class LandState : GroundedState
 	public LandState() : base() {}
 	public LandState(Character link) : base(link) {}
 	
+	[Signal]
+	public delegate void JumpsRestored();
+	
 	public override void Init()
 	{
 		if(ch.onSemiSolid && ch.downHeld)
@@ -19,7 +22,9 @@ public class LandState : GroundedState
 		ch.vac = Vector2.Zero;
 		ch.jumpCounter = 0;
 		ch.wallJumpCounter = 0;
-			
+		EmitSignal(nameof(JumpsRestored));
+		
+		
 		AdjustVelocity();
 		ch.PlayAnimation("Land");
 	}
