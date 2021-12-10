@@ -12,7 +12,7 @@ public class MatchCamera : Camera2D
 	[Export]
 	public bool debugMode = false;
 	[Export]
-	public Vector2 limits = new Vector2(1300, 1000);//how far away from the screen center the camera is allowed to see into
+	public Vector2 limits = new Vector2(1300, 900);//how far away from the screen center the camera is allowed to see into
 	[Export]
 	public Vector2 middle = Vector2.Zero;//center of screen
 	[Export]
