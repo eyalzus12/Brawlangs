@@ -199,7 +199,8 @@ public class AttackCreator
 		var load = h.LoadExtraProperties;
 		foreach(var s in load.Keys)
 		{
-			var prop = inif[section, s, null].cast(load[s], $"loading extra properties for hitbox {section}");
+			var type = load[s];
+			var prop = inif[section, s, null].cast(type, $"loading extra properties for hitbox {section}");
 			h.Set/*Deferred*/(s, prop);
 		}
 		
