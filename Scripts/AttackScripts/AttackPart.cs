@@ -13,7 +13,7 @@ public class AttackPart : Node2D
 	public HashSet<Character> ignoreList = new HashSet<Character>();
 	public Dictionary<Area2D, Hitbox> hitList = new Dictionary<Area2D, Hitbox>();
 	
-	public Dictionary<string, Type> LoadExtraProperties = new Dictionary<string, Type>();
+	public Dictionary<string, ParamRequest> LoadExtraProperties = new Dictionary<string, ParamRequest>();
 	
 	public bool active = false;
 	
@@ -38,8 +38,12 @@ public class AttackPart : Node2D
 	[Export]
 	public float knockbackMult = 1f;
 	
+	[Export]
+	public int stunMult = 1;
+	
 	public static float globalDamageMult = 1f;
 	public static float globalKnockbackMult = 1f;
+	public static int globalStunMult = 1;
 	
 	public bool hit = false;
 	
@@ -60,6 +64,7 @@ public class AttackPart : Node2D
 	{
 		globalDamageMult = 1f;
 		globalKnockbackMult = 1f;
+		globalStunMult = 1;
 	}
 	
 	public virtual void Reset()
@@ -76,9 +81,10 @@ public class AttackPart : Node2D
 		hitboxes.ForEach(h => h.Connect("HitboxHit", this, nameof(HandleHit)));
 	}
 	
-	public void LoadExtraProperty<T>(string s)
+	public void LoadExtraProperty<T>(string s, T @default = default(T))
 	{
-		LoadExtraProperties.Add(s, typeof(T));
+		var toAdd = new ParamRequest(typeof(T), s, @default);
+		LoadExtraProperties.Add(s, toAdd);
 	}
 	
 	public void Connect(AttackPart ap)
@@ -285,7 +291,7 @@ public class AttackPart : Node2D
 			var vkb = dirvec*hitbox.varKnockback;
 			var dmult = ch.damageDoneMult*hitbox.GetDamageMultiplier(hitChar)*damageMult*globalDamageMult;
 			var damage = hitbox.damage*dmult;
-			var smult = ch.stunDoneMult*hitbox.GetStunMultiplier(hitChar);
+			var smult = ch.stunDoneMult*hitbox.GetStunMultiplier(hitChar)*stunMult*globalStunMult;
 			var stun = hitbox.stun*smult;
 			hitChar.ApplyKnockback(skb, vkb, damage, stun, hitbox.hitpause);
 			ignoreList.Add(hitChar);

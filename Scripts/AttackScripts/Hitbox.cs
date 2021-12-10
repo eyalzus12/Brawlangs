@@ -23,11 +23,11 @@ public class Hitbox : Area2D
 	[Export]
 	public int hitPriority = 0;
 	[Export]
-	public Vector3 knockbackMult = new Vector3(0f, 1f, 1f);
+	public float teamKnockbackMult = 1f;
 	[Export]
-	public Vector3 damageMult = new Vector3(0f, 1f, 1f);
+	public float teamDamageMult = 1f;
 	[Export]
-	public Vector3 stunMult = new Vector3(0f, 1f, 1f);
+	public int teamStunMult = 1;
 	[Export]
 	public Vector2 momentumCarry = Vector2.Zero;
 	
@@ -37,7 +37,7 @@ public class Hitbox : Area2D
 	public Dictionary<string, float> stateDamageMult;
 	public Dictionary<string, float> stateStunMult;
 	
-	public Dictionary<string, Type> LoadExtraProperties = new Dictionary<string, Type>();
+	public Dictionary<string, ParamRequest> LoadExtraProperties = new Dictionary<string, ParamRequest>();
 	
 	public List<Vector2> activeFrames = new List<Vector2>();
 	public Character ch;
@@ -78,9 +78,10 @@ public class Hitbox : Area2D
 	
 	public virtual void Init() {}
 	
-	public void LoadExtraProperty<T>(string s)
+	public void LoadExtraProperty<T>(string s, T @default = default(T))
 	{
-		LoadExtraProperties.Add(s, typeof(T));
+		var toAdd = new ParamRequest(typeof(T), s, @default);
+		LoadExtraProperties.Add(s, toAdd);
 	}
 	
 	public virtual void Reload()
@@ -147,12 +148,7 @@ public class Hitbox : Area2D
 	
 	public virtual void Loop() {}
 	
-	private float TeamMult(Character c, Vector3 chooseFrom)
-	{
-		if(c == ch) return chooseFrom.x;
-		else if(c.teamNumber == ch.teamNumber) return chooseFrom.y;
-		else return chooseFrom.z;
-	}
+	private float TeamMult(Character c, float chooseFrom) => (c == ch || c.teamNumber == ch.teamNumber)?chooseFrom:1f;
 	
 	private float StateMult(Character c, Dictionary<string, float> chooseFrom)
 	{
@@ -169,9 +165,9 @@ public class Hitbox : Area2D
 		return 1f;
 	}
 	
-	public virtual float GetKnockbackMultiplier(Character c) => TeamMult(c, knockbackMult) * StateMult(c, stateKnockbackMult);
-	public virtual float GetDamageMultiplier(Character c) => TeamMult(c, damageMult) * StateMult(c, stateDamageMult);
-	public virtual int GetStunMultiplier(Character c) => (int)(TeamMult(c, stunMult) * StateMult(c, stateStunMult));
+	public virtual float GetKnockbackMultiplier(Character c) => TeamMult(c, teamKnockbackMult) * StateMult(c, stateKnockbackMult);
+	public virtual float GetDamageMultiplier(Character c) => TeamMult(c, teamDamageMult) * StateMult(c, stateDamageMult);
+	public virtual int GetStunMultiplier(Character c) => (int)(TeamMult(c, (float)teamStunMult) * StateMult(c, stateStunMult));
 	
 	public virtual Vector2 KnockbackDir(Character hitter, Character hitee)
 	{

@@ -13,7 +13,7 @@ public class Attack : Node2D
 	
 	public State connected = null;
 	
-	public Dictionary<string, Type> LoadExtraProperties = new Dictionary<string, Type>();
+	public Dictionary<string, ParamRequest> LoadExtraProperties = new Dictionary<string, ParamRequest>();
 	
 	[Signal]
 	public delegate void AttackStarts(Attack a);
@@ -85,8 +85,9 @@ public class Attack : Node2D
 	public virtual void OnHit(Hitbox hitbox, Area2D hurtbox) {}
 	public virtual bool CanActivate() => true;
 	
-	public void LoadExtraProperty<T>(string s)
+	public void LoadExtraProperty<T>(string s, T @default = default(T))
 	{
-		LoadExtraProperties.Add(s, typeof(T));
+		var toAdd = new ParamRequest(typeof(T), s, @default);
+		LoadExtraProperties.Add(s, toAdd);
 	}
 }

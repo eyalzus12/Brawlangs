@@ -5,6 +5,7 @@ public class JoshNSpecialProjectile : HitProjectile
 {
 	public CircleShape2D cshape;
 	
+	public JoshNSpecialProjectile() : base() {}
 	public JoshNSpecialProjectile(Character owner) : base(owner) {}
 	
 	public override void Init()

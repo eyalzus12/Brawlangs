@@ -4,11 +4,11 @@ using System;
 public class LimitedAttack : Attack
 {
 	public int amountUsed;
-	public int AmountCanUse = 1;
+	public int AmountCanUse = -1;
 	
 	public override void Init()
 	{
-		LoadExtraProperty<int>("AmountCanUse");
+		LoadExtraProperty<int>("AmountCanUse", -1);
 		amountUsed = 0;
 	}
 	
@@ -17,5 +17,5 @@ public class LimitedAttack : Attack
 		amountUsed++;
 	}
 	
-	public override bool CanActivate() => (amountUsed < AmountCanUse);
+	public override bool CanActivate() => (AmountCanUse <= -1)||(amountUsed < AmountCanUse);
 }

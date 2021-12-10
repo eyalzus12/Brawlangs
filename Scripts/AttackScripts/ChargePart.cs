@@ -4,21 +4,23 @@ using System;
 public class ChargePart : AttackPart
 {
 	public string ChargeInput = "heavy";
-	public float FullChargeDamageMult = 0f;
-	public float FullChargeKnockbackMult = 0f;
+	public float FullChargeDamageMult = 1f;
+	public float FullChargeKnockbackMult = 1f;
 	public int MinimumChargeForBoost = 1;
 	
 	public override void Init()
 	{
-		LoadExtraProperty<string>("ChargeInput");
-		LoadExtraProperty<float>("FullChargeDamageMult");
-		LoadExtraProperty<float>("FullChargeKnockbackMult");
-		LoadExtraProperty<int>("MinimumChargeForBoost");
+		LoadExtraProperty<string>("ChargeInput", "heavy");
+		LoadExtraProperty<float>("FullChargeDamageMult", 1f);
+		LoadExtraProperty<float>("FullChargeKnockbackMult", 1f);
+		LoadExtraProperty<int>("MinimumChargeForBoost", 1);
 	}
 	
 	public override void Loop()
 	{
-		if(!ch.Inputs.IsActionPressed($"player_{ChargeInput}_attack"))
+		var inputsuffix = (ChargeInput == "taunt")?"":"_attack";
+		var inputname = $"player_{ChargeInput}{inputsuffix}"; 
+		if(!ch.Inputs.IsActionPressed(inputname))
 		{
 			ChangePart(GetNextPart());
 		}
@@ -38,6 +40,6 @@ public class ChargePart : AttackPart
 		return (float)timeTook/(float)possibleTime;
 	}
 	
-	public virtual float CalculateDamageMult() => ChargeFraction()*FullChargeDamageMult + 1f;
-	public virtual float CalculateKnockbackMult() => ChargeFraction()*FullChargeKnockbackMult + 1f;
+	public virtual float CalculateDamageMult() => ChargeFraction()*(FullChargeDamageMult-1f) + 1f;
+	public virtual float CalculateKnockbackMult() => ChargeFraction()*(FullChargeKnockbackMult-1f) + 1f;
 }

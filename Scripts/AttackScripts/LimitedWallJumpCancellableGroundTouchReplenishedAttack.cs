@@ -4,18 +4,19 @@ using System;
 public class LimitedWallJumpCancellableGroundTouchReplenishedAttack : WallJumpCancellableGroundTouchReplenishedAttack
 {
 	public int walljumpAmountUsed;
-	public int WallJumpsPossible = 1;
+	public int WallJumpsPossible = -1;
 	
 	public override void Init()
 	{
 		base.Init();
-		LoadExtraProperty<int>("WallJumpsPossible");
+		LoadExtraProperty<int>("WallJumpsPossible", -1);
 		walljumpAmountUsed = 0;
 	}
 	
 	public override void Loop()
 	{
-		if(ch.walled && ch.Inputs.IsActionJustPressed("player_jump") && walljumpAmountUsed < WallJumpsPossible)
+		var available = (WallJumpsPossible <= -1)||(walljumpAmountUsed < WallJumpsPossible);
+		if(ch.walled && ch.Inputs.IsActionJustPressed("player_jump") && available)
 		{
 			ch.Inputs.MarkForDeletion("player_jump", true);
 			ch.ChangeState("WallJump");

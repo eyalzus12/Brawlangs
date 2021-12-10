@@ -61,12 +61,7 @@ public class AttackCreator
 				BuildPart(a, s, StartPartSection);
 		}
 		
-		var load = a.LoadExtraProperties;
-		foreach(var s in load.Keys)
-		{
-			var prop = inif[section, s, null].cast(load[s], $"loading extra properties for attack {section}");
-			a.Set/*Deferred*/(s, prop);
-		}
+		LoadExtraProperties(a, section);
 	}
 	
 	public AttackPart BuildPart(Attack a, string section, string start)
@@ -93,6 +88,8 @@ public class AttackCreator
 		ap.damageMult = dm;
 		var km = inif[section, "KnockbackMult", 1f].f();
 		ap.knockbackMult = km;
+		var sm = inif[section, "StunMult", 1].i();
+		ap.stunMult = sm;
 		
 		var oHitboxSections = inif[section, "Hitboxes", null];
 		if(oHitboxSections is string)
@@ -110,12 +107,7 @@ public class AttackCreator
 		ap.ConnectSignals();
 		ap.BuildHitboxAnimator();
 		
-		var load = ap.LoadExtraProperties;
-		foreach(var s in load.Keys)
-		{
-			var prop = inif[section, s, null].cast(load[s], $"loading extra properties for part {section}");
-			ap.Set/*Deferred*/(s, prop);
-		}
+		LoadExtraProperties(ap, section);
 		
 		return ap;
 	}
@@ -153,12 +145,12 @@ public class AttackCreator
 		Enum.TryParse<Hitbox.KnockbackSetting>(kt, out ks);
 		h.knockbackSetting = ks;
 		
-		var kmu = inif[section, "KnockbackMultiplier", new Vector3(0,1,1)].v3();
-		h.knockbackMult = kmu;
-		var dmu = inif[section, "DamageMultiplier", new Vector3(0,1,1)].v3();
-		h.damageMult = dmu;
-		var smu = inif[section, "StunMultiplier", new Vector3(0,1,1)].v3();
-		h.stunMult = smu;
+		var tkm = inif[section, "TeamKnockbackMultiplier", 1f].f();
+		h.teamKnockbackMult = tkm;
+		var tdm = inif[section, "TeamDamageMultiplier", 1f].f();
+		h.teamDamageMult = tdm;
+		var tsm = inif[section, "TeamStunMultiplier", 1].i();
+		h.teamStunMult = tsm;
 		
 		var kms = inif[section, "KnockbackStateMultipliers", ""].s();
 		if(kms != "")
@@ -191,18 +183,12 @@ public class AttackCreator
 			foreach(var entry in inif[sms])
 			{
 				var stateName = entry.Key;
-				var mult = entry.Value.f();
-				h.stateStunMult.Add(stateName, mult);
+				var mult = entry.Value.i();
+				h.stateStunMult.Add(stateName, (float)mult);
 			}
 		}
 		
-		var load = h.LoadExtraProperties;
-		foreach(var s in load.Keys)
-		{
-			var type = load[s];
-			var prop = inif[section, s, null].cast(type, $"loading extra properties for hitbox {section}");
-			h.Set/*Deferred*/(s, prop);
-		}
+		LoadExtraProperties(h, section);
 		
 		ap.AddChild(h);
 		ap.hitboxes.Add(h);
@@ -244,6 +230,30 @@ public class AttackCreator
 				ap.Connect(connection.Key, toConnect);
 				//connect
 			}
+		}
+	}
+	
+	/*
+	the following is a quick fix for being unable to get the load request dictionary
+	when using the Get method for godot objects, it refuses to be casted into the dictionary
+	oh well. this works ok.
+	*/
+	
+	public void LoadExtraProperties(Attack loadTo, string section) => LoadExtraProperties(loadTo, loadTo.LoadExtraProperties, section);
+	public void LoadExtraProperties(AttackPart loadTo, string section) => LoadExtraProperties(loadTo, loadTo.LoadExtraProperties, section);
+	public void LoadExtraProperties(Hitbox loadTo, string section) => LoadExtraProperties(loadTo, loadTo.LoadExtraProperties, section);
+	
+	public void LoadExtraProperties(Godot.Object loadTo, Dictionary<string, ParamRequest> load, string section)
+	{
+		foreach(var entry in load)
+		{
+			var ininame = entry.Key;
+			var request = entry.Value;
+			var type = request.ParamType;
+			var objname = request.ParamName;
+			var @default = request.ParamDefault;
+			var prop = inif[section, ininame, @default].cast(type, $"loading extra properties for {loadTo.GetType().Name} {section}");
+			loadTo.Set(objname, prop);
 		}
 	}
 }

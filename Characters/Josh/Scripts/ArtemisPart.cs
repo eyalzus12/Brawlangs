@@ -9,9 +9,9 @@ public class ArtemisPart : AttackPart
 	
 	public override void Init()
 	{
-		LoadExtraProperty<float>("ForwardSpeed");
-		LoadExtraProperty<float>("BackSpeed");
-		LoadExtraProperty<int>("MoveLength");
+		LoadExtraProperty<float>("ForwardSpeed", 0f);
+		LoadExtraProperty<float>("BackSpeed", 0f);
+		LoadExtraProperty<int>("MoveLength", 0);
 	}
 	
 	public override void Loop()
