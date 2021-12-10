@@ -80,7 +80,7 @@ public class GroundedState : State
 	
 	protected override void Taunt()
 	{
-		if(jump || !IsActionable() || ch.currentAttack != null) return;
+		if(jump) return;
 		
 		if(ch.upHeld) ch.ExecuteAttack("UTaunt");
 		else if(ch.downHeld) ch.ExecuteAttack("DTaunt");

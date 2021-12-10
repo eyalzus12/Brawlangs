@@ -69,6 +69,7 @@ public class Attack : Node2D
 		if(currentPart != null) currentPart.Stop();
 		EmitSignal(nameof(AttackEnds), this);
 		currentPart = null;
+		AttackPart.ResetGlobals();
 	}
 	
 	public override void _PhysicsProcess(float delta)

@@ -52,7 +52,7 @@ public class State : Node
 		if(Inputs.IsActionJustPressed("player_jump"))
 			DoJump();
 		
-		if(IsActionable() && ch.currentAttack is null)
+		if(actionable && ch.currentAttack is null)
 		{
 			if(Inputs.IsActionJustPressed("player_light_attack"))
 				LightAttack();
@@ -108,7 +108,6 @@ public class State : Node
 	
 	protected void SetHorizontalAlternatingInputs()
 	{
-		//TODO: probably find a way to optimize this. or atleast make it cleaner
 		if(Inputs.IsActionJustPressed("player_left"))
 		{
 			if(ch.rightHeld && !ch.leftHeld)
@@ -150,6 +149,49 @@ public class State : Node
 			ch.rightHeld = false;
 	}
 	
+	protected void SetVerticalAlternatingInputs()
+	{
+		if(Inputs.IsActionJustPressed("player_up"))
+		{
+			if(ch.downHeld && !ch.upHeld)
+				ch.downHeld = false;
+			ch.upHeld = true;
+		}
+		
+		if(Inputs.IsActionJustReleased("player_up"))
+		{
+			ch.upHeld = false;
+			if(Inputs.IsActionPressed("player_down"))
+				ch.downHeld = true;
+		}
+		
+		if(Inputs.IsActionPressed("player_up") && !ch.upHeld && !ch.downHeld)
+			ch.upHeld = true;
+		
+		if(!Inputs.IsActionPressed("player_up") && ch.upHeld)
+			ch.upHeld = false;
+		
+		if(Inputs.IsActionJustPressed("player_down"))
+		{
+			if(ch.upHeld && !ch.downHeld) 
+				ch.upHeld = false;
+			ch.downHeld = true;
+		}
+		
+		if(Inputs.IsActionJustReleased("player_down"))
+		{
+			ch.downHeld = false;
+			if(Inputs.IsActionPressed("player_up")) 
+				ch.upHeld = true;
+		}
+		
+		if(Inputs.IsActionPressed("player_down") && !ch.upHeld && !ch.downHeld)
+			ch.downHeld = true;
+		
+		if(!Inputs.IsActionPressed("player_down") && ch.downHeld)
+			ch.downHeld = false;
+	}
+	
 	protected void SetFastFallInput()
 	{
 		if(Inputs.IsActionJustPressed("player_down")
@@ -165,23 +207,9 @@ public class State : Node
 		}
 	}
 	
-	protected void SetDownHoldingInput()
-	{
-		/*if(Inputs.IsActionJustPressed("player_down"))
-			ch.downHeld = true;
-		if(Inputs.IsActionJustReleased("player_down"))
-			ch.downHeld = false;
-		if(Inputs.IsActionPressed("player_down") && !ch.downHeld)
-			ch.downHeld = true;
-		if(!Inputs.IsActionPressed("player_down") && ch.downHeld)
-			ch.downHeld = false;*/
-		ch.downHeld = Inputs.IsActionPressed("player_down");
-	}
 	
-	protected void SetUpHoldingInput()
-	{
-		ch.upHeld = Inputs.IsActionPressed("player_up");
-	}
+	protected void SetDownHoldingInput() => ch.downHeld = Inputs.IsActionPressed("player_down");
+	protected void SetUpHoldingInput() => ch.upHeld = Inputs.IsActionPressed("player_up");
 	
 	public void Unsnap() => snapVector = Vector2.Zero;
 		
@@ -195,12 +223,11 @@ public class State : Node
 		ch.aerial = true;
 		foreach(var collision in GetSlideCollisions())
 		{
+			var body = collision.Collider;//get body
+			if(body is null || !Godot.Object.IsInstanceValid(body)) continue;//ensure not removed
 			ch.aerial = false;
 			var vel = collision.ColliderVelocity;//get collision velocity
 			var norm = collision.Normal;//get the collision normal
-			//if(ch.grounded && ch.teamNumber == 0) GD.Print(norm);
-			var body = collision.Collider;//get body
-			if(body is null || !Godot.Object.IsInstanceValid(body)) continue;//ensure not removed
 			var fric = body.GetProp<float>("PlatformFriction", 1f);//get friction
 			var bounce = body.GetProp<float>("PlatformBounce", 0f);//get bounce
 			var cling = body.GetProp<bool>("Clingable", true);//get if clingable

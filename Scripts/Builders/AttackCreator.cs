@@ -89,6 +89,10 @@ public class AttackCreator
 		ap.movement = mv;
 		var me = inif[section, "MissEndlag", 0].i();
 		ap.missEndlag = me;
+		var dm = inif[section, "DamageMult", 1f].f();
+		ap.damageMult = dm;
+		var km = inif[section, "KnockbackMult", 1f].f();
+		ap.knockbackMult = km;
 		
 		var oHitboxSections = inif[section, "Hitboxes", null];
 		if(oHitboxSections is string)

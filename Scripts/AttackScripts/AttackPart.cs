@@ -32,6 +32,15 @@ public class AttackPart : Node2D
 	[Export]
 	public int missEndlag = 0;
 	
+	[Export]
+	public float damageMult = 1f;
+	
+	[Export]
+	public float knockbackMult = 1f;
+	
+	public static float globalDamageMult = 1f;
+	public static float globalKnockbackMult = 1f;
+	
 	public bool hit = false;
 	
 	public AnimationPlayer hitboxPlayer;
@@ -45,6 +54,12 @@ public class AttackPart : Node2D
 		ch = att.ch;
 		ConnectSignals();
 		Init();
+	}
+	
+	public static void ResetGlobals()
+	{
+		globalDamageMult = 1f;
+		globalKnockbackMult = 1f;
 	}
 	
 	public virtual void Reset()
@@ -264,11 +279,14 @@ public class AttackPart : Node2D
 			if(!ch.CanHit(hitChar) || ignoreList.Contains(hitChar)) continue;
 			hit = true;
 			OnHit(hitbox, hurtbox);
-			var dirvec = hitbox.KnockbackDir(ch, hitChar)*ch.knockbackDoneMult*hitbox.GetKnockbackMultiplier(hitChar);
+			var kmult = ch.knockbackDoneMult*hitbox.GetKnockbackMultiplier(hitChar)*knockbackMult*globalKnockbackMult;
+			var dirvec = hitbox.KnockbackDir(ch, hitChar)*kmult;
 			var skb = dirvec*hitbox.setKnockback + hitbox.momentumCarry*ch.GetVelocity();
 			var vkb = dirvec*hitbox.varKnockback;
-			var damage = hitbox.damage*ch.damageDoneMult*hitbox.GetDamageMultiplier(hitChar);
-			var stun = hitbox.stun*ch.stunDoneMult*hitbox.GetStunMultiplier(hitChar);
+			var dmult = ch.damageDoneMult*hitbox.GetDamageMultiplier(hitChar)*damageMult*globalDamageMult;
+			var damage = hitbox.damage*dmult;
+			var smult = ch.stunDoneMult*hitbox.GetStunMultiplier(hitChar);
+			var stun = hitbox.stun*smult;
 			hitChar.ApplyKnockback(skb, vkb, damage, stun, hitbox.hitpause);
 			ignoreList.Add(hitChar);
 			GD.Print($"{hitChar} was hit by {hitbox.Name}");
