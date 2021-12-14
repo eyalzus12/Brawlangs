@@ -102,10 +102,8 @@ public class AirState : State
 	
 	public override void SetInputs()
 	{
-		SetHorizontalAlternatingInputs();
-		SetDownHoldingInput();
+		base.SetInputs();
 		SetFastFallInput();
-		SetUpHoldingInput();
 	}
 	
 	protected override bool CalcStateChange()

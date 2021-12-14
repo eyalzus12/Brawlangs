@@ -53,13 +53,6 @@ public class StunState : State
 		}
 	}
 	
-	public override void SetInputs()
-	{
-		SetHorizontalAlternatingInputs();
-		SetUpHoldingInput();
-		SetDownHoldingInput();
-	}
-	
 	protected override bool CalcStateChange()
 	{
 		if(frameCount >= stunLength)

@@ -49,6 +49,7 @@ public class Projectile2D : Area2D
 			Destruct();
 	}
 	
+	//FIXME: should character collide use AreaEntered? to detect the hurtbox?
 	public void BodyEntered(Node body)
 	{
 		if(body is Character ch) OnCharacterCollide(ch);

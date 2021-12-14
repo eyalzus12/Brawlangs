@@ -13,7 +13,6 @@ public class ChargePart : AttackPart
 		LoadExtraProperty<string>("ChargeInput", "heavy");
 		LoadExtraProperty<float>("FullChargeDamageMult", 1f);
 		LoadExtraProperty<float>("FullChargeKnockbackMult", 1f);
-		LoadExtraProperty<int>("MinimumChargeForBoost", 1);
 	}
 	
 	public override void Loop()
@@ -35,9 +34,8 @@ public class ChargePart : AttackPart
 	
 	public virtual float ChargeFraction()
 	{
-		var timeTook = Math.Max(0, frameCount-MinimumChargeForBoost);
-		var possibleTime = Math.Max(0, length-MinimumChargeForBoost);
-		return (float)timeTook/(float)possibleTime;
+		var timeHeld = Math.Max(0, frameCount-startup);
+		return (float)timeHeld/(float)length;
 	}
 	
 	public virtual float CalculateDamageMult() => ChargeFraction()*(FullChargeDamageMult-1f) + 1f;

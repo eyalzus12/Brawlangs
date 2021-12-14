@@ -26,9 +26,7 @@ public class HitLagState : State
 	
 	public override void SetInputs()
 	{
-		SetHorizontalAlternatingInputs();
-		SetDownHoldingInput();
-		SetUpHoldingInput();
+		base.SetInputs();
 		SetFastFallInput();
 	}
 	

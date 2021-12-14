@@ -59,13 +59,6 @@ public class AttackState : State
 		else ch.vec.y.Lerp(ch.fallSpeed, ch.gravity);
 	}
 	
-	public override void SetInputs()
-	{
-		SetHorizontalAlternatingInputs();
-		SetDownHoldingInput();
-		SetUpHoldingInput();
-	}
-	
 	protected override void LoopActions()
 	{
 		SetupCollisionParamaters();

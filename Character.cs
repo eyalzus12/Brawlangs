@@ -291,6 +291,12 @@ public class Character : KinematicBody2D
 		}
 	}
 	
+	public T ChangeState<T>(string state) where T : State
+	{
+		if(GetState(state) is T) return (T)ChangeState(state);
+		else return null;
+	}
+	
 	//this function handles state changes
 	public State ChangeState(string state)
 	{
@@ -594,22 +600,28 @@ public class Character : KinematicBody2D
 	
 	//public bool CanBeHit(Hitbox hit) => (hit.ch != this);
 	
-	public virtual void ApplyKnockback(Vector2 skb, Vector2 vkb, float d, int stun, int hp)
+	public virtual void ApplyKnockback(HitData data)
 	{
+		var skb = data.Skb;
+		var vkb = data.Vkb;
+		var d = data.Damage;
+		var stun = data.Stun;
+		var hp = data.Hitpause;
+		
 		damage += d * damageTakenMult;
 		var force = (skb + damage*vkb/100f) * knockbackTakenMult;
 		var stunlen = stun * stunTakenMult;
 		
 		if(hp > 0)
 		{
-			var s = ChangeState("HitPause") as HitPauseState;
+			var s = ChangeState<HitPauseState>("HitPause");
 			s.force = force;
 			s.stunLength = stunlen;
 			s.hitPauseLength = hp;
 		}
 		else if(stunlen > 0)
 		{
-			var s = ChangeState("Stun") as StunState;
+			var s = ChangeState<StunState>("Stun");
 			s.Force = force;
 			s.stunLength = stunlen;
 		}
@@ -629,7 +641,7 @@ public class Character : KinematicBody2D
 	{
 		if(hitWith.hitlag > 0)
 		{
-			var s = ChangeState("HitLag") as HitLagState;
+			var s = ChangeState<HitLagState>("HitLag");
 			s.hitLagLength = hitWith.hitlag;
 		}
 	}
@@ -642,7 +654,7 @@ public class Character : KinematicBody2D
 		
 		currentAttack = a;
 		currentAttack.Connect("AttackEnds", this, nameof(ResetCurrentAttack));
-		var s = ChangeState("Attack") as AttackState;
+		var s = ChangeState<AttackState>("Attack");
 		s.att = currentAttack;
 		
 		currentAttack.Start();

@@ -18,13 +18,6 @@ public class HitPauseState : State
 		ch.ResetVelocity();
 	}
 	
-	public override void SetInputs()
-	{
-		SetHorizontalAlternatingInputs();
-		SetUpHoldingInput();
-		SetDownHoldingInput();
-	}
-	
 	protected override bool CalcStateChange()
 	{
 		if(frameCount >= hitPauseLength)

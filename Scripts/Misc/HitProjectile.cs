@@ -15,8 +15,8 @@ public class HitProjectile : Projectile2D
 	public override void OnCharacterCollide(Character ch)
 	{
 		if(!owner.CanHit(ch)) return;
-		ch.ApplyKnockback(Math.Sign(move.x)*setKnockback,
-		Math.Sign(move.x)*varKnockback, damage, stun, hitpause);
+		var data = new HitData(Math.Sign(move.x)*setKnockback, Math.Sign(move.x)*varKnockback, damage, stun, hitpause, this, ch.hurtbox);
+		ch.ApplyKnockback(data);
 		GD.Print($"{ch} was hit by a projectile {this.ToString()}");
 		Destruct();
 	}

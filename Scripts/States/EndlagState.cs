@@ -42,13 +42,6 @@ public class EndlagState : State
 		if(!ch.grounded) ch.vec.y.Lerp(ch.fallSpeed, ch.gravity);
 	}
 	
-	public override void SetInputs()
-	{
-		SetHorizontalAlternatingInputs();
-		SetDownHoldingInput();
-		SetUpHoldingInput();
-	}
-	
 	protected override bool CalcStateChange()
 	{
 		if(frameCount >= endlag)
@@ -62,7 +55,7 @@ public class EndlagState : State
 				ch.wallJumpCounter = 0;
 				EmitSignal(nameof(JumpsRestored));
 				if(ch.crouching) ch.ChangeState(ch.downHeld?"Crawl":"Getup");
-				else ch.ChangeState(ch.downHeld?"Duck":"Walk");
+				else ch.ChangeState(ch.downHeld?"Duck":ch.IsIdle()?"Idle":"Walk");
 			}
 			else if(ch.walled && ch.wallJumpCounter < ch.wallJumpNum)
 			{

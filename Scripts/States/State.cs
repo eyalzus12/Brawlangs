@@ -96,7 +96,13 @@ public class State : Node
 	protected virtual void DoGravity() {}
 	protected virtual void DoJump() {}
 	protected virtual void AdjustVelocity() {}
-	public virtual void SetInputs() {}
+	
+	public virtual void SetInputs()
+	{
+		SetHorizontalAlternatingInputs();
+		SetVerticalAlternatingInputs();
+	}
+	
 	protected virtual bool CalcStateChange() => false;
 	protected virtual void LoopActions() {}
 	protected virtual void RepeatActions() {}

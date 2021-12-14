@@ -90,13 +90,6 @@ public class GroundedState : State
 		MarkForDeletion("player_taunt", true);
 	}
 	
-	public override void SetInputs()
-	{
-		SetHorizontalAlternatingInputs();
-		SetDownHoldingInput();
-		SetUpHoldingInput();
-	}
-	
 	protected override bool CalcStateChange()
 	{
 		if(jump)

@@ -293,7 +293,10 @@ public class AttackPart : Node2D
 			var damage = hitbox.damage*dmult;
 			var smult = ch.stunDoneMult*hitbox.GetStunMultiplier(hitChar)*stunMult*globalStunMult;
 			var stun = hitbox.stun*smult;
-			hitChar.ApplyKnockback(skb, vkb, damage, stun, hitbox.hitpause);
+			
+			var data = new HitData(skb, vkb, damage, stun, hitbox.hitpause, hitbox, hurtbox);
+			
+			hitChar.ApplyKnockback(data);
 			ignoreList.Add(hitChar);
 			GD.Print($"{hitChar} was hit by {hitbox.Name}");
 			att.OnHit(hitbox, hurtbox);
