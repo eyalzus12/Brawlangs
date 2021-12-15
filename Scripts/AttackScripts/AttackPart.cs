@@ -33,6 +33,12 @@ public class AttackPart : Node2D
 	public int missEndlag = 0;
 	
 	[Export]
+	public int cooldown = 0;
+	
+	[Export]
+	public int missCooldown = 0;
+	
+	[Export]
 	public float damageMult = 1f;
 	
 	[Export]
@@ -306,4 +312,5 @@ public class AttackPart : Node2D
 	}
 	
 	public virtual int GetEndlag() => endlag + (hit?0:missEndlag);
+	public virtual int GetCooldown() => cooldown + (hit?0:missCooldown);
 }

@@ -8,6 +8,8 @@ public class Attack : Node2D
 	public AttackPart currentPart;
 	public Character ch;
 	
+	public AttackPart lastUsedPart;
+	
 	public int frameCount = 0;
 	public bool active = false;
 	
@@ -56,6 +58,7 @@ public class Attack : Node2D
 		if(newPart is null) Stop();
 		else if(currentPart != newPart)
 		{
+			lastUsedPart = currentPart;
 			if(currentPart != null) currentPart.Stop();
 			currentPart = newPart;
 			currentPart.Activate();
@@ -64,6 +67,7 @@ public class Attack : Node2D
 	
 	public virtual void Stop()
 	{
+		lastUsedPart = currentPart;
 		active = false;
 		OnEnd();
 		if(currentPart != null) currentPart.Stop();
@@ -90,4 +94,7 @@ public class Attack : Node2D
 		var toAdd = new ParamRequest(typeof(T), s, @default);
 		LoadExtraProperties.Add(s, toAdd);
 	}
+	
+	public virtual int GetCooldown() => (currentPart??lastUsedPart).GetCooldown();
+	public virtual int GetEndlag() => (currentPart??lastUsedPart).GetEndlag();
 }

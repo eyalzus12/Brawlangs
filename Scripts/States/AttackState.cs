@@ -96,10 +96,10 @@ public class AttackState : State
 			a.currentPart = null;
 		}
 		
-		int endlag = a.currentPart.GetEndlag();
+		int endlag = a.GetEndlag();
 		if(endlag > 0)
 		{
-			var s = ch.ChangeState("Endlag") as EndlagState;
+			var s = ch.ChangeState<EndlagState>("Endlag");
 			s.endlag = endlag;
 			s.att = a;
 		}

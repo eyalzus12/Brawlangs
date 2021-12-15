@@ -4,6 +4,9 @@ using System.Collections.Generic;
 
 public class State : Node
 {
+	[Signal]
+	public delegate void StateEnd(State s);
+	
 	public bool actionable => IsActionable();
 	
 	public const int DROP_THRU_BIT = 1;

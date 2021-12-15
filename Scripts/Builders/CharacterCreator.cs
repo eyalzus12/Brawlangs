@@ -48,6 +48,7 @@ public class CharacterCreator
 		//create attacks
 		var attCreator = new AttackCreator($"{directoryPath}/{attackFile}.ini");
 		attCreator.Build(ch);
+		ch.SetupAttacks();
 		
 		//find animation folder name
 		var animationsFolder = charinif["Animations", ""].s();

@@ -80,10 +80,14 @@ public class AttackCreator
 		ap.length = ln;
 		var el = inif[section, "Endlag", 0].i();
 		ap.endlag = el;
+		var cd = inif[section, "Cooldown", 0].i();
+		ap.cooldown = cd;
 		var mv = inif[section, "Movement", Vector2.Zero].v2();
 		ap.movement = mv;
 		var me = inif[section, "MissEndlag", 0].i();
 		ap.missEndlag = me;
+		var mc = inif[section, "MissCooldown", 0].i();
+		ap.missCooldown = mc;
 		var dm = inif[section, "DamageMult", 1f].f();
 		ap.damageMult = dm;
 		var km = inif[section, "KnockbackMult", 1f].f();

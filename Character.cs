@@ -203,6 +203,10 @@ public class Character : KinematicBody2D
 	public CollisionShape2D collision;
 	public Hurtbox hurtbox;
 	public Dictionary<string, CollisionSettings> settings = new Dictionary<string, CollisionSettings>();
+	
+	public List<Attack> attacks = new List<Attack>();
+	public Dictionary<string, Attack> attackDict = new Dictionary<string, Attack>();
+	public Dictionary<Attack, int> attackCooldowns = new Dictionary<Attack, int>();
 		
 	public List<string> StatList = new List<string>();
 	public PropertyMap prop = new PropertyMap();
@@ -220,6 +224,7 @@ public class Character : KinematicBody2D
 	{
 		//SetupCollision();
 		SetupStates();
+		SetupAttacks();
 		//Respawn();
 		//ReadStats();
 		
@@ -241,14 +246,14 @@ public class Character : KinematicBody2D
 		++framesSinceLastHit;
 		StoreVelocities();
 		TruncateVelocityIfInsignificant();
+		UpdateAttackCooldowns();
 		if(Input.IsActionJustPressed("reset")) Respawn();
 		currentState?.SetInputs();
 		currentState?.DoPhysics(delta);
 			
 		sprite.FlipH = DirectionToBool();
 		
-		collision?.SetDeferred("position", OriginalCollisionPosition*new Vector2(direction, 1));
-		//collision?.SetDeferred("rotation", ogrot*direction);
+		UpdateCollision();
 	}
 	
 	public void PlayAnimation(string anm) => sprite.Play(anm);
@@ -309,6 +314,7 @@ public class Character : KinematicBody2D
 		}
 		
 		currentState?.OnChange(tempState);
+		currentState?.EmitSignal("StateEnd", currentState);
 		
 		if(currentState == tempState)
 		{
@@ -477,6 +483,11 @@ public class Character : KinematicBody2D
 	////////////////Collision//////////////////
 	///////////////////////////////////////////
 	
+	public virtual void UpdateCollision()
+	{
+		collision?.SetDeferred("position", OriginalCollisionPosition*new Vector2(direction, 1));
+	}
+	
 	public bool ApplySettings(string setting)
 	{
 		try
@@ -596,6 +607,17 @@ public class Character : KinematicBody2D
 	////////////////Attacks////////////////////
 	///////////////////////////////////////////
 	
+	public virtual void SetupAttacks()
+	{
+		attacks = GetChildren().FilterType<Attack>().ToList();
+		
+		foreach(var a in attacks)
+		{
+			attackDict.Add(a.Name, a);
+			attackCooldowns.Add(a, 0);
+		}
+	}
+	
 	public bool CanHit(Character c) => (c != this)&&(c.teamNumber!=teamNumber||friendlyFire);
 	
 	//public bool CanBeHit(Hitbox hit) => (hit.ch != this);
@@ -646,9 +668,16 @@ public class Character : KinematicBody2D
 		}
 	}
 	
+	public virtual bool IsAttackInCooldown(Attack a)
+	{
+		var cd = GetAttackCooldown(a);
+		if(cd is null) return false;
+		else return (cd>0);
+	}
+	
 	public virtual void ExecuteAttack(Attack a)
 	{
-		if(a is null || !a.CanActivate()) return;
+		if(a is null || !a.CanActivate() || IsAttackInCooldown(a)) return;
 		
 		if(currentAttack != null) ResetCurrentAttack(null);
 		
@@ -668,10 +697,48 @@ public class Character : KinematicBody2D
 		else GD.Print($"Node {s} found, but isn't an attack. Very sussy.");
 	}
 	
+	public Attack GetAttack(string s)
+	{
+		try
+		{
+			return attackDict[s];
+		}
+		catch(KeyNotFoundException)
+		{
+			return null;
+		}
+	}
+	
+	public int? GetAttackCooldown(string s) => GetAttackCooldown(GetAttack(s));
+	
+	public int? GetAttackCooldown(Attack a)
+	{
+		try
+		{
+			return attackCooldowns[a];
+		}
+		catch(KeyNotFoundException)
+		{
+			return null;
+		}
+	}
+	
+	public void UpdateAttackCooldowns()
+	{
+		var keys = new List<Attack>(attackCooldowns.Keys);
+		foreach(var k in keys)
+		{
+			var cd = attackCooldowns[k];
+			if(cd <= 0) continue;
+			attackCooldowns[k] = cd - 1;
+		}
+	}
+	
 	public void ResetCurrentAttack(Attack a)
 	{
 		if(currentAttack is null) return;
 		currentAttack.Disconnect("AttackEnds", this, nameof(ResetCurrentAttack));
+		SetAttackCooldowns();
 		currentAttack = null;
 	}
 	
@@ -679,6 +746,12 @@ public class Character : KinematicBody2D
 	{
 		GetParent().AddChild(proj);
 		proj.Active = true;
+	}
+	
+	public virtual void SetAttackCooldowns()
+	{
+		var cd = currentAttack.GetEndlag() + currentAttack.GetCooldown();
+		attackCooldowns[currentAttack] = cd;
 	}
 	
 	///////////////////////////////////////////
