@@ -28,8 +28,8 @@ public class ChargePart : AttackPart
 	public override void OnEnd()
 	{
 		if(frameCount < MinimumChargeForBoost) return;
-		globalDamageMult *= CalculateDamageMult();
-		globalKnockbackMult *= CalculateKnockbackMult();
+		att.damageMult *= CalculateDamageMult();
+		att.knockbackMult *= CalculateKnockbackMult();
 	}
 	
 	public virtual float ChargeFraction()

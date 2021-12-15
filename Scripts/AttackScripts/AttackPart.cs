@@ -47,10 +47,6 @@ public class AttackPart : Node2D
 	[Export]
 	public int stunMult = 1;
 	
-	public static float globalDamageMult = 1f;
-	public static float globalKnockbackMult = 1f;
-	public static int globalStunMult = 1;
-	
 	public bool hit = false;
 	
 	public AnimationPlayer hitboxPlayer;
@@ -64,13 +60,6 @@ public class AttackPart : Node2D
 		ch = att.ch;
 		ConnectSignals();
 		Init();
-	}
-	
-	public static void ResetGlobals()
-	{
-		globalDamageMult = 1f;
-		globalKnockbackMult = 1f;
-		globalStunMult = 1;
 	}
 	
 	public virtual void Reset()
@@ -291,13 +280,13 @@ public class AttackPart : Node2D
 			if(!ch.CanHit(hitChar) || ignoreList.Contains(hitChar)) continue;
 			hit = true;
 			OnHit(hitbox, hurtbox);
-			var kmult = ch.knockbackDoneMult*hitbox.GetKnockbackMultiplier(hitChar)*knockbackMult*globalKnockbackMult;
+			var kmult = ch.knockbackDoneMult*hitbox.GetKnockbackMultiplier(hitChar)*knockbackMult*att.knockbackMult;
 			var dirvec = hitbox.KnockbackDir(ch, hitChar)*kmult;
 			var skb = dirvec*hitbox.setKnockback + hitbox.momentumCarry*ch.GetVelocity();
 			var vkb = dirvec*hitbox.varKnockback;
-			var dmult = ch.damageDoneMult*hitbox.GetDamageMultiplier(hitChar)*damageMult*globalDamageMult;
+			var dmult = ch.damageDoneMult*hitbox.GetDamageMultiplier(hitChar)*damageMult*att.damageMult;
 			var damage = hitbox.damage*dmult;
-			var smult = ch.stunDoneMult*hitbox.GetStunMultiplier(hitChar)*stunMult*globalStunMult;
+			var smult = ch.stunDoneMult*hitbox.GetStunMultiplier(hitChar)*stunMult*att.stunMult;
 			var stun = hitbox.stun*smult;
 			
 			var data = new HitData(skb, vkb, damage, stun, hitbox.hitpause, hitbox, hurtbox);

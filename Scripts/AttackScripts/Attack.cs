@@ -13,6 +13,10 @@ public class Attack : Node2D
 	public int frameCount = 0;
 	public bool active = false;
 	
+	public float damageMult = 1f;
+	public float knockbackMult = 1f;
+	public int stunMult = 1;
+	
 	public State connected = null;
 	
 	public Dictionary<string, ParamRequest> LoadExtraProperties = new Dictionary<string, ParamRequest>();
@@ -41,6 +45,9 @@ public class Attack : Node2D
 	
 	public virtual void Start()
 	{
+		damageMult = 1f;
+		knockbackMult = 1f;
+		stunMult = 1;
 		frameCount = 0;
 		active = true;
 		EmitSignal(nameof(AttackStarts), this);
@@ -73,7 +80,6 @@ public class Attack : Node2D
 		if(currentPart != null) currentPart.Stop();
 		EmitSignal(nameof(AttackEnds), this);
 		currentPart = null;
-		AttackPart.ResetGlobals();
 	}
 	
 	public override void _PhysicsProcess(float delta)
