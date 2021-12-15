@@ -8,9 +8,6 @@ public class AttackState : State
 	public AttackState() : base() {}
 	public AttackState(Character link) : base(link) {}
 	
-	[Signal]
-	public delegate void JumpsRestored();
-	
 	public override bool IsActionable() => false;
 	
 	public Attack att;
@@ -78,7 +75,7 @@ public class AttackState : State
 		{
 			ch.jumpCounter = 0;
 			ch.wallJumpCounter = 0;
-			EmitSignal(nameof(JumpsRestored));
+			ch.EmitSignal("JumpsRestored");
 		}
 	}
 	
@@ -112,7 +109,7 @@ public class AttackState : State
 			{
 				ch.jumpCounter = 0;
 				ch.wallJumpCounter = 0;
-				EmitSignal(nameof(JumpsRestored));
+				ch.EmitSignal("JumpsRestored");
 				
 				if(ch.crouching) ch.ChangeState(ch.downHeld?"Crawl":"Getup");
 				else ch.ChangeState(ch.downHeld?"Duck":"Walk");

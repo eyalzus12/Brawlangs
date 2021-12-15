@@ -13,6 +13,8 @@ public class Character : KinematicBody2D
 	
 	[Signal]
 	public delegate void Dead(Node2D who);
+	[Signal]
+	public delegate void JumpsRestored();
 	
 	////////////////////////////////////////////
 	[Export]
