@@ -58,7 +58,7 @@ public class EndlagState : State
 			}
 			else if(ch.walled && ch.wallJumpCounter < ch.wallJumpNum)
 			{
-				if(ch.GetState<AttackState>("Attack").touched) ch.wallJumpCounter--;
+				if(ch.GetState<AttackState>().touched) ch.wallJumpCounter--;
 				ch.ChangeState("WallLand");
 			}
 			else ch.ChangeState("Air");

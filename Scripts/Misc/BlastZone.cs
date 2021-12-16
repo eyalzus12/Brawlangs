@@ -4,6 +4,8 @@ using System.Collections.Generic;
 
 public class BlastZone : Node2D
 {
+	public const Vector2 DEFAULT_SIZE =  new Vector2(2300, 950);
+	
 	[Export]
 	public Rect2 Bounds;// = CalcRect(new Vector2(512, 300), new Vector2(2000, 1200));
 	
@@ -11,7 +13,7 @@ public class BlastZone : Node2D
 	
 	public BlastZone()
 	{
-		Bounds = CalcRect(Vector2.Zero, new Vector2(2300, 1100));
+		Bounds = CalcRect(Vector2.Zero, DEFAULT_SIZE);
 	}
 	
 	public BlastZone(Vector2 Center, Vector2 Limits)

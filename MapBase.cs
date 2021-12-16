@@ -6,9 +6,9 @@ using System.Linq;
 public class MapBase : Node2D
 {
 	[Export]
-	public Vector2 BlastZones = new Vector2(2300, 1500);
+	public Vector2 BlastZones = new Vector2(2300, 1100);
 	[Export]
-	public Vector2 CameraLimits = new Vector2(1300, 1000);
+	public Vector2 CameraLimits = new Vector2(1300, 900);
 	
 	public override void _Ready()
 	{

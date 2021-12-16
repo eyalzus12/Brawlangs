@@ -96,7 +96,7 @@ public class AttackState : State
 		int endlag = a.GetEndlag();
 		if(endlag > 0)
 		{
-			var s = ch.ChangeState<EndlagState>("Endlag");
+			var s = ch.ChangeState<EndlagState>();
 			s.endlag = endlag;
 			s.att = a;
 		}
@@ -116,7 +116,7 @@ public class AttackState : State
 			}
 			else if(ch.walled && ch.wallJumpCounter < ch.wallJumpNum)
 			{
-				if(ch.GetState<AttackState>("Attack").touched) ch.wallJumpCounter--;
+				if(ch.GetState<AttackState>().touched) ch.wallJumpCounter--;
 				ch.ChangeState("WallLand");
 			}
 			else ch.ChangeState("Air");

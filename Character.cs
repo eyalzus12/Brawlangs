@@ -280,7 +280,9 @@ public class Character : KinematicBody2D
 		}
 	}
 	
-	public T GetState<T>(string state) where T: State => (T)GetState(state);
+	public string GetStateName<T>() where T: State => typeof(T).Name.Replace("State", "");
+	
+	public T GetState<T>() where T: State => (T)GetState(GetStateName<T>());
 	
 	public bool HasState(string state) => states.ContainsKey(state);
 	
@@ -298,11 +300,10 @@ public class Character : KinematicBody2D
 		}
 	}
 	
-	public T ChangeState<T>(string state) where T : State
-	{
-		if(GetState(state) is T) return (T)ChangeState(state);
-		else return null;
-	}
+	//TODO: make this work
+	//public bool AddState<T>() where T: State, new(Character) => AddState(new T(this));
+	
+	public T ChangeState<T>() where T : State => (T)ChangeState(GetStateName<T>());
 	
 	//this function handles state changes
 	public State ChangeState(string state)
@@ -638,14 +639,14 @@ public class Character : KinematicBody2D
 		
 		if(hp > 0)
 		{
-			var s = ChangeState<HitPauseState>("HitPause");
+			var s = ChangeState<HitPauseState>();
 			s.force = force;
 			s.stunLength = stunlen;
 			s.hitPauseLength = hp;
 		}
 		else if(stunlen > 0)
 		{
-			var s = ChangeState<StunState>("Stun");
+			var s = ChangeState<StunState>();
 			s.Force = force;
 			s.stunLength = stunlen;
 		}
@@ -665,7 +666,7 @@ public class Character : KinematicBody2D
 	{
 		if(hitWith.hitlag > 0)
 		{
-			var s = ChangeState<HitLagState>("HitLag");
+			var s = ChangeState<HitLagState>();
 			s.hitLagLength = hitWith.hitlag;
 		}
 	}
@@ -677,27 +678,22 @@ public class Character : KinematicBody2D
 		else return (cd>0);
 	}
 	
-	public virtual void ExecuteAttack(Attack a)
+	public virtual bool ExecuteAttack(Attack a)
 	{
-		if(a is null || !a.CanActivate() || IsAttackInCooldown(a)) return;
+		if(a is null || !a.CanActivate() || IsAttackInCooldown(a)) return false;
 		
 		if(currentAttack != null) ResetCurrentAttack(null);
 		
 		currentAttack = a;
 		currentAttack.Connect("AttackEnds", this, nameof(ResetCurrentAttack));
-		var s = ChangeState<AttackState>("Attack");
+		var s = ChangeState<AttackState>();
 		s.att = currentAttack;
 		
 		currentAttack.Start();
+		return true;
 	}
 	
-	public void ExecuteAttack(string s)
-	{
-		var n = GetNode(s);
-		if(n is null) GD.Print($"No attack {s} found. You probably forgot to add it to the loading list.");
-		else if(n is Attack a) ExecuteAttack(a);
-		else GD.Print($"Node {s} found, but isn't an attack. Very sussy.");
-	}
+	public bool ExecuteAttack(string s) => ExecuteAttack(GetAttack(s));
 	
 	public Attack GetAttack(string s)
 	{
@@ -707,6 +703,7 @@ public class Character : KinematicBody2D
 		}
 		catch(KeyNotFoundException)
 		{
+			GD.Print($"No attack {s} found. You probably forgot to add it to the loading list");
 			return null;
 		}
 	}
@@ -715,25 +712,29 @@ public class Character : KinematicBody2D
 	
 	public int? GetAttackCooldown(Attack a)
 	{
-		try
+		if(a is null)
 		{
-			return attackCooldowns[a];
-		}
-		catch(KeyNotFoundException)
-		{
+			GD.Print("Could not get cooldown for given attack as it is null");
 			return null;
+		}
+		else
+		{
+			try
+			{
+				return attackCooldowns[a];
+			}
+			catch(KeyNotFoundException)
+			{
+				GD.Print($"Could not get cooldown for attack {a.Name} as it does not exist");
+				return null;
+			}
 		}
 	}
 	
 	public void UpdateAttackCooldowns()
 	{
 		var keys = new List<Attack>(attackCooldowns.Keys);
-		foreach(var k in keys)
-		{
-			var cd = attackCooldowns[k];
-			if(cd <= 0) continue;
-			attackCooldowns[k] = cd - 1;
-		}
+		foreach(var k in keys) attackCooldowns[k] = Math.Max(0, attackCooldowns[k] - 1);
 	}
 	
 	public void ResetCurrentAttack(Attack a)

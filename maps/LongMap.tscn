@@ -9,6 +9,8 @@ extents = Vector2( 512, 32 )
 [node name="Base" type="Node2D"]
 position = Vector2( 512, 300 )
 script = ExtResource( 1 )
+BlastZones = Vector2( 2300, 1100 )
+CameraLimits = Vector2( 1300, 900 )
 
 [node name="Platform1" type="StaticBody2D" parent="."]
 position = Vector2( 0, 100 )

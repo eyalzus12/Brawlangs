@@ -25,12 +25,14 @@ tracks/0/keys = {
 "times": PoolRealArray( 1, 6, 7, 12 ),
 "transitions": PoolRealArray( 1, 1, 1, 1 ),
 "update": 0,
-"values": [ Vector2( 744, 176 ), Vector2( 280, 176 ), Vector2( 280, 176 ), Vector2( 744, 176 ) ]
+"values": [ Vector2( 232, -124 ), Vector2( -232, -124 ), Vector2( -232, -124 ), Vector2( 232, -124 ) ]
 }
 
 [node name="Base" type="Node2D"]
 position = Vector2( 512, 300 )
 script = ExtResource( 1 )
+BlastZones = Vector2( 2300, 1100 )
+CameraLimits = Vector2( 1300, 900 )
 
 [node name="StaticBody2D" type="StaticBody2D" parent="."]
 position = Vector2( 0, 100 )
@@ -45,7 +47,7 @@ texture = ExtResource( 2 )
 shape = SubResource( 1 )
 
 [node name="MovingPlatform" type="KinematicBody2D" parent="."]
-position = Vector2( 232, -124 )
+position = Vector2( -55.7062, -124 )
 rotation = 1.74846e-07
 collision_layer = 2
 collision_mask = 0
