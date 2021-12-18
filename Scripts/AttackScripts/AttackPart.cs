@@ -47,6 +47,15 @@ public class AttackPart : Node2D
 	[Export]
 	public int stunMult = 1;
 	
+	[Export]
+	public string startupAnimation;
+	
+	[Export]
+	public string attackAnimation;
+	
+	[Export]
+	public string endlagAnimation;
+	
 	public bool hit = false;
 	
 	public AnimationPlayer hitboxPlayer;
@@ -99,6 +108,7 @@ public class AttackPart : Node2D
 	
 	public virtual void Activate()
 	{
+		ch.PlayAnimation(startupAnimation);
 		active = true;
 		hit = false;
 		frameCount = 0;
@@ -118,6 +128,7 @@ public class AttackPart : Node2D
 	{
 		if(!active) return;
 		++frameCount;
+		if(frameCount > startup) ch.PlayAnimation(attackAnimation);
 		Loop();
 		ActualHit();
 	}

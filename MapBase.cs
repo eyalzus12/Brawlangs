@@ -10,6 +10,16 @@ public class MapBase : Node2D
 	[Export]
 	public Vector2 CameraLimits = new Vector2(1300, 900);
 	
+	public readonly static Color blue = new Color(0, 0, 1);
+	public readonly static Color red = new Color(1, 0, 0);
+	public readonly static Color green = new Color(0, 1, 0);
+	public readonly static Color yellow = new Color(1, 1, 0);
+	public readonly static Color megenta = new Color(1, 0, 1);
+	public readonly static Color cyan = new Color(0, 1, 1);
+	public readonly static Color grey = new Color(0.5f, 0.5f, 0.5f);
+	public readonly static Color pink = new Color(1, 0.5f, 0.5f);
+	public readonly static Color[] colorlist = {blue, red, green, yellow, megenta, cyan, grey, pink};
+	
 	public override void _Ready()
 	{
 		LoadCharacters();
@@ -50,18 +60,8 @@ public class MapBase : Node2D
 		path = $"{path}/{charname}.cfg";
 		var cr = new CharacterCreator(path);
 		var c = cr.Build(this, i-1);
-		var blue = new Color(0, 0, 1);
-		var red = new Color(1, 0, 0);
-		var green = new Color(0, 1, 0);
-		var yellow = new Color(1, 1, 0);
-		var megenta = new Color(1, 0, 1);
-		var cyan = new Color(0, 1, 1);
-		var grey = new Color(0.5f, 0.5f, 0.5f);
-		var pink = new Color(1, 0.5f, 0.5f);
-		Color[] colorlist = {blue, red, green, yellow, megenta, cyan, grey, pink};
 		
-		c.SelfModulate = colorlist[i-1];
-		c.sprite.SelfModulate = c.SelfModulate;
+		c.sprite.SelfModulate = colorlist[i-1];
 		c.Respawn();
 		
 		var im = new BufferInputManager(c.teamNumber);
@@ -133,7 +133,6 @@ public class MapBase : Node2D
 	{
 		if(what == MainLoop.NotificationWmQuitRequest)
 		{
-			Cleanup();
 			GetTree().Quit();
 		}
 	}
@@ -148,22 +147,11 @@ public class MapBase : Node2D
 	
 	public void MatchEnd()
 	{
-		GetTree().CallDeferred("change_scene", "res://ResultsScreen.tscn");
-		Cleanup();
+		this.ChangeScene("res://ResultsScreen.tscn");
 	}
 	
 	public void ExitToMainMenu()
 	{
-		Cleanup();
-			
-		GetTree()
-			.CallDeferred("change_scene",
-			ProjectSettings
-			.GetSetting("application/run/main_scene"));
-	}
-	
-	public void Cleanup()
-	{
-		GetTree().Root.GetChildren().FilterType<Character>().ToList().ForEach(ch => ch.CallDeferred("queue_free"));
+		this.ChangeScene(ProjectSettings.GetSetting("application/run/main_scene").s());
 	}
 }

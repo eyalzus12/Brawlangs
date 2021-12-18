@@ -23,14 +23,11 @@ public class AttackState : State
 			if(!ch.crouching && ch.downHeld) ch.Crouch();
 			else if(ch.crouching && !ch.downHeld) ch.Uncrouch();
 		}*/
-		
-		//ch.PlayAnimation(att.animation);
-		//figure out way to do it when the attack actually exists
 	}
 	
 	protected override void DoMovement()
 	{
-		if(att is null/* || (att.currentPart != null && att.currentPart.movement != Vector2.Zero)*/) return;
+		if(att is null) return;
 		
 		var friction = att?.attackFriction ?? 0f;
 		ch.vec.x *= (1f-friction*(ch.grounded?ch.ffric:1f));

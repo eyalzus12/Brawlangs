@@ -14,7 +14,7 @@ public class StageSelect : Control
 		cont = GetNode<GridContainer>(CONT_NAME);
 		var path_object = this.GetData("ini_path") as string;
 		
-		if(path_object.NotNull())
+		if(path_object != null)
 		{
 			var te = GetNode<TextEdit>("TextEdit");
 			te.Text = path_object ?? "";
@@ -33,11 +33,12 @@ public class StageSelect : Control
 		if(dir.Open(path) == Error.Ok)
 		{
 			dir.ListDirBegin(true);
-			string file;
 			
-			while((file = dir.GetNext()) != "")
+			for(string file = dir.GetNext(); file != ""; file = dir.GetNext())
 			if(!dir.CurrentIsDir() && StringUtils.GetExtension(file) == MAP_EXT)
+			{
 				AddMap(file, path);
+			}
 		}
 	}
 	

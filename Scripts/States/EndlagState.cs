@@ -30,6 +30,11 @@ public class EndlagState : State
 		ch.vec.x *= 1f-friction*(ch.grounded?ch.ffric:1f);
 	}
 	
+	protected override void FirstFrameAfterInit()
+	{
+		ch.PlayAnimation(att.GetEndlagAnimation());
+	}
+	
 	protected override void RepeatActions()
 	{
 		if(Inputs.IsActionReallyJustReleased("player_down"))

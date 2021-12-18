@@ -58,6 +58,7 @@ public class MatchCamera : Camera2D
 		if(Input.IsActionJustPressed("toggle_camera_debug"))
 			debugMode = !debugMode;
 		
+		if(OS.WindowMinimized) return;
 		viewportRect = GetViewportRect();
 		var center = followed.Select(ch=>ch.Position).Avg();
 		OffsetPos = middle.MoveToward(center, maxCenterOffset);

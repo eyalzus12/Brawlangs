@@ -29,6 +29,9 @@ public class PublicData : Node
 		}
 	}
 	
+	public new object Get(string s) => this[s];
+	public T Get<T>(string s) => (T)Get(s);
+	
 	public void Add(string str, object obj)
 	{
 		try {dict.Add(str, obj);}
@@ -45,11 +48,19 @@ public class PublicData : Node
 	public bool HasKey(string str) => dict.ContainsKey(str);
 	public bool HasValue(object obj) => dict.ContainsValue(obj);
 	public bool TryGet(string str, out object o) => dict.TryGetValue(str, out o);
+	public bool TryGet<T>(string str, out T t)
+	{
+		object o;
+		var res = dict.TryGetValue(str, out o);
+		t = (T)o;
+		return res;
+	}
 	public object GetOrDefault(string str, object @default)
 	{
 		try {return dict[str];}
 		catch(KeyNotFoundException) {return @default;}
 	}
+	//public T GetOrDefault<T>(string str, T @default) => (T)GetOrDefault(str, @default);
 	public void Clear() => dict.Clear();
 	public bool Empty => (Count == 0);
 	

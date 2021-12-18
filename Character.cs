@@ -468,9 +468,11 @@ public class Character : KinematicBody2D
 		else return "None";
 	}
 	
-	public void OnSemiSolidLeave(Godot.Object body) 
+	public readonly static Type[] ignoreTypes = new Type[]{typeof(AttackState), typeof(EndlagState), typeof(StunState)};
+	
+	public virtual void OnSemiSolidLeave(Godot.Object body) 
 	{
-		if(currentState is AttackState || currentState is EndlagState) return;
+		foreach(var t in ignoreTypes) if(currentState.GetType() == t) return;
 		SetCollisionMaskBit(DROP_THRU_BIT, true);
 	}
 	
@@ -621,7 +623,7 @@ public class Character : KinematicBody2D
 		}
 	}
 	
-	public bool CanHit(Character c) => (c != this)&&(c.teamNumber!=teamNumber||friendlyFire);
+	public virtual bool CanHit(Character c) => (c != this)&&(c.teamNumber!=teamNumber||friendlyFire);
 	
 	//public bool CanBeHit(Hitbox hit) => (hit.ch != this);
 	

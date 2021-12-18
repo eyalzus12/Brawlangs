@@ -47,6 +47,8 @@ public class State : Node
 		if(!justInit) LoopActions();
 		else justInit = false;
 		
+		if(frameCount == 1) FirstFrameAfterInit();
+		
 		frameCount++;
 		RepeatActions();
 		DoMovement();
@@ -107,6 +109,7 @@ public class State : Node
 	}
 	
 	protected virtual bool CalcStateChange() => false;
+	protected virtual void FirstFrameAfterInit() {}
 	protected virtual void LoopActions() {}
 	protected virtual void RepeatActions() {}
 	public virtual void OnChange(State newState) {}

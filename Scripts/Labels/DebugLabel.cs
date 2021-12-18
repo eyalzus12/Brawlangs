@@ -93,8 +93,8 @@ public class DebugLabel : InfoLabel
 		Add("Down", ch.downHeld);
 		Add("Up", ch.upHeld);
 		Newline();
-		Add("Air jumps Used", ch.jumpCounter);
-		Add("Wall touches", ch.wallJumpCounter);
+		Add("AirJumpsUsed", ch.jumpCounter);
+		Add("WallTouches", ch.wallJumpCounter);
 		Newline();
 		Add("LeftInput",GetInputString("player_left"));
 		Add("RightInput", GetInputString("player_right"));
@@ -106,14 +106,14 @@ public class DebugLabel : InfoLabel
 		Add("LightAttackInput", GetInputString("player_light_attack"));
 		Add("HeavyAttackInput", GetInputString("player_heavy_attack"));
 		Add("SpecialAttackInput", GetInputString("player_special_attack"));
-		//Add("TauntAttackInput", GetInputString("player_taunt"));
+		Add("TauntAttackInput", GetInputString("player_taunt"));
 		Newline();
 		Newline();
 		Add("Buffer", "\n"+ch.Inputs.ToString());
 		Newline();
 		Add("FPS", Engine.GetFramesPerSecond());
-		Add("Physics frame", Engine.GetPhysicsFrames());
-		Add("Debug build", OS.IsDebugBuild());
+		Add("PhysicsFrame", Engine.GetPhysicsFrames());
+		Add("DebugBuild", OS.IsDebugBuild());
 		Add("OS", OS.GetName());
 	}
 	

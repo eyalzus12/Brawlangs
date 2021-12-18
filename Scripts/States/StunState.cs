@@ -57,6 +57,7 @@ public class StunState : State
 	{
 		if(frameCount >= stunLength)
 		{
+			ch.SetCollisionMaskBit(DROP_THRU_BIT, true);
 			ch.framesSinceLastHit = 0;
 			ch.ChangeState(ch.grounded?"Idle":ch.walled?"Wall":"Air");
 		}

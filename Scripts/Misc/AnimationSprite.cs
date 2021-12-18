@@ -109,11 +109,6 @@ public class AnimationSprite : Sprite
 	
 	public void Pause() => framePlayer.Stop(false);
 	public void Continue() => framePlayer.Play();
-	
-	public override void _PhysicsProcess(float delta)
-	{
-		//GD.Print($"current frame is {Frame} and physics frame {Engine.GetPhysicsFrames()}");
-	}
 }
 
 public readonly struct AnimationSheet

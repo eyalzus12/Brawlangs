@@ -94,6 +94,12 @@ public class AttackCreator
 		ap.knockbackMult = km;
 		var sm = inif[section, "StunMult", 1].i();
 		ap.stunMult = sm;
+		var sa = inif[section, "StartupAnimation", "Default"].s();
+		ap.startupAnimation = sa;
+		var aa = inif[section, "AttackAnimation", "Default"].s();
+		ap.attackAnimation = aa;
+		var ea = inif[section, "EndlagAnimation", "Default"].s();
+		ap.endlagAnimation = ea;
 		
 		var oHitboxSections = inif[section, "Hitboxes", null];
 		if(oHitboxSections is string)
