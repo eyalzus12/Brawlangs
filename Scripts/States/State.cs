@@ -47,7 +47,7 @@ public class State : Node
 		if(!justInit) LoopActions();
 		else justInit = false;
 		
-		if(frameCount == 1) FirstFrameAfterInit();
+		if(frameCount == 0) FirstFrameAfterInit();
 		
 		frameCount++;
 		RepeatActions();
