@@ -18,30 +18,26 @@ public class MapCreator
 	
 	public bool Build(Node n)
 	{
-		GD.Print(inif.ToString());
-		
-		var list = inif[BASE_SECTION, "Platforms", null];
-		if(list is null) return false;
-		
-		foreach(string str in list.ls()) BuildPlatform(str, n);
+		var plats = inif[BASE_SECTION, "Platforms", null];
+		if(plats is string)	BuildPlatform(plats.s(), n);
+		else foreach(var str in plats.ls()) BuildPlatform(str, n);
 		
 		var camera = new MatchCamera();
 		camera.Name = "Camera";
-		var cbounds = inif[BASE_SECTION, "CameraBounds", new Vector2(700, 500)].v2();
+		var cbounds = inif[BASE_SECTION, "CameraBounds", MatchCamera.DEFAULT_LIMITS].v2();
 		camera.limits = cbounds;
-		var center = inif[BASE_SECTION, "Center", new Vector2(512, 300)].v2();
+		var center = inif[BASE_SECTION, "Center", Vector2.Zero].v2();
 		camera.middle = center;
-		var zoom = inif[BASE_SECTION, "BaseZoom", 1.5f].f();
+		var zoom = inif[BASE_SECTION, "BaseZoom", 1.7f].f();
 		camera.baseZoom = zoom;
-		var zoff = inif[BASE_SECTION, "ZoomOffset", 0.5f].f();
+		var zoff = inif[BASE_SECTION, "ZoomOffset", 0.1f].f();
 		camera.zoomOffset = zoff;
 		var inter = inif[BASE_SECTION, "Interpolation", 0.01f].f();
 		camera.interpolationWeight = inter;
-		var debug = inif[BASE_SECTION, "Debug", false].b();
 		n.AddChild(camera);
 		camera.Current = true;
 		
-		var blast = inif[BASE_SECTION, "BlastZones", new Vector2(2000, 1200)].v2();
+		var blast = inif[BASE_SECTION, "BlastZones", BlastZone.DEFAULT_SIZE].v2();
 		var bz = new BlastZone(center, blast);
 		n.AddChild(bz);
 		
@@ -73,9 +69,10 @@ public class MapCreator
 		var cp = inif[section, "Collision", section+"col"];
 		if(cp is string) BuildCollision(cp.s(), sp);
 		else foreach(var s in cp.ls()) BuildCollision(s, sp);
+		
 		var sr = inif[section, "Sprite", section+"sprite"];
 		if(sr is string) BuildSprite(sr.s(), sp);
-		else foreach(var ss in sr.ls()) BuildCollision(ss, sp);
+		else foreach(var ss in sr.ls()) BuildSprite(ss, sp);
 		
 		return true;
 	}
@@ -113,7 +110,7 @@ public class MapCreator
 		var scl = inif[section, "Scale", new Vector2(1f,1f)].v2();
 		sp.Scale = scl;
 		var te = inif[section, "Texture", "res://icon.png"].s();
-		sp.Texture = ResourceLoader.Load(te) as Texture;
+		sp.Texture = ResourceLoader.Load<Texture>(te);
 		var zz = inif[section, "Z", 1].i();
 		sp.ZIndex = zz;
 		
@@ -122,24 +119,26 @@ public class MapCreator
 		return true;
 	}
 	
-	private Shape2D t2s(string type, string section)
+	private Shape2D t2s(string type, string section) => GetFunc(type)(section);
+	
+	private Func<string, Shape2D> GetFunc(string type)
 	{
 		switch(type)
 		{
 			case "Rectangle":
-				return s2r(section);
+				return s2r;
 			case "Circle":
-				return s2c(section);
+				return s2c;
 			case "Capsule":
-				return s2p(section);
+				return s2p;
 			case "Line":
-				return s2l(section);
+				return s2l;
 			case "ConvexPolygon":
-				return s2xp(section);
+				return s2xp;
 			case "ConvcavePolygon":
-				return s2vp(section);
+				return s2vp;
 			case "Segment":
-				return s2s(section);
+				return s2s;
 			default:
 				return null;
 		}
@@ -193,8 +192,8 @@ public class MapCreator
 	{
 		var xps = new ConvexPolygonShape2D();
 		
-		var vl = inif[section, "Points", null].lv2();
-		xps.Points = vl.ToArray();
+		var vl = inif[section, "Points", null].lv2().ToArray();
+		xps.Points = vl;
 		
 		return xps;
 	}
@@ -203,8 +202,8 @@ public class MapCreator
 	{
 		var vps = new ConcavePolygonShape2D();
 		
-		var vl = inif[section, "Segments", null].lv2();
-		vps.Segments = vl.ToArray();
+		var vl = inif[section, "Segments", null].lv2().ToArray();
+		vps.Segments = vl;
 		
 		return vps;
 	}
