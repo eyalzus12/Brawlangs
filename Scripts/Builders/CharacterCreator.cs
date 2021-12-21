@@ -55,6 +55,11 @@ public class CharacterCreator
 		//create animations
 		BuildAnimations(ch, $"{directoryPath}/{animationsFolder}");
 		
+		//find audio folder name
+		var audioFolder = charinif["Audio", ""].s();
+		//load sounds
+		BuildAudio(ch, $"{directoryPath}/{audioFolder}");
+		
 		ch.teamNumber = teamNum;
 		return ch;
 	}
@@ -108,6 +113,30 @@ public class CharacterCreator
 			texture.CreateFromImage(image, 0b11);
 			return texture;
 		}
+	}
+	
+	public void BuildAudio(Character ch, string audioFolder)
+	{
+		var am = new CharacterAudioManager();
+		am.Name = "AudioManager";
+		
+		var files = ListPostImportDirectoryFiles(audioFolder).Distinct().ToList();
+		foreach(var file in files)
+		{
+			var filename = StringUtils.RemoveExtension(file);
+			var resourcePath = $"{audioFolder}/{file}";
+			var audio = ResourceLoader.Load<AudioStream>(resourcePath);
+			if(audio is null)
+			{
+				GD.Print($"failed to load sound file {filename} from path {resourcePath}");
+				continue;
+			}
+			am.AddSound(filename, audio);
+			//spr.AddSheet(texture, animationName, frames, loop);
+		}
+		
+		ch.AddChild(am);
+		ch.audioManager = am;
 	}
 	
 	public static List<string> ListPostImportDirectoryFiles(string path)

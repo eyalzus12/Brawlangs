@@ -218,6 +218,7 @@ public class Character : KinematicBody2D
 	public InputManager Inputs;
 	
 	public AnimationSprite sprite;
+	public CharacterAudioManager audioManager;
 	
 	public Character() {}
 	public Character(bool dummy) {this.dummy = dummy;}
@@ -260,6 +261,7 @@ public class Character : KinematicBody2D
 	
 	public void PlayAnimation(string anm) => sprite.Play(anm);
 	public void QueueAnimation(string anm) => sprite.Queue(anm);
+	public void PlaySound(string sound) => audioManager.Play(sound);
 	
 	///////////////////////////////////////////
 	///////////////States//////////////////////
@@ -662,6 +664,11 @@ public class Character : KinematicBody2D
 		GD.Print($"Combo count is {comboCount+1}");
 		
 		framesSinceLastHit = 0;
+		
+		//var sound = ResourceLoader.Load<AudioStreamSample>("res://Characters/brawlangs_hitsound_test.wav");
+		//audioManager.Play(sound);
+		
+		PlaySound("TempHitsound");
 	}
 	
 	public virtual void HandleHitting(Hitbox hitWith, Area2D hurtboxHit, Character charHit)
