@@ -100,6 +100,8 @@ public class AttackCreator
 		ap.attackAnimation = aa;
 		var ea = inif[section, "EndlagAnimation", "Default"].s();
 		ap.endlagAnimation = ea;
+		var ps = inif[section, "Sound", ""].s();
+		ap.attackSound = ps;
 		
 		var oHitboxSections = inif[section, "Hitboxes", null];
 		if(oHitboxSections is string)

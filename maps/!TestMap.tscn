@@ -311,6 +311,8 @@ tracks/0/keys = {
 [node name="TestMap" type="Node2D"]
 position = Vector2( 512, 300 )
 script = ExtResource( 1 )
+BlastZones = Vector2( 13000, 3400 )
+CameraLimits = Vector2( 12000, 3200 )
 
 [node name="ground" type="TileMap" parent="."]
 tile_set = SubResource( 10 )

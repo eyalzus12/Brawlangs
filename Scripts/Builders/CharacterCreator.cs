@@ -69,7 +69,7 @@ public class CharacterCreator
 		var spr = new AnimationSprite();
 		spr.Name = "Sprite";
 		
-		var files = ListPostImportDirectoryFiles(animationsFolder).Distinct().ToList();
+		var files = ListPostImportDirectoryFiles(animationsFolder, ".png").Distinct().ToList();
 		foreach(var file in files)
 		{
 			var filename = StringUtils.RemoveExtension(file);
@@ -120,26 +120,59 @@ public class CharacterCreator
 		var am = new CharacterAudioManager();
 		am.Name = "AudioManager";
 		
-		var files = ListPostImportDirectoryFiles(audioFolder).Distinct().ToList();
+		var files = ListPostImportDirectoryFiles(audioFolder, ".wav", ".ogg", ".mp3").Distinct().ToList();
 		foreach(var file in files)
 		{
 			var filename = StringUtils.RemoveExtension(file);
 			var resourcePath = $"{audioFolder}/{file}";
-			var audio = ResourceLoader.Load<AudioStream>(resourcePath);
-			if(audio is null)
-			{
-				GD.Print($"failed to load sound file {filename} from path {resourcePath}");
-				continue;
-			}
-			am.AddSound(filename, audio);
-			//spr.AddSheet(texture, animationName, frames, loop);
+			var loop = filename.EndsWith("Loop");
+			var audio = GenerateAudioFromPath(resourcePath, loop);
+			var noloopname = filename.Substring(0, filename.Length - "Loop".Length);
+			var normalizedFilename = (loop?noloopname:filename);
+			am.AddSound(normalizedFilename, audio);
 		}
 		
 		ch.AddChild(am);
 		ch.audioManager = am;
 	}
 	
-	public static List<string> ListPostImportDirectoryFiles(string path)
+	public AudioStream GenerateAudioFromPath(string path, bool loop = false)
+	{
+		var audio = ResourceLoader.Load<AudioStream>(path);
+		if(audio is null)
+		{
+			GD.Print($"failed to load sound file from path {path}");
+			return null;
+		}
+		
+		if(loop)
+		{
+			if(audio is AudioStreamOGGVorbis ogg)
+			{
+				ogg.Loop = true;
+				return ogg;
+			}
+			else if(audio is AudioStreamMP3 mp3)
+			{
+				mp3.Loop = true;
+				return mp3;
+			}
+			else if(audio is AudioStreamSample wav)
+			{
+				GD.Print("Warning: WAV does not support dynamic looping yet. Turn looping on in the import file or use ogg instead.");
+				//wav.LoopMode = AudioStreamSample.LoopModeEnum.Forward;
+				return wav;
+			}
+			else
+			{
+				GD.Print($"Cannot loop audio file {path} since it isn't MP3, OGG, or WAV.");
+				return audio;
+			}
+		}
+		else return audio;
+	}
+	
+	public static List<string> ListPostImportDirectoryFiles(string path, params string[] desiredExtensions)
 	{
 		var tempArray = ListDirectoryFiles(path);
 		var fileArray = new List<string>();

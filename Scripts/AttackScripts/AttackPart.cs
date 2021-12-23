@@ -56,6 +56,9 @@ public class AttackPart : Node2D
 	[Export]
 	public string endlagAnimation;
 	
+	[Export]
+	public string attackSound;
+	
 	public bool hit = false;
 	
 	public AnimationPlayer hitboxPlayer;
@@ -109,6 +112,7 @@ public class AttackPart : Node2D
 	public virtual void Activate()
 	{
 		ch.PlayAnimation(startupAnimation);
+		ch.PlaySound(attackSound);
 		active = true;
 		hit = false;
 		frameCount = 0;
