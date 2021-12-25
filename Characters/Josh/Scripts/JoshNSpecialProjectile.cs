@@ -17,6 +17,7 @@ public class JoshNSpecialProjectile : HitProjectile
 		damage = 10f;
 		SelfModulate = (new Color(1,0.1f,0.1f,1));
 		GlobalPosition = owner.GlobalPosition;
+		Position = new Vector2(Position.x, Position.y-10f);
 		move = new Vector2(owner.direction * 5, 0);
 		var cs = new CollisionShape2D();
 		AddChild(cs);

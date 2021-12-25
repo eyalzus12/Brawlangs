@@ -68,14 +68,15 @@ public static class IterUtils
 		foreach(var e in earr) foreach(var o in e) yield return o;
 	}
 	
-	//public static IEnumerable<object> Flatten(this params IEnumerable<object>[] earr) => Flatten<object>(earr);
-	
 	public static IEnumerable<(T1, T2)> Product<T1, T2>(this IEnumerable<T1> e1, IEnumerable<T2> e2)
 	{
 		foreach(var o1 in e1) foreach(var o2 in e2) yield return (o1, o2);
 	}
 	
 	public static IEnumerable<(object, object)> Product(this IEnumerable<object> e1, IEnumerable<object> e2) => e1.Product<object, object>(e2);
+	
+	public static IEnumerable<T> Concat<T>(this IEnumerable<T> e, T @add) => e.Concat<T>(new T[]{@add});
+	public static IEnumerable<object> Concat(this IEnumerable<object> e, object @add) => e.Concat<object>(@add);
 	
 	public static void Debug(this IEnumerable<object> e)
 	{
@@ -90,5 +91,6 @@ public static class IterUtils
 		return @default;
 	}
 	
-	public static Vector2 Avg(this IEnumerable<Vector2> e) => e.Aggregate(Vector2.Zero,(a,v)=>a+v)/e.Count();
+	public static Vector2 Sum(this IEnumerable<Vector2> e) => e.Aggregate(Vector2.Zero, (v1,v2)=>v1+v2);
+	public static Vector2 Avg(this IEnumerable<Vector2> e) => e.Sum()/e.Count();
 }

@@ -58,13 +58,22 @@ public class EndlagState : State
 				ch.jumpCounter = 0;
 				ch.wallJumpCounter = 0;
 				ch.EmitSignal("JumpsRestored");
-				if(ch.crouching) ch.ChangeState(ch.downHeld?"Crawl":"Getup");
-				else ch.ChangeState(ch.downHeld?"Duck":ch.IsIdle()?"Idle":"Walk");
+				if(ch.downHeld)
+				{
+					ch.Crouch();
+					ch.ChangeState(ch.IsIdle()?"Crouch":"Crawl");
+				}
+				else
+				{
+					ch.Uncrouch();
+					ch.ChangeState(ch.IsIdle()?"Idle":"Walk");
+				}
 			}
 			else if(ch.walled && ch.wallJumpCounter < ch.wallJumpNum)
 			{
 				if(ch.GetState<AttackState>().touched) ch.wallJumpCounter--;
-				ch.ChangeState("WallLand");
+				ch.ApplySettings("Wall");
+				ch.ChangeState("Wall");
 			}
 			else ch.ChangeState("Air");
 		}

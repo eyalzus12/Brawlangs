@@ -55,32 +55,48 @@ public class MatchCamera : Camera2D
 	
 	public override void _Process(float delta)
 	{
+		//toggle debug display
 		if(Input.IsActionJustPressed("toggle_camera_debug"))
 			debugMode = !debugMode;
 		
 		if(OS.WindowMinimized) return;
+		
+		//get viewport rect
 		viewportRect = GetViewportRect();
+		
+		//get positions to follow
 		var positions = followed.Select(ch=>ch.Position);
-		center = positions.Concat(new Vector2[]{middle}).Avg();
+		//get average position, including map center. this will be used for following
+		center = positions.Concat(middle).Avg();
+		//create a rect, starting at the center, that includes all positions
 		cameraRect = positions.Aggregate(new Rect2(center, Vector2.Zero), (a,v)=>a.Expand(v));
-		
-		cameraRect.Position -= middle;//get position relative to center
+		cameraRect.Position -= middle;//make rect relative to map center
 		cameraRect = cameraRect.Limit(limits.x, limits.y);//limit the rectangle to the limits
-		cameraRect.Position += middle;//get new position
-		
-		Offset = Offset.LinearInterpolate(cameraRect.Center(), interpolationWeight);
+		cameraRect.Position += middle;//get non relative position
+		//now cameraRect is in the desired place and size for the camera;
+		//so we need to set the camera's position and zoom to match
 		//interpolate between the desired position and the current one, to smoothen it out
-		Zoom = Zoom.LinearInterpolate(CalculateZoom(cameraRect), interpolationWeight);
+		var desiredOffset = cameraRect.Center();
+		Offset = Offset.LinearInterpolate(desiredOffset, interpolationWeight);
 		//interpolate between the desired zoom and the current one, to smoothen it out
+		var desiredZoom = CalculateZoom(cameraRect);
+		Zoom = Zoom.LinearInterpolate(desiredZoom, interpolationWeight);
+		
+		//draw debug things
 		Update();
 	}
 	
 	public Vector2 CalculateZoom(Rect2 cameraRect)
 	{
+		//get the zoom that'll match on the xy
 		var cameraZoomXY = cameraRect.Size/viewportRect.Size;
+		//get desired matching zoom
 		var cameraZoom = Math.Max(Math.Max(cameraZoomXY.x, cameraZoomXY.y), 1)+zoomOffset;
+		//get max zoom possible on the xy
 		var maxZoomXY = limits/viewportRect.Size;
-		var maxZoom = Math.Max(Math.Min(maxZoomXY.x, maxZoomXY.y), 1);
+		//get desired max zoom possible
+		var maxZoom = Math.Min(maxZoomXY.x, maxZoomXY.y);
+		//get resulting zoom that fits the max
 		var zoomResult = baseZoom*Math.Min(cameraZoom, maxZoom);
 		return zoomResult*Vector2.One;
 	}

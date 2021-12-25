@@ -87,8 +87,18 @@ public class Character : KinematicBody2D
 	//how many wall jumps you have
 	////////////////////////////////////////////
 	[Export]
-	public float bounce = 0.25f;
+	public float ceilingBonkBounce = 0.25f;
+	//how much speed is conserved when bonking
+	[Export]
+	public float ceilingBounce = 0.95f;
 	//how much speed is conserved when hitting a ceiling
+	[Export]
+	public float wallBounce = 0.95f;
+	//how much speed is conserved when hitting a wall
+	[Export]
+	public float floorBounce = 0.95f;
+	//how much speed is conserved when hitting the floor
+	////////////////////////////////////////////
 	[Export]
 	public float groundFriction = 0.2f;
 	//how much speed is removed over time when not moving on the ground
@@ -173,8 +183,10 @@ public class Character : KinematicBody2D
 	public float cbounce = 1f;//ceiling bounce
 	
 	public Vector2 Norm => grounded?fnorm:walled?wnorm:ceilinged?cnorm:Vector2.Zero;
+	public float CharBounce => grounded?floorBounce:walled?wallBounce:ceilinged?ceilingBounce:0f;
 	public Vector2 PlatVel => grounded?fvel:walled?wvel:ceilinged?cvel:Vector2.Zero;
 	public float PlatFric => grounded?ffric:walled?wfric:ceilinged?cfric:1f;
+	public float PlatBounce => grounded?ffric:walled?wfric:ceilinged?cfric:1f;
 	
 	public bool fastfalling = false;//wether or not fastfalling
 	public uint jumpCounter = 0;//how many air jumps have been used
@@ -282,9 +294,9 @@ public class Character : KinematicBody2D
 		}
 	}
 	
-	public string GetStateName<T>() where T: State => typeof(T).Name.Replace("State", "");
+	public string GetStateName<T>() where T : State => typeof(T).Name.Replace("State", "");
 	
-	public T GetState<T>() where T: State => (T)GetState(GetStateName<T>());
+	public T GetState<T>() where T : State => (T)GetState(GetStateName<T>());
 	
 	public bool HasState(string state) => states.ContainsKey(state);
 	
@@ -301,9 +313,6 @@ public class Character : KinematicBody2D
 			return false;
 		}
 	}
-	
-	//TODO: make this work
-	//public bool AddState<T>() where T: State, new(Character) => AddState(new T(this));
 	
 	public T ChangeState<T>() where T : State => (T)ChangeState(GetStateName<T>());
 	

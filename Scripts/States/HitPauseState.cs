@@ -22,7 +22,7 @@ public class HitPauseState : State
 	{
 		if(frameCount >= hitPauseLength)
 		{
-			var s = ch.ChangeState("Stun") as StunState;
+			var s = ch.ChangeState<StunState>();
 			s.Force = force;
 			s.stunLength = stunLength;
 			force = Vector2.Zero;

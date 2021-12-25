@@ -141,10 +141,17 @@ public class AirState : State
 	{
 		if(ch.ceilinged)
 		{
+			ch.PlayAnimation("Bonk");
+			ch.QueueAnimation("Drift");
+			
 			if(ch.cnorm == Vector2.Down)
-				ch.vec *= ch.bounce;
-			else if(ch.vec.y < 0) 
+				ch.vec.y *= ch.ceilingBonkBounce;
+			else if(ch.vec.y < 0)
+			{
 				ch.vec.x = 0;
+				if(ch.cvel.y != 0f)
+					ch.vec.y *= ch.ceilingBonkBounce;
+			}
 		}
 	}
 	

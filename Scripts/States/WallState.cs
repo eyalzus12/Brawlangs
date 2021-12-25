@@ -64,7 +64,7 @@ public class WallState : State
 		if(ch.ceilinged)
 		{
 			if(ch.cnorm == Vector2.Down)
-				ch.vec *= ch.bounce;
+				ch.vec *= ch.ceilingBounce;
 			else if(ch.vec.y < 0) 
 				ch.vec.x = 0;
 		}

@@ -14,10 +14,7 @@ public class CharacterAudioManager : AudioStreamPlayer2D
 	
 	public void Play(string sound)
 	{
-		try
-		{
-			Play(sounds[sound]);
-		}
+		try {Play(sounds[sound]);}
 		catch(KeyNotFoundException) {}
 	}
 	

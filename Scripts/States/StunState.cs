@@ -51,7 +51,8 @@ public class StunState : State
 		if(framesSinceLastBounce >= BOUNCE_PERIOD && !ch.aerial && (!ch.grounded || ch.voc.y > VCF))
 		{
 			var r = ch.voc.Bounce(ch.Norm);
-			r.y *= BOUNCE_FACTOR;
+			var bounce = ch.CharBounce;
+			r.y *= bounce;
 			ch.voc = r;
 			framesSinceLastBounce = 0;
 		}
