@@ -14,8 +14,7 @@ public class AirState : State
 		Unsnap();
 		ch.onSemiSolid = false;
 		ch.onSlope = false;
-		var currentAnimation = ch.sprite.currentSheet.name;
-		if(currentAnimation == "Jump" || currentAnimation == "WallJump")
+		if(ch.sprite.currentSheet.name.StartsWith("Jump"))
 			ch.QueueAnimation("Drift");
 		else
 			ch.PlayAnimation("Drift");

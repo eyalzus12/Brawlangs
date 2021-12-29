@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class BlastZone : Node2D
 {
-	public readonly static Vector2 DEFAULT_SIZE =  new Vector2(2300, 950);
+	public readonly static Vector2 DEFAULT_SIZE =  new Vector2(2300, 1100);
 	
 	[Export]
 	public Rect2 Bounds;// = CalcRect(new Vector2(512, 300), new Vector2(2000, 1200));

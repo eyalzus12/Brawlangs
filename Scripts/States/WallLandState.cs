@@ -30,7 +30,6 @@ public class WallLandState : WallState
 		{
 			ch.ChangeState("Air");
 			ch.ApplySettings("Normal");
-			//for some reason this causes weird behavior.
 		}
 		else if(frameCount >= ch.wallLand) ch.ChangeState("Wall");
 		else return false;

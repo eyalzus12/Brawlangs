@@ -10,7 +10,7 @@ public class MatchCamera : Camera2D
 	public List<Node2D> followed = new List<Node2D>();
 	
 	[Export(PropertyHint.Range, "0.1,0.5,or_greater")]
-	public float zoomOffset = 0.1f;//no idea what this does
+	public float zoomOffset = 0f;//no idea what this does
 	[Export]
 	public bool debugMode = false;
 	[Export]
@@ -64,12 +64,18 @@ public class MatchCamera : Camera2D
 		//get viewport rect
 		viewportRect = GetViewportRect();
 		
-		//get positions to follow
-		var positions = followed.Select(ch=>ch.Position);
+		var mx = middle.x-limits.x;
+		var Mx = middle.x+limits.x;
+		var my = middle.y-limits.y;
+		var My = middle.y+limits.y;
+		//get positions, confined inside the limits
+		var positions = followed.Select(ch=>ch.Position.Clamp(mx,Mx,my,My));
 		//get average position, including map center. this will be used for following
 		center = positions.Concat(middle).Avg();
 		//create a rect, starting at the center, that includes all positions
-		cameraRect = positions.Aggregate(new Rect2(center, Vector2.Zero), (a,v)=>a.Expand(v));
+		
+		var initialRect = new Rect2(center, Vector2.Zero);
+		cameraRect = positions.Aggregate(initialRect, (a,v)=>a.Expand(v));
 		cameraRect.Position -= middle;//make rect relative to map center
 		cameraRect = cameraRect.Limit(limits.x, limits.y);//limit the rectangle to the limits
 		cameraRect.Position += middle;//get non relative position

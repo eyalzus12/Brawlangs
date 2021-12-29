@@ -13,6 +13,7 @@ extents = Vector2( 1280, 4 )
 [node name="Base" type="Node2D"]
 position = Vector2( 512, 300 )
 script = ExtResource( 1 )
+BlastZones = Vector2( 2300, 1200 )
 
 [node name="Soft1" type="StaticBody2D" parent="."]
 position = Vector2( 0, 200 )

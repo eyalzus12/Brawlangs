@@ -4,3 +4,4 @@
 
 [node name="Node2D" type="Node2D"]
 script = ExtResource( 1 )
+BlastZones = Vector2( 2300, 1200 )
