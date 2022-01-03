@@ -212,7 +212,7 @@ public class AttackCreator
 		var pos = inif[section, "Position", Vector2.Zero].v2();
 		cs.Position = pos;
 		var rot = inif[section, "Rotation", 0f].f();
-		cs.Rotation = (float)(rot*Math.PI/180f);
+		cs.Rotation = (float)(rot*Math.PI/180f);//turn to rads
 		
 		var ps = new CapsuleShape2D();
 		
@@ -237,6 +237,7 @@ public class AttackCreator
 			var conndict = inif.dict[entry.Value.Item1];//get dictionary of connection
 			foreach(var connection in conndict)//go over it
 			{
+				//TODO: take from the attack's attack part dictionary, for safer connecting.
 				AttackPart toConnect = (AttackPart)a.GetNode(connection.Value.s());
 				//get requested to connect to
 				ap.Connect(connection.Key, toConnect);

@@ -22,8 +22,8 @@ public class DamageCalculator
 		{
 			if(damage <= 0f) break;
 			var step = val.Item1;//how much to go until next addition
-			var amount = val.Item2;//how much to add by step
-			color += amount * Math.Min(damage/step, 1f) / 255f;//add
+			var amount = val.Item2 / 255f;//how much to add by step
+			color += amount * Math.Min(damage/step, 1f);//add
 			damage -= step;//next addition
 		}
 		

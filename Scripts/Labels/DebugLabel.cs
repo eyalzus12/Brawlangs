@@ -56,6 +56,8 @@ public class DebugLabel : InfoLabel
 		Add("QueuedAnimation", ch.sprite.queuedSheet?.name??"None");
 		Add("AnimationLooping", ch.sprite.currentSheet.loop);
 		Add("AnimationFrame", ch.sprite.Frame);
+		//Newline();
+		//Add("PlayedSound", ch.audioManager.Stream?.get_name??"None");
 		Newline();
 		Add("CollisionSetting", ch.currentSetting.Name);
 		Add("CollisionMask", ch.CollisionMask);

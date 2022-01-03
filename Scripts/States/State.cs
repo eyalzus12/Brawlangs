@@ -31,12 +31,9 @@ public class State : Node
 	public State(Character link)
 	{
 		ch = link;
-		//SetupInputManager();
 	}
 	
 	public virtual bool IsActionable() => true;
-	
-	//public void SetupInputManager() => Inputs = (InputManager)ch.GetRootNode(ch.dummy?"Dummy":"Buffer" + "Input");
 	
 	public override string ToString() => GetType().Name.Replace("State", "");
 	
@@ -224,28 +221,35 @@ public class State : Node
 	protected void SetUpHoldingInput() => ch.upHeld = Inputs.IsActionPressed("player_up");
 	
 	public void Unsnap() => snapVector = Vector2.Zero;
-		
+	
 	public void MarkForDeletion(string action, bool now = false) => Inputs.MarkForDeletion(action, now);
 	
 	public void SetupCollisionParamaters()
 	//does all the needed calculations on collision
 	{
-		ch.onSemiSolid = false;//reset semi solid
-		ch.onSlope = false;//reset slope
-		ch.aerial = true;
+		ch.onSemiSolid = false;//reset semi solid detection
+		ch.onSlope = false;//reset slope detection
+		ch.aerial = true;//assume no collision for the start
 		foreach(var collision in GetSlideCollisions())
 		{
-			var body = collision.Collider;//get body
-			if(body is null || !Godot.Object.IsInstanceValid(body)) continue;//ensure not removed
-			ch.aerial = false;
+			var body = collision.Collider;//get collided body
+			if(body is null || !Godot.Object.IsInstanceValid(body)) continue;//ensure the collided body actually exists
+			
+			////////////////////////////////////////////////////////////////////////////////////////////////
+			//get paramaters of the platform, like friction, speed, etc
+			////////////////////////////////////////////////////////////////////////////////////////////////
+			
 			var vel = collision.ColliderVelocity;//get collision velocity
-			var norm = collision.Normal;//get the collision normal
+			var norm = collision.Normal;//get the collision normal (angle)
 			var fric = body.GetProp<float>("PlatformFriction", 1f);//get friction
 			var bounce = body.GetProp<float>("PlatformBounce", 0f);//get bounce
-			var cling = body.GetProp<bool>("Clingable", true);//get if clingable
+			var cling = body.GetProp<bool>("Clingable", true);//get if clingable (wall property)
 			
-			var oneway = false;
-			if(!ch.onSemiSolid && body is CollisionObject2D col)//if the collider IS a collider, cuz trust is overrated
+			
+			//TODO: this entire check should probably only be done for floors, since it isnt used in walls and ceilings anyways
+			var oneway = false;//init check if collided body is one way (only checks collision in a specific direction)
+			//this goes over all of the "shape owners" and checks if they have one way collision enabeled
+			if(!ch.onSemiSolid && body is CollisionObject2D col)//if the collider IS a collidable body, cuz trust is overrated
 			{
 				foreach(var sh in col.GetShapeOwners())//check each collision shape owners
 				{
@@ -253,12 +257,16 @@ public class State : Node
 					if(col.IsShapeOwnerOneWayCollisionEnabled(shid))//name goes brrr
 					{
 						oneway = true;//set that shape is one way
-						break;
+						break;//finished checking
 					}
 				}
 			}
 			
-			var fallthrough = body.GetProp<bool>("FallThroughPlatform", oneway);//get if can fall through
+			var fallthrough = body.GetProp<bool>("FallThroughPlatform", oneway);//get if can fall through the platform
+			
+			////////////////////////////////////////////////////////////////////////////////////////////////
+			//now we set the paramaters related to the type of collision itself (ground, wall, ceiling, etc)
+			////////////////////////////////////////////////////////////////////////////////////////////////
 			
 			if(norm == Vector2.Right || norm == Vector2.Left)
 			//Wall if straight right or left
@@ -287,8 +295,12 @@ public class State : Node
 				ch.onSlope = (norm != Vector2.Up);//get if you're on a slope, based on if the floor is straight
 				ch.ffric = fric;//get floor friction
 				ch.fbounce = bounce;//get floor bounce
-				ch.onSemiSolid = fallthrough;
+				ch.onSemiSolid = fallthrough;//set fall through
 			}
+			
+			if(ch.grounded || ch.walled || ch.ceilinged) ch.aerial = false;
+			//collision exists, so character isnt aerial
+			//the check ensures that non clingable walls wont mark the character as non aerial
 		}
 	}
 	
