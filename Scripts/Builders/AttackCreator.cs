@@ -146,6 +146,8 @@ public class AttackCreator
 		h.hitPriority = pr;
 		var cm = inif[section, "MomentumCarry", Vector2.Zero].v2();
 		h.momentumCarry = cm;
+		var hs = inif[section, "HitSound", "DefaultHit"].s();
+		h.hitSound = hs;
 		h.Name = section;
 		
 		var af = inif[section, "ActiveFrames", new List<Vector2>()];

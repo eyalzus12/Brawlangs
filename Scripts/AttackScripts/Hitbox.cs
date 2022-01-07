@@ -30,6 +30,8 @@ public class Hitbox : Area2D
 	public int teamStunMult = 1;
 	[Export]
 	public Vector2 momentumCarry = Vector2.Zero;
+	[Export]
+	public string hitSound = "DefaultHit";
 	
 	public KnockbackSetting knockbackSetting;
 	

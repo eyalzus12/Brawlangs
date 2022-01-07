@@ -1,0 +1,21 @@
+[remap]
+
+importer="wav"
+type="AudioStreamSample"
+path="res://.import/WinThad.wav-af29211a6b5eb57c5db4fc41fdfcc175.sample"
+
+[deps]
+
+source_file="res://Characters/Josh/JoshAudio/WinThad.wav"
+dest_files=[ "res://.import/WinThad.wav-af29211a6b5eb57c5db4fc41fdfcc175.sample" ]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop=false
+compress/mode=0

@@ -674,10 +674,8 @@ public class Character : KinematicBody2D
 		
 		framesSinceLastHit = 0;
 		
-		//var sound = ResourceLoader.Load<AudioStreamSample>("res://Characters/brawlangs_hitsound_test.wav");
-		//audioManager.Play(sound);
-		
-		PlaySound("TempHitsound");
+		PlaySound((data.Hitter as Hitbox).hitSound);
+		//this will need updating once i make hitboxes not reliant on a character
 	}
 	
 	public virtual void HandleHitting(Hitbox hitWith, Area2D hurtboxHit, Character charHit)

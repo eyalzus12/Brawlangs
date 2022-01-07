@@ -1,0 +1,15 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+path="res://.import/DlightTestHit.mp3-1c846a9e53502208102a168a8f6410f0.mp3str"
+
+[deps]
+
+source_file="res://Characters/Josh/JoshAudio/DlightTestHit.mp3"
+dest_files=[ "res://.import/DlightTestHit.mp3-1c846a9e53502208102a168a8f6410f0.mp3str" ]
+
+[params]
+
+loop=false
+loop_offset=0
