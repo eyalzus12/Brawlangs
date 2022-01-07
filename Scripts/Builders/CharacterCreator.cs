@@ -117,7 +117,7 @@ public class CharacterCreator
 	
 	public void BuildAudio(Character ch, string audioFolder)
 	{
-		var am = new CharacterAudioManager();
+		var am = new CharacterAudioManager(4);
 		am.Name = "AudioManager";
 		
 		var files = ListPostImportDirectoryFiles(audioFolder, ".wav", ".ogg", ".mp3").Distinct().ToList();
@@ -183,9 +183,14 @@ public class CharacterCreator
 				var filename = file.Replace(".import", "");
 				fileArray.Add(filename);
 			}
-			else if(file.EndsWith(".png"))
+			else
 			{
-				fileArray.Add(file);
+				foreach(var ext in desiredExtensions)
+				if(file.EndsWith(ext))
+				{
+					fileArray.Add(file);
+					break;
+				}
 			}
 		}
 		

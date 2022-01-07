@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 public class State : Node
 {
@@ -230,6 +231,12 @@ public class State : Node
 		ch.onSemiSolid = false;//reset semi solid detection
 		ch.onSlope = false;//reset slope detection
 		ch.aerial = true;//assume no collision for the start
+		////////////////////////////////////////////////////////////////////////////////////////////////
+		//FIX: this goes over the colliders themsevles. this means that if a collider has more than one normal (at different positions, itll throw off the calculation)
+		//need to find a way to check the collision shape itself
+		//actually... no. this doesn't make sense. the other part of the slope that has a different normal isnt detected. so wtf is happening?
+		//i could use test move!
+		////////////////////////////////////////////////////////////////////////////////////////////////
 		foreach(var collision in GetSlideCollisions())
 		{
 			var body = collision.Collider;//get collided body
@@ -243,26 +250,6 @@ public class State : Node
 			var norm = collision.Normal;//get the collision normal (angle)
 			var fric = body.GetProp<float>("PlatformFriction", 1f);//get friction
 			var bounce = body.GetProp<float>("PlatformBounce", 0f);//get bounce
-			var cling = body.GetProp<bool>("Clingable", true);//get if clingable (wall property)
-			
-			
-			//TODO: this entire check should probably only be done for floors, since it isnt used in walls and ceilings anyways
-			var oneway = false;//init check if collided body is one way (only checks collision in a specific direction)
-			//this goes over all of the "shape owners" and checks if they have one way collision enabeled
-			if(!ch.onSemiSolid && body is CollisionObject2D col)//if the collider IS a collidable body, cuz trust is overrated
-			{
-				foreach(var sh in col.GetShapeOwners())//check each collision shape owners
-				{
-					uint shid = Convert.ToUInt32(sh);//convert int to uint
-					if(col.IsShapeOwnerOneWayCollisionEnabled(shid))//name goes brrr
-					{
-						oneway = true;//set that shape is one way
-						break;//finished checking
-					}
-				}
-			}
-			
-			var fallthrough = body.GetProp<bool>("FallThroughPlatform", oneway);//get if can fall through the platform
 			
 			////////////////////////////////////////////////////////////////////////////////////////////////
 			//now we set the paramaters related to the type of collision itself (ground, wall, ceiling, etc)
@@ -271,7 +258,8 @@ public class State : Node
 			if(norm == Vector2.Right || norm == Vector2.Left)
 			//Wall if straight right or left
 			{
-				ch.walled = cling;//if not clingable, ignore being on a wall
+				var cling = body.GetProp<bool>("Clingable", true);//get if clingable
+				if(ch.walled && !cling) ch.walled = false;//if not clingable, ignore being on a wall
 				
 				ch.wnorm = norm;//get wall normal
 				ch.wvel = vel;//get wall velocity
@@ -292,16 +280,38 @@ public class State : Node
 			{
 				ch.fnorm = norm;//get floor normal
 				ch.fvel = vel;//get floor velocity
-				ch.onSlope = (norm != Vector2.Up);//get if you're on a slope, based on if the floor is straight
+				if(!ch.onSlope && norm != Vector2.Up) ch.onSlope = true;//get if you're on a slope, based on if the floor is straight
 				ch.ffric = fric;//get floor friction
 				ch.fbounce = bounce;//get floor bounce
+				
+				////////////////////////////////////////////////////////////////////////////////////////////////
+				//check if we can fall through the platform
+				////////////////////////////////////////////////////////////////////////////////////////////////
+				
+				if(ch.onSemiSolid) continue;//character IS on semi solid, so skip checking for this collisio body
+				var oneway = false;//init check if collided body is one way (only checks collision in a specific direction)
+				//this goes over all of the "shape owners" and checks if they have one way collision enabeled
+				if(!ch.onSemiSolid && body is CollisionObject2D col)//if the collider IS a collidable body, cuz trust is overrated
+				{
+					foreach(var sh in col.GetShapeOwners())//check each collision shape owners
+					{
+						uint shid = Convert.ToUInt32(sh);//convert int to uint
+						if(col.IsShapeOwnerOneWayCollisionEnabled(shid))//name goes brrr
+						{
+							oneway = true;//set that shape is one way
+							break;//finished checking
+						}
+					}
+				}
+			
+				var fallthrough = body.GetProp<bool>("FallThroughPlatform", oneway);//get if can fall through the platform
 				ch.onSemiSolid = fallthrough;//set fall through
 			}
-			
-			if(ch.grounded || ch.walled || ch.ceilinged) ch.aerial = false;
-			//collision exists, so character isnt aerial
-			//the check ensures that non clingable walls wont mark the character as non aerial
 		}
+		
+		if(ch.grounded || ch.walled || ch.ceilinged) ch.aerial = false;
+		//collision exists, so character isnt aerial
+		//the check ensures that non clingable walls wont mark the character as non aerial
 	}
 	
 	private IEnumerable<KinematicCollision2D> GetSlideCollisions()

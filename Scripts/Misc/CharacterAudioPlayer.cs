@@ -1,0 +1,25 @@
+using Godot;
+using System;
+using System.Collections.Generic;
+
+public class CharacterAudioPlayer : AudioStreamPlayer2D
+{
+	[Signal]
+	public delegate void FinishedPlaying(CharacterAudioPlayer who, AudioStream what);
+	
+	public override void _Ready()
+	{
+		Connect("finished", this, nameof(OnFinish));
+	}
+	
+	public void Play(AudioStream stream)
+	{
+		Stream = stream;
+		Play();
+	}
+	
+	public void OnFinish()
+	{
+		EmitSignal(nameof(FinishedPlaying), this, Stream);
+	}
+}

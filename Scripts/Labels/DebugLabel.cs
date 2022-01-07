@@ -14,7 +14,7 @@ public class DebugLabel : InfoLabel
 	
 	public override void UpdateLabel()
 	{
-		if(ch is null || !Godot.Object.IsInstanceValid(ch)) return;
+		if(ch is null || !Godot.Object.IsInstanceValid(ch) || !Visible) return;
 		Add("Name", ch.Name);
 		Add("Script", ch.GetType().Name);
 		Add("TeamNumber", ch.teamNumber);
@@ -56,8 +56,8 @@ public class DebugLabel : InfoLabel
 		Add("QueuedAnimation", ch.sprite.queuedSheet?.name??"None");
 		Add("AnimationLooping", ch.sprite.currentSheet.loop);
 		Add("AnimationFrame", ch.sprite.Frame);
-		//Newline();
-		//Add("PlayedSound", ch.audioManager.Stream?.get_name??"None");
+		Newline();
+		Add("PlayedSounds", ch.audioManager.ToString());
 		Newline();
 		Add("CollisionSetting", ch.currentSetting.Name);
 		Add("CollisionMask", ch.CollisionMask);

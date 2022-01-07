@@ -93,4 +93,6 @@ public static class IterUtils
 	
 	public static Vector2 Sum(this IEnumerable<Vector2> e) => e.Aggregate(Vector2.Zero, (v1,v2)=>v1+v2);
 	public static Vector2 Avg(this IEnumerable<Vector2> e) => e.Sum()/e.Count();
+	
+	public static void Rotate<T>(this Queue<T> q) => q.Enqueue(q.Dequeue());
 }
