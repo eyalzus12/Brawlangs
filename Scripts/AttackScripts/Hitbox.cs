@@ -33,7 +33,8 @@ public class Hitbox : Area2D
 	[Export]
 	public string hitSound = "DefaultHit";
 	
-	public KnockbackSetting knockbackSetting;
+	public AngleFlipper horizontalAngleFlipper;
+	public AngleFlipper verticalAngleFlipper;
 	
 	public Dictionary<string, float> stateKnockbackMult;
 	public Dictionary<string, float> stateDamageMult;
@@ -171,44 +172,78 @@ public class Hitbox : Area2D
 	public virtual float GetDamageMultiplier(Character c) => TeamMult(c, teamDamageMult) * StateMult(c, stateDamageMult);
 	public virtual int GetStunMultiplier(Character c) => (int)(TeamMult(c, (float)teamStunMult) * StateMult(c, stateStunMult));
 	
-	public virtual Vector2 KnockbackDir(Character hitter, Character hitee)
+	public virtual Vector2 KnockbackDir(Character hitter, Character hitee) => new Vector2(
+		KnockbackDirX(hitter, hitee),
+		KnockbackDirY(hitter, hitee)
+	);
+	
+	public virtual float KnockbackDirX(Character hitter, Character hitee)
 	{
-		var difference = hitee.Position-hitter.Position;
-		switch(knockbackSetting)
+		switch(horizontalAngleFlipper)
 		{
-			case KnockbackSetting.Directional:
-				return new Vector2(hitter.direction,1);
-			case KnockbackSetting.Away:
-				if(difference.x == 0) difference.x = 1;
-				if(difference.y == 0) difference.y = 1;
-				return new Vector2(Math.Sign(difference.x), Math.Sign(difference.y));
-			case KnockbackSetting.Angled:
-				if(difference == Vector2.Zero) return difference;
-				return difference.Normalized();
-			case KnockbackSetting.Exact:
-				return Vector2.One;
+			case AngleFlipper.Away:
+			case AngleFlipper.AwayCharacter:
+				return Math.Sign((hitee.Position-hitter.Position).x);
+			case AngleFlipper.AwayHitbox:
+				return Math.Sign((hitee.Position-Position).x);
+			case AngleFlipper.None:
+				return 1;
+			case AngleFlipper.Direction:
 			default:
-				return new Vector2(hitter.direction,1);
+				return hitter.direction;
+		}
+	}
+	
+	public virtual float KnockbackDirY(Character hitter, Character hitee)
+	{
+		switch(verticalAngleFlipper)
+		{
+			case AngleFlipper.Away:
+			case AngleFlipper.AwayCharacter:
+				return Math.Sign((hitee.Position-hitter.Position).y);
+			case AngleFlipper.AwayHitbox:
+				return Math.Sign((hitee.Position-Position).y);
+			case AngleFlipper.None:
+			case AngleFlipper.Direction:
+			default:
+				return 1;
 		}
 	}
 	
 	public virtual Color GetDrawColor()
 	{
 		if(stun == 0 && hitpause == 0 && hitlag == 0) return new Color(0.9f,0.9f,0.9f,1);
-		switch(knockbackSetting)
+		switch(horizontalAngleFlipper)
 		{
-			case KnockbackSetting.Directional: return new Color(1, 0.1f, 0.1f, 1);
-			case KnockbackSetting.Away: return new Color(1, 0.3f, 0.1f, 1);
-			case KnockbackSetting.Angled: return new Color(0.7f, 0.7f, 0.1f, 1);
-			default: return new Color(0.5f, 0.5f, 0, 1);
+			case AngleFlipper.AwayHitbox:
+			case AngleFlipper.AwayCharacter:
+			case AngleFlipper.Away:
+				return new Color(1, 0.3f, 0.1f, 1);
+			case AngleFlipper.None:
+				switch(verticalAngleFlipper)
+				{
+					case AngleFlipper.AwayHitbox:
+					case AngleFlipper.AwayCharacter:
+					case AngleFlipper.Away:
+						return new Color(0.7f, 0.7f, 0.1f, 1);
+					case AngleFlipper.None:
+					case AngleFlipper.Direction:
+					default:
+						return new Color(0.5f, 0.5f, 0, 1);
+				}
+				
+			case AngleFlipper.Direction:
+			default:
+				return new Color(1, 0.1f, 0.1f, 1);
 		}
 	}
 	
-	public enum KnockbackSetting
+	public enum AngleFlipper
 	{
-		Directional,
+		Direction,
 		Away,
-		Angled,
-		Exact
+		AwayHitbox,
+		AwayCharacter,
+		None
 	}
 }

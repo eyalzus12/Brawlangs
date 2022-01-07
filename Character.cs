@@ -674,7 +674,7 @@ public class Character : KinematicBody2D
 		
 		framesSinceLastHit = 0;
 		
-		PlaySound((data.Hitter as Hitbox).hitSound);
+		PlaySound((data.Hitter as Hitbox)?.hitSound ?? "DefaultHit");
 		//this will need updating once i make hitboxes not reliant on a character
 	}
 	

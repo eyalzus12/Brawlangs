@@ -154,10 +154,14 @@ public class AttackCreator
 		if(af is Vector2) h.activeFrames = new List<Vector2> {af.v2()};
 		else h.activeFrames = af.lv2();
 		
-		var kt = inif[section, "KnockbackType", "Directional"].s();
-		Hitbox.KnockbackSetting ks;
-		Enum.TryParse<Hitbox.KnockbackSetting>(kt, out ks);
-		h.knockbackSetting = ks;
+		var hafs = inif[section, "HorizontalAngleFlipper", "Directional"].s();
+		Hitbox.AngleFlipper haf;
+		Enum.TryParse<Hitbox.AngleFlipper>(hafs, out haf);
+		h.horizontalAngleFlipper = haf;
+		var vafs = inif[section, "VerticalAngleFlipper", "None"].s();
+		Hitbox.AngleFlipper vaf;
+		Enum.TryParse<Hitbox.AngleFlipper>(vafs, out vaf);
+		h.verticalAngleFlipper = vaf;
 		
 		var tkm = inif[section, "TeamKnockbackMultiplier", 1f].f();
 		h.teamKnockbackMult = tkm;
