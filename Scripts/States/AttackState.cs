@@ -29,8 +29,8 @@ public class AttackState : State
 	{
 		if(att is null) return;
 		
-		var friction = att?.attackFriction ?? 0f;
-		ch.vec.x *= (1f-friction*(ch.grounded?ch.ffric:1f));
+		var friction = att.attackFriction*(ch.grounded?ch.ffric:1f);
+		ch.vec.x *= (1f-friction);
 	}
 	
 	protected override void DoGravity()
@@ -65,7 +65,7 @@ public class AttackState : State
 		{
 			ch.jumpCounter = 0;
 			ch.wallJumpCounter++;
-			ch.vec.y *= ch.wallFriction * ch.wfric;
+			ch.vec.y *= (1-ch.wallFriction*ch.wfric);
 			touched = true;
 		}
 		

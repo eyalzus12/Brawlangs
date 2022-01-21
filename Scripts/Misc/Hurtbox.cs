@@ -14,7 +14,7 @@ public class Hurtbox : Area2D
 		get => col.Position;
 		set
 		{
-			var val = value*new Vector2(ch.direction, 1);
+			var val = value*new Vector2(direction, 1);
 			col?.SetDeferred("position", val);
 			originalPosition = value;
 		}
@@ -25,7 +25,7 @@ public class Hurtbox : Area2D
 		get => col.Rotation;
 		set
 		{
-			var val = value*ch.direction;
+			var val = value*direction;
 			col?.SetDeferred("rotation", val);
 			originalRotation = value;
 		}
@@ -34,30 +34,28 @@ public class Hurtbox : Area2D
 	public Vector2 originalPosition = Vector2.Zero;
 	public float originalRotation = 0f;
 	
-	public Character ch;
+	public Node2D owner;
 	
-	public void CreateCollision(/*float rad, float hei*/)
+	public void CreateCollision()
 	{
 		var coli = new CollisionShape2D();
 		AddChild(coli);
 		col = coli;
 		var shape = new CapsuleShape2D();
-		/*shape.Radius = rad;
-		shape.Height = hei;*/
 		col.Shape = shape;
-		CollisionLayer = 0b1000;
-		CollisionMask = 0b0;
+		CollisionLayer &= (((ulong)-1)^(0b10111));//rightmost bits set to 01000
+		CollisionMask &= (((ulong)-1)^(0b11111));//rightmost bits set to 00000
 		
 		originalPosition = col?.Position ?? default(Vector2);
 		originalRotation = col?.Rotation ?? 0;
 		
-		ch = GetParent() as Character;
+		owner = GetParent() as Node2D;
 	}
 	
 	public override void _PhysicsProcess(float delta)
 	{
-		col?.SetDeferred("position", originalPosition*new Vector2(ch.direction, 1));
-		col?.SetDeferred("rotation", originalRotation*ch.direction);
+		col?.SetDeferred("position", originalPosition*new Vector2(direction, 1));
+		col?.SetDeferred("rotation", originalRotation*direction);
 		Update();
 	}
 	
@@ -67,24 +65,12 @@ public class Hurtbox : Area2D
 		ZIndex = 2;
 		GeometryUtils.DrawCapsuleShape(this,
 			Shape, //shape
-			originalPosition*new Vector2(ch.direction, 1), //position
-			originalRotation*ch.direction, //rotation
+			originalPosition*new Vector2(direction, 1), //position
+			originalRotation*direction, //rotation
 			GetDrawColor()); //color
-		
-		/*
-		var oval = shape.Shape as CapsuleShape2D;
-		var height = oval.Height;
-		var radius = oval.Radius;
-		var color = new Color(1,1,1);
-		var position = originalPosition*new Vector2(ch.direction, 1);
-		var rotation = originalRotation*ch.direction;
-		DrawSetTransform(position, rotation, new Vector2(1,1));
-		var middleRect = BlastZone.CalcRect(Vector2.Zero, new Vector2(radius, height/2));
-		DrawRect(middleRect, color);
-		DrawCircle(new Vector2(0, height/2), radius, color);
-		DrawCircle(new Vector2(0, -height/2), radius, color);
-		*/
 	}
 	
 	public virtual Color GetDrawColor() => new Color(0,1,0,1);
+	
+	public int direction => (owner as Character).direction;
 }

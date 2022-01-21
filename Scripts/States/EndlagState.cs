@@ -72,6 +72,7 @@ public class EndlagState : State
 			else if(ch.walled && ch.wallJumpCounter < ch.wallJumpNum)
 			{
 				if(ch.GetState<AttackState>().touched) ch.wallJumpCounter--;
+				else ch.vec.y *= (1-ch.wallFriction*ch.wfric);
 				ch.ApplySettings("Wall");
 				ch.ChangeState("Wall");
 			}

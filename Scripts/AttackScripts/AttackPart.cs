@@ -77,11 +77,10 @@ public class AttackPart : Node2D
 	public virtual void Reset()
 	{
 		hitboxes = GetChildren().FilterType<Hitbox>().ToList();
-		/*foreach(var n in GetChildren()) if(n is Hitbox h)
-		{
-			hitboxes.Add(h);
-		}*/
+		PostHitboxInit();
 	}
+	
+	public virtual void PostHitboxInit() {}
 	
 	public void ConnectSignals()
 	{
@@ -296,7 +295,7 @@ public class AttackPart : Node2D
 			hit = true;
 			OnHit(hitbox, hurtbox);
 			var kmult = ch.knockbackDoneMult*hitbox.GetKnockbackMultiplier(hitChar)*knockbackMult*att.knockbackMult;
-			var dirvec = hitbox.KnockbackDir(ch, hitChar)*kmult;
+			var dirvec = hitbox.KnockbackDir(hitChar)*kmult;
 			var skb = dirvec*hitbox.setKnockback + hitbox.momentumCarry*ch.GetVelocity();
 			var vkb = dirvec*hitbox.varKnockback;
 			var dmult = ch.damageDoneMult*hitbox.GetDamageMultiplier(hitChar)*damageMult*att.damageMult;

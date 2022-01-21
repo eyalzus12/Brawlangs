@@ -34,7 +34,7 @@ public class GroundedState : State
 		float friction = ch.ffric * 
 			(ch.onSlope?ch.slopeFriction:ch.groundFriction);
 		
-		ch.vec.x -= friction*ch.vec.x;
+		ch.vec.x *= (1-friction);
 	}
 	
 	protected override void DoJump()

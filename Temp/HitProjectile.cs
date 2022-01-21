@@ -6,11 +6,7 @@ public class HitProjectile : Projectile2D
 	public HitProjectile() : base() {}
 	public HitProjectile(Character owner) : base(owner) {}
 	
-	public Vector2 setKnockback = Vector2.Zero;
-	public Vector2 varKnockback = Vector2.Zero;
-	public int stun = 0;
-	public int hitpause = 0;
-	public float damage = 0f;
+	public List<Hitbox> hitboxes = new List<Hitbox>();
 	
 	public override void OnCharacterCollide(Character ch)
 	{

@@ -232,10 +232,8 @@ public class State : Node
 		ch.onSlope = false;//reset slope detection
 		ch.aerial = true;//assume no collision for the start
 		////////////////////////////////////////////////////////////////////////////////////////////////
-		//FIX: this goes over the colliders themsevles. this means that if a collider has more than one normal (at different positions, itll throw off the calculation)
-		//need to find a way to check the collision shape itself
-		//actually... no. this doesn't make sense. the other part of the slope that has a different normal isnt detected. so wtf is happening?
-		//i could use test move!
+		//FIX: for some reason, when on a slope multiple collsiions are given. this is the cause for fnorm not properly updating:
+		//the (0,-1) normal is also given
 		////////////////////////////////////////////////////////////////////////////////////////////////
 		foreach(var collision in GetSlideCollisions())
 		{
@@ -280,18 +278,18 @@ public class State : Node
 			{
 				ch.fnorm = norm;//get floor normal
 				ch.fvel = vel;//get floor velocity
-				if(!ch.onSlope && norm != Vector2.Up) ch.onSlope = true;//get if you're on a slope, based on if the floor is straight
 				ch.ffric = fric;//get floor friction
 				ch.fbounce = bounce;//get floor bounce
+				if(!ch.onSlope && norm != Vector2.Up) ch.onSlope = true;//get if you're on a slope, based on if the floor is straight
 				
 				////////////////////////////////////////////////////////////////////////////////////////////////
 				//check if we can fall through the platform
 				////////////////////////////////////////////////////////////////////////////////////////////////
 				
-				if(ch.onSemiSolid) continue;//character IS on semi solid, so skip checking for this collisio body
+				if(ch.onSemiSolid) continue;//character IS on semi solid, so skip checking for this collision body
 				var oneway = false;//init check if collided body is one way (only checks collision in a specific direction)
 				//this goes over all of the "shape owners" and checks if they have one way collision enabeled
-				if(!ch.onSemiSolid && body is CollisionObject2D col)//if the collider IS a collidable body, cuz trust is overrated
+				if(body is CollisionObject2D col)//if the collider IS a collidable body, cuz trust is overrated
 				{
 					foreach(var sh in col.GetShapeOwners())//check each collision shape owners
 					{

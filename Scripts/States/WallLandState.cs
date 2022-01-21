@@ -15,7 +15,7 @@ public class WallLandState : WallState
 		ch.vac = Vector2.Zero;
 		SetupCollisionParamaters();
 		
-		ch.vec.y *= ch.wallFriction * ch.wfric;
+		ch.vec.y *= (1-ch.wallFriction*ch.wfric);
 			
 		//ch.onSemiSolid = false;
 		ch.PlayAnimation("WallLand");

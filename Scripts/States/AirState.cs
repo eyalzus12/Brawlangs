@@ -33,7 +33,6 @@ public class AirState : State
 	
 	protected virtual void DoFriction()
 	{
-		//ch.vec.x -= ch.vec.x * ch.airFriction;
 		ch.vec.x *= (1f-ch.airFriction);
 	}
 	

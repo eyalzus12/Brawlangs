@@ -33,6 +33,8 @@ public class Hitbox : Area2D
 	[Export]
 	public string hitSound = "DefaultHit";
 	
+	public int frameCount = 0;
+	
 	public AngleFlipper horizontalAngleFlipper;
 	public AngleFlipper verticalAngleFlipper;
 	
@@ -43,7 +45,7 @@ public class Hitbox : Area2D
 	public Dictionary<string, ParamRequest> LoadExtraProperties = new Dictionary<string, ParamRequest>();
 	
 	public List<Vector2> activeFrames = new List<Vector2>();
-	public Character ch;
+	public Node2D owner;
 	
 	private bool active = false;
 	
@@ -65,18 +67,18 @@ public class Hitbox : Area2D
 	
 	public override void _Ready()
 	{
-		//shape.SetDeferred("position",
-		//	new Vector2(ch.direction*shape.Position.x, shape.Position.y));
+		frameCount = 0;
+		
 		Init();
 		Reload();
-				
+		
 		Active = false;
 		Visible = false;
 		
 		Connect("area_entered", this, nameof(OnHurtboxEnter));
 		
-		CollisionLayer = 0b1_0000;
-		CollisionMask = 0b0_1000;
+		CollisionLayer &= (((ulong)-1)^(0b01111));//rightmost bits set to 10000
+		CollisionMask &= (((ulong)-1)^(0b10111));//rightmost bits set to 01000
 	}
 	
 	public virtual void Init() {}
@@ -118,10 +120,16 @@ public class Hitbox : Area2D
 	public override void _PhysicsProcess(float delta)
 	{
 		if(!Active) return;
-		shape?.SetDeferred("position", originalPosition*new Vector2(ch.direction, 1));
-		shape?.SetDeferred("rotation", originalRotation*ch.direction);
+		++frameCount;
+		UpdateHitboxPosition();
 		Update();
 		Loop();
+	}
+	
+	public virtual void UpdateHitboxPosition()
+	{
+		shape?.SetDeferred("position", originalPosition*new Vector2(direction, 1));
+		shape?.SetDeferred("rotation", originalRotation*direction);
 	}
 	
 	public override void _Draw()
@@ -130,32 +138,19 @@ public class Hitbox : Area2D
 		ZIndex = 4;
 		GeometryUtils.DrawCapsuleShape(this,
 			shape.Shape as CapsuleShape2D, //shape
-			originalPosition*new Vector2(ch.direction, 1), //position
-			originalRotation*ch.direction, //rotation
+			originalPosition*new Vector2(direction, 1), //position
+			originalRotation*direction, //rotation
 			GetDrawColor()); //color
-		
-		/*
-		var oval = shape.Shape as CapsuleShape2D;
-		var height = oval.Height;
-		var radius = oval.Radius;
-		var color = new Color(1,1,1);
-		var position = originalPosition*new Vector2(ch.direction, 1);
-		var rotation = originalRotation*ch.direction;
-		DrawSetTransform(position, rotation, new Vector2(1,1));
-		var middleRect = BlastZone.CalcRect(Vector2.Zero, new Vector2(radius, height/2));
-		DrawRect(middleRect, color);
-		DrawCircle(new Vector2(0, height/2), radius, color);
-		DrawCircle(new Vector2(0, -height/2), radius, color);
-		*/
 	}
 	
 	public virtual void Loop() {}
 	
-	private float TeamMult(Character c, float chooseFrom) => (c == ch || c.teamNumber == ch.teamNumber)?chooseFrom:1f;
+	private float TeamMult(Node2D n, float chooseFrom) => (n == owner || TeamNum(n) == TeamNum(owner))?chooseFrom:1f;
+	private int TeamNum(Node2D n) => (n.Get("teamNumber")??-1).i();
 	
-	private float StateMult(Character c, Dictionary<string, float> chooseFrom)
+	private float StateMult(Node2D n, Dictionary<string, float> chooseFrom)
 	{
-		if(chooseFrom is null) return 1f;
+		if(chooseFrom is null || !(n is Character c)) return 1f;
 		
 		var f = 1f;
 		
@@ -168,41 +163,41 @@ public class Hitbox : Area2D
 		return 1f;
 	}
 	
-	public virtual float GetKnockbackMultiplier(Character c) => TeamMult(c, teamKnockbackMult) * StateMult(c, stateKnockbackMult);
-	public virtual float GetDamageMultiplier(Character c) => TeamMult(c, teamDamageMult) * StateMult(c, stateDamageMult);
-	public virtual int GetStunMultiplier(Character c) => (int)(TeamMult(c, (float)teamStunMult) * StateMult(c, stateStunMult));
+	public virtual float GetKnockbackMultiplier(Node2D n) => TeamMult(n, teamKnockbackMult) * StateMult(n, stateKnockbackMult);
+	public virtual float GetDamageMultiplier(Node2D n) => TeamMult(n, teamDamageMult) * StateMult(n, stateDamageMult);
+	public virtual int GetStunMultiplier(Node2D n) => (int)(TeamMult(n, (float)teamStunMult) * StateMult(n, stateStunMult));
 	
-	public virtual Vector2 KnockbackDir(Character hitter, Character hitee) => new Vector2(
-		KnockbackDirX(hitter, hitee),
-		KnockbackDirY(hitter, hitee)
+	public virtual Vector2 KnockbackDir(Node2D hitChar) => new Vector2(
+		KnockbackDirX(hitChar),
+		KnockbackDirY(hitChar)
 	);
 	
-	public virtual float KnockbackDirX(Character hitter, Character hitee)
+	public virtual float KnockbackDirX(Node2D hitChar)
 	{
 		switch(horizontalAngleFlipper)
 		{
 			case AngleFlipper.Away:
 			case AngleFlipper.AwayCharacter:
-				return Math.Sign((hitee.Position-hitter.Position).x);
+				return Math.Sign((hitChar.Position-owner.Position).x);
 			case AngleFlipper.AwayHitbox:
-				return Math.Sign((hitee.Position-Position).x);
+				return Math.Sign((hitChar.Position-Position).x);
 			case AngleFlipper.None:
 				return 1;
 			case AngleFlipper.Direction:
 			default:
-				return hitter.direction;
+				return direction;
 		}
 	}
 	
-	public virtual float KnockbackDirY(Character hitter, Character hitee)
+	public virtual float KnockbackDirY(Node2D hitChar)
 	{
 		switch(verticalAngleFlipper)
 		{
 			case AngleFlipper.Away:
 			case AngleFlipper.AwayCharacter:
-				return Math.Sign((hitee.Position-hitter.Position).y);
+				return Math.Sign((hitChar.Position-owner.Position).y);
 			case AngleFlipper.AwayHitbox:
-				return Math.Sign((hitee.Position-Position).y);
+				return Math.Sign((hitChar.Position-Position).y);
 			case AngleFlipper.None:
 			case AngleFlipper.Direction:
 			default:
@@ -246,4 +241,6 @@ public class Hitbox : Area2D
 		AwayCharacter,
 		None
 	}
+	
+	public int direction => (owner.Get("direction")??1).i();
 }

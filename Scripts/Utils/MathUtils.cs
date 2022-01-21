@@ -5,7 +5,6 @@ public static class MathUtils
 {
 	public static float Lerp(this ref float val, float to, float @by)
 	{
-		//return (val -= (val-to)*@by);
 		if(val.MoreThan(to)) val -= @by;
 		else 
 		{
@@ -15,7 +14,6 @@ public static class MathUtils
 		}
 		
 		return val;
-		//return val = (val += ((to-@from)/@by).Clamp(@from, to))
 	}
 	
 	public static void TruncateIfInsignificant(this ref float i)

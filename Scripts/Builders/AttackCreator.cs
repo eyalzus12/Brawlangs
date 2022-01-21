@@ -210,7 +210,7 @@ public class AttackCreator
 		
 		ap.AddChild(h);
 		ap.hitboxes.Add(h);
-		h.ch = ap.ch;
+		h.owner = ap.ch;
 		
 		//Build collision. no need for seperate function
 		var cs = new CollisionShape2D();

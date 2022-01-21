@@ -7,7 +7,7 @@ public class YourMom : Hitbox
 	{
 		Node n = area.GetParent();
 		var c = n as Character;
-		if(!ch.CanHit(c)) return;
+		if(!(owner as Character).CanHit(c)) return;
 		var me = new MomEffect(180);
 		c.AttachEffect(me);
 	}
