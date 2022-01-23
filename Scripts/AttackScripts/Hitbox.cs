@@ -31,16 +31,12 @@ public class Hitbox : Area2D
 	[Export]
 	public Vector2 momentumCarry = Vector2.Zero;
 	[Export]
-	public string hitSound = "DefaultHit";
+	public AudioStream hitSound;
 	
 	public int frameCount = 0;
 	
 	public AngleFlipper horizontalAngleFlipper;
 	public AngleFlipper verticalAngleFlipper;
-	
-	public Dictionary<string, float> stateKnockbackMult;
-	public Dictionary<string, float> stateDamageMult;
-	public Dictionary<string, float> stateStunMult;
 	
 	public Dictionary<string, ParamRequest> LoadExtraProperties = new Dictionary<string, ParamRequest>();
 	
@@ -58,6 +54,7 @@ public class Hitbox : Area2D
 		set
 		{
 			active = value;
+			if(value) UpdateHitboxPosition();
 			Visible = value;
 			shape?.SetDeferred("disabled", !active);
 		}
@@ -75,10 +72,18 @@ public class Hitbox : Area2D
 		Active = false;
 		Visible = false;
 		
-		Connect("area_entered", this, nameof(OnHurtboxEnter));
+		Connect("area_entered", this, nameof(OnAreaEnter));
 		
-		CollisionLayer &= (((ulong)-1)^(0b01111));//rightmost bits set to 10000
-		CollisionMask &= (((ulong)-1)^(0b10111));//rightmost bits set to 01000
+		CollisionLayer ^= 0b11111;//reset five rightmost bits
+		CollisionLayer |= 0b100000;//rightmost bits set to 10000
+		CollisionMask ^= 0b11111;///reset five rightmost bits
+		CollisionMask |= 0b01000;//rightmost bits set to 01000
+	}
+	
+	public virtual void UpdateHitboxPosition()
+	{
+		shape?.SetDeferred("position", originalPosition*new Vector2(direction, 1));
+		shape?.SetDeferred("rotation", originalRotation*direction);
 	}
 	
 	public virtual void Init() {}
@@ -91,24 +96,26 @@ public class Hitbox : Area2D
 	
 	public virtual void Reload()
 	{
+		var children = GetChildren();
 		try
 		{
-			shape = GetChildren().FilterType<CollisionShape2D>().Single();
+			shape = children.FilterType<CollisionShape2D>().Single();
 		}
 		catch(InvalidOperationException)
 		{
-			if(GetChildren().Count >= 2)
+			if(children.Count >= 2)
 			//there's two collision shapes for some reason
-				GD.Print("Hitbox {this.ToString()} of character {ch.Name} has more than one collision shape");
+				GD.Print("Hitbox {this.ToString()} of object {owner.Name} has more than one collision shape");
 			//another option is that there's no collision, probably meaning it was added before its collision
 			//the builder should manually call this function after adding collision
 		}
 		
 		originalPosition = shape?.Position ?? default(Vector2);
 		originalRotation = shape?.Rotation ?? 0;
+		UpdateHitboxPosition();
 	}
 	
-	public void OnHurtboxEnter(Area2D area)
+	public void OnAreaEnter(Area2D area)
 	{
 		OnHit(area);
 		EmitSignal(nameof(HitboxHit), this, area);
@@ -121,15 +128,8 @@ public class Hitbox : Area2D
 	{
 		if(!Active) return;
 		++frameCount;
-		UpdateHitboxPosition();
-		Update();
 		Loop();
-	}
-	
-	public virtual void UpdateHitboxPosition()
-	{
-		shape?.SetDeferred("position", originalPosition*new Vector2(direction, 1));
-		shape?.SetDeferred("rotation", originalRotation*direction);
+		Update();
 	}
 	
 	public override void _Draw()
@@ -138,34 +138,15 @@ public class Hitbox : Area2D
 		ZIndex = 4;
 		GeometryUtils.DrawCapsuleShape(this,
 			shape.Shape as CapsuleShape2D, //shape
-			originalPosition*new Vector2(direction, 1), //position
-			originalRotation*direction, //rotation
+			shape.Position, //position
+			shape.Rotation, //rotation
 			GetDrawColor()); //color
 	}
 	
 	public virtual void Loop() {}
 	
-	private float TeamMult(Node2D n, float chooseFrom) => (n == owner || TeamNum(n) == TeamNum(owner))?chooseFrom:1f;
-	private int TeamNum(Node2D n) => (n.Get("teamNumber")??-1).i();
-	
-	private float StateMult(Node2D n, Dictionary<string, float> chooseFrom)
-	{
-		if(chooseFrom is null || !(n is Character c)) return 1f;
-		
-		var f = 1f;
-		
-		for(var t = c.currentState.GetType(); t.Name != "State"; t = t.BaseType)
-		{
-			if(chooseFrom.TryGetValue(t.Name.Replace("State", ""), out f))
-				return f;
-		}
-		
-		return 1f;
-	}
-	
-	public virtual float GetKnockbackMultiplier(Node2D n) => TeamMult(n, teamKnockbackMult) * StateMult(n, stateKnockbackMult);
-	public virtual float GetDamageMultiplier(Node2D n) => TeamMult(n, teamDamageMult) * StateMult(n, stateDamageMult);
-	public virtual int GetStunMultiplier(Node2D n) => (int)(TeamMult(n, (float)teamStunMult) * StateMult(n, stateStunMult));
+	public float TeamMult(Node2D n, float chooseFrom) => (n == owner || TeamNum(n) == TeamNum(owner))?chooseFrom:1f;
+	protected int TeamNum(Node2D n) => (n.Get("teamNumber")??-1).i();
 	
 	public virtual Vector2 KnockbackDir(Node2D hitChar) => new Vector2(
 		KnockbackDirX(hitChar),
@@ -242,5 +223,7 @@ public class Hitbox : Area2D
 		None
 	}
 	
-	public int direction => (owner.Get("direction")??1).i();
+	
+	public virtual int GetDirection() => (owner?.Get("direction")??1).i();
+	public int direction => GetDirection();
 }

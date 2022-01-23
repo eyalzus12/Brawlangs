@@ -43,8 +43,10 @@ public class Hurtbox : Area2D
 		col = coli;
 		var shape = new CapsuleShape2D();
 		col.Shape = shape;
-		CollisionLayer &= (((ulong)-1)^(0b10111));//rightmost bits set to 01000
-		CollisionMask &= (((ulong)-1)^(0b11111));//rightmost bits set to 00000
+		CollisionLayer ^= 0b11111;//reset five rightmost bits
+		CollisionLayer |= 0b01000;//rightmost bits set to 01000
+		CollisionMask ^= 0b11111;//reset five rightmost bits
+		//CollisionMask |= 0b00000;//rightmost bits set to 00000. basically does nothing
 		
 		originalPosition = col?.Position ?? default(Vector2);
 		originalRotation = col?.Rotation ?? 0;

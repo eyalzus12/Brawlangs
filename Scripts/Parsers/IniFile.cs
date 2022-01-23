@@ -15,6 +15,8 @@ using Strl = System.Collections.Generic.List<string>;
 public class IniFile
 {
 	public IniDictionary dict;
+	public string filePath;
+	public File file;
 	
 	public IniFile() => Reset();
 	
@@ -62,6 +64,8 @@ public class IniFile
 		File f = new File();//create new file
 		var er = f.Open(path, File.ModeFlags.Read);//open file
 		if(er != Error.Ok) return er;//if error, return
+		filePath = path;
+		file = f;
 		string content = f.GetAsText();//read text
 		f.Close();//flush buffer
 		Parse(content);//parse

@@ -7,11 +7,11 @@ using PartDir = System.Collections.Generic.Dictionary<string, AttackPart>;
 public class AttackPart : Node2D
 {
 	public PartDir dir = new PartDir();
-	public List<Hitbox> hitboxes = new List<Hitbox>();
+	public List<CharacterHitbox> hitboxes = new List<CharacterHitbox>();
 	public int frameCount = 0;
 	
-	public HashSet<Character> ignoreList = new HashSet<Character>();
-	public Dictionary<Area2D, Hitbox> hitList = new Dictionary<Area2D, Hitbox>();
+	public HashSet<Node2D> ignoreList = new HashSet<Node2D>();
+	public Dictionary<Hurtbox, CharacterHitbox> hitList = new Dictionary<Hurtbox, CharacterHitbox>();
 	
 	public Dictionary<string, ParamRequest> LoadExtraProperties = new Dictionary<string, ParamRequest>();
 	
@@ -76,7 +76,7 @@ public class AttackPart : Node2D
 	
 	public virtual void Reset()
 	{
-		hitboxes = GetChildren().FilterType<Hitbox>().ToList();
+		hitboxes = GetChildren().FilterType<CharacterHitbox>().ToList();
 		PostHitboxInit();
 	}
 	
@@ -265,21 +265,22 @@ public class AttackPart : Node2D
 		catch(KeyNotFoundException) {return null;}
 	}
 	
-	public virtual void HandleHit(Hitbox hitbox, Area2D hurtbox)
+	public virtual void HandleHit(CharacterHitbox hitbox, Area2D hurtbox)
 	{
 		if(!hitbox.Active) return;
+		if(!(hurtbox is Hurtbox realhurtbox)) return;//can only handle hurtboxes for hitting
 		var hitChar = (Character)hurtbox.GetParent();
 		if(!ch.CanHit(hitChar) || ignoreList.Contains(hitChar)) return;
 		
-		var current = new Hitbox();
-		if(hitList.TryGetValue(hurtbox, out current))
+		var current = new CharacterHitbox();
+		if(hitList.TryGetValue(realhurtbox, out current))
 		{
 			if(hitbox.hitPriority > current.hitPriority)
-				hitList[hurtbox] = hitbox;
+				hitList[realhurtbox] = hitbox;
 		}
 		else
 		{
-			hitList.Add(hurtbox, hitbox);
+			hitList.Add(realhurtbox, hitbox);
 		}
 	}
 	
@@ -289,18 +290,27 @@ public class AttackPart : Node2D
 		foreach(var entry in hitList)
 		{
 			Hitbox hitbox = entry.Value;
-			Area2D hurtbox = entry.Key;
+			Hurtbox hurtbox = entry.Key;
 			var hitChar = (Character)hurtbox.GetParent();
 			if(!ch.CanHit(hitChar) || ignoreList.Contains(hitChar)) continue;
 			hit = true;
 			OnHit(hitbox, hurtbox);
-			var kmult = ch.knockbackDoneMult*hitbox.GetKnockbackMultiplier(hitChar)*knockbackMult*att.knockbackMult;
+			
+			var kmult = ch.knockbackDoneMult*knockbackMult*att.knockbackMult;
+			var dmult = ch.damageDoneMult*damageMult*att.damageMult;
+			var smult = ch.stunDoneMult*stunMult*att.stunMult;
+			
+			if(hitbox is CharacterHitbox chitbox)
+			{
+				kmult *= chitbox.GetKnockbackMultiplier(hitChar);
+				dmult *= chitbox.GetDamageMultiplier(hitChar);
+				smult *= chitbox.GetStunMultiplier(hitChar);
+			}
+			
 			var dirvec = hitbox.KnockbackDir(hitChar)*kmult;
 			var skb = dirvec*hitbox.setKnockback + hitbox.momentumCarry*ch.GetVelocity();
 			var vkb = dirvec*hitbox.varKnockback;
-			var dmult = ch.damageDoneMult*hitbox.GetDamageMultiplier(hitChar)*damageMult*att.damageMult;
 			var damage = hitbox.damage*dmult;
-			var smult = ch.stunDoneMult*hitbox.GetStunMultiplier(hitChar)*stunMult*att.stunMult;
 			var stun = hitbox.stun*smult;
 			
 			var data = new HitData(skb, vkb, damage, stun, hitbox.hitpause, hitbox, hurtbox);

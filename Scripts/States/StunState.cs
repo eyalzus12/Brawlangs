@@ -25,7 +25,7 @@ public class StunState : State
 		
 		if(ch.grounded && !ch.onSemiSolid)
 		{
-			ch.voc = ch.voc.Bounce(ch.fnorm);;
+			ch.voc = ch.voc.Bounce(ch.fnorm);
 			framesSinceLastBounce = 0;
 		}
 	}

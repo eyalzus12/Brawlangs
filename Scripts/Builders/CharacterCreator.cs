@@ -43,13 +43,6 @@ public class CharacterCreator
 		var collCreator = new CollisionCreator($"{directoryPath}/{collisionFile}.ini");
 		collCreator.Build(ch);
 		
-		//find attack file name
-		var attackFile = charinif["Attacks", ""].s();
-		//create attacks
-		var attCreator = new AttackCreator($"{directoryPath}/{attackFile}.ini");
-		attCreator.Build(ch);
-		ch.SetupAttacks();
-		
 		//find animation folder name
 		var animationsFolder = charinif["Animations", ""].s();
 		//create animations
@@ -59,6 +52,13 @@ public class CharacterCreator
 		var audioFolder = charinif["Audio", ""].s();
 		//load sounds
 		BuildAudio(ch, $"{directoryPath}/{audioFolder}");
+		
+		//find attack file name
+		var attackFile = charinif["Attacks", ""].s();
+		//create attacks
+		var attCreator = new AttackCreator($"{directoryPath}/{attackFile}.ini");
+		attCreator.Build(ch);
+		ch.SetupAttacks();
 		
 		ch.teamNumber = teamNum;
 		return ch;

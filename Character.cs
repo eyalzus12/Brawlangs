@@ -274,6 +274,7 @@ public class Character : KinematicBody2D
 	public void PlayAnimation(string anm) => sprite.Play(anm);
 	public void QueueAnimation(string anm) => sprite.Queue(anm);
 	public void PlaySound(string sound) => audioManager.Play(sound);
+	public void PlaySound(AudioStream sound) => audioManager.Play(sound);
 	
 	///////////////////////////////////////////
 	///////////////States//////////////////////
@@ -674,8 +675,8 @@ public class Character : KinematicBody2D
 		
 		framesSinceLastHit = 0;
 		
-		PlaySound((data.Hitter as Hitbox)?.hitSound ?? "DefaultHit");
-		//this will need updating once i make hitboxes not reliant on a character
+		var HitSoundToPlay = data.Hitter.hitSound;
+		PlaySound(HitSoundToPlay);
 	}
 	
 	public virtual void HandleHitting(Hitbox hitWith, Area2D hurtboxHit, Character charHit)
@@ -761,11 +762,11 @@ public class Character : KinematicBody2D
 		currentAttack = null;
 	}
 	
-	public virtual void EmitProjectile(Projectile2D proj)
+	/*public virtual void EmitProjectile(Projectile2D proj)
 	{
 		GetParent().AddChild(proj);
 		proj.Active = true;
-	}
+	}*/
 	
 	public virtual void SetAttackCooldowns()
 	{

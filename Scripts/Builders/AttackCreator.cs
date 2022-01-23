@@ -128,7 +128,7 @@ public class AttackCreator
 	{
 		var HitboxSctipt = inif[section, "Script", ""].s();
 		var baseFolder = path.SplitByLast('/')[0];
-		var h = TypeUtils.LoadScript<Hitbox>(HitboxSctipt, new Hitbox(), baseFolder);
+		var h = TypeUtils.LoadScript<CharacterHitbox>(HitboxSctipt, new CharacterHitbox(), baseFolder);
 		
 		var sk = inif[section, "SetKnockback", Vector2.Zero].v2();
 		h.setKnockback = sk;
@@ -147,7 +147,16 @@ public class AttackCreator
 		var cm = inif[section, "MomentumCarry", Vector2.Zero].v2();
 		h.momentumCarry = cm;
 		var hs = inif[section, "HitSound", "DefaultHit"].s();
-		h.hitSound = hs;
+		try
+		{
+			var ahs = ap.ch.audioManager.sounds[hs];
+			h.hitSound = ahs;
+		}
+		catch(KeyNotFoundException)
+		{
+			GD.Print($"Hit sound {hs} for hitbox {section} in file at path {inif.filePath} could not be found.");
+		}
+		
 		h.Name = section;
 		
 		var af = inif[section, "ActiveFrames", new List<Vector2>()];
@@ -210,7 +219,6 @@ public class AttackCreator
 		
 		ap.AddChild(h);
 		ap.hitboxes.Add(h);
-		h.owner = ap.ch;
 		
 		//Build collision. no need for seperate function
 		var cs = new CollisionShape2D();
@@ -231,6 +239,7 @@ public class AttackCreator
 		cs.Disabled = true;
 		cs.Name = section + "Collision";
 		h.AddChild(cs);
+		h.owner = ap.ch;
 		h.Reload();
 	}
 	
