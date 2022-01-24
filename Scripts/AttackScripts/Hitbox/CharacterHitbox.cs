@@ -8,12 +8,6 @@ public class CharacterHitbox : Hitbox
 	public Dictionary<string, float> stateDamageMult;
 	public Dictionary<string, float> stateStunMult;
 	
-	public override void Loop()
-	{
-		base.Loop();
-		UpdateHitboxPosition();
-	}
-	
 	private float StateMult(Node2D n, Dictionary<string, float> chooseFrom)
 	{
 		if(chooseFrom is null || !(n is Character c)) return 1f;//only works on characters obv

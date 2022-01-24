@@ -129,6 +129,7 @@ public class Hitbox : Area2D
 		if(!Active) return;
 		++frameCount;
 		Loop();
+		UpdateHitboxPosition();
 		Update();
 	}
 	
