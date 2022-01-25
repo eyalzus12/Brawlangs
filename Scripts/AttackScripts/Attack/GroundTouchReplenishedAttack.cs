@@ -3,9 +3,9 @@ using System;
 
 public class GroundTouchReplenishedAttack : LimitedAttack
 {
-	public override void Init()
+	public override void LoadProperties()
 	{
-		base.Init();
+		base.LoadProperties();
 		ch.Connect("JumpsRestored", this, nameof(GroundTouch));
 	}
 	

@@ -527,7 +527,8 @@ public class Character : KinematicBody2D
 	}
 	
 	//checks if changing to a practicular collision shape is safe
-	/*public bool CanChange(CollisionShape2D collShape)
+	//unused
+	public bool CanChange(CollisionShape2D collShape)
 	{
 		var spaceState = GetWorld2d().DirectSpaceState;
 		var query = new Physics2DShapeQueryParameters();
@@ -539,7 +540,7 @@ public class Character : KinematicBody2D
 		query.Transform = query.Transform.Translated(CF*fnorm + trav);
 		var temp = GetCollisionMaskBit(DROP_THRU_BIT);
 		SetCollisionMaskBit(DROP_THRU_BIT, false);
-		query.CollisionLayer = (int)CollisionMask;
+		query.CollisionLayer = CollisionMask;
 		SetCollisionMaskBit(DROP_THRU_BIT, temp);
 		query.CollideWithAreas = false;
 		query.CollideWithBodies = true;
@@ -555,7 +556,7 @@ public class Character : KinematicBody2D
 		}
 		
 		return (result?.Count == 0);
-	}*/
+	}
 	
 	
 	//crouches

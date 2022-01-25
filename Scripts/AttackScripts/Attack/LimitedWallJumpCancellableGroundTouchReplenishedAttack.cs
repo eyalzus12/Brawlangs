@@ -6,9 +6,9 @@ public class LimitedWallJumpCancellableGroundTouchReplenishedAttack : WallJumpCa
 	public int walljumpAmountUsed;
 	public int WallJumpsPossible = -1;
 	
-	public override void Init()
+	public override void LoadProperties()
 	{
-		base.Init();
+		base.LoadProperties();
 		LoadExtraProperty<int>("WallJumpsPossible", -1);
 		walljumpAmountUsed = 0;
 	}

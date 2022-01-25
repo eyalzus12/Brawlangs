@@ -61,6 +61,7 @@ public class AttackCreator
 				BuildPart(a, s, StartPartSection);
 		}
 		
+		a.LoadProperties();
 		LoadExtraProperties(a, section);
 		
 		n.AddChild(a);
@@ -108,7 +109,7 @@ public class AttackCreator
 		var oHitboxSections = inif[section, "Hitboxes", null];
 		if(oHitboxSections is string)
 			BuildHitbox(ap, oHitboxSections.s());
-		else if(oHitboxSections.NotNull())
+		else if(oHitboxSections is object)//not null
 		{
 			var HitboxSections = oHitboxSections.ls();
 			foreach(var s in HitboxSections) BuildHitbox(ap, s);
@@ -119,6 +120,7 @@ public class AttackCreator
 		if(ConnectionSection != "") cn.Add(section, (ConnectionSection, a));
 		//request connection for later
 		
+		ap.LoadProperties();
 		LoadExtraProperties(ap, section);
 		
 		a.AddChild(ap);
@@ -217,6 +219,7 @@ public class AttackCreator
 			}
 		}
 		
+		h.LoadProperties();
 		LoadExtraProperties(h, section);
 		
 		//Build collision. no need for seperate function

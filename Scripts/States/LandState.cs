@@ -26,13 +26,7 @@ public class LandState : GroundedState
 	}
 	
 	protected override void DoJump() {}
-	
-	protected override void DoMovement()
-	{
-		//if(ch.InputingDirection()) DoInputMovement();
-		//else
-		//DoFriction();
-	}
+	protected override void DoMovement() {}
 	
 	protected override bool CalcStateChange()
 	{

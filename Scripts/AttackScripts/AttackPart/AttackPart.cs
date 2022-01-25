@@ -80,6 +80,8 @@ public class AttackPart : Node2D
 		LoadExtraProperties.Add(s, toAdd);
 	}
 	
+	public virtual void LoadProperties() {}
+	
 	public void Connect(AttackPart ap)
 	{
 		dir.Add(ap.Name, ap);

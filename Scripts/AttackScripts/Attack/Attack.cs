@@ -88,6 +88,7 @@ public class Attack : Node2D
 	}
 	
 	public virtual void Init() {}
+	public virtual void LoadProperties() {}
 	public virtual void OnStart() {}
 	public virtual void Loop() {}
 	public virtual void OnEnd() {}

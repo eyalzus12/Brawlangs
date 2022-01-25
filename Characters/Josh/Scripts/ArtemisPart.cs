@@ -7,7 +7,7 @@ public class ArtemisPart : AttackPart
 	public float BackSpeed = 0f;
 	public int MoveLength = 0;
 	
-	public override void Init()
+	public override void LoadProperties()
 	{
 		LoadExtraProperty<float>("ForwardSpeed", 0f);
 		LoadExtraProperty<float>("BackSpeed", 0f);

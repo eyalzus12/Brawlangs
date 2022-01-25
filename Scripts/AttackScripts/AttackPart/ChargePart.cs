@@ -8,7 +8,7 @@ public class ChargePart : AttackPart
 	public float FullChargeKnockbackMult = 1f;
 	public int MinimumChargeForBoost = 1;
 	
-	public override void Init()
+	public override void LoadProperties()
 	{
 		LoadExtraProperty<string>("ChargeInput", "heavy");
 		LoadExtraProperty<float>("FullChargeDamageMult", 1f);

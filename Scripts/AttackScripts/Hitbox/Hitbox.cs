@@ -89,6 +89,8 @@ public class Hitbox : Area2D
 	
 	public virtual void Init() {}
 	
+	public virtual void LoadProperties() {}
+	
 	public void LoadExtraProperty<T>(string s, T @default = default(T))
 	{
 		var toAdd = new ParamRequest(typeof(T), s, @default);
