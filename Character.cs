@@ -237,15 +237,8 @@ public class Character : KinematicBody2D
 	
 	public override void _Ready()
 	{
-		//SetupCollision();
 		SetupStates();
 		SetupAttacks();
-		//Respawn();
-		//ReadStats();
-		
-		/*if(dummy) return;
-		var ac = new AttackCreator();
-		ac.Build(this);*/
 	}
 	
 	public bool ReadStats()
@@ -422,9 +415,6 @@ public class Character : KinematicBody2D
 		damage = 0f;
 		framesSinceLastHit = 0;
 		comboCount = 0;
-		
-		//foreach(var n in GetChildren()) if(n is Hitbox h) h.Active = false;
-		//GetChildren().FilterType<Hitbox>().ToList<Hitbox>().ForEach(h=>h.Active=false);
 	}
 	
 	public virtual void StoreVelocities()
@@ -480,6 +470,7 @@ public class Character : KinematicBody2D
 		else return "None";
 	}
 	
+	//FIX: this doesnt account for inheritence
 	public readonly static Type[] ignoreTypes = new Type[]{typeof(AttackState), typeof(EndlagState), typeof(StunState)};
 	
 	public virtual void OnSemiSolidLeave(Godot.Object body) 

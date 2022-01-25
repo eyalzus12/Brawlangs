@@ -88,9 +88,9 @@ public class ObjectPool : Node
 	
 	public void DisposePool()
 	{
-		for(var entry in ObjectDict)
+		foreach(var entry in ObjectDict)
 		{
-			var queue = entry.Item2;
+			var queue = entry.Value;
 			while(queue.Count > 0)
 			{
 				var obj = queue.Dequeue();

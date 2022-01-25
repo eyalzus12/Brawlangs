@@ -44,13 +44,13 @@ public class AttackCreator
 		var AttackScript = inif[section, "Script", ""].s();
 		var baseFolder = path.SplitByLast('/')[0];
 		var a = TypeUtils.LoadScript<Attack>(AttackScript, new Attack(), baseFolder);
-		n.AddChild(a);
+		a.ch = n as Character;
+		a.Name = section;
 		
 		var fric = inif[section, "Friction", 1f].f();
 		a.attackFriction = fric;
-		a.Name = section;
-		var StartPartSection = inif[section, "StartPart", ""].s();
 		
+		var StartPartSection = inif[section, "StartPart", ""].s();
 		object oPartSections = inif[section, "Parts", new List<string>()];
 		if(oPartSections is string PartSection)
 			BuildPart(a, PartSection, StartPartSection);
@@ -62,6 +62,8 @@ public class AttackCreator
 		}
 		
 		LoadExtraProperties(a, section);
+		
+		n.AddChild(a);
 	}
 	
 	public AttackPart BuildPart(Attack a, string section, string start)
@@ -69,9 +71,9 @@ public class AttackCreator
 		var PartScript = inif[section, "Script", ""].s();
 		var baseFolder = path.SplitByLast('/')[0];
 		var ap = TypeUtils.LoadScript<AttackPart>(PartScript, new AttackPart(), baseFolder);
-		
+		ap.att = a;
+		ap.ch = a.ch;
 		ap.Name = section;
-		a.AddChild(ap);
 		if(section == start) a.start = ap;
 		
 		var su = inif[section, "Startup", 0].i();
@@ -116,10 +118,10 @@ public class AttackCreator
 		//get connection section
 		if(ConnectionSection != "") cn.Add(section, (ConnectionSection, a));
 		//request connection for later
-		ap.ConnectSignals();
-		ap.BuildHitboxAnimator();
 		
 		LoadExtraProperties(ap, section);
+		
+		a.AddChild(ap);
 		
 		return ap;
 	}
@@ -129,6 +131,8 @@ public class AttackCreator
 		var HitboxSctipt = inif[section, "Script", ""].s();
 		var baseFolder = path.SplitByLast('/')[0];
 		var h = TypeUtils.LoadScript<CharacterHitbox>(HitboxSctipt, new CharacterHitbox(), baseFolder);
+		h.Name = section;
+		h.owner = ap.ch;
 		
 		var sk = inif[section, "SetKnockback", Vector2.Zero].v2();
 		h.setKnockback = sk;
@@ -156,8 +160,6 @@ public class AttackCreator
 		{
 			GD.Print($"Hit sound {hs} for hitbox {section} in file at path {inif.filePath} could not be found.");
 		}
-		
-		h.Name = section;
 		
 		var af = inif[section, "ActiveFrames", new List<Vector2>()];
 		if(af is Vector2) h.activeFrames = new List<Vector2> {af.v2()};
@@ -217,16 +219,16 @@ public class AttackCreator
 		
 		LoadExtraProperties(h, section);
 		
-		ap.AddChild(h);
-		ap.hitboxes.Add(h);
-		
 		//Build collision. no need for seperate function
 		var cs = new CollisionShape2D();
 		
 		var pos = inif[section, "Position", Vector2.Zero].v2();
 		cs.Position = pos;
+		h.originalPosition = pos;
 		var rot = inif[section, "Rotation", 0f].f();
-		cs.Rotation = (float)(rot*Math.PI/180f);//turn to rads
+		var rotrad = (float)(rot*Math.PI/180f);
+		cs.Rotation = rotrad;//turn to rads
+		h.originalRotation = rotrad;
 		
 		var ps = new CapsuleShape2D();
 		
@@ -238,9 +240,9 @@ public class AttackCreator
 		cs.Shape = ps;
 		cs.Disabled = true;
 		cs.Name = section + "Collision";
+		h.shape = cs;
 		h.AddChild(cs);
-		h.owner = ap.ch;
-		h.Reload();
+		ap.AddChild(h);
 	}
 	
 	public void BuildConnections()

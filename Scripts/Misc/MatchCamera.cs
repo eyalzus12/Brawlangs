@@ -34,7 +34,7 @@ public class MatchCamera : Camera2D
 	public override void _Ready()
 	{
 		Reset();
-		SmoothingEnabled = true;
+		SmoothingEnabled = false;
 		
 		viewportRect = GetViewportRect();
 		SetProcess(followed.Count != 0);
@@ -45,7 +45,6 @@ public class MatchCamera : Camera2D
 		Offset = middle+startOffsetOffset;
 		Zoom = startZoomMult*baseZoom*Vector2.One;
 		
-		//TODO: linq
 		foreach(var n in GetParent().GetChildren()) if(n is Character c)
 		{
 			followed.Add(c);

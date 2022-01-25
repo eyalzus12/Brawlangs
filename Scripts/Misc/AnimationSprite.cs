@@ -15,13 +15,17 @@ public class AnimationSprite : Sprite
 		currentSheet = new AnimationSheet(null, "", 0, false);
 	}
 	
+	public override void _Ready()
+	{
+		InitFramePlayer();
+	}
+	
 	public void InitFramePlayer()
 	{
-		var fplayer = new AnimationPlayer();
-		fplayer.PlaybackProcessMode = AnimationPlayer.AnimationProcessMode.Physics;
-		fplayer.Name = "FramePlayer";
-		AddChild(fplayer);
-		framePlayer = GetNode<AnimationPlayer>("FramePlayer");
+		framePlayer = new AnimationPlayer();
+		framePlayer.PlaybackProcessMode = AnimationPlayer.AnimationProcessMode.Physics;
+		framePlayer.Name = "FramePlayer";
+		AddChild(framePlayer);
 		foreach(var a in animations)
 		{
 			var animationName = a.Key;
@@ -95,6 +99,7 @@ public class AnimationSprite : Sprite
 	
 	public void SetSheet(AnimationSheet sheet)
 	{
+		if(framePlayer is null) return;
 		currentSheet = sheet;
 		this.Texture = currentSheet.texture;
 		this.Hframes = currentSheet.frames;
@@ -107,8 +112,8 @@ public class AnimationSprite : Sprite
 		queuedSheet = sheet;
 	}
 	
-	public void Pause() => framePlayer.Stop(false);
-	public void Continue() => framePlayer.Play();
+	public void Pause() => framePlayer?.Stop(false);
+	public void Continue() => framePlayer?.Play();
 }
 
 public readonly struct AnimationSheet

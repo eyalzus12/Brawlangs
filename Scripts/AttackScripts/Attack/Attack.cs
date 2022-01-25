@@ -39,7 +39,6 @@ public class Attack : Node2D
 	public override void _Ready()
 	{
 		frameCount = 0;
-		ch = GetParent() as Character;
 		Init();
 	}
 	

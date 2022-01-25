@@ -24,7 +24,6 @@ public class CharacterCreator
 		var name = charinif["Name", ""].s();
 		//load name
 		ch.Name = name + teamNum;
-		n.AddChild(ch);
 		
 		ch.CollisionLayer = 0b100;
 		ch.CollisionMask = 0b011;
@@ -37,12 +36,6 @@ public class CharacterCreator
 		prop.ReadFromConfigFile($"{directoryPath}/{statFile}.cfg", "Stats");
 		prop.LoadProperties(ch);
 		
-		//find collision file name
-		var collisionFile = charinif["Collision", ""].s();
-		//create collision
-		var collCreator = new CollisionCreator($"{directoryPath}/{collisionFile}.ini");
-		collCreator.Build(ch);
-		
 		//find animation folder name
 		var animationsFolder = charinif["Animations", ""].s();
 		//create animations
@@ -53,14 +46,20 @@ public class CharacterCreator
 		//load sounds
 		BuildAudio(ch, $"{directoryPath}/{audioFolder}");
 		
+		//find collision file name
+		var collisionFile = charinif["Collision", ""].s();
+		//create collision
+		var collCreator = new CollisionCreator($"{directoryPath}/{collisionFile}.ini");
+		collCreator.Build(ch);
+		
 		//find attack file name
 		var attackFile = charinif["Attacks", ""].s();
 		//create attacks
 		var attCreator = new AttackCreator($"{directoryPath}/{attackFile}.ini");
 		attCreator.Build(ch);
-		ch.SetupAttacks();
 		
 		ch.teamNumber = teamNum;
+		n.AddChild(ch);
 		return ch;
 	}
 	
@@ -87,10 +86,8 @@ public class CharacterCreator
 			spr.AddSheet(texture, animationName, frames, loop);
 		}
 		
-		ch.AddChild(spr);
-		spr.InitFramePlayer();
 		ch.sprite = spr;
-		spr.Play("Default");
+		ch.AddChild(spr);
 	}
 	
 	public Texture GenerateTextureFromPath(string path)

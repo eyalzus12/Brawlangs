@@ -9,11 +9,7 @@ public class CharacterAudioManager : Node
 	public List<CharacterAudioPlayer> players = new List<CharacterAudioPlayer>();
 	public Queue<CharacterAudioPlayer> available = new Queue<CharacterAudioPlayer>();
 	
-	public CharacterAudioManager()
-	{
-		sounds = new Dictionary<string, AudioStream>();
-		players = new List<CharacterAudioPlayer>();
-	}
+	public CharacterAudioManager() {}
 	
 	public CharacterAudioManager(int capacity)
 	{
@@ -36,7 +32,6 @@ public class CharacterAudioManager : Node
 		var use = available.Dequeue();
 		use.Play(stream);
 		use.Connect("FinishedPlaying", this, nameof(StreamFinished));
-		
 	}
 	
 	public void Play(string sound)

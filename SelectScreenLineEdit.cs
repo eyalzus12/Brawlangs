@@ -21,18 +21,20 @@ public class SelectScreenLineEdit : LineEdit
 		object o = null;
 		if(data.TryGet($"{PREFIX}{number}", out o)) Text = o.s();
 		
-		//check = GetParent().GetNode<Label>("Label").GetNode<CheckBox>("CheckBox");
-		//if(data.TryGet($"{PREFIX}{number}Dummy", out o))
-		//	check.Pressed = o.b();
-		
+		//bruh wtf is this
 		GetParent().GetParent().GetParent().GetNode<Button>("ExitButton").Connect("pressed", this, nameof(OnExit));
 		
 	}
 	
 	public void OnExit()
 	{
-		if(Text == "") return;
-		data.AddOverride($"{PREFIX}{number}", Text);
-		//data.AddOverride($"{PREFIX}{number}Dummy", check.Pressed);
+		if(Text == "")
+		{
+			data.Remove($"{PREFIX}{number}");
+		}
+		else
+		{
+			data.AddOverride($"{PREFIX}{number}", Text);
+		}
 	}
 }

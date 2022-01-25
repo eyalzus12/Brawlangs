@@ -36,7 +36,7 @@ public class Hurtbox : Area2D
 	
 	public Node2D owner;
 	
-	public void CreateCollision()
+	public override void _Ready()
 	{
 		var coli = new CollisionShape2D();
 		AddChild(coli);
@@ -50,8 +50,6 @@ public class Hurtbox : Area2D
 		
 		originalPosition = col?.Position ?? default(Vector2);
 		originalRotation = col?.Rotation ?? 0;
-		
-		owner = GetParent() as Node2D;
 	}
 	
 	public override void _PhysicsProcess(float delta)

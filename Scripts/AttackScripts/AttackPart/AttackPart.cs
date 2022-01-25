@@ -68,23 +68,10 @@ public class AttackPart : Node2D
 	public override void _Ready()
 	{
 		frameCount = 0;
-		att = GetParent() as Attack;
-		ch = att.ch;
-		ConnectSignals();
-		Init();
-	}
-	
-	public virtual void Reset()
-	{
 		hitboxes = GetChildren().FilterType<CharacterHitbox>().ToList();
-		PostHitboxInit();
-	}
-	
-	public virtual void PostHitboxInit() {}
-	
-	public void ConnectSignals()
-	{
 		hitboxes.ForEach(h => h.Connect("HitboxHit", this, nameof(HandleHit)));
+		BuildHitboxAnimator();
+		Init();
 	}
 	
 	public void LoadExtraProperty<T>(string s, T @default = default(T))
@@ -138,11 +125,10 @@ public class AttackPart : Node2D
 	
 	public void BuildHitboxAnimator()
 	{
-		var hplayer = new AnimationPlayer();
-		hplayer.PlaybackProcessMode = AnimationPlayer.AnimationProcessMode.Physics;
-		hplayer.Name = "AttackPlayer";
-		AddChild(hplayer);
-		hitboxPlayer = GetNode<AnimationPlayer>("AttackPlayer");
+		hitboxPlayer = new AnimationPlayer();
+		hitboxPlayer.PlaybackProcessMode = AnimationPlayer.AnimationProcessMode.Physics;
+		hitboxPlayer.Name = "AttackPlayer";
+		AddChild(hitboxPlayer);
 		var anm = new Animation();
 		anm.Length = (startup+length/*+endlag*/)/60f;
 		hitboxPlayer.AddAnimation("HitboxActivation", anm);
@@ -159,19 +145,20 @@ public class AttackPart : Node2D
 			}
 		}
 		
-		/*
+		#if DEBUG_HITBOX_PLAYER
+		GD.Print("Animation hitbox player debug ahead");
 		GD.Print(anm.GetTrackCount());
 		for(int i = 0; i < anm.GetTrackCount(); ++i)
 		{
+			GD.Print(anm.TrackGetPath(i));
 			GD.Print(anm.TrackGetKeyCount(i));
 			for(int j = 0; j < anm.TrackGetKeyCount(i); ++j)
 			{
-				GD.Print(anm.TrackGetKeyTime(i, j));
-				GD.Print(anm.TrackGetKeyValue(i, j));
+				GD.Print(anm.TrackGetKeyTime(i, j) + " " + anm.TrackGetKeyValue(i, j));
 			}
-			GD.Print(anm.TrackGetPath(i));
 		}
-		*/
+		GD.Print("-------------------------------------------");
+		#endif
 		
 		hitboxPlayer.Connect("animation_finished", this, "cnp");
 	}

@@ -19,7 +19,7 @@ public class MapCreator
 	public bool Build(Node n)
 	{
 		var plats = inif[BASE_SECTION, "Platforms", null];
-		if(plats is string)	BuildPlatform(plats.s(), n);
+		if(plats is string) BuildPlatform(plats.s(), n);
 		else foreach(var str in plats.ls()) BuildPlatform(str, n);
 		
 		var camera = new MatchCamera();
@@ -34,17 +34,18 @@ public class MapCreator
 		camera.zoomOffset = zoff;
 		var inter = inif[BASE_SECTION, "Interpolation", 0.01f].f();
 		camera.interpolationWeight = inter;
-		n.AddChild(camera);
+		
 		camera.Current = true;
 		
 		var blast = inif[BASE_SECTION, "BlastZones", BlastZone.DEFAULT_SIZE].v2();
 		var bz = new BlastZone(center, blast);
-		n.AddChild(bz);
 		
+		n.AddChild(camera);
+		n.AddChild(bz);
 		return true;
 	}
 	
-	public bool BuildPlatform(String section, Node n)
+	public void BuildPlatform(String section, Node n)
 	{
 		section = section.Trim();
 		var sp = new StaticPlatform2D();
@@ -64,8 +65,6 @@ public class MapCreator
 		var ft = inif[section, "FallThrough", false].b();
 		sp.FallThroughPlatform = ft;
 		
-		n.AddChild(sp);
-		
 		var cp = inif[section, "Collision", section+"col"];
 		if(cp is string) BuildCollision(cp.s(), sp);
 		else foreach(var s in cp.ls()) BuildCollision(s, sp);
@@ -74,10 +73,10 @@ public class MapCreator
 		if(sr is string) BuildSprite(sr.s(), sp);
 		else foreach(var ss in sr.ls()) BuildSprite(ss, sp);
 		
-		return true;
+		n.AddChild(sp);
 	}
 	
-	public bool BuildCollision(string section, Node n)
+	public void BuildCollision(string section, Node n)
 	{
 		section = section.Trim();
 		var cs = new CollisionShape2D();
@@ -94,11 +93,9 @@ public class MapCreator
 		cs.Shape = t2s(type, section);
 		
 		n.AddChild(cs);
-		
-		return true;
 	}
 	
-	public bool BuildSprite(string section, Node n)
+	public void BuildSprite(string section, Node n)
 	{
 		section = section.Trim();
 		var sp = new Sprite();
@@ -115,8 +112,6 @@ public class MapCreator
 		sp.ZIndex = zz;
 		
 		n.AddChild(sp);
-		
-		return true;
 	}
 	
 	private Shape2D t2s(string type, string section) => GetFunc(type)(section);

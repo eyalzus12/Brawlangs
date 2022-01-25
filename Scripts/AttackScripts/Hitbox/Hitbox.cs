@@ -67,7 +67,6 @@ public class Hitbox : Area2D
 		frameCount = 0;
 		
 		Init();
-		Reload();
 		
 		Active = false;
 		Visible = false;
@@ -78,6 +77,8 @@ public class Hitbox : Area2D
 		CollisionLayer |= 0b100000;//rightmost bits set to 10000
 		CollisionMask ^= 0b11111;///reset five rightmost bits
 		CollisionMask |= 0b01000;//rightmost bits set to 01000
+		
+		UpdateHitboxPosition();
 	}
 	
 	public virtual void UpdateHitboxPosition()
@@ -92,27 +93,6 @@ public class Hitbox : Area2D
 	{
 		var toAdd = new ParamRequest(typeof(T), s, @default);
 		LoadExtraProperties.Add(s, toAdd);
-	}
-	
-	public virtual void Reload()
-	{
-		var children = GetChildren();
-		try
-		{
-			shape = children.FilterType<CollisionShape2D>().Single();
-		}
-		catch(InvalidOperationException)
-		{
-			if(children.Count >= 2)
-			//there's two collision shapes for some reason
-				GD.Print("Hitbox {this.ToString()} of object {owner.Name} has more than one collision shape");
-			//another option is that there's no collision, probably meaning it was added before its collision
-			//the builder should manually call this function after adding collision
-		}
-		
-		originalPosition = shape?.Position ?? default(Vector2);
-		originalRotation = shape?.Rotation ?? 0;
-		UpdateHitboxPosition();
 	}
 	
 	public void OnAreaEnter(Area2D area)
