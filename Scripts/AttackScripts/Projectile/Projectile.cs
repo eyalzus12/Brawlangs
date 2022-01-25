@@ -4,6 +4,10 @@ using System.Collections.Generic;
 
 public class Projectile : Node2D
 {
+	[Signal]
+	public delegate void ProjectileDied(Projectile who);
+	
+	public Vector2 spawningPosition = default;
 	public int frameCount = 0;
 	public int maxLifetime = 600;
 	public ProjectileMovementFunction Movement;
@@ -36,6 +40,7 @@ public class Projectile : Node2D
 	public override void _Ready()
 	{
 		frameCount = 0;
+		Position = spawningPosition;
 		Init();
 		Active = false;
 	}
@@ -59,6 +64,6 @@ public class Projectile : Node2D
 	public void Destruct()
 	{
 		OnRemove();
-		QueueFree();//TODO: save into pooling list!
+		EmitSignal(nameof(ProjectileDied), this);
 	}
 }
