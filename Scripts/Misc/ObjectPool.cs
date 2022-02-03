@@ -6,12 +6,14 @@ public class ObjectPool : Node
 {
 	public const int LoadAmount = 3;
 	public Dictionary<string, Queue<Node2D>> ObjectDict;
-	public Queue<Tuple<string,Node2D>> ReturnQueue;
+	public Dictionary<string, PackedScene> LoadDict;
+	public Queue<Tuple<string, Node2D>> ReturnQueue;
 	public HashSet<Node2D> ReturnQueueSet;
 	
 	public ObjectPool()
 	{
 		ObjectDict = new Dictionary<string, Queue<Node2D>>();
+		LoadDict = new Dictionary<string, PackedScene>();
 	}
 	
 	public override void _PhysicsProcess(float delta)
@@ -19,50 +21,53 @@ public class ObjectPool : Node
 		CleanReturnQueue();
 	}
 	
-	public Node2D GetObject(string path)
+	public Node2D GetObject(string identifier, PackedScene loader = null)
 	{
-		Node2D obj;
 		Queue<Node2D> poolQueue;
-		if(!ObjectDict.TryGetValue(path, out poolQueue) || poolQueue.Count <= 0)//no available objects
+		if(!ObjectDict.TryGetValue(identifier, out poolQueue) || poolQueue.Count <= 0)//no available objects
 		{
-			CreateNewObject(path);//load new ones
+			poolQueue = CreateNewObject(identifier, loader);//load new ones
 		}
 		
-		obj = poolQueue.Dequeue();//get available object
-		return obj;
+		return poolQueue?.Dequeue();//get available object if exists
 	}
 	
-	public void CreateNewObject(string path)
+	public Queue<Node2D> CreateNewObject(string identifier, PackedScene source = null)
 	{
-		var resource = ResourceLoader.Load<PackedScene>(path);
-		if(resource is null)
+		if(!ObjectDict.ContainsKey(identifier))//no queue exists
 		{
-			GD.Print($"Cannot pool objects from path {path} as it does not exist");
-			return;
+			if(source is null)//cant instance 
+			{
+				GD.Print($"Cannot pool object with identifier {identifier} because given packed scene is null");
+				return null;
+			}
+			
+			ObjectDict.Add(identifier, new Queue<Node2D>());//make a queue
+			LoadDict.Add(identifier, source);
 		}
-		
-		if(!ObjectDict.ContainsKey(path))//no queue exists
-			ObjectDict.Add(path, new Queue<Node2D>());//make a queue
 		
 		for(int i = 0; i < LoadAmount; ++i)
 		{
-			var obj = resource.Instance<Node2D>();//instance new object
-			ObjectDict[path].Enqueue(obj);//put in the pool
+			var loader = source??LoadDict[identifier];
+			var obj = source.Instance<Node2D>();//instance new object
+			ObjectDict[identifier].Enqueue(obj);//put in the pool
 		}
+		
+		return ObjectDict[identifier];
 	}
 	
-	public bool InsertObject(Node2D n, string path = "")
+	public bool InsertObject(Node2D n, string identifier = "")
 	{
-		if(path == "") path = n.Filename;
+		if(identifier == "") identifier = n.Filename;
 		
-		if(path == "")
+		if(identifier == "")
 		{
-			GD.Print($"Cannot pool object {n} because it does not have a given file path (or wasnt generated from one)");
+			GD.Print($"Cannot pool object {n} because it does not have a given identifier (or wasnt generated from one)");
 			return false;
 		}
 		
 		if(ReturnQueueSet.Contains(n)) return false;
-		ReturnQueue.Enqueue(new Tuple<string,Node2D>(path,n));
+		ReturnQueue.Enqueue(new Tuple<string,Node2D>(identifier,n));
 		ReturnQueueSet.Add(n);
 		return true;
 	}
@@ -73,20 +78,20 @@ public class ObjectPool : Node
 		{
 			var h = ReturnQueue.Dequeue();
 			var obj = h.Item2;
-			var path = h.Item1;
+			var identifier = h.Item1;
 			if(obj is null || !Godot.Object.IsInstanceValid(obj)) continue;
 			var parent = obj.GetParent();
 			parent.RemoveChild(obj);
 			
-			if(!ObjectDict.ContainsKey(path))
-				ObjectDict.Add(path, new Queue<Node2D>());//make a queue
-			ObjectDict[path].Enqueue(obj);
+			if(!ObjectDict.ContainsKey(identifier))
+				ObjectDict.Add(identifier, new Queue<Node2D>());//make a queue
+			ObjectDict[identifier].Enqueue(obj);
 			
 			ReturnQueueSet.Remove(obj);
 		}
 	}
 	
-	public void DisposePool()
+	public void ClearPool()
 	{
 		foreach(var entry in ObjectDict)
 		{
@@ -99,11 +104,12 @@ public class ObjectPool : Node
 		}
 		
 		ObjectDict.Clear();
+		LoadDict.Clear();
 	}
 	
 	public override void _ExitTree()
 	{
-		DisposePool();
+		ClearPool();
 		ReturnQueue.Clear();
 		ReturnQueueSet.Clear();
 	}

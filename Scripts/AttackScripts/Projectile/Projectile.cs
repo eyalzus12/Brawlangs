@@ -10,6 +10,7 @@ public class Projectile : Node2D
 	public Vector2 spawningPosition = default;
 	public int frameCount = 0;
 	public int maxLifetime = 600;
+	public int direction = 1;
 	public ProjectileMovementFunction Movement;
 	public Dictionary<string, ParamRequest> LoadExtraProperties = new Dictionary<string, ParamRequest>();
 	public bool active = false;
@@ -50,13 +51,14 @@ public class Projectile : Node2D
 		if(!Active) return;
 		++frameCount;
 		Loop();
-		Position = Movement.GetNext(Position);
+		Position = Movement.GetNext(this);
 		
 		if(frameCount >= maxLifetime)
 			Destruct();
 	}
 	
 	public virtual void Init() {}
+	public virtual void LoadProperties() {}
 	public virtual void OnSpawn() {}
 	public virtual void Loop() {}
 	public virtual void OnRemove() {}

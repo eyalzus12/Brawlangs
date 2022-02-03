@@ -65,6 +65,7 @@ public class AttackCreator
 		LoadExtraProperties(a, section);
 		
 		n.AddChild(a);
+		a.Owner = n;//for scene packing
 	}
 	
 	public AttackPart BuildPart(Attack a, string section, string start)
@@ -124,17 +125,19 @@ public class AttackCreator
 		LoadExtraProperties(ap, section);
 		
 		a.AddChild(ap);
+		ap.Owner = a;//for scene packing
 		
 		return ap;
 	}
 	
-	public void BuildHitbox(AttackPart ap, string section)
+	public void BuildHitbox(Node2D ap, string section)
 	{
-		var HitboxSctipt = inif[section, "Script", ""].s();
+		var HitboxScript = inif[section, "Script", ""].s();
 		var baseFolder = path.SplitByLast('/')[0];
-		var h = TypeUtils.LoadScript<CharacterHitbox>(HitboxSctipt, new CharacterHitbox(), baseFolder);
+		var h = TypeUtils.LoadScript<CharacterHitbox>(HitboxScript, new CharacterHitbox(), baseFolder);
 		h.Name = section;
-		h.owner = ap.ch;
+		var ch = (Character)ap.Get("ch");
+		h.owner = ch;
 		
 		var sk = inif[section, "SetKnockback", Vector2.Zero].v2();
 		h.setKnockback = sk;
@@ -155,7 +158,7 @@ public class AttackCreator
 		var hs = inif[section, "HitSound", "DefaultHit"].s();
 		try
 		{
-			var ahs = ap.ch.audioManager.sounds[hs];
+			var ahs = ch.audioManager.sounds[hs];
 			h.hitSound = ahs;
 		}
 		catch(KeyNotFoundException)
@@ -245,7 +248,9 @@ public class AttackCreator
 		cs.Name = section + "Collision";
 		h.shape = cs;
 		h.AddChild(cs);
+		cs.Owner = h;//for scene packing
 		ap.AddChild(h);
+		h.Owner = ap;//for scene packing
 	}
 	
 	public void BuildConnections()

@@ -34,6 +34,11 @@ public class HitProjectile : Projectile
 		base.Init();
 	}
 	
+	public override void LoadProperties()
+	{
+		LoadExtraProperty<List<Hitbox>>("Hitboxes", new List<Hitbox>());
+	}
+	
 	public virtual void OnHit(Hitbox hitbox, Area2D hurtbox) {}
 	
 	public virtual void HandleHit(Hitbox hitbox, Area2D hurtbox)

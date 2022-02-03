@@ -43,6 +43,10 @@ public class Hitbox : Area2D
 	public List<Vector2> activeFrames = new List<Vector2>();
 	public Node2D owner;
 	
+	public Dictionary<string, float> stateKnockbackMult;
+	public Dictionary<string, float> stateDamageMult;
+	public Dictionary<string, float> stateStunMult;
+	
 	private bool active = false;
 	
 	public Vector2 originalPosition = Vector2.Zero;
@@ -130,6 +134,25 @@ public class Hitbox : Area2D
 	
 	public float TeamMult(Node2D n, float chooseFrom) => (n == owner || TeamNum(n) == TeamNum(owner))?chooseFrom:1f;
 	protected int TeamNum(Node2D n) => (n.Get("teamNumber")??-1).i();
+	
+	private float StateMult(Node2D n, Dictionary<string, float> chooseFrom)
+	{
+		if(chooseFrom is null || !(n is Character c)) return 1f;//only works on characters obv
+		
+		var f = 1f;
+		
+		for(var t = c.currentState.GetType(); t.Name != "State"; t = t.BaseType)
+		{
+			if(chooseFrom.TryGetValue(t.Name.Replace("State", ""), out f))
+				return f;
+		}
+		
+		return 1f;
+	}
+	
+	public virtual float GetKnockbackMultiplier(Node2D n) => TeamMult(n, teamKnockbackMult) * StateMult(n, stateKnockbackMult);
+	public virtual float GetDamageMultiplier(Node2D n) => TeamMult(n, teamDamageMult) * StateMult(n, stateDamageMult);
+	public virtual int GetStunMultiplier(Node2D n) => (int)(TeamMult(n, (float)teamStunMult) * StateMult(n, stateStunMult));
 	
 	public virtual Vector2 KnockbackDir(Node2D hitChar) => new Vector2(
 		KnockbackDirX(hitChar),
