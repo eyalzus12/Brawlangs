@@ -34,7 +34,7 @@ public class Hurtbox : Area2D
 	public Vector2 originalPosition = Vector2.Zero;
 	public float originalRotation = 0f;
 	
-	public Node2D owner;
+	public IHittable owner;
 	
 	public override void _Ready()
 	{

@@ -64,7 +64,7 @@ public class MapBase : Node2D
 		c.sprite.SelfModulate = colorlist[i-1];
 		c.Respawn();
 		
-		var im = new BufferInputManager(c.teamNumber);
+		var im = new BufferInputManager(c.TeamNumber);
 		c.AddChild(im);
 		c.Inputs = im;
 		return c;

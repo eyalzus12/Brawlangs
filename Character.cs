@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-public class Character : KinematicBody2D
+public class Character : KinematicBody2D, IHittable, IAttacker
 {
 	public const int DROP_THRU_BIT = 1;
 	protected const int CF = 30;
@@ -151,7 +151,8 @@ public class Character : KinematicBody2D
 	////////////////////////////////////////////
 	public int direction = 1;//1 for right -1 for left
 	
-	public int teamNumber = 0;
+	private int _teamNumber = 0;
+	public int TeamNumber{get => _teamNumber; set => _teamNumber=value;}
 	public bool friendlyFire = false;
 	public int stocks = 3;
 	
@@ -221,7 +222,10 @@ public class Character : KinematicBody2D
 	public List<Attack> attacks = new List<Attack>();
 	public Dictionary<string, Attack> attackDict = new Dictionary<string, Attack>();
 	public Dictionary<Attack, int> attackCooldowns = new Dictionary<Attack, int>();
-		
+	
+	public Dictionary<string, PackedScene> projectiles = new Dictionary<string, PackedScene>();
+	public Dictionary<string, HashSet<Projectile>> activeProjectiles = new Dictionary<string, HashSet<Projectile>>();
+	
 	public List<string> StatList = new List<string>();
 	public PropertyMap prop = new PropertyMap();
 	
@@ -627,11 +631,9 @@ public class Character : KinematicBody2D
 		}
 	}
 	
-	public virtual bool CanHit(Character c) => (c != this)&&(c.teamNumber!=teamNumber||friendlyFire);
+	public virtual bool CanHit(IHittable hitObject) => (hitObject != this)&&(hitObject.TeamNumber!=_teamNumber||friendlyFire);
 	
-	//public bool CanBeHit(Hitbox hit) => (hit.ch != this);
-	
-	public virtual void ApplyKnockback(HitData data)
+	public void HandleGettingHit(HitData data)
 	{
 		var skb = data.Skb;
 		var vkb = data.Vkb;
@@ -671,12 +673,12 @@ public class Character : KinematicBody2D
 		PlaySound(HitSoundToPlay);
 	}
 	
-	public virtual void HandleHitting(Hitbox hitWith, Area2D hurtboxHit, Character charHit)
+	public void HandleHitting(Hitbox hitbox, Hurtbox hurtbox, IHittable hitChar)
 	{
-		if(hitWith.hitlag > 0)
+		if(hitbox.hitlag > 0)
 		{
 			var s = ChangeState<HitLagState>();
-			s.hitLagLength = hitWith.hitlag;
+			s.hitLagLength = hitbox.hitlag;
 		}
 	}
 	

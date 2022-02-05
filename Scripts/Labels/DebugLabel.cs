@@ -17,7 +17,7 @@ public class DebugLabel : InfoLabel
 		if(ch is null || !Godot.Object.IsInstanceValid(ch) || !Visible) return;
 		Add("Name", ch.Name);
 		Add("Script", ch.GetType().Name);
-		Add("TeamNumber", ch.teamNumber);
+		Add("TeamNumber", ch.TeamNumber);
 		Newline();
 		Add("Damage", Math.Round(ch.damage,2));
 		Add("Stocks", ch.stocks);
@@ -119,7 +119,7 @@ public class DebugLabel : InfoLabel
 		Add("OS", OS.GetName());
 	}
 	
-	protected override bool EnsureCorrectAppearence() => (this.GetDataOrDefault("CurrentInfoLabelCharacter",0).i() == ch.teamNumber);
+	protected override bool EnsureCorrectAppearence() => (this.GetDataOrDefault("CurrentInfoLabelCharacter",0).i() == ch.TeamNumber);
 	
 	private string GetInputString(string s) =>
 		ch.Inputs.IsActionJustPressed(s)?"Pressed":

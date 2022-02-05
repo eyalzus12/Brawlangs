@@ -78,5 +78,5 @@ public class DeathHandeler : Node
 		GD.Print(sb.ToString());*/
 	}
 	
-	public string Log(Character c, int logcount) => $"Character {c.Name} from team {c.teamNumber} placed {StringUtils.IntToWord(logcount)}";
+	public string Log(Character c, int logcount) => $"Character {c.Name} from team {c.TeamNumber} placed {StringUtils.IntToWord(logcount)}";
 }

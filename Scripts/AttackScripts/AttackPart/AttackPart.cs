@@ -7,9 +7,9 @@ using PartDir = System.Collections.Generic.Dictionary<string, AttackPart>;
 public class AttackPart : Node2D
 {
 	public PartDir dir = new PartDir();
-	public List<CharacterHitbox> hitboxes = new List<CharacterHitbox>();
 	public int frameCount = 0;
 	
+	public List<CharacterHitbox> hitboxes = new List<CharacterHitbox>();
 	public HashSet<Node2D> ignoreList = new HashSet<Node2D>();
 	public Dictionary<Hurtbox, CharacterHitbox> hitList = new Dictionary<Hurtbox, CharacterHitbox>();
 	
@@ -176,47 +176,18 @@ public class AttackPart : Node2D
 		ignoreList.Clear();
 	}
 	
-	public virtual void Pause()
-	{
-		hitboxPlayer.Stop();
-	}
-	
-	public virtual void Resume()
-	{
-		hitboxPlayer.Play();
-	}
-	
-	public virtual void Loop()
-	{
-		
-	}
-	
-	public virtual void OnStart()
-	{
-		
-	}
-	
-	public virtual void OnEnd()
-	{
-		
-	}
-	
-	public virtual void OnHit(Hitbox hitbox, Area2D hurtbox)
-	{
-		
-	}
+	public virtual void Pause() {hitboxPlayer.Stop();}
+	public virtual void Resume() {hitboxPlayer.Play();}
+	public virtual void Loop() {}
+	public virtual void OnStart() {}
+	public virtual void OnEnd() {}
+	public virtual void OnHit(Hitbox hitbox, Area2D hurtbox) {}
 	
 	public virtual void cnp(string dummy="")
 	{
 		if(!active) return;
 		ChangePart(GetNextPart());
 	}
-	
-	/*public virtual void CalculateNextPart()
-	{
-		if(hitPart) HitMissPart();
-		else NextPart();
-	}*/
 	
 	private List<string> Describe(Character c)
 	{
@@ -304,7 +275,7 @@ public class AttackPart : Node2D
 			
 			var data = new HitData(skb, vkb, damage, stun, hitbox.hitpause, hitbox, hurtbox);
 			
-			hitChar.ApplyKnockback(data);
+			hitChar.HandleGettingHit(data);
 			ignoreList.Add(hitChar);
 			GD.Print($"{hitChar} was hit by {hitbox.Name}");
 			att.OnHit(hitbox, hurtbox);

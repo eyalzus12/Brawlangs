@@ -40,7 +40,7 @@ public class ProjectileCreator
 	public PackedScene BuildProjectile(Node2D n, string section)
 	{
 		var proj = new Projectile();
-		proj.owner = n;
+		//proj.owner = n;
 		proj.Name = section;
 		var sp = inif[section, "Position", Vector2.Zero].v2();
 		proj.spawningPosition = sp;
