@@ -26,6 +26,16 @@ public class Projectile : Node2D, IHitter, IHittable
 	public bool Hit{get => _hit; set => _hit=value;}
 	public IAttacker OwnerObject{get => _owner; set => _owner=value;}
 	
+	public int TeamNumber{get => OwnerObject.TeamNumber; set => OwnerObject.TeamNumber = value;}
+	
+	public float DamageTakenMult{get=>1f;set{}}
+	public float KnockbackTakenMult{get=>1f;set{}}
+	public int StunTakenMult{get=>1;set{}}
+
+	public float DamageDoneMult{get => OwnerObject.DamageDoneMult; set => OwnerObject.DamageDoneMult = value;}
+	public float KnockbackDoneMult{get => OwnerObject.KnockbackDoneMult; set => OwnerObject.KnockbackDoneMult = value;}
+	public int StunDoneMult{get => OwnerObject.StunDoneMult; set => OwnerObject.StunDoneMult = value;}
+	
 	public Dictionary<string, ParamRequest> LoadExtraProperties = new Dictionary<string, ParamRequest>();
 	
 	private bool _active = false;

@@ -20,134 +20,70 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	[Export]
 	public string name = "Unnamed";//name used for debuging
 	////////////////////////////////////////////
-	[Export]
-	public float fallSpeed = 800f;
-	//max fall speed
-	[Export]
-	public float fastFallSpeed = 1200f;
-	//max fastfall speed
-	[Export]
-	public float wallFallSpeed = 250f;
-	//max wall fall speeed
-	[Export]
-	public float wallFastFallSpeed = 450f;
-	//max wall fastfall speed
-	[Export]
-	public float gravity = 20f;
-	//how fast you normally fall
-	[Export]
-	public float fastFallGravity = 60f;
-	//how fast you fastfall
-	[Export]
-	public float wallGravity = 10f;
-	//how fast you fall on a wall
-	[Export]
-	public float wallFastFallGravity = 20f;
-	//how fast you fastfall on a wall
+	public float fallSpeed = 800f;//max fall speed
+	public float fastFallSpeed = 1200f;//max fastfall speed
+	public float wallFallSpeed = 250f;//max wall fall speeed
+	public float wallFastFallSpeed = 450f;//max wall fastfall speed
+	public float gravity = 20f;//how fast you normally fall
+	public float fastFallGravity = 60f;//how fast you fastfall
+	public float wallGravity = 10f;//how fast you fall on a wall
+	public float wallFastFallGravity = 20f;//how fast you fastfall on a wall
 	////////////////////////////////////////////
-	[Export]
-	public float groundSpeed = 650f;
-	//max ground speed
-	[Export]
-	public float airSpeed = 600f;
-	//max air speed
-	[Export]
-	public float crawlSpeed = 200f;
-	//crawling speed
-	[Export]
-	public float groundAcceleration = 75f;
-	//how fast you reach groundSpeed
-	[Export]
-	public float airAcceleration = 45f;
-	//how fast you reach airSpeed
+	public float groundSpeed = 650f;//max ground speed
+	public float airSpeed = 600f;//max air speed
+	public float crawlSpeed = 200f;//crawling speed
+	public float groundAcceleration = 75f;//how fast you reach groundSpeed
+	public float airAcceleration = 45f;//how fast you reach airSpeed
 	////////////////////////////////////////////
-	[Export]
-	public float jumpHeight = 400f;
-	//how high you jump
-	[Export]
-	public float shorthopHeight = 200f;
-	//how high you shorthop
-	[Export]
-	public float doubleJumpHeight = 600f;
-	//how high you jump in the air
-	[Export]
-	public float horizontalWallJump = 400f;
-	//horizontal velocity from wall jumping
-	[Export]
-	public float verticalWallJump = 400f;
-	//vertical velocity from wall jumping
-	[Export]
+	public float jumpHeight = 400f;//how high you jump
+	public float shorthopHeight = 200f;//how high you shorthop
+	public float doubleJumpHeight = 600f;//how high you jump in the air
+	public float horizontalWallJump = 400f;//horizontal velocity from wall jumping
+	public float verticalWallJump = 400f;//vertical velocity from wall jumping
 	public float fastfallMargin = -100f;
 	////////////////////////////////////////////
-	[Export]
-	public uint jumpNum = 3;
-	//how many air jump you have
-	[Export]
-	public uint wallJumpNum = 255;
-	//how many wall jumps you have
+	public uint jumpNum = 3;//how many air jump you have
+	public uint wallJumpNum = 5;//how many wall jumps you have
 	////////////////////////////////////////////
-	[Export]
-	public float ceilingBonkBounce = 0.25f;
-	//how much speed is conserved when bonking
-	[Export]
-	public float ceilingBounce = 0.95f;
-	//how much speed is conserved when hitting a ceiling
-	[Export]
-	public float wallBounce = 0.95f;
-	//how much speed is conserved when hitting a wall
-	[Export]
-	public float floorBounce = 0.95f;
-	//how much speed is conserved when hitting the floor
+	public float ceilingBonkBounce = 0.25f;//how much speed is conserved when bonking
+	public float ceilingBounce = 0.95f;//how much speed is conserved when hitting a ceiling
+	public float wallBounce = 0.95f;//how much speed is conserved when hitting a wall
+	public float floorBounce = 0.95f;//how much speed is conserved when hitting the floor
 	////////////////////////////////////////////
-	[Export]
-	public float groundFriction = 0.2f;
-	//how much speed is removed over time when not moving on the ground
-	[Export]
-	public float airFriction = 0.1f;
-	//how much speed is removed over time when not moving in the air
-	[Export]
-	public float wallFriction = 0.4f;
-	//how much speed is removed upon touching a wall
-	[Export]
-	public float slopeFriction = 0.1f;
-	//how much speed is removed over time when not moving on a slope
+	public float groundFriction = 0.2f;//how much speed is removed over time when not moving on the ground
+	public float airFriction = 0.1f;//how much speed is removed over time when not moving in the air
+	public float wallFriction = 0.4f;//how much speed is removed upon touching a wall
+	public float slopeFriction = 0.1f;//how much speed is removed over time when not moving on a slope
 	////////////////////////////////////////////
-	[Export]
-	public uint impactLand = 2;
-	//how many frames of inactionability there are after touching the ground
-	[Export]
-	public uint jumpSquat = 4;
-	//how many frames before a ground jump comes out
-	[Export]
-	public uint wallLand = 2;
-	//how many frames of inactionability there are after touching a wall
-	[Export]
-	public uint wallJumpSquat = 2;
-	//how many frames before a wall jump comes out
-	[Export]
+	public uint impactLand = 2;//how many frames of inactionability there are after touching the ground
+	public uint jumpSquat = 4;//how many frames before a ground jump comes out
+	public uint wallLand = 2;//how many frames of inactionability there are after touching a wall
+	public uint wallJumpSquat = 2;//how many frames before a wall jump comes out
 	public uint walkTurn = 3;
-	[Export]
 	public uint duckLength = 3;
-	[Export]
 	public uint getupLength = 4;
 	////////////////////////////////////////////
-	[Export]
 	public bool dummy = false;
 	////////////////////////////////////////////
-	[Export]
 	public float damage = 0f;
-	[Export]
-	public float damageTakenMult = 1f;
-	[Export]
-	public float knockbackTakenMult = 1f;
-	[Export]
-	public int stunTakenMult = 1;
-	[Export]
-	public float damageDoneMult = 1f;
-	[Export]
-	public float knockbackDoneMult = 1f;
-	[Export]
-	public int stunDoneMult = 1;
+	////////////////////////////////////////////
+	private float _damageTakenMult = 1f;
+	public float DamageTakenMult{get => _damageTakenMult; set => _damageTakenMult = value;}
+	
+	private float _knockbackTakenMult = 1f;
+	public float KnockbackTakenMult{get => _knockbackTakenMult; set => _knockbackTakenMult = value;}
+	
+	private int _stunTakenMult = 1;
+	public int StunTakenMult{get => _stunTakenMult; set => _stunTakenMult = value;}
+	////////////////////////////////////////////
+	private float _damageDoneMult = 1f;
+	public float DamageDoneMult{get => _damageDoneMult; set => _damageDoneMult = value;}
+	
+	private float _knockbackDoneMult = 1f;
+	public float KnockbackDoneMult{get => _knockbackDoneMult; set => _knockbackDoneMult = value;}
+	
+	public int _stunDoneMult = 1;
+	public int StunDoneMult{get => _stunDoneMult; set => _stunDoneMult = value;}
 	////////////////////////////////////////////
 	public int direction = 1;//1 for right -1 for left
 	
@@ -523,10 +459,12 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		var posval = setting.CollisionPosition*new Vector2(direction, 1);
 		collision?.SetDeferred("position", posval);
 		OriginalCollisionPosition = setting.CollisionPosition;
+		
 		hurtbox.Radius = setting.HurtboxRadius;
 		hurtbox.Height = setting.HurtboxHeight;
 		hurtbox.CollisionPosition = setting.HurtboxPosition;
 		hurtbox.CollisionRotation = setting.HurtboxRotation;
+		
 		return true;
 	}
 	
@@ -641,9 +579,9 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		var stun = data.Stun;
 		var hp = data.Hitpause;
 		
-		damage += d * damageTakenMult;
-		var force = (skb + damage*vkb/100f) * knockbackTakenMult;
-		var stunlen = stun * stunTakenMult;
+		damage += d * DamageTakenMult;
+		var force = (skb + damage*vkb/100f) * KnockbackTakenMult;
+		var stunlen = stun * StunTakenMult;
 		
 		if(hp > 0)
 		{
@@ -673,8 +611,10 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		PlaySound(HitSoundToPlay);
 	}
 	
-	public void HandleHitting(Hitbox hitbox, Hurtbox hurtbox, IHittable hitChar)
+	public void HandleHitting(HitData data)
 	{
+		Hitbox hitbox = data.Hitter;
+		Hurtbox hurtbox = data.Hitee;
 		if(hitbox.hitlag > 0)
 		{
 			var s = ChangeState<HitLagState>();

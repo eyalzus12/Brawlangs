@@ -256,9 +256,9 @@ public class AttackPart : Node2D
 			hit = true;
 			OnHit(hitbox, hurtbox);
 			
-			var kmult = ch.knockbackDoneMult*knockbackMult*att.knockbackMult;
-			var dmult = ch.damageDoneMult*damageMult*att.damageMult;
-			var smult = ch.stunDoneMult*stunMult*att.stunMult;
+			var kmult = ch.KnockbackDoneMult*knockbackMult*att.knockbackMult;
+			var dmult = ch.DamageDoneMult*damageMult*att.damageMult;
+			var smult = ch.StunDoneMult*stunMult*att.stunMult;
 			
 			if(hitbox is CharacterHitbox chitbox)
 			{
@@ -279,7 +279,7 @@ public class AttackPart : Node2D
 			ignoreList.Add(hitChar);
 			GD.Print($"{hitChar} was hit by {hitbox.Name}");
 			att.OnHit(hitbox, hurtbox);
-			ch.HandleHitting(hitbox, hurtbox, hitChar);
+			ch.HandleHitting(data);
 		}
 		hitList.Clear();
 	}

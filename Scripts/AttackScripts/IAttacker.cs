@@ -9,5 +9,5 @@ public interface IAttacker
 	int TeamNumber{get; set;}
 	
 	bool CanHit(IHittable hitObject);
-	void HandleHitting(Hitbox hitbox, Hurtbox hurtbox, IHittable hitChar);
+	void HandleHitting(HitData data);
 }

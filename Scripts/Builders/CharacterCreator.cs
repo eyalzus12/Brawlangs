@@ -58,11 +58,13 @@ public class CharacterCreator
 		var attCreator = new AttackCreator($"{directoryPath}/{attackFile}.ini");
 		attCreator.Build(ch);
 		
+		/*
 		//find projectiles file name
 		var projFile = charinif["Projectiles", ""].s();
 		//create attacks
 		var projCreator = new ProjectileCreator($"{directoryPath}/{projFile}.ini");
 		projCreator.Build(ch);
+		*/
 		
 		ch.TeamNumber = teamNum;
 		n.AddChild(ch);

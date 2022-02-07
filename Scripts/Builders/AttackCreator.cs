@@ -134,7 +134,7 @@ public class AttackCreator
 	{
 		var HitboxScript = inif[section, "Script", ""].s();
 		var baseFolder = path.SplitByLast('/')[0];
-		var h = TypeUtils.LoadScript<CharacterHitbox>(HitboxScript, new CharacterHitbox(), baseFolder);
+		var h = TypeUtils.LoadScript<Hitbox>(HitboxScript, new CharacterHitbox(), baseFolder);
 		h.Name = section;
 		var ch = (Character)ap.Get("ch");
 		h.owner = ch;
