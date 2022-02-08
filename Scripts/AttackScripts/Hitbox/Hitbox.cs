@@ -66,6 +66,28 @@ public class Hitbox : Area2D
 	
 	public CollisionShape2D shape = new CollisionShape2D();
 	
+	public Vector2 CollisionPosition
+	{
+		get => shape.Position;
+		set
+		{
+			var val = value*new Vector2(direction, 1);
+			shape?.SetDeferred("position", val);
+			originalPosition = value;
+		}
+	}
+	
+	public float CollisionRotation
+	{
+		get => shape.Rotation;
+		set
+		{
+			var val = value*direction;
+			shape?.SetDeferred("rotation", val);
+			originalRotation = value;
+		}
+	}
+	
 	public override void _Ready()
 	{
 		frameCount = 0;
@@ -87,8 +109,8 @@ public class Hitbox : Area2D
 	
 	public virtual void UpdateHitboxPosition()
 	{
-		shape?.SetDeferred("position", originalPosition*new Vector2(direction, 1));
-		shape?.SetDeferred("rotation", originalRotation*direction);
+		CollisionPosition = originalPosition;
+		CollisionRotation = originalRotation;
 	}
 	
 	public virtual void Init() {}
@@ -125,17 +147,17 @@ public class Hitbox : Area2D
 		ZIndex = 4;
 		GeometryUtils.DrawCapsuleShape(this,
 			shape.Shape as CapsuleShape2D, //shape
-			shape.Position, //position
-			shape.Rotation, //rotation
+			CollisionPosition, //position
+			CollisionRotation, //rotation
 			GetDrawColor()); //color
 	}
 	
 	public virtual void Loop() {}
 	
-	public float TeamMult(Node2D n, float chooseFrom) => (n == owner || TeamNum(n) == TeamNum(owner))?chooseFrom:1f;
-	protected int TeamNum(Node2D n) => (n.Get("teamNumber")??-1).i();
+	public float TeamMult(IHittable n, float chooseFrom) => (n == owner || n.TeamNumber == TeamNumber)?chooseFrom:1f;
+	protected int TeamNumber => (owner.Get("TeamNumber")??-1).i();
 	
-	private float StateMult(Node2D n, Dictionary<string, float> chooseFrom)
+	private float StateMult(IHittable n, Dictionary<string, float> chooseFrom)
 	{
 		if(chooseFrom is null || !(n is Character c)) return 1f;//only works on characters obv
 		
@@ -150,9 +172,9 @@ public class Hitbox : Area2D
 		return 1f;
 	}
 	
-	public virtual float GetKnockbackMultiplier(Node2D n) => TeamMult(n, teamKnockbackMult) * StateMult(n, stateKnockbackMult);
-	public virtual float GetDamageMultiplier(Node2D n) => TeamMult(n, teamDamageMult) * StateMult(n, stateDamageMult);
-	public virtual int GetStunMultiplier(Node2D n) => (int)(TeamMult(n, (float)teamStunMult) * StateMult(n, stateStunMult));
+	public virtual float GetKnockbackMultiplier(IHittable n) => TeamMult(n, teamKnockbackMult) * StateMult(n, stateKnockbackMult);
+	public virtual float GetDamageMultiplier(IHittable n) => TeamMult(n, teamDamageMult) * StateMult(n, stateDamageMult);
+	public virtual int GetStunMultiplier(IHittable n) => (int)(TeamMult(n, (float)teamStunMult) * StateMult(n, stateStunMult));
 	
 	public virtual Vector2 KnockbackDir(Node2D hitChar) => new Vector2(
 		KnockbackDirX(hitChar),

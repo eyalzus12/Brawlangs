@@ -122,7 +122,7 @@ public class AttackPart : Node2D
 		++frameCount;
 		if(frameCount > startup) ch.PlayAnimation(attackAnimation);
 		Loop();
-		ActualHit();
+		HandleHits();
 	}
 	
 	public void BuildHitboxAnimator()
@@ -167,7 +167,6 @@ public class AttackPart : Node2D
 	
 	public virtual void Stop()
 	{
-		//GD.Print(hitboxes.Count);
 		hitboxPlayer.Stop(true);
 		hitboxes.ForEach(h => h.Active = false);
 		active = false;
@@ -244,7 +243,7 @@ public class AttackPart : Node2D
 		}
 	}
 	
-	public virtual void ActualHit(/*(Hitbox, Area2D) info*/)
+	public virtual void HandleHits()
 	{
 		if(!active) return;
 		foreach(var entry in hitList)
@@ -256,16 +255,9 @@ public class AttackPart : Node2D
 			hit = true;
 			OnHit(hitbox, hurtbox);
 			
-			var kmult = ch.KnockbackDoneMult*knockbackMult*att.knockbackMult;
-			var dmult = ch.DamageDoneMult*damageMult*att.damageMult;
-			var smult = ch.StunDoneMult*stunMult*att.stunMult;
-			
-			if(hitbox is CharacterHitbox chitbox)
-			{
-				kmult *= chitbox.GetKnockbackMultiplier(hitChar);
-				dmult *= chitbox.GetDamageMultiplier(hitChar);
-				smult *= chitbox.GetStunMultiplier(hitChar);
-			}
+			var kmult = ch.KnockbackDoneMult*knockbackMult*att.knockbackMult*hitbox.GetKnockbackMultiplier(hitChar);
+			var dmult = ch.DamageDoneMult*damageMult*att.damageMult*hitbox.GetDamageMultiplier(hitChar);
+			var smult = ch.StunDoneMult*stunMult*att.stunMult*hitbox.GetStunMultiplier(hitChar);
 			
 			var dirvec = hitbox.KnockbackDir(hitChar)*kmult;
 			var skb = dirvec*hitbox.setKnockback + hitbox.momentumCarry*ch.GetVelocity();

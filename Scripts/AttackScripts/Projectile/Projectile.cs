@@ -15,16 +15,19 @@ public class Projectile : Node2D, IHitter, IHittable
 	public ProjectileMovementFunction Movement;
 	
 	private List<Hitbox> _hitboxes = new List<Hitbox>();
-	private HashSet<IHittable> _ignoreList = new HashSet<IHittable>();
-	private Dictionary<Hurtbox, Hitbox> _hitList = new Dictionary<Hurtbox, Hitbox>();
-	private bool _hit = false;
-	private IAttacker _owner;
-	
 	public List<Hitbox> Hitboxes{get => _hitboxes; set => _hitboxes=value;}
+	private HashSet<IHittable> _ignoreList = new HashSet<IHittable>();
 	public HashSet<IHittable> HitIgnoreList{get => _ignoreList; set => _ignoreList=value;}
+	private Dictionary<Hurtbox, Hitbox> _hitList = new Dictionary<Hurtbox, Hitbox>();
 	public Dictionary<Hurtbox, Hitbox> HitList{get => _hitList; set => _hitList=value;}
+	private bool _hit = false;
 	public bool Hit{get => _hit; set => _hit=value;}
+	private IAttacker _owner;
 	public IAttacker OwnerObject{get => _owner; set => _owner=value;}
+	
+	public string currentCollisionSetting;
+	private List<Hurtbox> _hurtboxes = new List<Hurtbox>();
+	public List<Hurtbox> Hurtboxes{get => _hurtboxes; set => _hurtboxes=value;}
 	
 	public int TeamNumber{get => OwnerObject.TeamNumber; set => OwnerObject.TeamNumber = value;}
 	
@@ -95,16 +98,16 @@ public class Projectile : Node2D, IHitter, IHittable
 	public void Destruct()
 	{
 		OnRemove();
-		_hitboxes.ForEach(h => h.Active = false);
-		_active = false;
-		_hitList.Clear();
-		_ignoreList.Clear();
+		Hitboxes.ForEach(h => h.Active = false);
+		Active = false;
+		HitList.Clear();
+		HitIgnoreList.Clear();
 		EmitSignal(nameof(ProjectileDied), this);
 	}
 	
 	public virtual void Reset()
 	{
-		_hitboxes = GetChildren().FilterType<Hitbox>().ToList();
+		Hitboxes = GetChildren().FilterType<Hitbox>().ToList();
 		PostHitboxInit();
 	}
 	
@@ -127,7 +130,7 @@ public class Projectile : Node2D, IHitter, IHittable
 		if(!OwnerObject.CanHit(hitChar) || HitIgnoreList.Contains(hitChar)) return;
 		
 		Hitbox current;
-		if(_hitList.TryGetValue(realhurtbox, out current))
+		if(HitList.TryGetValue(realhurtbox, out current))
 		{
 			if(hitbox.hitPriority > current.hitPriority)
 				HitList[realhurtbox] = hitbox;
@@ -145,13 +148,14 @@ public class Projectile : Node2D, IHitter, IHittable
 			Hitbox hitbox = entry.Value;
 			Hurtbox hurtbox = entry.Key;
 			var hitChar = hurtbox.owner;
-			if(!OwnerObject.CanHit(hitChar) || HitIgnoreList.Contains(hitChar)) continue;
+			if(!OwnerObject.CanHit(hitChar) || HitIgnoreList.Contains(hitChar)) continue;//already hit or cant hit
 			HitEvent(hitbox, hurtbox);
 			Hit = true;
 			
-			var kmult = owner.KnockbackDoneMult;
-			var dmult = owner.DamageDoneMult;
-			var smult = owner.StunDoneMult;
+			var kmult = owner.KnockbackDoneMult*KnockbackDoneMult*hitbox.GetKnockbackMultiplier(hitChar);
+			var dmult = owner.DamageDoneMult*DamageDoneMult*hitbox.GetDamageMultiplier(hitChar);
+			var smult = owner.StunDoneMult*StunDoneMult*hitbox.GetStunMultiplier(hitChar);
+			
 			var skb = hitbox.setKnockback*kmult;
 			var vkb = hitbox.varKnockback*kmult;
 			var damage = hitbox.damage*dmult;
@@ -165,6 +169,12 @@ public class Projectile : Node2D, IHitter, IHittable
 			GD.Print($"{hitChar} was hit by {hitbox.Name}");
 		}
 		HitList.Clear();
+	}
+	
+	public void ApplySettings(string setting)
+	{
+		currentCollisionSetting = setting;
+		Hurtboxes.ForEach(h=>h.ChangeState(setting));
 	}
 	
 	public virtual void HitEvent(Hitbox hitbox, Hurtbox hurtbox) {}

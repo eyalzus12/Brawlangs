@@ -8,13 +8,12 @@ public class Hurtbox : Area2D
 	
 	public CapsuleShape2D Shape{get => (CapsuleShape2D)col.Shape; set => col.Shape = value;}
 	
-	public string CurrentCollisionState = "Default";
-	public HurtboxCollisionState CurrentCollisionStateData;
-	
 	public float Radius {get => Shape.Radius; set => Shape.Radius = value;}
 	public float Height {get => Shape.Height; set => Shape.Height = value;}
 	
 	public Dictionary<string, HurtboxCollisionState> states = new Dictionary<string, HurtboxCollisionState>();
+	public string CurrentCollisionState = "Default";
+	public HurtboxCollisionState CurrentCollisionStateData;
 	
 	public Vector2 CollisionPosition
 	{

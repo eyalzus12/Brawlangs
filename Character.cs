@@ -149,24 +149,22 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public Attack currentAttack;
 	
 	public Dictionary<string, State> states = new Dictionary<string, State>();
-		
-	public CollisionSettings currentSetting = default;
-	public CollisionShape2D collision;
-	public Hurtbox hurtbox;
-	public Dictionary<string, CollisionSettings> settings = new Dictionary<string, CollisionSettings>();
+	
+	public string currentCollisionSetting;
+	private List<Hurtbox> _hurtboxes = new List<Hurtbox>();
+	public List<Hurtbox> Hurtboxes{get => _hurtboxes; set => _hurtboxes=value;}
+	public CharacterCollision collision;
 	
 	public List<Attack> attacks = new List<Attack>();
 	public Dictionary<string, Attack> attackDict = new Dictionary<string, Attack>();
 	public Dictionary<Attack, int> attackCooldowns = new Dictionary<Attack, int>();
 	
-	public Dictionary<string, PackedScene> projectiles = new Dictionary<string, PackedScene>();
-	public Dictionary<string, HashSet<Projectile>> activeProjectiles = new Dictionary<string, HashSet<Projectile>>();
+	//public Dictionary<string, PackedScene> projectiles = new Dictionary<string, PackedScene>();
+	//public Dictionary<string, HashSet<Projectile>> activeProjectiles = new Dictionary<string, HashSet<Projectile>>();
 	
 	public List<string> StatList = new List<string>();
 	public PropertyMap prop = new PropertyMap();
 	
-	public Vector2 OriginalCollisionPosition = default;
-		
 	public InputManager Inputs;
 	
 	public AnimationSprite sprite;
@@ -198,10 +196,8 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		if(Input.IsActionJustPressed("reset")) Respawn();
 		currentState?.SetInputs();
 		currentState?.DoPhysics(delta);
-			
-		sprite.FlipH = DirectionToBool();
 		
-		UpdateCollision();
+		sprite.FlipH = DirectionToBool();
 	}
 	
 	public void PlayAnimation(string anm) => sprite.Play(anm);
@@ -342,7 +338,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		GD.Print("\nRespawning...");
 		Inputs?.MarkAllForDeletion();
 		currentAttack?.Stop();
-		ApplySettings("Normal");
+		ApplySettings("Default");
 		ChangeState("Air");
 		Position = Vector2.Zero;
 		fastfalling = false;
@@ -411,6 +407,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	}
 	
 	//FIX: this doesnt account for inheritence
+	//TODO: just use some function like IsActionable
 	public readonly static Type[] ignoreTypes = new Type[]{typeof(AttackState), typeof(EndlagState), typeof(StunState)};
 	
 	public virtual void OnSemiSolidLeave(Godot.Object body) 
@@ -431,41 +428,11 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	////////////////Collision//////////////////
 	///////////////////////////////////////////
 	
-	public virtual void UpdateCollision()
+	public void ApplySettings(string setting)
 	{
-		collision?.SetDeferred("position", OriginalCollisionPosition*new Vector2(direction, 1));
-	}
-	
-	public bool ApplySettings(string setting)
-	{
-		try
-		{
-			return ApplySettings(settings[setting]);
-		}
-		catch(KeyNotFoundException)
-		{
-			try
-			{
-				return ApplySettings(settings["Normal"]);
-			}
-			catch(KeyNotFoundException) {return false;}
-		}
-	}
-	
-	public bool ApplySettings(CollisionSettings setting)
-	{
-		currentSetting = setting;
-		(collision.Shape as RectangleShape2D).Extents = setting.CollisionExtents;
-		var posval = setting.CollisionPosition*new Vector2(direction, 1);
-		collision?.SetDeferred("position", posval);
-		OriginalCollisionPosition = setting.CollisionPosition;
-		
-		hurtbox.Radius = setting.HurtboxRadius;
-		hurtbox.Height = setting.HurtboxHeight;
-		hurtbox.CollisionPosition = setting.HurtboxPosition;
-		hurtbox.CollisionRotation = setting.HurtboxRotation;
-		
-		return true;
+		currentCollisionSetting = setting;
+		collision.ChangeState(setting);
+		Hurtboxes.ForEach(h=>h.ChangeState(setting));
 	}
 	
 	//checks if changing to a practicular collision shape is safe
@@ -500,7 +467,6 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		return (result?.Count == 0);
 	}
 	
-	
 	//crouches
 	public void Crouch()
 	{
@@ -511,7 +477,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	//uncrouches
 	public void Uncrouch()
 	{
-		ApplySettings("Normal");
+		ApplySettings("Default");
 		crouching = false;
 	}
 	
