@@ -160,8 +160,9 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public Dictionary<string, Attack> attackDict = new Dictionary<string, Attack>();
 	public Dictionary<Attack, int> attackCooldowns = new Dictionary<Attack, int>();
 	
-	//public Dictionary<string, PackedScene> projectiles = new Dictionary<string, PackedScene>();
-	//public Dictionary<string, HashSet<Projectile>> activeProjectiles = new Dictionary<string, HashSet<Projectile>>();
+	public Dictionary<string, PackedScene> projectiles = new Dictionary<string, PackedScene>();
+	public Dictionary<string, HashSet<Projectile>> activeProjectiles = new Dictionary<string, HashSet<Projectile>>();
+	public ObjectPool objectPool;
 	
 	public List<string> StatList = new List<string>();
 	public PropertyMap prop = new PropertyMap();
@@ -664,11 +665,50 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		currentAttack = null;
 	}
 	
-	/*public virtual void EmitProjectile(Projectile2D proj)
+	public virtual void EmitProjectile(string proj)
 	{
-		GetParent().AddChild(proj);
-		proj.Active = true;
-	}*/
+		try
+		{
+			//get a packed scene of a fitting projectile
+			var packedProjectile = projectiles[proj];
+			//get pooled projectile
+			var generatedProjectile = (Projectile)objectPool.GetObject(proj, packedProjectile);
+			if(generatedProjectile is null)
+			{
+				GD.Print($"Failed to emit projectile {proj} because the object pool returned a null");
+			}
+			else
+			{
+				if(!activeProjectiles.ContainsKey(proj))//projectile havent been used yet. create storage
+					activeProjectiles.Add(proj, new HashSet<Projectile>());
+				
+				//add to scene
+				GetParent().AddChild(generatedProjectile);
+				//store as active
+				activeProjectiles[proj].Add(generatedProjectile);
+				//connect destruction signal
+				generatedProjectile.Connect("ProjectileDied", this, nameof(HandleProjectileDestruction));
+			}
+		}
+		catch(KeyNotFoundException)
+		{
+			GD.Print($"Character {Name} does not have projectile {proj} defined, you idiot");
+		}
+	}
+	
+	public virtual void HandleProjectileDestruction(Projectile who)
+	{
+		var identifier = who.identifier;
+		try
+		{
+			activeProjectiles[identifier].Remove(who);
+			objectPool.InsertObject(who, identifier);
+		}
+		catch(KeyNotFoundException)
+		{
+			GD.Print($"Projectile {identifier} died but was never reported as active. TF");
+		}
+	}
 	
 	public virtual void SetAttackCooldowns()
 	{

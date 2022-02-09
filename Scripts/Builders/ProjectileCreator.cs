@@ -15,14 +15,14 @@ public class ProjectileCreator
 		inif.Load(path);
 	}
 	
-	public List<PackedScene> Build(Node2D n)
+	public List<(string,PackedScene)> Build(Node2D n)
 	{
-		var packs = new List<PackedScene>();
-		var oProjectiles = inif["", "ProjectileSections", new List<string>()];
-		if(oProjectiles is string)
+		var packs = new List<(string,PackedScene)>();
+		var oProjectiles = inif["", "Projectiles", new List<string>()];
+		if(oProjectiles is string sproj)
 		{
-			var pack = BuildProjectile(n, oProjectiles.s());
-			packs.Add(pack);
+			var pack = BuildProjectile(n, sproj);
+			packs.Add((sproj,pack));
 		}
 		else
 		{
@@ -30,7 +30,7 @@ public class ProjectileCreator
 			foreach(var s in Projectiles)
 			{
 				var pack = BuildProjectile(n, s);
-				packs.Add(pack);
+				packs.Add((s,pack));
 			}
 		}
 		
@@ -40,18 +40,77 @@ public class ProjectileCreator
 	public PackedScene BuildProjectile(Node2D n, string section)
 	{
 		var proj = new Projectile();
-		//proj.owner = n;
+		proj.owner = (IAttacker)n;
 		proj.Name = section;
+		proj.identifier = section;
 		var sp = inif[section, "Position", Vector2.Zero].v2();
 		proj.spawningPosition = sp;
 		var lt = inif[section, "LifeTime", 1].i();
 		proj.maxLifetime = lt;
-		var dr = inif[section, "Direction", 1].i();//should be -1 or 1
-		if(dr != 1 && dr != -1) dr = 1;//fallback
-		proj.direction = dr;
 		var smf = inif[section, "MovementFunction", ""].s();
 		var movf = BuildMovementFunction(smf);
 		proj.Movement = movf;
+		
+		var oHitboxSections = inif[section, "Hitboxes", $"{section}Hitbox"];
+		if(oHitboxSections is string hitboxSection)
+			BuildHitbox(proj, hitboxSection);
+		else if(oHitboxSections is object)//not null
+		{
+			var HitboxSections = oHitboxSections.ls();
+			foreach(var s in HitboxSections) BuildHitbox(proj, s);
+		}
+		
+		var oStates = inif[section, "CollisionStates", ""];
+		var oHurtboxes = inif[section, "Hurtboxes", $"{section}Hurtbox"];
+		
+		if(oStates is string state)
+		{
+			if(oHurtboxes is string hurtbox)
+			{
+				var hr = new Hurtbox();
+				hr.Name = hurtbox;
+				hr.owner = proj;
+				proj.AddChild(hr);
+				hr.Owner = proj;
+				proj.Hurtboxes.Add(hr);
+				BuildHurtbox(hr, state+hurtbox, state);
+			}
+			else foreach(var hurtboox in oHurtboxes.ls())//name needs to be different than hurtbox. aaa
+			{
+				var hr = new Hurtbox();
+				hr.Name = hurtboox;
+				hr.owner = proj;
+				proj.AddChild(hr);
+				hr.Owner = proj;
+				proj.Hurtboxes.Add(hr);
+				BuildHurtbox(hr, state+hurtboox, state);
+			}
+		}
+		else
+		{
+			if(oHurtboxes is string hurtbox)
+			{
+				var hr = new Hurtbox();
+				hr.Name = hurtbox;
+				hr.owner = proj;
+				proj.AddChild(hr);
+				hr.Owner = proj;
+				proj.Hurtboxes.Add(hr);
+				foreach(var staate in oStates.ls())
+					BuildHurtbox(hr, staate+hurtbox, staate);
+			}
+			else foreach(var hurtboox in oHurtboxes.ls())
+			{
+				var hr = new Hurtbox();
+				hr.Name = hurtboox;
+				hr.owner = proj;
+				proj.AddChild(hr);
+				hr.Owner = proj;
+				proj.Hurtboxes.Add(hr);
+				foreach(var staate in oStates.ls())
+					BuildHurtbox(hr, staate+hurtboox, staate);
+			}
+		}
 		
 		proj.LoadProperties();
 		LoadExtraProperties(proj, section);
@@ -68,21 +127,33 @@ public class ProjectileCreator
 	
 	public ProjectileMovementFunction BuildMovementFunction(string section)
 	{
-		var movf = new ProjectileMovementFunction();
+		var movementScript = inif[section, "Script", ""].s();
+		var baseFolder = path.SplitByLast('/')[0];
+		var movf = TypeUtils.LoadScript<ProjectileMovementFunction>(movementScript, new ProjectileMovementFunction(), baseFolder);
 		if(section == "") return movf;
 		movf.LoadProperties();
 		LoadExtraProperties(movf, section);
 		return movf;
 	}
 	
+	public void BuildHurtbox(Hurtbox hr, string section, string state)
+	{
+		var rd = inif[section, "Radius", 0f].f();
+		var he = inif[section, "Height", 0f].f();
+		var pos = inif[section, "Position", Vector2.Zero].v2();
+		var rot = inif[section, "Rotation", 0f].f();
+		rot = (float)(rot*Math.PI/180f);//to rads
+		var hurtboxState = new HurtboxCollisionState(state, rd, he, pos, rot);
+		hr.AddState(hurtboxState);
+	}
+	
 	public void BuildHitbox(Node2D n, string section)
 	{
-		/*var HitboxScript = inif[section, "Script", ""].s();
+		var HitboxScript = inif[section, "Script", ""].s();
 		var baseFolder = path.SplitByLast('/')[0];
-		var h = TypeUtils.LoadScript<Hitbox>(HitboxScript, new Hitbox(), baseFolder);*/
-		var h = new Hitbox();
+		var h = TypeUtils.LoadScript<Hitbox>(HitboxScript, new Hitbox(), baseFolder);
+		//var h = new Hitbox();
 		h.Name = section;
-		//var ch = (Character)ap.Get("ch");
 		h.owner = n;
 		
 		var sk = inif[section, "SetKnockback", Vector2.Zero].v2();
@@ -111,10 +182,6 @@ public class ProjectileCreator
 		{
 			GD.Print($"Hit sound {hs} for hitbox {section} in file at path {inif.filePath} could not be found.");
 		}*/
-		
-		/*var af = inif[section, "ActiveFrames", new List<Vector2>()];
-		if(af is Vector2) h.activeFrames = new List<Vector2> {af.v2()};
-		else h.activeFrames = af.lv2();*/
 		
 		var hafs = inif[section, "HorizontalAngleFlipper", "Directional"].s();
 		Hitbox.AngleFlipper haf;
@@ -214,20 +281,8 @@ public class ProjectileCreator
 			var @default = request.ParamDefault;
 			
 			var prop_obj = inif[section, ininame, @default];
-			
-			if(type == typeof(Hitbox))
-			{
-				BuildHitbox(loadTo, prop_obj.s());
-			}
-			else if(type == typeof(List<Hitbox>))
-			{
-				foreach(var h in prop_obj.ls()) BuildHitbox(loadTo, h);
-			}
-			else
-			{
-				var prop = prop_obj.cast(type, $"loading extra properties for {loadTo.GetType().Name} {section}");
-				loadTo.Set(objname, prop);
-			}
+			var prop = prop_obj.cast(type, $"loading extra properties for {loadTo.GetType().Name} {section}");
+			loadTo.Set(objname, prop);
 		}
 	}
 }

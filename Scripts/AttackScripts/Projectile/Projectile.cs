@@ -8,6 +8,7 @@ public class Projectile : Node2D, IHitter, IHittable
 	[Signal]
 	public delegate void ProjectileDied(Projectile who);
 	
+	public string identifier;
 	public Vector2 spawningPosition = default;
 	public int frameCount = 0;
 	public int maxLifetime = 600;
@@ -74,7 +75,8 @@ public class Projectile : Node2D, IHitter, IHittable
 		ConnectSignals();
 		_hit = false;
 		Init();
-		Active = false;
+		Active = true;
+		GD.Print("aaaaaa");
 	}
 	
 	public override void _PhysicsProcess(float delta)
@@ -97,12 +99,14 @@ public class Projectile : Node2D, IHitter, IHittable
 	
 	public void Destruct()
 	{
+		//GD.Print("Hmmmmm");
 		OnRemove();
 		Hitboxes.ForEach(h => h.Active = false);
 		Active = false;
 		HitList.Clear();
 		HitIgnoreList.Clear();
 		EmitSignal(nameof(ProjectileDied), this);
+		GetParent().RemoveChild(this);
 	}
 	
 	public virtual void Reset()
@@ -127,7 +131,7 @@ public class Projectile : Node2D, IHitter, IHittable
 		if(!hitbox.Active) return;
 		if(!(hurtbox is Hurtbox realhurtbox)) return;//can only handle hurtboxes for hitting
 		var hitChar = realhurtbox.owner;
-		if(!OwnerObject.CanHit(hitChar) || HitIgnoreList.Contains(hitChar)) return;
+		if(hitChar == this || !OwnerObject.CanHit(hitChar) || HitIgnoreList.Contains(hitChar)) return;
 		
 		Hitbox current;
 		if(HitList.TryGetValue(realhurtbox, out current))

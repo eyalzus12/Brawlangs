@@ -59,13 +59,13 @@ public class DebugLabel : InfoLabel
 		Newline();
 		Add("PlayedSounds", ch.audioManager.ToString());
 		Newline();
-		//Add("CollisionSetting", ch.currentSetting.Name);
+		Add("CollisionSetting", ch.currentCollisionSetting);
 		//Add("CollisionMask", ch.CollisionMask);
-		Newline();
+		//Newline();
 		//Add("CollisionExtents", (ch.collision.Shape is RectangleShape2D r)?r.Extents:Vector2.Zero);
 		//Add("CollisionPosition", ch.collision.Position);
 		//Add("CollisionRotation", Math.Round(ch.collision.Rotation * 180f / Math.PI, 2));
-		Newline();
+		//Newline();
 		//Add("HurtboxRadius", ch.hurtbox.Shape.Radius);
 		//Add("HurtboxHeight", ch.hurtbox.Shape.Height);
 		//Add("HurtboxPosition", ch.hurtbox.col.Position);
