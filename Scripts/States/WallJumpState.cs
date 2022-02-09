@@ -43,7 +43,7 @@ public class WallJumpState : WallState
 			ch.ChangeState("Air");
 		else return false;
 		
-		ch.ApplySettings("Normal");
+		ch.ApplySettings("Default");
 		return true;
 	}
 }

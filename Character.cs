@@ -42,8 +42,8 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public float verticalWallJump = 400f;//vertical velocity from wall jumping
 	public float fastfallMargin = -100f;
 	////////////////////////////////////////////
-	public uint jumpNum = 3;//how many air jump you have
-	public uint wallJumpNum = 5;//how many wall jumps you have
+	public int jumpNum = 3;//how many air jump you have
+	public int wallJumpNum = 5;//how many wall jumps you have
 	////////////////////////////////////////////
 	public float ceilingBonkBounce = 0.25f;//how much speed is conserved when bonking
 	public float ceilingBounce = 0.95f;//how much speed is conserved when hitting a ceiling
@@ -55,13 +55,13 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public float wallFriction = 0.4f;//how much speed is removed upon touching a wall
 	public float slopeFriction = 0.1f;//how much speed is removed over time when not moving on a slope
 	////////////////////////////////////////////
-	public uint impactLand = 2;//how many frames of inactionability there are after touching the ground
-	public uint jumpSquat = 4;//how many frames before a ground jump comes out
-	public uint wallLand = 2;//how many frames of inactionability there are after touching a wall
-	public uint wallJumpSquat = 2;//how many frames before a wall jump comes out
-	public uint walkTurn = 3;
-	public uint duckLength = 3;
-	public uint getupLength = 4;
+	public int impactLand = 2;//how many frames of inactionability there are after touching the ground
+	public int jumpSquat = 4;//how many frames before a ground jump comes out
+	public int wallLand = 2;//how many frames of inactionability there are after touching a wall
+	public int wallJumpSquat = 2;//how many frames before a wall jump comes out
+	public int walkTurn = 3;
+	public int duckLength = 3;
+	public int getupLength = 4;
 	////////////////////////////////////////////
 	public bool dummy = false;
 	////////////////////////////////////////////
@@ -154,6 +154,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	private List<Hurtbox> _hurtboxes = new List<Hurtbox>();
 	public List<Hurtbox> Hurtboxes{get => _hurtboxes; set => _hurtboxes=value;}
 	public CharacterCollision collision;
+	public PlatformDropDetector DropDetector;
 	
 	public List<Attack> attacks = new List<Attack>();
 	public Dictionary<string, Attack> attackDict = new Dictionary<string, Attack>();
@@ -432,6 +433,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	{
 		currentCollisionSetting = setting;
 		collision.ChangeState(setting);
+		DropDetector.UpdateBasedOnCollisionShape();
 		Hurtboxes.ForEach(h=>h.ChangeState(setting));
 	}
 	

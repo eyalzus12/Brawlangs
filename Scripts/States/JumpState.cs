@@ -52,7 +52,7 @@ public class JumpState : GroundedState
 	{
 		if(!ch.grounded)
 		{
-			ch.ApplySettings("Normal");
+			ch.ApplySettings("Default");
 			ch.ChangeState("Air");
 		}
 		else return false;

@@ -181,6 +181,6 @@ public class Projectile : Node2D, IHitter, IHittable
 	
 	public virtual void HandleGettingHit(HitData data)
 	{
-		
+		Destruct();
 	}
 }

@@ -9,8 +9,6 @@ public class EndlagState : State
 	public int endlag = 0;
 	public Attack att = null;
 	
-	
-	
 	public override bool IsActionable() => false;
 	
 	public override void Init()

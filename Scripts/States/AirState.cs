@@ -45,7 +45,7 @@ public class AirState : State
 	protected override void DoJump()
 	{
 //		platformCancel = !ch.GetCollisionMaskBit(DROP_THRU_BIT);
-		if(platformCancel) return;
+//		if(platformCancel) return;
 		
 		if(ch.jumpCounter < ch.jumpNum)
 		{

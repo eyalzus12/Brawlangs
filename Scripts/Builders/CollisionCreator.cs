@@ -53,12 +53,12 @@ public class CollisionCreator
 				}
 			}
 			
-			BuildCollision(cs, collision+state, state);
+			BuildCollision(cs, state+collision, state);
 		}
 		else
 		{
 			foreach(var staate in oStates.ls())
-				BuildCollision(cs, collision+staate, staate);
+				BuildCollision(cs, staate+collision, staate);
 			
 			if(oHurtboxes is string hurtbox)
 			{
@@ -82,78 +82,20 @@ public class CollisionCreator
 					foreach(var staate in oStates.ls())
 						BuildHurtbox(hr, staate+hurtboox, staate);
 				}
-				
 			}
 		}
 		
-		/*
-		var collisionSection = inif["", "Collision", ""].s();
-		if(collisionSection != "") BuildCollision()
-		
-		var oHitboxSections = inif[section, "Hitboxes", null];
-		if(oHitboxSections is string)
-			BuildHitbox(ap, oHitboxSections.s());
-		else if(oHitboxSections is object)//not null
-		{
-			var HitboxSections = oHitboxSections.ls();
-			foreach(var s in HitboxSections) BuildHitbox(ap, s);
-		}
-		
-		var cs = new CharacterCollision();
-		cs.Shape = new RectangleShape2D();
-		cs.Name = "Collision";
-		
-		var HurtboxScript = inif["", "HurtboxScript", ""].s();
-		var baseFolder = path.SplitByLast('/')[0];
-		var hr = TypeUtils.LoadScript<Hurtbox>(HurtboxScript, new Hurtbox(), baseFolder);
-		hr.Name = "Hurtbox";
-		hr.owner = ch;
-		
-		//////////////////////////////////////////////////////////////////////////////////
-		
-		var oBase = inif["", "Bases", new List<string>()];
-		if(oBase is string) BuildBase(ch, oBase.s());
-		else
-		{
-			var Bases = oBase.ls();
-			foreach(var s in Bases) BuildBase(ch, s);
-		}
-		
-		//////////////////////////////////////////////////////////////////////////////////
-		*/
-		
-		/*var platDrop = new Area2D();
-		platDrop.Name = "PlatformDrop";
-		
-		platDrop.Connect("body_exited", ch, "OnSemiSolidLeave");
-		platDrop.CollisionLayer = 0;
-		platDrop.CollisionMask = 0b10;
-		
-		var droppos = inif["", "PlatDropPosition", new Vector2(0, 19)].v2();
-		platDrop.Position = droppos;
-		
-		var dropc = new CollisionShape2D();
-		dropc.Shape = new RectangleShape2D();
-		dropc.Name = "DropCollision";
-		var dropext = inif["", "PlatDropExtents", new Vector2(32, 11)].v2();
-		(dropc.Shape as RectangleShape2D).Extents = dropext;
-		
-		platDrop.Visible = false;
-		
-		//////////////////////////////////////////////////////////////////////////////////
-		
-		platDrop.AddChild(dropc);
-		ch.AddChild(platDrop);*/
-		/*ch.hurtbox = hr;
-		ch.AddChild(hr);
-		ch.collision = cs;
-		ch.AddChild(cs);*/
+		var platDrop = new PlatformDropDetector();
+		platDrop.Name = "DropDetector";
+		platDrop.owner = ch;
+		ch.DropDetector = platDrop;
+		ch.AddChild(platDrop);
 	}
 	
 	public void BuildHurtbox(Hurtbox hr, string section, string state)
 	{
-		var rd = inif[section, "Radius", 30].f();
-		var he = inif[section, "Height", 16].f();
+		var rd = inif[section, "Radius", 0f].f();
+		var he = inif[section, "Height", 0f].f();
 		var pos = inif[section, "Position", Vector2.Zero].v2();
 		var rot = inif[section, "Rotation", 0f].f();
 		rot = (float)(rot*Math.PI/180f);//to rads

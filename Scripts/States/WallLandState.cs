@@ -29,7 +29,7 @@ public class WallLandState : WallState
 		if(!ch.walled)
 		{
 			ch.ChangeState("Air");
-			ch.ApplySettings("Normal");
+			ch.ApplySettings("Default");
 		}
 		else if(frameCount >= ch.wallLand) ch.ChangeState("Wall");
 		else return false;

@@ -55,7 +55,7 @@ public class WallState : State
 			return true;
 		}
 		
-		ch.ApplySettings("Normal");
+		ch.ApplySettings("Default");
 		return true;
 	}
 	
