@@ -681,7 +681,8 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 			{
 				if(!activeProjectiles.ContainsKey(proj))//projectile havent been used yet. create storage
 					activeProjectiles.Add(proj, new HashSet<Projectile>());
-				
+				//set direction
+				generatedProjectile.direction = direction;
 				//add to scene
 				GetParent().AddChild(generatedProjectile);
 				//store as active

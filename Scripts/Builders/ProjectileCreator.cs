@@ -15,9 +15,9 @@ public class ProjectileCreator
 		inif.Load(path);
 	}
 	
-	public List<(string,PackedScene)> Build(Node2D n)
+	/*public List<(string,Projectile)> Build(Node2D n)
 	{
-		var packs = new List<(string,PackedScene)>();
+		var packs = new List<(string,Projectile)>();
 		var oProjectiles = inif["", "Projectiles", new List<string>()];
 		if(oProjectiles is string sproj)
 		{
@@ -35,12 +35,12 @@ public class ProjectileCreator
 		}
 		
 		return packs;
-	}
+	}*/
 	
-	public PackedScene BuildProjectile(Node2D n, string section)
+	public Projectile BuildProjectile(/*Node2D n, */string section)
 	{
 		var proj = new Projectile();
-		proj.owner = (IAttacker)n;
+		//proj.owner = (IAttacker)n;
 		proj.Name = section;
 		proj.identifier = section;
 		var sp = inif[section, "Position", Vector2.Zero].v2();
@@ -115,14 +115,15 @@ public class ProjectileCreator
 		proj.LoadProperties();
 		LoadExtraProperties(proj, section);
 		
-		var pack = new PackedScene();
+		/*var pack = new PackedScene();
 		var err = pack.Pack(proj);
 		if(err != Error.Ok)
 		{
 			GD.Print($"Error {err} while packing projectile defined at section {section} of file {path}");
 			return null;
 		}
-		else return pack;
+		else return pack;*/
+		return proj;
 	}
 	
 	public ProjectileMovementFunction BuildMovementFunction(string section)

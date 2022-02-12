@@ -8,12 +8,16 @@ public class Projectile : Node2D, IHitter, IHittable
 	[Signal]
 	public delegate void ProjectileDied(Projectile who);
 	
+	[Export]
 	public string identifier;
+	[Export]
 	public Vector2 spawningPosition = default;
-	public int frameCount = 0;
+	[Export]
 	public int maxLifetime = 600;
+	
 	public int direction = 1;
 	public ProjectileMovementFunction Movement;
+	public int frameCount = 0;
 	
 	private List<Hitbox> _hitboxes = new List<Hitbox>();
 	public List<Hitbox> Hitboxes{get => _hitboxes; set => _hitboxes=value;}
@@ -76,6 +80,7 @@ public class Projectile : Node2D, IHitter, IHittable
 		_hit = false;
 		Init();
 		Active = true;
+		GD.Print(maxLifetime);
 		GD.Print("aaaaaa");
 	}
 	
@@ -106,7 +111,7 @@ public class Projectile : Node2D, IHitter, IHittable
 		HitList.Clear();
 		HitIgnoreList.Clear();
 		EmitSignal(nameof(ProjectileDied), this);
-		GetParent().RemoveChild(this);
+		//GetParent().RemoveChild(this);
 	}
 	
 	public virtual void Reset()
