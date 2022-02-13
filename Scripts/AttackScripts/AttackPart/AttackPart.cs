@@ -10,8 +10,8 @@ public class AttackPart : Node2D
 	public int frameCount = 0;
 	
 	public List<CharacterHitbox> hitboxes = new List<CharacterHitbox>();
-	public HashSet<Node2D> ignoreList = new HashSet<Node2D>();
-	public Dictionary<Hurtbox, CharacterHitbox> hitList = new Dictionary<Hurtbox, CharacterHitbox>();
+	public HashSet<IHittable> ignoreList = new HashSet<IHittable>();
+	public Dictionary<Hurtbox, Hitbox> hitList = new Dictionary<Hurtbox, Hitbox>();
 	
 	public Dictionary<string, ParamRequest> LoadExtraProperties = new Dictionary<string, ParamRequest>();
 	
@@ -224,14 +224,14 @@ public class AttackPart : Node2D
 		catch(KeyNotFoundException) {return null;}
 	}
 	
-	public virtual void HandleHit(CharacterHitbox hitbox, Area2D hurtbox)
+	public virtual void HandleHit(Hitbox hitbox, Area2D hurtbox)
 	{
 		if(!hitbox.Active) return;
 		if(!(hurtbox is Hurtbox realhurtbox)) return;//can only handle hurtboxes for hitting
-		var hitChar = (Character)hurtbox.GetParent();
+		var hitChar = realhurtbox.owner;
 		if(!ch.CanHit(hitChar) || ignoreList.Contains(hitChar)) return;
 		
-		var current = new CharacterHitbox();
+		var current = new Hitbox();
 		if(hitList.TryGetValue(realhurtbox, out current))
 		{
 			if(hitbox.hitPriority > current.hitPriority)
@@ -250,7 +250,7 @@ public class AttackPart : Node2D
 		{
 			Hitbox hitbox = entry.Value;
 			Hurtbox hurtbox = entry.Key;
-			var hitChar = (Character)hurtbox.GetParent();
+			var hitChar = hurtbox.owner;
 			if(!ch.CanHit(hitChar) || ignoreList.Contains(hitChar)) continue;
 			hit = true;
 			OnHit(hitbox, hurtbox);
@@ -259,7 +259,7 @@ public class AttackPart : Node2D
 			var dmult = ch.DamageDoneMult*damageMult*att.damageMult*hitbox.GetDamageMultiplier(hitChar);
 			var smult = ch.StunDoneMult*stunMult*att.stunMult*hitbox.GetStunMultiplier(hitChar);
 			
-			var dirvec = hitbox.KnockbackDir(hitChar)*kmult;
+			var dirvec = hitbox.KnockbackDir((Node2D)hurtbox.GetParent())*kmult;//owner is IHittable, so use parent
 			var skb = dirvec*hitbox.setKnockback + hitbox.momentumCarry*ch.GetVelocity();
 			var vkb = dirvec*hitbox.varKnockback;
 			var damage = hitbox.damage*dmult;

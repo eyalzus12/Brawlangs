@@ -162,7 +162,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	
 	public Dictionary<string, PackedScene> projectiles = new Dictionary<string, PackedScene>();
 	public Dictionary<string, HashSet<Projectile>> activeProjectiles = new Dictionary<string, HashSet<Projectile>>();
-	public ObjectPool objectPool;
+	public ProjectilePool objectPool;
 	
 	public List<string> StatList = new List<string>();
 	public PropertyMap prop = new PropertyMap();
@@ -353,6 +353,16 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		damage = 0f;
 		framesSinceLastHit = 0;
 		comboCount = 0;
+		
+		var activeProjectilesCopy = new Dictionary<string, HashSet<Projectile>>(activeProjectiles);
+		foreach(var entry in activeProjectilesCopy)
+		{
+			var list = entry.Value.ToList();
+			foreach(var projectile in list)
+			{
+				projectile.Destruct();
+			}
+		}
 	}
 	
 	public virtual void StoreVelocities()
@@ -670,9 +680,9 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		try
 		{
 			//get a packed scene of a fitting projectile
-			var packedProjectile = projectiles[proj];
+			//var packedProjectile = projectiles[proj];
 			//get pooled projectile
-			var generatedProjectile = (Projectile)objectPool.GetObject(proj, packedProjectile);
+			var generatedProjectile = objectPool.GetProjectile(proj, proj);
 			if(generatedProjectile is null)
 			{
 				GD.Print($"Failed to emit projectile {proj} because the object pool returned a null");
@@ -683,12 +693,14 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 					activeProjectiles.Add(proj, new HashSet<Projectile>());
 				//set direction
 				generatedProjectile.direction = direction;
+				//add owner
+				generatedProjectile.OwnerObject = this;
+				//connect destruction signal
+				generatedProjectile.Connect("ProjectileDied", this, nameof(HandleProjectileDestruction));
 				//add to scene
 				GetParent().AddChild(generatedProjectile);
 				//store as active
 				activeProjectiles[proj].Add(generatedProjectile);
-				//connect destruction signal
-				generatedProjectile.Connect("ProjectileDied", this, nameof(HandleProjectileDestruction));
 			}
 		}
 		catch(KeyNotFoundException)
@@ -703,7 +715,8 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		try
 		{
 			activeProjectiles[identifier].Remove(who);
-			objectPool.InsertObject(who, identifier);
+			objectPool.InsertProjectile(who, identifier);
+			who.Disconnect("ProjectileDied", this, nameof(HandleProjectileDestruction));
 		}
 		catch(KeyNotFoundException)
 		{

@@ -51,7 +51,7 @@ public class PlatformDropDetector : Area2D
 		//Step 1: set y extents to low value
 		desiredExtents.y = Y_EXTENTS;
 		//Step 2: move to the bottom of the collision shape
-		desiredPosition.y -= colExtents.y;
+		desiredPosition.y += colExtents.y;
 		
 		//plat drop is now at the bottom of the collision shape, is identical in width, and has a very low height
 		

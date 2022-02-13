@@ -58,13 +58,7 @@ public class Projectile : Node2D, IHitter, IHittable
 		}
 	}
 	
-	public IAttacker owner;
-	
 	public Projectile() {}
-	public Projectile(IAttacker owner)
-	{
-		this.owner = owner;
-	}
 	
 	public void LoadExtraProperty<T>(string s, T @default = default(T))
 	{
@@ -75,13 +69,12 @@ public class Projectile : Node2D, IHitter, IHittable
 	public override void _Ready()
 	{
 		frameCount = 0;
-		Position = spawningPosition;
+		Position = spawningPosition+((Node2D)OwnerObject).Position;
 		ConnectSignals();
 		_hit = false;
 		Init();
 		Active = true;
-		GD.Print(maxLifetime);
-		GD.Print("aaaaaa");
+		Hitboxes.ForEach(h => h.Active = true);
 	}
 	
 	public override void _PhysicsProcess(float delta)
@@ -161,12 +154,14 @@ public class Projectile : Node2D, IHitter, IHittable
 			HitEvent(hitbox, hurtbox);
 			Hit = true;
 			
-			var kmult = owner.KnockbackDoneMult*KnockbackDoneMult*hitbox.GetKnockbackMultiplier(hitChar);
-			var dmult = owner.DamageDoneMult*DamageDoneMult*hitbox.GetDamageMultiplier(hitChar);
-			var smult = owner.StunDoneMult*StunDoneMult*hitbox.GetStunMultiplier(hitChar);
+			var kmult = OwnerObject.KnockbackDoneMult*KnockbackDoneMult*hitbox.GetKnockbackMultiplier(hitChar);
+			var dmult = OwnerObject.DamageDoneMult*DamageDoneMult*hitbox.GetDamageMultiplier(hitChar);
+			var smult = OwnerObject.StunDoneMult*StunDoneMult*hitbox.GetStunMultiplier(hitChar);
 			
-			var skb = hitbox.setKnockback*kmult;
-			var vkb = hitbox.varKnockback*kmult;
+			var dirvec = hitbox.KnockbackDir((Node2D)hurtbox.GetParent())*kmult;//owner is IHittable, so use parent
+			
+			var skb = dirvec*hitbox.setKnockback;
+			var vkb = dirvec*hitbox.varKnockback;
 			var damage = hitbox.damage*dmult;
 			var stun = hitbox.stun*smult;
 			
@@ -177,6 +172,7 @@ public class Projectile : Node2D, IHitter, IHittable
 			HitIgnoreList.Add(hitChar);
 			GD.Print($"{hitChar} was hit by {hitbox.Name}");
 		}
+		if(HitList.Count > 0) Destruct();
 		HitList.Clear();
 	}
 	

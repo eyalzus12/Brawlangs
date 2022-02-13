@@ -15,7 +15,7 @@ public class HitLagState : State
 		ch.ResetVelocity();
 		//pause animation
 		ch.fastfalling = false;
-		ch.currentAttack.currentPart.Pause();
+		ch.currentAttack?.currentPart?.Pause();
 	}
 	
 	protected override void DoGravity()

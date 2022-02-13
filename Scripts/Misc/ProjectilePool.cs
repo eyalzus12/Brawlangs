@@ -9,13 +9,15 @@ public class ProjectilePool : Node
 	public Dictionary<string, string> LoadDict;
 	public Queue<Tuple<string, Projectile>> ReturnQueue;
 	public HashSet<Projectile> ReturnQueueSet;
-	public ProjectileCreator ProjCreat;
+	public ProjectileCreator ProjCreate;
 	
 	public ProjectilePool()
 	{
 		ProjectileDict = new Dictionary<string, Queue<Projectile>>();
 		LoadDict = new Dictionary<string, string>();
-		ProjCreat = new ProjectileCreator();
+		ReturnQueueSet = new HashSet<Projectile>();
+		ProjCreate = new ProjectileCreator();
+		ReturnQueue = new Queue<Tuple<string, Projectile>>();
 	}
 	
 	public override void _PhysicsProcess(float delta)
@@ -40,7 +42,7 @@ public class ProjectilePool : Node
 		{
 			if(source == "")//cant instance 
 			{
-				GD.Print($"Cannot pool object with identifier {identifier} because given section is null");
+				GD.Print($"Cannot pool projectile with identifier {identifier} because given section is empty");
 				return null;
 			}
 			
@@ -50,9 +52,7 @@ public class ProjectilePool : Node
 		
 		for(int i = 0; i < LoadAmount; ++i)
 		{
-			/*var loader = source??LoadDict[identifier];
-			var obj = source.Instance<Node2D>();//instance new object*/
-			var obj = ProjCreat.BuildProjectile(source);
+			var obj = ProjCreate.BuildProjectile(source);
 			ProjectileDict[identifier].Enqueue(obj);//put in the pool
 		}
 		
@@ -65,11 +65,16 @@ public class ProjectilePool : Node
 		
 		if(identifier == "")
 		{
-			GD.Print($"Cannot pool object {p} because it does not have a given identifier (or wasnt generated from one)");
+			GD.Print($"Cannot pool projectile {p} because it does not have a given identifier (or wasnt generated from one)");
 			return false;
 		}
 		
-		if(ReturnQueueSet.Contains(p)) return false;
+		if(ReturnQueueSet.Contains(p))
+		{
+			GD.Print($"Cannot pool projectile {p} because it already got pooled");
+			return false;
+		}
+		
 		ReturnQueue.Enqueue(new Tuple<string,Projectile>(identifier,p));
 		ReturnQueueSet.Add(p);
 		return true;
@@ -83,8 +88,7 @@ public class ProjectilePool : Node
 			var obj = h.Item2;
 			var identifier = h.Item1;
 			if(obj is null || !Godot.Object.IsInstanceValid(obj)) continue;
-			var parent = obj.GetParent();
-			parent.RemoveChild(obj);
+			obj.GetParent().RemoveChild(obj);
 			
 			if(!ProjectileDict.ContainsKey(identifier))
 				ProjectileDict.Add(identifier, new Queue<Projectile>());//make a queue

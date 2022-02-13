@@ -148,14 +148,12 @@ public class ProjectileCreator
 		hr.AddState(hurtboxState);
 	}
 	
-	public void BuildHitbox(Node2D n, string section)
+	public void BuildHitbox(Projectile p, string section)
 	{
 		var HitboxScript = inif[section, "Script", ""].s();
 		var baseFolder = path.SplitByLast('/')[0];
 		var h = TypeUtils.LoadScript<Hitbox>(HitboxScript, new Hitbox(), baseFolder);
-		//var h = new Hitbox();
 		h.Name = section;
-		h.owner = n;
 		
 		var sk = inif[section, "SetKnockback", Vector2.Zero].v2();
 		h.setKnockback = sk;
@@ -165,8 +163,6 @@ public class ProjectileCreator
 		h.stun = st;
 		var hp = inif[section, "HitPause", 0].i();
 		h.hitpause = hp;
-		var hl = inif[section, "HitLag", 0].i();
-		h.hitlag = hl;
 		var dm = inif[section, "Damage", 0f].f();
 		h.damage = dm;
 		var pr = inif[section, "Priority", 0].i();
@@ -262,9 +258,10 @@ public class ProjectileCreator
 		cs.Name = section + "Collision";
 		h.shape = cs;
 		h.AddChild(cs);
-		cs.Owner = h;//for scene packing
-		n.AddChild(h);
-		h.Owner = n;//for scene packing
+		//cs.Owner = h;//for scene packing
+		p.AddChild(h);
+		//h.Owner = p;//for scene packing
+		p.Hitboxes.Add(h);
 	}
 	
 	public void LoadExtraProperties(Projectile loadTo, string section) => LoadExtraProperties(loadTo, loadTo.LoadExtraProperties, section);
