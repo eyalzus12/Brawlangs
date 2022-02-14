@@ -13,7 +13,7 @@ public class Projectile : Node2D, IHitter, IHittable
 	[Export]
 	public Vector2 spawningPosition = default;
 	[Export]
-	public int maxLifetime = 600;
+	public int maxLifetime = 0;
 	
 	public int direction = 1;
 	public ProjectileMovementFunction Movement;
@@ -71,10 +71,18 @@ public class Projectile : Node2D, IHitter, IHittable
 		frameCount = 0;
 		Position = spawningPosition+((Node2D)OwnerObject).Position;
 		ConnectSignals();
-		_hit = false;
+		Hit = false;
 		Init();
 		Active = true;
-		Hitboxes.ForEach(h => h.Active = true);
+		Hitboxes.ForEach(InitHitbox);
+		Hurtboxes.ForEach(h=>h.ChangeState("Default"));
+	}
+	
+	protected void InitHitbox(Hitbox h)
+	{
+		h.Active = true;
+		h.frameCount = 0;
+		h.Init();
 	}
 	
 	public override void _PhysicsProcess(float delta)
@@ -97,14 +105,13 @@ public class Projectile : Node2D, IHitter, IHittable
 	
 	public void Destruct()
 	{
-		//GD.Print("Hmmmmm");
 		OnRemove();
 		Hitboxes.ForEach(h => h.Active = false);
+		DisonnectSignals();
 		Active = false;
 		HitList.Clear();
 		HitIgnoreList.Clear();
 		EmitSignal(nameof(ProjectileDied), this);
-		//GetParent().RemoveChild(this);
 	}
 	
 	public virtual void Reset()
@@ -120,6 +127,15 @@ public class Projectile : Node2D, IHitter, IHittable
 		foreach(var h in Hitboxes)
 		{
 			h.Connect("HitboxHit", this, nameof(HandleInitialHit));
+			h.owner = this;
+		}
+	}
+	
+	public virtual void DisonnectSignals()
+	{
+		foreach(var h in Hitboxes)
+		{
+			h.Disconnect("HitboxHit", this, nameof(HandleInitialHit));
 			h.owner = this;
 		}
 	}
@@ -158,7 +174,8 @@ public class Projectile : Node2D, IHitter, IHittable
 			var dmult = OwnerObject.DamageDoneMult*DamageDoneMult*hitbox.GetDamageMultiplier(hitChar);
 			var smult = OwnerObject.StunDoneMult*StunDoneMult*hitbox.GetStunMultiplier(hitChar);
 			
-			var dirvec = hitbox.KnockbackDir((Node2D)hurtbox.GetParent())*kmult;//owner is IHittable, so use parent
+			var nodeHitChar = (Node2D)hurtbox.GetParent();//owner is IHittable, so use parent
+			var dirvec = hitbox.KnockbackDir(nodeHitChar)*kmult;
 			
 			var skb = dirvec*hitbox.setKnockback;
 			var vkb = dirvec*hitbox.varKnockback;
@@ -170,9 +187,9 @@ public class Projectile : Node2D, IHitter, IHittable
 			hitChar.HandleGettingHit(data);
 			OwnerObject.HandleHitting(data);
 			HitIgnoreList.Add(hitChar);
-			GD.Print($"{hitChar} was hit by {hitbox.Name}");
+			GD.Print($"{nodeHitChar.Name} was hit by {hitbox.Name}");
 		}
-		if(HitList.Count > 0) Destruct();
+		if(HitList.Count > 0) DidHit();
 		HitList.Clear();
 	}
 	
@@ -183,6 +200,8 @@ public class Projectile : Node2D, IHitter, IHittable
 	}
 	
 	public virtual void HitEvent(Hitbox hitbox, Hurtbox hurtbox) {}
+	
+	public virtual void DidHit() => Destruct();
 	
 	public virtual void HandleGettingHit(HitData data)
 	{

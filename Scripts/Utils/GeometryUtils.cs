@@ -125,7 +125,7 @@ public static class GeometryUtils
 		return result.ToArray();
 	}
 	
-	public static void DrawCapsuleShape(CanvasItem ci, CapsuleShape2D shape, Vector2 position, float rotation, Color color)
+	public static void DrawCapsuleShape(this CanvasItem ci, CapsuleShape2D shape, Vector2 position, float rotation, Color color)
 	{
 		var height = shape.Height;
 		var radius = shape.Radius;

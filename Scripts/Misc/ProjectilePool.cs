@@ -6,18 +6,16 @@ public class ProjectilePool : Node
 {
 	public const int LoadAmount = 3;
 	public Dictionary<string, Queue<Projectile>> ProjectileDict;
-	public Dictionary<string, string> LoadDict;
-	public Queue<Tuple<string, Projectile>> ReturnQueue;
+	public Queue<(string, Projectile)> ReturnQueue;
 	public HashSet<Projectile> ReturnQueueSet;
 	public ProjectileCreator ProjCreate;
 	
 	public ProjectilePool()
 	{
 		ProjectileDict = new Dictionary<string, Queue<Projectile>>();
-		LoadDict = new Dictionary<string, string>();
 		ReturnQueueSet = new HashSet<Projectile>();
 		ProjCreate = new ProjectileCreator();
-		ReturnQueue = new Queue<Tuple<string, Projectile>>();
+		ReturnQueue = new Queue<(string, Projectile)>();
 	}
 	
 	public override void _PhysicsProcess(float delta)
@@ -30,42 +28,33 @@ public class ProjectilePool : Node
 		Queue<Projectile> poolQueue;
 		if(!ProjectileDict.TryGetValue(identifier, out poolQueue) || poolQueue.Count <= 0)//no available objects
 		{
-			poolQueue = CreateNewProjectile(identifier, loader);//load new ones
+			poolQueue = CreateNewProjectile(identifier);//load new ones
 		}
 		
 		return poolQueue?.Dequeue();//get available object if exists
 	}
 	
-	public Queue<Projectile> CreateNewProjectile(string identifier, string source = "")
+	public Queue<Projectile> CreateNewProjectile(string identifier)
 	{
 		if(!ProjectileDict.ContainsKey(identifier))//no queue exists
-		{
-			if(source == "")//cant instance 
-			{
-				GD.Print($"Cannot pool projectile with identifier {identifier} because given section is empty");
-				return null;
-			}
-			
 			ProjectileDict.Add(identifier, new Queue<Projectile>());//make a queue
-			LoadDict.Add(identifier, source);
-		}
 		
 		for(int i = 0; i < LoadAmount; ++i)
 		{
-			var obj = ProjCreate.BuildProjectile(source);
+			var obj = ProjCreate.BuildProjectile(identifier);
 			ProjectileDict[identifier].Enqueue(obj);//put in the pool
 		}
 		
 		return ProjectileDict[identifier];
 	}
 	
-	public bool InsertProjectile(Projectile p, string identifier = "")
+	public bool InsertProjectile(Projectile p)
 	{
-		if(identifier == "") identifier = p.Filename;
+		var identifier = p.identifier;
 		
 		if(identifier == "")
 		{
-			GD.Print($"Cannot pool projectile {p} because it does not have a given identifier (or wasnt generated from one)");
+			GD.Print($"Cannot pool projectile {p} because it does not have an identifier");
 			return false;
 		}
 		
@@ -75,8 +64,9 @@ public class ProjectilePool : Node
 			return false;
 		}
 		
-		ReturnQueue.Enqueue(new Tuple<string,Projectile>(identifier,p));
+		ReturnQueue.Enqueue((identifier, p));
 		ReturnQueueSet.Add(p);
+		p.GetParent().RemoveChild(p);
 		return true;
 	}
 	
@@ -85,10 +75,13 @@ public class ProjectilePool : Node
 		while(ReturnQueue.Count > 0)
 		{
 			var h = ReturnQueue.Dequeue();
-			var obj = h.Item2;
 			var identifier = h.Item1;
-			if(obj is null || !Godot.Object.IsInstanceValid(obj)) continue;
-			obj.GetParent().RemoveChild(obj);
+			var obj = h.Item2;
+			if(obj is null || !Godot.Object.IsInstanceValid(obj))
+			{
+				GD.Print($"aaaa {obj}");
+				continue;
+			}
 			
 			if(!ProjectileDict.ContainsKey(identifier))
 				ProjectileDict.Add(identifier, new Queue<Projectile>());//make a queue
@@ -111,7 +104,6 @@ public class ProjectilePool : Node
 		}
 		
 		ProjectileDict.Clear();
-		LoadDict.Clear();
 	}
 	
 	public override void _ExitTree()

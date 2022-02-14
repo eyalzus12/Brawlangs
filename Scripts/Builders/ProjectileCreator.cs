@@ -45,7 +45,7 @@ public class ProjectileCreator
 		proj.identifier = section;
 		var sp = inif[section, "Position", Vector2.Zero].v2();
 		proj.spawningPosition = sp;
-		var lt = inif[section, "LifeTime", 1].i();
+		var lt = inif[section, "LifeTime", 0].i();
 		proj.maxLifetime = lt;
 		var smf = inif[section, "MovementFunction", ""].s();
 		var movf = BuildMovementFunction(smf);
@@ -60,7 +60,7 @@ public class ProjectileCreator
 			foreach(var s in HitboxSections) BuildHitbox(proj, s);
 		}
 		
-		var oStates = inif[section, "CollisionStates", ""];
+		/*var oStates = inif[section, "CollisionStates", ""];
 		var oHurtboxes = inif[section, "Hurtboxes", $"{section}Hurtbox"];
 		
 		if(oStates is string state)
@@ -110,6 +110,29 @@ public class ProjectileCreator
 				foreach(var staate in oStates.ls())
 					BuildHurtbox(hr, staate+hurtboox, staate);
 			}
+		}*/
+		
+		var oHurtboxes = inif[section, "Hurtboxes", $"{section}Hurtbox"];
+		
+		if(oHurtboxes is string hurtbox)
+		{
+			var hr = new Hurtbox();
+			hr.Name = hurtbox;
+			hr.owner = proj;
+			proj.AddChild(hr);
+			hr.Owner = proj;
+			proj.Hurtboxes.Add(hr);
+			BuildHurtbox(hr, hurtbox, "Default");
+		}
+		else foreach(var hurtboox in oHurtboxes.ls())
+		{
+			var hr = new Hurtbox();
+			hr.Name = hurtboox;
+			hr.owner = proj;
+			proj.AddChild(hr);
+			hr.Owner = proj;
+			proj.Hurtboxes.Add(hr);
+			BuildHurtbox(hr, hurtboox, "Default");
 		}
 		
 		proj.LoadProperties();

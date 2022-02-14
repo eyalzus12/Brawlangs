@@ -679,10 +679,8 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	{
 		try
 		{
-			//get a packed scene of a fitting projectile
-			//var packedProjectile = projectiles[proj];
 			//get pooled projectile
-			var generatedProjectile = objectPool.GetProjectile(proj, proj);
+			var generatedProjectile = objectPool.GetProjectile(proj);
 			if(generatedProjectile is null)
 			{
 				GD.Print($"Failed to emit projectile {proj} because the object pool returned a null");
@@ -697,10 +695,12 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 				generatedProjectile.OwnerObject = this;
 				//connect destruction signal
 				generatedProjectile.Connect("ProjectileDied", this, nameof(HandleProjectileDestruction));
-				//add to scene
-				GetParent().AddChild(generatedProjectile);
 				//store as active
 				activeProjectiles[proj].Add(generatedProjectile);
+				//request that _Ready will be called
+				generatedProjectile.RequestReady();
+				//add to scene
+				GetParent().AddChild(generatedProjectile);
 			}
 		}
 		catch(KeyNotFoundException)
@@ -715,7 +715,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		try
 		{
 			activeProjectiles[identifier].Remove(who);
-			objectPool.InsertProjectile(who, identifier);
+			objectPool.InsertProjectile(who);
 			who.Disconnect("ProjectileDied", this, nameof(HandleProjectileDestruction));
 		}
 		catch(KeyNotFoundException)

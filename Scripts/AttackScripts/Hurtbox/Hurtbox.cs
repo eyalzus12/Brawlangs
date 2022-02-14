@@ -56,6 +56,8 @@ public class Hurtbox : Area2D
 		
 		originalPosition = CollisionPosition;
 		originalRotation = CollisionRotation;
+		
+		ChangeState("Default");
 	}
 	
 	public override void _PhysicsProcess(float delta)
@@ -97,7 +99,7 @@ public class Hurtbox : Area2D
 	{
 		if(!this.GetRootNode<UpdateScript>("UpdateScript").debugCollision) return;
 		ZIndex = 2;
-		GeometryUtils.DrawCapsuleShape(this, Shape, CollisionPosition, CollisionRotation, GetDrawColor());
+		this.DrawCapsuleShape(Shape, CollisionPosition, CollisionRotation, GetDrawColor());
 	}
 	
 	public virtual Color GetDrawColor() => new Color(0,1,0,1);

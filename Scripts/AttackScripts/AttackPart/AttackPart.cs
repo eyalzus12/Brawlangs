@@ -9,7 +9,7 @@ public class AttackPart : Node2D
 	public PartDir dir = new PartDir();
 	public int frameCount = 0;
 	
-	public List<CharacterHitbox> hitboxes = new List<CharacterHitbox>();
+	public List<Hitbox> hitboxes = new List<Hitbox>();
 	public HashSet<IHittable> ignoreList = new HashSet<IHittable>();
 	public Dictionary<Hurtbox, Hitbox> hitList = new Dictionary<Hurtbox, Hitbox>();
 	
@@ -68,7 +68,7 @@ public class AttackPart : Node2D
 	public override void _Ready()
 	{
 		frameCount = 0;
-		hitboxes = GetChildren().FilterType<CharacterHitbox>().ToList();
+		hitboxes = GetChildren().FilterType<Hitbox>().ToList();
 		hitboxes.ForEach(h => h.Connect("HitboxHit", this, nameof(HandleHit)));
 		BuildHitboxAnimator();
 		Init();
