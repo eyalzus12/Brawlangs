@@ -7,12 +7,19 @@ public class ChargePart : AttackPart
 	public float FullChargeDamageMult = 1f;
 	public float FullChargeKnockbackMult = 1f;
 	public int MinimumChargeForBoost = 1;
+	public string ChargeSound = "";
 	
 	public override void LoadProperties()
 	{
 		LoadExtraProperty<string>("ChargeInput", "heavy");
 		LoadExtraProperty<float>("FullChargeDamageMult", 1f);
 		LoadExtraProperty<float>("FullChargeKnockbackMult", 1f);
+		LoadExtraProperty<string>("ChargeSound", "");
+	}
+	
+	public override void OnStart()
+	{
+		ch.PlaySound(ChargeSound);
 	}
 	
 	public override void Loop()

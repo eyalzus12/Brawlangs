@@ -190,8 +190,8 @@ public class ProjectileCreator
 		h.damage = dm;
 		var pr = inif[section, "Priority", 0].i();
 		h.hitPriority = pr;
-		var cm = inif[section, "MomentumCarry", Vector2.Zero].v2();
-		h.momentumCarry = cm;
+		//var cm = inif[section, "MomentumCarry", Vector2.Zero].v2();
+		//h.momentumCarry = cm;
 		/*var hs = inif[section, "HitSound", "DefaultHit"].s();
 		try
 		{

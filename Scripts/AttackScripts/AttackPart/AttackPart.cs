@@ -59,6 +59,8 @@ public class AttackPart : Node2D
 	[Export]
 	public string attackSound;
 	
+	public List<string> emittedProjectiles;
+	
 	public bool hit = false;
 	
 	public AnimationPlayer hitboxPlayer;
@@ -68,6 +70,7 @@ public class AttackPart : Node2D
 	public override void _Ready()
 	{
 		frameCount = 0;
+		if(startup == 0) OnStartupFinish(); 
 		hitboxes = GetChildren().FilterType<Hitbox>().ToList();
 		hitboxes.ForEach(h => h.Connect("HitboxHit", this, nameof(HandleHit)));
 		BuildHitboxAnimator();
@@ -92,10 +95,7 @@ public class AttackPart : Node2D
 		dir.Add(name, ap);
 	}
 	
-	public virtual void Init()
-	{
-		
-	}
+	public virtual void Init() {}
 	
 	public virtual void Activate()
 	{
@@ -120,9 +120,15 @@ public class AttackPart : Node2D
 	{
 		if(!active) return;
 		++frameCount;
-		if(frameCount > startup) ch.PlayAnimation(attackAnimation);
+		if(frameCount == startup) OnStartupFinish();
+		else if(frameCount > startup) ch.PlayAnimation(attackAnimation);
 		Loop();
 		HandleHits();
+	}
+	
+	public virtual void OnStartupFinish()
+	{
+		emittedProjectiles?.ForEach(s=>ch.EmitProjectile(s));
 	}
 	
 	public void BuildHitboxAnimator()

@@ -106,6 +106,9 @@ public class AttackCreator
 		ap.endlagAnimation = ea;
 		var ps = inif[section, "Sound", ""].s();
 		ap.attackSound = ps;
+		var ep = inif[section, "EmittedProjectiles", new List<string>()];
+		if(ep is string sep) ap.emittedProjectiles = new List<string>{sep};
+		else ap.emittedProjectiles = ep.ls();
 		
 		var oHitboxSections = inif[section, "Hitboxes", null];
 		if(oHitboxSections is string)
@@ -130,13 +133,13 @@ public class AttackCreator
 		return ap;
 	}
 	
-	public void BuildHitbox(Node2D ap, string section)
+	public void BuildHitbox(AttackPart ap, string section)
 	{
 		var HitboxScript = inif[section, "Script", ""].s();
 		var baseFolder = path.SplitByLast('/')[0];
 		var h = TypeUtils.LoadScript<Hitbox>(HitboxScript, new Hitbox(), baseFolder);
 		h.Name = section;
-		var ch = (Character)ap.Get("ch");
+		var ch = ap.ch;
 		h.owner = ch;
 		
 		var sk = inif[section, "SetKnockback", Vector2.Zero].v2();
