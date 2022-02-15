@@ -259,7 +259,8 @@ public class AttackPart : Node2D
 			var dmult = ch.DamageDoneMult*damageMult*att.damageMult*hitbox.GetDamageMultiplier(hitChar);
 			var smult = ch.StunDoneMult*stunMult*att.stunMult*hitbox.GetStunMultiplier(hitChar);
 			
-			var dirvec = hitbox.KnockbackDir((Node2D)hurtbox.GetParent())*kmult;//owner is IHittable, so use parent
+			var nodeHitChar = (Node2D)hurtbox.GetParent();//owner is IHittable, so use parent
+			var dirvec = hitbox.KnockbackDir(nodeHitChar)*kmult;//owner is IHittable, so use parent
 			var skb = dirvec*hitbox.setKnockback + hitbox.momentumCarry*ch.GetVelocity();
 			var vkb = dirvec*hitbox.varKnockback;
 			var damage = hitbox.damage*dmult;
@@ -269,7 +270,7 @@ public class AttackPart : Node2D
 			
 			hitChar.HandleGettingHit(data);
 			ignoreList.Add(hitChar);
-			GD.Print($"{hitChar} was hit by {hitbox.Name}");
+			GD.Print($"{nodeHitChar.Name} was hit by {hitbox.Name}");
 			att.OnHit(hitbox, hurtbox);
 			ch.HandleHitting(data);
 		}
