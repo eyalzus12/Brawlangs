@@ -2,10 +2,10 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class CharacterAudioPlayer : AudioStreamPlayer2D
+public class AudioPlayer : AudioStreamPlayer2D
 {
 	[Signal]
-	public delegate void FinishedPlaying(CharacterAudioPlayer who, AudioStream what);
+	public delegate void FinishedPlaying(AudioPlayer who, AudioStream what);
 	
 	public override void _Ready()
 	{

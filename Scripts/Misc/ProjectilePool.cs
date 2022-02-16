@@ -9,13 +9,23 @@ public class ProjectilePool : Node
 	public Queue<(string, Projectile)> ReturnQueue;
 	public HashSet<Projectile> ReturnQueueSet;
 	public ProjectileCreator ProjCreate;
+	public Node2D owner;
 	
 	public ProjectilePool()
 	{
 		ProjectileDict = new Dictionary<string, Queue<Projectile>>();
 		ReturnQueueSet = new HashSet<Projectile>();
-		ProjCreate = new ProjectileCreator();
 		ReturnQueue = new Queue<(string, Projectile)>();
+		ProjCreate = new ProjectileCreator();
+	}
+	
+	public ProjectilePool(Node2D owner)
+	{
+		ProjectileDict = new Dictionary<string, Queue<Projectile>>();
+		ReturnQueueSet = new HashSet<Projectile>();
+		ReturnQueue = new Queue<(string, Projectile)>();
+		this.owner = owner;
+		ProjCreate = new ProjectileCreator();
 	}
 	
 	public override void _PhysicsProcess(float delta)
@@ -41,7 +51,7 @@ public class ProjectilePool : Node
 		
 		for(int i = 0; i < LoadAmount; ++i)
 		{
-			var obj = ProjCreate.BuildProjectile(identifier);
+			var obj = ProjCreate.BuildProjectile(owner, identifier);
 			ProjectileDict[identifier].Enqueue(obj);//put in the pool
 		}
 		

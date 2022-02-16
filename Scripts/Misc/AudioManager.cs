@@ -2,20 +2,21 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 
-public class CharacterAudioManager : Node
+public class AudioManager : Node
 {
 	public Dictionary<string, AudioStream> sounds = new Dictionary<string, AudioStream>();
-	public List<CharacterAudioPlayer> players = new List<CharacterAudioPlayer>();
-	public Queue<CharacterAudioPlayer> available = new Queue<CharacterAudioPlayer>();
+	public List<AudioPlayer> players = new List<AudioPlayer>();
+	public Queue<AudioPlayer> available = new Queue<AudioPlayer>();
 	
-	public CharacterAudioManager() {}
+	public AudioManager() {}
 	
-	public CharacterAudioManager(int capacity)
+	public AudioManager(int capacity)
 	{
 		for(int i = 0; i < capacity; ++i)
 		{
-			var player = new CharacterAudioPlayer();
+			var player = new AudioPlayer();
 			players.Add(player);
 			available.Enqueue(player);
 		}
@@ -45,7 +46,7 @@ public class CharacterAudioManager : Node
 	
 	public void AddSound(string name, AudioStream audio) => sounds.Add(name, audio);
 	
-	public void StreamFinished(CharacterAudioPlayer who, AudioStream what)
+	public void StreamFinished(AudioPlayer who, AudioStream what)
 	{
 		available.Enqueue(who);
 		who.Disconnect("FinishedPlaying", this, nameof(StreamFinished));
@@ -63,5 +64,25 @@ public class CharacterAudioManager : Node
 			}
 		}
 		return result.ToString();
+	}
+	
+	public void Cleanup()
+	{
+		players.ForEach(player => {
+			if(player.Playing)
+			{
+				player.Stop();
+				player.Disconnect("FinishedPlaying", this, nameof(StreamFinished));
+				available.Enqueue(player);
+			}
+			
+		});
+		
+		
+	}
+	
+	public override void _ExitTree()
+	{
+		Cleanup();
 	}
 }

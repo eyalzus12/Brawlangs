@@ -170,7 +170,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public InputManager Inputs;
 	
 	public AnimationSprite sprite;
-	public CharacterAudioManager audioManager;
+	public AudioManager audioManager;
 	
 	public Character() {}
 	public Character(bool dummy) {this.dummy = dummy;}
@@ -586,8 +586,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		
 		framesSinceLastHit = 0;
 		
-		var HitSoundToPlay = data.Hitter.hitSound;
-		PlaySound(HitSoundToPlay);
+		PlaySound(data.Hitter.hitSound);
 	}
 	
 	public void HandleHitting(HitData data)
@@ -692,7 +691,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 				//set direction
 				generatedProjectile.direction = direction;
 				//add owner
-				generatedProjectile.OwnerObject = this;
+				//generatedProjectile.OwnerObject = this;
 				//connect destruction signal
 				generatedProjectile.Connect("ProjectileDied", this, nameof(HandleProjectileDestruction));
 				//store as active

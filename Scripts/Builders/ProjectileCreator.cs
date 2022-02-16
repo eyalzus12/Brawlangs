@@ -37,10 +37,18 @@ public class ProjectileCreator
 		return packs;
 	}*/
 	
-	public Projectile BuildProjectile(/*Node2D n, */string section)
+	public Projectile BuildProjectile(Node2D n, string section)
 	{
 		var proj = new Projectile();
-		//proj.owner = (IAttacker)n;
+		
+		proj.OwnerObject = (IAttacker)n;
+		var characterAudioManager = n.Get("audioManager") as AudioManager;
+		var am = new AudioManager(2);
+		am.Name = "AudioManager";
+		am.sounds = characterAudioManager.sounds;
+		proj.AddChild(am);
+		proj.audioManager = am;
+		
 		proj.Name = section;
 		proj.identifier = section;
 		var sp = inif[section, "Position", Vector2.Zero].v2();
@@ -59,58 +67,6 @@ public class ProjectileCreator
 			var HitboxSections = oHitboxSections.ls();
 			foreach(var s in HitboxSections) BuildHitbox(proj, s);
 		}
-		
-		/*var oStates = inif[section, "CollisionStates", ""];
-		var oHurtboxes = inif[section, "Hurtboxes", $"{section}Hurtbox"];
-		
-		if(oStates is string state)
-		{
-			if(oHurtboxes is string hurtbox)
-			{
-				var hr = new Hurtbox();
-				hr.Name = hurtbox;
-				hr.owner = proj;
-				proj.AddChild(hr);
-				hr.Owner = proj;
-				proj.Hurtboxes.Add(hr);
-				BuildHurtbox(hr, state+hurtbox, state);
-			}
-			else foreach(var hurtboox in oHurtboxes.ls())//name needs to be different than hurtbox. aaa
-			{
-				var hr = new Hurtbox();
-				hr.Name = hurtboox;
-				hr.owner = proj;
-				proj.AddChild(hr);
-				hr.Owner = proj;
-				proj.Hurtboxes.Add(hr);
-				BuildHurtbox(hr, state+hurtboox, state);
-			}
-		}
-		else
-		{
-			if(oHurtboxes is string hurtbox)
-			{
-				var hr = new Hurtbox();
-				hr.Name = hurtbox;
-				hr.owner = proj;
-				proj.AddChild(hr);
-				hr.Owner = proj;
-				proj.Hurtboxes.Add(hr);
-				foreach(var staate in oStates.ls())
-					BuildHurtbox(hr, staate+hurtbox, staate);
-			}
-			else foreach(var hurtboox in oHurtboxes.ls())
-			{
-				var hr = new Hurtbox();
-				hr.Name = hurtboox;
-				hr.owner = proj;
-				proj.AddChild(hr);
-				hr.Owner = proj;
-				proj.Hurtboxes.Add(hr);
-				foreach(var staate in oStates.ls())
-					BuildHurtbox(hr, staate+hurtboox, staate);
-			}
-		}*/
 		
 		var oHurtboxes = inif[section, "Hurtboxes", $"{section}Hurtbox"];
 		
@@ -138,14 +94,6 @@ public class ProjectileCreator
 		proj.LoadProperties();
 		LoadExtraProperties(proj, section);
 		
-		/*var pack = new PackedScene();
-		var err = pack.Pack(proj);
-		if(err != Error.Ok)
-		{
-			GD.Print($"Error {err} while packing projectile defined at section {section} of file {path}");
-			return null;
-		}
-		else return pack;*/
 		return proj;
 	}
 	
@@ -192,16 +140,17 @@ public class ProjectileCreator
 		h.hitPriority = pr;
 		//var cm = inif[section, "MomentumCarry", Vector2.Zero].v2();
 		//h.momentumCarry = cm;
-		/*var hs = inif[section, "HitSound", "DefaultHit"].s();
+		
+		var hs = inif[section, "HitSound", "DefaultHit"].s();
 		try
 		{
-			var ahs = ch.audioManager.sounds[hs];
+			var ahs = p.audioManager.sounds[hs];
 			h.hitSound = ahs;
 		}
 		catch(KeyNotFoundException)
 		{
 			GD.Print($"Hit sound {hs} for hitbox {section} in file at path {inif.filePath} could not be found.");
-		}*/
+		}
 		
 		var hafs = inif[section, "HorizontalAngleFlipper", "Directional"].s();
 		Hitbox.AngleFlipper haf;

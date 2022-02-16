@@ -21,12 +21,16 @@ public class Projectile : Node2D, IHitter, IHittable
 	
 	private List<Hitbox> _hitboxes = new List<Hitbox>();
 	public List<Hitbox> Hitboxes{get => _hitboxes; set => _hitboxes=value;}
+	
 	private HashSet<IHittable> _ignoreList = new HashSet<IHittable>();
 	public HashSet<IHittable> HitIgnoreList{get => _ignoreList; set => _ignoreList=value;}
+	
 	private Dictionary<Hurtbox, Hitbox> _hitList = new Dictionary<Hurtbox, Hitbox>();
 	public Dictionary<Hurtbox, Hitbox> HitList{get => _hitList; set => _hitList=value;}
+	
 	private bool _hit = false;
 	public bool Hit{get => _hit; set => _hit=value;}
+	
 	private IAttacker _owner;
 	public IAttacker OwnerObject{get => _owner; set => _owner=value;}
 	
@@ -44,7 +48,17 @@ public class Projectile : Node2D, IHitter, IHittable
 	public float KnockbackDoneMult{get => OwnerObject.KnockbackDoneMult; set => OwnerObject.KnockbackDoneMult = value;}
 	public int StunDoneMult{get => OwnerObject.StunDoneMult; set => OwnerObject.StunDoneMult = value;}
 	
+	public AudioManager audioManager;
+	public void PlaySound(string sound) => audioManager.Play(sound);
+	public void PlaySound(AudioStream sound) => audioManager.Play(sound);
+	
 	public Dictionary<string, ParamRequest> LoadExtraProperties = new Dictionary<string, ParamRequest>();
+	public virtual void LoadProperties() {}
+	public void LoadExtraProperty<T>(string s, T @default = default(T))
+	{
+		var toAdd = new ParamRequest(typeof(T), s, @default);
+		LoadExtraProperties.Add(s, toAdd);
+	}
 	
 	private bool _active = false;
 	public bool Active
@@ -59,12 +73,6 @@ public class Projectile : Node2D, IHitter, IHittable
 	}
 	
 	public Projectile() {}
-	
-	public void LoadExtraProperty<T>(string s, T @default = default(T))
-	{
-		var toAdd = new ParamRequest(typeof(T), s, @default);
-		LoadExtraProperties.Add(s, toAdd);
-	}
 	
 	public override void _Ready()
 	{
@@ -98,7 +106,6 @@ public class Projectile : Node2D, IHitter, IHittable
 	}
 	
 	public virtual void Init() {}
-	public virtual void LoadProperties() {}
 	public virtual void OnSpawn() {}
 	public virtual void Loop() {}
 	public virtual void OnRemove() {}

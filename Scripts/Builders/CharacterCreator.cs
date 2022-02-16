@@ -25,7 +25,7 @@ public class CharacterCreator
 		//load name
 		ch.Name = name + teamNum;
 		
-		var objectPool = new ProjectilePool(); 
+		var objectPool = new ProjectilePool(ch); 
 		ch.AddChild(objectPool);
 		ch.objectPool = objectPool;
 		
@@ -132,7 +132,7 @@ public class CharacterCreator
 	
 	public void BuildAudio(Character ch, string audioFolder)
 	{
-		var am = new CharacterAudioManager(4);
+		var am = new AudioManager(4);
 		am.Name = "AudioManager";
 		
 		var files = ListPostImportDirectoryFiles(audioFolder, ".wav", ".ogg", ".mp3").Distinct().ToList();
