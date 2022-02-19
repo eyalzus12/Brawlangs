@@ -14,7 +14,13 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	[Signal]
 	public delegate void Dead(Node2D who);
 	[Signal]
-	public delegate void JumpsRestored();
+	public delegate void OptionsRestoredFromGroundTouch();
+	[Signal]
+	public delegate void OptionsRestoredFromWallTouch();
+	[Signal]
+	public delegate void OptionsRestoredFromHitting();
+	[Signal]
+	public delegate void OptionsRestoredFromGettingHit();
 	
 	////////////////////////////////////////////
 	[Export]
@@ -42,8 +48,21 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public float verticalWallJump = 400f;//vertical velocity from wall jumping
 	public float fastfallMargin = -100f;
 	////////////////////////////////////////////
-	public int jumpNum = 3;//how many air jump you have
-	public int wallJumpNum = 5;//how many wall jumps you have
+	//public int jumpNum = 3;//how many air jump you have
+	//public int wallJumpNum = 5;//how many wall jumps you have
+	public int maxClingsAllowed = 2;
+	public int currentClingsUsed = 0;
+	
+	public int maxAirJumpsAllowed = 2;
+	public int currentAirJumpsUsed = 0;
+	
+	public int givenClingsOnHitting = 2;
+	public int givenAirJumpsOnHitting = 1;
+	public bool gotOptionsFromHitting = false;
+	
+	public int givenClingsOnGettingHit = 1;
+	public int givenAirJumpsOnGettingHit = 1;
+	public bool gotOptionsFromGettingHit = false;
 	////////////////////////////////////////////
 	public float ceilingBonkBounce = 0.25f;//how much speed is conserved when bonking
 	public float ceilingBounce = 0.95f;//how much speed is conserved when hitting a ceiling
@@ -126,8 +145,8 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public float PlatBounce => grounded?ffric:walled?wfric:ceilinged?cfric:1f;
 	
 	public bool fastfalling = false;//wether or not fastfalling
-	public uint jumpCounter = 0;//how many air jumps have been used
-	public uint wallJumpCounter = 0;//how many wall jumps have been used
+	//public uint jumpCounter = 0;//how many air jumps have been used
+	//public uint wallJumpCounter = 0;//how many wall jumps have been used
 	
 	public bool grounded = false;//is on ground
 	public bool walled = false;//is on wall
@@ -345,8 +364,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		Position = Vector2.Zero;
 		fastfalling = false;
 		crouching = false;
-		jumpCounter = 0;
-		wallJumpCounter = 0;
+		RestoreOptionsOnGroundTouch();
 		ResetVelocity();
 		direction = 1;
 		SetCollisionMaskBit(DROP_THRU_BIT, true);
@@ -363,6 +381,45 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 				projectile.Destruct();
 			}
 		}
+	}
+	
+	public virtual void RestoreOptionsOnGroundTouch()
+	{
+		currentClingsUsed = 0;
+		currentAirJumpsUsed = 0;
+		gotOptionsFromHitting = false;
+		gotOptionsFromGettingHit = false;
+		EmitSignal(nameof(OptionsRestoredFromGroundTouch));
+	}
+	
+	public virtual void RestoreOptionsOnWallTouch()
+	{
+		currentClingsUsed++;
+		currentAirJumpsUsed = 0;
+		EmitSignal(nameof(OptionsRestoredFromWallTouch));
+	}
+	
+	public virtual void RestoreOptionsOnHitting()
+	{
+		if(gotOptionsFromHitting) return;
+		currentClingsUsed -= givenClingsOnHitting;
+		if(currentClingsUsed < 0) currentClingsUsed = 0;
+		currentAirJumpsUsed -= givenAirJumpsOnHitting;
+		if(currentAirJumpsUsed < 0) currentAirJumpsUsed = 0;
+		EmitSignal(nameof(OptionsRestoredFromHitting));
+		gotOptionsFromHitting = true;
+		//gotOptionsFromGettingHit = false;
+	}
+	
+	public virtual void RestoreOptionsOnGettingHit()
+	{
+		if(gotOptionsFromGettingHit) return;
+		currentClingsUsed -= givenClingsOnGettingHit;
+		if(currentClingsUsed < 0) currentClingsUsed = 0;
+		currentAirJumpsUsed -= givenAirJumpsOnGettingHit;
+		if(currentAirJumpsUsed < 0) currentAirJumpsUsed = 0;
+		EmitSignal(nameof(OptionsRestoredFromGettingHit));
+		gotOptionsFromGettingHit = true;
 	}
 	
 	public virtual void StoreVelocities()
@@ -558,6 +615,8 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		var stun = data.Stun;
 		var hp = data.Hitpause;
 		
+		if(data.Hitee.owner == this) RestoreOptionsOnGettingHit();
+		
 		damage += d * DamageTakenMult;
 		var force = (skb + damage*vkb/100f) * KnockbackTakenMult;
 		var stunlen = stun * StunTakenMult;
@@ -593,6 +652,9 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	{
 		Hitbox hitbox = data.Hitter;
 		Hurtbox hurtbox = data.Hitee;
+		
+		if(hitbox.owner == this) RestoreOptionsOnHitting();
+		
 		if(hitbox.hitlag > 0)
 		{
 			var s = ChangeState<HitLagState>();

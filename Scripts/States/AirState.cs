@@ -47,11 +47,11 @@ public class AirState : State
 //		platformCancel = !ch.GetCollisionMaskBit(DROP_THRU_BIT);
 //		if(platformCancel) return;
 		
-		if(ch.jumpCounter < ch.jumpNum)
+		if(ch.currentAirJumpsUsed < ch.maxAirJumpsAllowed)
 		{
 			MarkForDeletion("player_jump", true);
 			ch.vec.y = -ch.doubleJumpHeight;
-			ch.jumpCounter++;
+			ch.currentAirJumpsUsed++;
 			ch.fastfalling = false;
 			ch.PlayAnimation("Jump");
 			ch.QueueAnimation("Drift");
@@ -115,7 +115,7 @@ public class AirState : State
 			GD.Print(ch.MoveAndCollide(move));
 		}
 		
-		if(ch.walled && ch.wallJumpCounter < ch.wallJumpNum) ch.ChangeState("WallLand");
+		if(ch.walled && ch.currentClingsUsed < ch.maxClingsAllowed) ch.ChangeState("WallLand");
 		else if(ch.grounded)
 		{
 			if(platformCancel) ch.ChangeState("Jump");//not active

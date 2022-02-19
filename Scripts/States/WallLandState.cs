@@ -11,17 +11,16 @@ public class WallLandState : WallState
 	public override void Init()
 	{
 		Unsnap();
-		ch.jumpCounter = 0;
 		ch.vac = Vector2.Zero;
 		SetupCollisionParamaters();
 		
 		ch.vec.y *= (1-ch.wallFriction*ch.wfric);
-			
+		
 		//ch.onSemiSolid = false;
 		ch.PlayAnimation("WallLand");
 		ch.ApplySettings("Wall");
 		
-		ch.wallJumpCounter++;
+		ch.RestoreOptionsOnWallTouch();
 	}
 	
 	protected override bool CalcStateChange()

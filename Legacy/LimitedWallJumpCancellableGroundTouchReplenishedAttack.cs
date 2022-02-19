@@ -20,8 +20,7 @@ public class LimitedWallJumpCancellableGroundTouchReplenishedAttack : WallJumpCa
 		{
 			ch.Inputs.MarkForDeletion("player_jump", true);
 			ch.ChangeState("WallJump");
-			if(ch.jumpCounter < 1) ch.jumpCounter = 1;
-			if(amountUsed > 0) amountUsed--;;
+			if(amountUsed > 0) amountUsed--;
 			walljumpAmountUsed++;
 		}
 	}

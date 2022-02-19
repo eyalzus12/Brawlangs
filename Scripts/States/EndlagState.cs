@@ -48,14 +48,13 @@ public class EndlagState : State
 	{
 		if(frameCount >= endlag)
 		{
+			var s = ch.GetState<AttackState>();
 			ch.TurnConditional();
 			ch.SetCollisionMaskBit(DROP_THRU_BIT, true);
 			
 			if(ch.grounded)
 			{
-				ch.jumpCounter = 0;
-				ch.wallJumpCounter = 0;
-				ch.EmitSignal("JumpsRestored");
+				if(!s.touchedGround) ch.RestoreOptionsOnGroundTouch();
 				if(ch.downHeld)
 				{
 					ch.Crouch();
@@ -67,9 +66,9 @@ public class EndlagState : State
 					ch.ChangeState(ch.IsIdle()?"Idle":"Walk");
 				}
 			}
-			else if(ch.walled && ch.wallJumpCounter < ch.wallJumpNum)
+			else if(ch.walled && ch.currentClingsUsed < ch.maxClingsAllowed)
 			{
-				if(ch.GetState<AttackState>().touched) ch.wallJumpCounter--;
+				if(!s.touchedWall) ch.RestoreOptionsOnWallTouch();
 				else ch.vec.y *= (1-ch.wallFriction*ch.wfric);
 				ch.ApplySettings("Wall");
 				ch.ChangeState("Wall");

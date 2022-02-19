@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class WallJumpCancellableGroundTouchReplenishedAttack : GroundTouchReplenishedAttack
+public class WallJumpCancellableGroundTouchReplenishedAttack : ReplenishedLimitedAttack
 {
 	public bool walljumpUsed = false;
 	
@@ -17,8 +17,7 @@ public class WallJumpCancellableGroundTouchReplenishedAttack : GroundTouchReplen
 		{
 			ch.Inputs.MarkForDeletion("player_jump", true);
 			ch.ChangeState("WallJump");
-			if(ch.jumpCounter < 1) ch.jumpCounter = 1;
-			if(amountUsed > 0) amountUsed--;;
+			if(amountUsed > 0) amountUsed--;
 			walljumpUsed = true;
 		}
 	}

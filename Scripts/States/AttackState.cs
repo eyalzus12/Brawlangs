@@ -3,7 +3,8 @@ using System;
 
 public class AttackState : State
 {
-	public bool touched = false;
+	public bool touchedWall = false;
+	public bool touchedGround = false;
 	
 	public AttackState() : base() {}
 	public AttackState(Character link) : base(link) {}
@@ -15,7 +16,8 @@ public class AttackState : State
 	public override void Init()
 	{
 		Unsnap();
-		touched = false;
+		touchedWall = false;
+		touchedGround = false;
 		ch.SetCollisionMaskBit(DROP_THRU_BIT, !ch.downHeld);
 		
 		/*if(ch.grounded)
@@ -61,19 +63,17 @@ public class AttackState : State
 		if(Inputs.IsActionReallyJustReleased("player_down"))
 			ch.SetCollisionMaskBit(DROP_THRU_BIT, true);
 		//SetupCollisionParamaters();
-		if(ch.walled && ch.wallJumpCounter < ch.wallJumpNum && !touched)
+		if(ch.walled && ch.currentClingsUsed < ch.maxClingsAllowed && !touchedWall)
 		{
-			ch.jumpCounter = 0;
-			ch.wallJumpCounter++;
+			ch.RestoreOptionsOnWallTouch();
 			ch.vec.y *= (1-ch.wallFriction*ch.wfric);
-			touched = true;
+			touchedWall = true;
 		}
 		
-		if(ch.grounded)
+		if(ch.grounded && !touchedGround)
 		{
-			ch.jumpCounter = 0;
-			ch.wallJumpCounter = 0;
-			ch.EmitSignal("JumpsRestored");
+			ch.RestoreOptionsOnGroundTouch();
+			touchedGround = true;
 		}
 	}
 	
@@ -105,9 +105,6 @@ public class AttackState : State
 			
 			if(ch.grounded)
 			{
-				ch.jumpCounter = 0;
-				ch.wallJumpCounter = 0;
-				ch.EmitSignal("JumpsRestored");
 				if(ch.downHeld)
 				{
 					ch.Crouch();
@@ -119,9 +116,8 @@ public class AttackState : State
 					ch.ChangeState(ch.IsIdle()?"Idle":"Walk");
 				}
 			}
-			else if(ch.walled && ch.wallJumpCounter < ch.wallJumpNum)
+			else if(ch.walled && touchedWall)
 			{
-				if(ch.GetState<AttackState>().touched) ch.wallJumpCounter--;
 				ch.ApplySettings("Wall");
 				ch.ChangeState("Wall");
 			}
