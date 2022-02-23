@@ -6,6 +6,7 @@ public interface IHittable
 {
 	int TeamNumber{get; set;}
 	void HandleGettingHit(HitData data);
+	int InvincibilityLeft{get; set;}
 	
 	float DamageTakenMult{get;set;}
 	float KnockbackTakenMult{get;set;}

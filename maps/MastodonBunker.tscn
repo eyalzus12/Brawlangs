@@ -15,7 +15,6 @@ extents = Vector2( 240, 122.88 )
 [node name="Base" type="Node2D"]
 position = Vector2( 512, 300 )
 script = ExtResource( 1 )
-BlastZones = Vector2( 2300, 1200 )
 
 [node name="Platform" type="KinematicBody2D" parent="."]
 position = Vector2( -321.6, 41.116 )

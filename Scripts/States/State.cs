@@ -54,8 +54,10 @@ public class State : Node
 		
 		if(Inputs.IsActionJustPressed("player_jump"))
 			DoJump();
+		if(Inputs.IsActionJustPressed("player_dodge"))
+			DoDodge();
 		
-		if(actionable && ch.currentAttack is null)
+		if(this == ch.currentState && actionable && ch.currentAttack is null)
 		{
 			if(Inputs.IsActionJustPressed("player_light_attack"))
 				LightAttack();
@@ -98,6 +100,7 @@ public class State : Node
 	protected virtual void DoMovement() {}
 	protected virtual void DoGravity() {}
 	protected virtual void DoJump() {}
+	protected virtual void DoDodge() {}
 	protected virtual void AdjustVelocity() {}
 	
 	public virtual void SetInputs()

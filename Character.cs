@@ -64,6 +64,22 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public int givenAirJumpsOnGettingHit = 1;
 	public bool gotOptionsFromGettingHit = false;
 	////////////////////////////////////////////
+	public int forwardRollStartup;
+	public int forwardRollLength;
+	public float forwardRollSpeed;
+	public int forwardRollEndlag;
+	public int forwardRollCooldown;
+	
+	public int backwardsRollStartup;
+	public int backwardsRollLength;
+	public float backwardsRollSpeed;
+	public int backwardsRollEndlag;
+	public int backwardsRollCooldown;
+	
+	private int _invleft = 0;
+	public int InvincibilityLeft{get => _invleft; set => _invleft = value;}
+	
+	////////////////////////////////////////////
 	public float ceilingBonkBounce = 0.25f;//how much speed is conserved when bonking
 	public float ceilingBounce = 0.95f;//how much speed is conserved when hitting a ceiling
 	public float wallBounce = 0.95f;//how much speed is conserved when hitting a wall
@@ -211,6 +227,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public override void _PhysicsProcess(float delta)
 	{
 		++framesSinceLastHit;
+		if(InvincibilityLeft > 0) InvincibilityLeft--;
 		StoreVelocities();
 		TruncateVelocityIfInsignificant();
 		UpdateAttackCooldowns();
@@ -328,13 +345,20 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		AddState(new CrouchState(this));
 		AddState(new CrawlState(this));
 		AddState(new CrawlWallState(this));
-		//AddState(new CrouchJumpState(this));
 		
 		AddState(new StunState(this));
 		AddState(new HitPauseState(this));
 		AddState(new HitLagState(this));
 		AddState(new AttackState(this));
 		AddState(new EndlagState(this));
+		
+		AddState(new ForwardRollStartupState(this));
+		AddState(new ForwardRollState(this));
+		AddState(new ForwardRollEndlagState(this));
+		
+		AddState(new BackwardsRollStartupState(this));
+		AddState(new BackwardsRollState(this));
+		AddState(new BackwardsRollEndlagState(this));
 	}
 	
 	///////////////////////////////////////////
@@ -362,6 +386,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		ApplySettings("Default");
 		ChangeState("Air");
 		Position = Vector2.Zero;
+		InvincibilityLeft = 0;//TODO: respawn i frames
 		fastfalling = false;
 		crouching = false;
 		RestoreOptionsOnGroundTouch();
@@ -605,7 +630,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		}
 	}
 	
-	public virtual bool CanHit(IHittable hitObject) => (hitObject != this)&&(hitObject.TeamNumber!=_teamNumber||friendlyFire);
+	public virtual bool CanHit(IHittable hitObject) => (hitObject != this)&&(hitObject.InvincibilityLeft <= 0)&&(hitObject.TeamNumber!=_teamNumber||friendlyFire);
 	
 	public void HandleGettingHit(HitData data)
 	{

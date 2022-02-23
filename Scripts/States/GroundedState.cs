@@ -39,7 +39,16 @@ public class GroundedState : State
 	
 	protected override void DoJump()
 	{
+		if(!actionable) return;
 		jump = true;
+	}
+	
+	protected override void DoDodge()
+	{
+		if(!actionable || jump) return;
+		
+		if(ch.InputingDirection())
+			ch.ChangeState((ch.InputingTurn()?"Backwards":"Forward") + "RollStartup");
 	}
 	
 	protected override void LightAttack()

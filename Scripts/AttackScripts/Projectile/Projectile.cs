@@ -48,9 +48,14 @@ public class Projectile : Node2D, IHitter, IHittable
 	public float KnockbackDoneMult{get => OwnerObject.KnockbackDoneMult; set => OwnerObject.KnockbackDoneMult = value;}
 	public int StunDoneMult{get => OwnerObject.StunDoneMult; set => OwnerObject.StunDoneMult = value;}
 	
+	private int _invleft = 0;
+	public int InvincibilityLeft{get => _invleft; set => _invleft = value;}
+	
 	public AudioManager audioManager;
 	public void PlaySound(string sound) => audioManager.Play(sound);
 	public void PlaySound(AudioStream sound) => audioManager.Play(sound);
+	
+	
 	
 	public Dictionary<string, ParamRequest> LoadExtraProperties = new Dictionary<string, ParamRequest>();
 	public virtual void LoadProperties() {}
