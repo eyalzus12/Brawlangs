@@ -44,7 +44,8 @@ public class AttackCreator
 		var AttackScript = inif[section, "Script", ""].s();
 		var baseFolder = path.SplitByLast('/')[0];
 		var a = TypeUtils.LoadScript<Attack>(AttackScript, new Attack(), baseFolder);
-		a.ch = n as Character;
+		var ch = n as Character;
+		a.ch = ch;
 		a.Name = section;
 		
 		var fric = inif[section, "Friction", 1f].f();
@@ -66,6 +67,9 @@ public class AttackCreator
 		
 		n.AddChild(a);
 		a.Owner = n;//for scene packing
+		ch.attacks.Add(a);
+		ch.attackDict.Add(a.Name, a);
+		ch.actionCooldowns.Add(a.Name, 0);
 	}
 	
 	public AttackPart BuildPart(Attack a, string section, string start)

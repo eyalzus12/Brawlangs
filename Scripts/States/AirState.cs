@@ -22,7 +22,7 @@ public class AirState : State
 	
 	protected override void DoMovement()
 	{
-		if(ch.InputingDirection()) DoInputMovement();
+		if(ch.InputtingHorizontalDirection()) DoInputMovement();
 		else DoFriction();
 	}
 	
@@ -56,6 +56,12 @@ public class AirState : State
 			ch.PlayAnimation("Jump");
 			ch.QueueAnimation("Drift");
 		}
+	}
+	
+	protected override void DoDodge()
+	{
+		if(!actionable || ch.IsActionInCooldown("Dodge")) return;
+		ch.ChangeState((ch.InputtingDirection()?"Directional":"Spot")+"AirDodge");
 	}
 	
 	protected override void LightAttack()

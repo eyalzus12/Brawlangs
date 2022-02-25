@@ -17,7 +17,7 @@ public class GroundedState : State
 	
 	protected override void DoMovement()
 	{
-		if(ch.InputingDirection()) DoInputMovement();
+		if(ch.InputtingHorizontalDirection()) DoInputMovement();
 	}
 	
 	protected void DoInputMovement()
@@ -47,8 +47,11 @@ public class GroundedState : State
 	{
 		if(!actionable || jump) return;
 		
-		if(ch.InputingDirection())
-			ch.ChangeState((ch.InputingTurn()?"Backwards":"Forward") + "RollStartup");
+		if(ch.InputtingHorizontalDirection())
+		{
+			var choice = (ch.InputtingTurn()?"Back":"Forward") + "Roll";
+			if(!ch.IsActionInCooldown(choice)) ch.ChangeState(choice);
+		}
 	}
 	
 	protected override void LightAttack()

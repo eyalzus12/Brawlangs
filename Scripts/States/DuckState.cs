@@ -24,7 +24,7 @@ public class DuckState : BaseCrouchState
 		if(base.CalcStateChange()) return true;
 		else if(frameCount >= ch.duckLength)
 		{
-			if(ch.InputingDirection()) ch.ChangeState("Crawl");
+			if(ch.InputtingHorizontalDirection()) ch.ChangeState("Crawl");
 			else ch.ChangeState("Crouch");
 		}
 		else return false;

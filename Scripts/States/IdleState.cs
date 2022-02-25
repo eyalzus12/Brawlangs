@@ -14,7 +14,7 @@ public class IdleState : GroundedState
 	
 	protected override void DoMovement()
 	{
-		if(ch.InputingDirection())
+		if(ch.InputtingHorizontalDirection())
 			ch.vec.x = ch.GetInputDirection() * ch.groundAcceleration;
 	}
 	
@@ -23,7 +23,7 @@ public class IdleState : GroundedState
 		if(base.CalcStateChange()) return true;
 		else if(ch.TurnConditional())
 			ch.ChangeState("WalkTurn");
-		else if(ch.InputingDirection())
+		else if(ch.InputtingHorizontalDirection())
 			ch.ChangeState("Walk");
 		else return false;
 		

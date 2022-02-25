@@ -23,7 +23,7 @@ public class GetupState : GroundedState
 	{
 		ch.TurnConditional();
 		
-		if(ch.InputingDirection())
+		if(ch.InputtingHorizontalDirection())
 			ch.vec.x = ch.direction * ch.crawlSpeed;
 		else ch.vec.x = 0;
 	}
@@ -34,7 +34,7 @@ public class GetupState : GroundedState
 		else if(frameCount >= ch.getupLength)
 		{
 			if(ch.IsIdle()) ch.ChangeState("Idle");
-			else if(ch.InputingDirection()) ch.ChangeState("Walk");
+			else if(ch.InputtingHorizontalDirection()) ch.ChangeState("Walk");
 			else ch.ChangeState("WalkStop");
 		}
 		else return false;

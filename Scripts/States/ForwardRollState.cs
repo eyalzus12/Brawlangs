@@ -1,29 +1,16 @@
 using Godot;
 using System;
 
-public class ForwardRollState : State
+public class ForwardRollState : RollState
 {
 	public ForwardRollState() : base() {}
 	public ForwardRollState(Character link) : base(link) {}
 	
-	public override bool IsActionable() => false;
-	
-	public override void Init()
-	{
-		if(ch.InvincibilityLeft < ch.forwardRollLength) ch.InvincibilityLeft = ch.forwardRollLength;
-		ch.vec = new Vector2(ch.direction*ch.forwardRollSpeed, VCF);
-	}
-	
-	protected override bool CalcStateChange()
-	{
-		if(frameCount >= ch.forwardRollLength)
-		{
-			ch.vec = new Vector2(0, VCF);
-			ch.InvincibilityLeft = 0;
-			ch.ChangeState("ForwardRollEndlag");
-		}
-		else return false;
-		
-		return true;
-	}
+	public override int Startup() => ch.forwardRollStartup;
+	public override int InvincibilityLength() => ch.forwardRollLength;
+	public override int Endlag() => ch.forwardRollEndlag;
+	public override int Cooldown() => ch.forwardRollCooldown;
+	public override string ActionName() => "ForwardRoll";
+	public override string Animation() => "ForwardRoll";
+	public override float Speed() => ch.forwardRollSpeed;
 }

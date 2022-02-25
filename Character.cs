@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 public class Character : KinematicBody2D, IHittable, IAttacker
 {
@@ -70,11 +71,25 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public int forwardRollEndlag;
 	public int forwardRollCooldown;
 	
-	public int backwardsRollStartup;
-	public int backwardsRollLength;
-	public float backwardsRollSpeed;
-	public int backwardsRollEndlag;
-	public int backwardsRollCooldown;
+	public int backRollStartup;
+	public int backRollLength;
+	public float backRollSpeed;
+	public int backRollEndlag;
+	public int backRollCooldown;
+	
+	public int spotAirDodgeStartup = 3;
+	public int spotAirDodgeLength = 15;
+	public int spotAirDodgeEndlag = 3;
+	public int spotAirDodgeCooldown = 163;
+	public int directionalAirDodgeStartup = 2;
+	public int directionalAirDodgeLength = 10;
+	public float directionalAirDodgeSpeed = 2000;
+	public int directionalAirDodgeEndlag = 2;
+	public int directionalAirDodgeCooldown = 163;
+	public bool reduceDodgeCooldownOnGroundTouch = true;
+	public bool reduceDodgeCooldownOnWallTouch = false;
+	public int groundTouchDodgeCooldownThreshold = 75;
+	public int wallTouchDodgeCooldownThreshold = 0;
 	
 	private int _invleft = 0;
 	public int InvincibilityLeft{get => _invleft; set => _invleft = value;}
@@ -193,7 +208,8 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	
 	public List<Attack> attacks = new List<Attack>();
 	public Dictionary<string, Attack> attackDict = new Dictionary<string, Attack>();
-	public Dictionary<Attack, int> attackCooldowns = new Dictionary<Attack, int>();
+	//public Dictionary<Attack, int> attackCooldowns = new Dictionary<Attack, int>();
+	public Dictionary<string, int> actionCooldowns = new Dictionary<string, int>();
 	
 	public Dictionary<string, PackedScene> projectiles = new Dictionary<string, PackedScene>();
 	public Dictionary<string, HashSet<Projectile>> activeProjectiles = new Dictionary<string, HashSet<Projectile>>();
@@ -213,7 +229,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public override void _Ready()
 	{
 		SetupStates();
-		SetupAttacks();
+		SetupCooldownDict();
 	}
 	
 	public bool ReadStats()
@@ -230,7 +246,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		if(InvincibilityLeft > 0) InvincibilityLeft--;
 		StoreVelocities();
 		TruncateVelocityIfInsignificant();
-		UpdateAttackCooldowns();
+		UpdateActionCooldowns();
 		if(Input.IsActionJustPressed("reset")) Respawn();
 		currentState?.SetInputs();
 		currentState?.DoPhysics(delta);
@@ -352,13 +368,10 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		AddState(new AttackState(this));
 		AddState(new EndlagState(this));
 		
-		AddState(new ForwardRollStartupState(this));
 		AddState(new ForwardRollState(this));
-		AddState(new ForwardRollEndlagState(this));
-		
-		AddState(new BackwardsRollStartupState(this));
-		AddState(new BackwardsRollState(this));
-		AddState(new BackwardsRollEndlagState(this));
+		AddState(new BackRollState(this));
+		AddState(new SpotAirDodgeState(this));
+		AddState(new DirectionalAirDodgeState(this));
 	}
 	
 	///////////////////////////////////////////
@@ -582,19 +595,21 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	
 	public void Turn() => direction *= -1;
 	
-	public bool InputingTurn() => (GetFutureDirection() != direction);
-	public bool InputingDirection() => leftHeld||rightHeld;
+	public bool InputtingTurn() => (GetFutureDirection() != direction);
+	public bool InputtingHorizontalDirection() => leftHeld||rightHeld;
+	public bool InputtingVerticalDirection() => upHeld||downHeld;
+	public bool InputtingDirection() => InputtingHorizontalDirection()||InputtingVerticalDirection();
 	
 	public bool TurnConditional()
 	{
-		if(InputingTurn()) Turn();
+		if(InputtingTurn()) Turn();
 		else return false;
 		
 		return true;
 	}
 	
 	public bool IsIdle() => (Math.Truncate(GetVelocity().x) == 0);
-	public bool IsStill() => (IsIdle() && !InputingDirection());
+	public bool IsStill() => (IsIdle() && !InputtingHorizontalDirection());
 	
 	public int GetInputDirection()
 	{
@@ -615,18 +630,23 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public bool DirectionToBool() => (direction != 1);
 	//false = right, left = true. used for flipping sprite;
 	
+	public Vector2 GetInputVector()
+	{
+		var x = rightHeld?1:leftHeld?-1:0;
+		var y = downHeld?1:upHeld?-1:0;
+		return new Vector2(x,y).Normalized();
+	}
+	
 	///////////////////////////////////////////
 	////////////////Attacks////////////////////
 	///////////////////////////////////////////
 	
-	public virtual void SetupAttacks()
+	public readonly static string[] ActionsWithCooldown = new string[]{"ForwardRoll", "BackRoll", "Dodge"};
+	public virtual void SetupCooldownDict()
 	{
-		attacks = GetChildren().FilterType<Attack>().ToList();
-		
-		foreach(var a in attacks)
+		foreach(var action in ActionsWithCooldown)
 		{
-			attackDict.Add(a.Name, a);
-			attackCooldowns.Add(a, 0);
+			actionCooldowns.Add(action, 0);
 		}
 	}
 	
@@ -687,16 +707,23 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		}
 	}
 	
-	public virtual bool IsAttackInCooldown(Attack a)
+	public virtual bool IsActionInCooldown(string s)
 	{
-		var cd = GetAttackCooldown(a);
+		var cd = GetActionCooldown(s);
 		if(cd is null) return false;
 		else return (cd>0);
 	}
 	
+	public virtual string DebugCooldownPrint()
+	{
+		var sb = new StringBuilder();
+		
+		return sb.ToString();
+	}
+	
 	public virtual bool ExecuteAttack(Attack a)
 	{
-		if(a is null || !a.CanActivate() || IsAttackInCooldown(a)) return false;
+		if(a is null || !a.CanActivate() || IsActionInCooldown(a.Name)) return false;
 		
 		if(currentAttack != null) ResetCurrentAttack(null);
 		
@@ -724,33 +751,35 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		}
 	}
 	
-	public int? GetAttackCooldown(string s) => GetAttackCooldown(GetAttack(s));
-	
-	public int? GetAttackCooldown(Attack a)
+	public int? GetActionCooldown(string s)
 	{
-		if(a is null)
+		try
 		{
-			GD.Print("Could not get cooldown for given attack as it is null");
-			return null;
+			return actionCooldowns[s];
 		}
-		else
+		catch(KeyNotFoundException)
 		{
-			try
-			{
-				return attackCooldowns[a];
-			}
-			catch(KeyNotFoundException)
-			{
-				GD.Print($"Could not get cooldown for attack {a.Name} as it does not exist");
-				return null;
-			}
+			GD.Print($"Could not get cooldown for action {s} as it does not exist in the cooldown dictionary");
+			return null;
 		}
 	}
 	
-	public void UpdateAttackCooldowns()
+	public void SetActionCooldown(string s, int cd)
 	{
-		var keys = new List<Attack>(attackCooldowns.Keys);
-		foreach(var k in keys) attackCooldowns[k] = Math.Max(0, attackCooldowns[k] - 1);
+		try
+		{
+			actionCooldowns[s] = cd;
+		}
+		catch(KeyNotFoundException)
+		{
+			GD.Print($"Could not set cooldown for action {s} as it does not exist in the cooldown dictionary");
+		}
+	}
+	
+	public void UpdateActionCooldowns()
+	{
+		var keys = new List<string>(actionCooldowns.Keys);
+		foreach(var k in keys) actionCooldowns[k] = Math.Max(0, actionCooldowns[k] - 1);
 	}
 	
 	public void ResetCurrentAttack(Attack a)
@@ -813,7 +842,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public virtual void SetAttackCooldowns()
 	{
 		var cd = currentAttack.GetEndlag() + currentAttack.GetCooldown();
-		attackCooldowns[currentAttack] = cd;
+		SetActionCooldown(currentAttack.Name, cd);
 	}
 	
 	///////////////////////////////////////////
