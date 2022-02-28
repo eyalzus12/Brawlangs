@@ -6,6 +6,8 @@ public class DirectionalAirDodgeState : GenericInvincibleState
 	public DirectionalAirDodgeState() : base() {}
 	public DirectionalAirDodgeState(Character link) : base(link) {}
 	
+	public bool touchedWall = false;
+	public bool touchedGround = false;
 	public Vector2 movement;
 	
 	public override bool IsActionable() => false;
@@ -20,7 +22,24 @@ public class DirectionalAirDodgeState : GenericInvincibleState
 	public override void Init()
 	{
 		base.Init();
+		touchedWall = false;
+		touchedGround = false;
 		movement = ch.GetInputVector()*ch.directionalAirDodgeSpeed;
+	}
+	
+	protected override void LoopActions()
+	{
+		base.LoopActions();
+		
+		ch.vec.x *= (1f-ch.AppropriateFriction);
+		ch.vec.y *= (1f-ch.airFriction);
+		
+		if(ch.walled && ch.currentClingsUsed < ch.maxClingsAllowed) touchedWall = true;
+		if(ch.grounded)
+		{
+			ch.vec.y = VCF;
+			touchedGround = true;
+		}
 	}
 	
 	protected override void OnIFramesStart()
@@ -28,30 +47,46 @@ public class DirectionalAirDodgeState : GenericInvincibleState
 		ch.vec = movement;
 	}
 	
-	protected override void OnEndlagStart()
-	{
-		//ch.vec = new Vector2(0, VCF);
-	}
-	
 	protected override void DecideNextState()
 	{
-		bool turn = ch.TurnConditional();
-			
+		ch.TurnConditional();
+		
+		if(touchedGround) ch.RestoreOptionsOnGroundTouch();
+		if(touchedWall) ch.RestoreOptionsOnWallTouch();
+		
 		if(ch.grounded)
 		{
-			if(Inputs.IsActionJustPressed("player_jump"))
-				ch.ChangeState("Jump");
-			else if(Inputs.IsActionPressed("player_down") && !ch.onSemiSolid) 
-				ch.ChangeState(ch.InputtingHorizontalDirection()?ch.walled?"CrawlWall":"Crawl":"Crouch");
-			else if(ch.IsIdle())
-				ch.ChangeState("Idle");
-			else if(turn)
-				ch.ChangeState("WalkTurn");
-			else if(ch.InputtingHorizontalDirection())
-				ch.ChangeState(ch.walled?"WalkWall":"Walk");
+			if(ch.downHeld)
+			{
+				if(ch.onSemiSolid)
+				{
+					ch.SetCollisionMaskBit(DROP_THRU_BIT, false);
+					ch.vic.y = VCF;
+					ch.ChangeState("Air");
+				}
+				else
+				{
+					ch.Crouch();
+					ch.ChangeState("Crawl");
+				}
+			}
 			else
+			{
+				ch.Uncrouch();
 				ch.ChangeState("WalkStop");
+			}
+		}
+		else if(ch.walled && ch.currentClingsUsed < ch.maxClingsAllowed)
+		{
+			ch.ApplySettings("Wall");
+			ch.ChangeState("Wall");
 		}
 		else ch.ChangeState("Air");
+	}
+	
+	public override void OnChange(State newState)
+	{
+		base.OnChange(newState);
+		ch.lastDodgeUsed = "Directional";
 	}
 }

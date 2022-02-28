@@ -30,6 +30,10 @@ public class DebugLabel : InfoLabel
 		Add("Turning", ch.InputtingTurn());
 		Newline();
 		Add("IFramesLeft", ch.InvincibilityLeft);
+		Add("LastDodgeUsed", ch.lastDodgeUsed);
+		Add("DodgeCooldown", ch.DodgeCooldown);
+		//Add("ForwardRollCooldown", ch.GetActionCooldown("ForwardRoll")??0);
+		//Add("BackRollCooldown", ch.GetActionCooldown("BackRoll")??0);
 		Newline();
 		Add("Ground", ch.grounded);
 		Add("Wall", ch.walled);

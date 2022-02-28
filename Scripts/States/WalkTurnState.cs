@@ -17,11 +17,11 @@ public class WalkTurnState : GroundedSlowdownState
 	{
 		if(!actionable || jump) return;
 		
-		if(ch.InputtingHorizontalDirection() && !ch.InputtingTurn())
+		/*if(ch.InputtingHorizontalDirection() && !ch.InputtingTurn())
 		{
 			ch.direction *= -1;
 			ch.ChangeState("BackRoll");
-		}
+		}*/
 	}
 	
 	protected override bool CalcStateChange()

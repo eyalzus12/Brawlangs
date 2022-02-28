@@ -43,6 +43,12 @@ public class JumpState : GroundedState
 	
 	protected override void DoJump() {}
 	
+	protected override void DoDodge()
+	{
+		if(ch.IsActionInCooldown("Dodge")) return;
+		ch.ChangeState("DirectionalAirDodge");
+	}
+	
 	protected override void DoMovement()
 	{
 		if(!jumpActive) base.DoMovement();

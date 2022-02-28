@@ -25,4 +25,10 @@ public class SpotAirDodgeState : GenericInvincibleState
 		bool turn = ch.TurnConditional();
 		ch.ChangeState("Air");
 	}
+	
+	public override void OnChange(State newState)
+	{
+		base.OnChange(newState);
+		ch.lastDodgeUsed = "Spot";
+	}
 }

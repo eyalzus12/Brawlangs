@@ -62,6 +62,7 @@ public class AirState : State
 	{
 		if(!actionable || ch.IsActionInCooldown("Dodge")) return;
 		ch.ChangeState((ch.InputtingDirection()?"Directional":"Spot")+"AirDodge");
+		MarkForDeletion("player_dodge", true);
 	}
 	
 	protected override void LightAttack()

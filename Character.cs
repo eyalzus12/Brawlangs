@@ -77,23 +77,40 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public int backRollEndlag;
 	public int backRollCooldown;
 	
+	public int dashStartup;
+	public int dashLength;
+	public int dashSpeed;
+	public int dashCancelWindow;
+	
 	public int spotAirDodgeStartup = 3;
 	public int spotAirDodgeLength = 15;
 	public int spotAirDodgeEndlag = 3;
-	public int spotAirDodgeCooldown = 163;
-	public int directionalAirDodgeStartup = 2;
-	public int directionalAirDodgeLength = 10;
-	public float directionalAirDodgeSpeed = 2000;
-	public int directionalAirDodgeEndlag = 2;
-	public int directionalAirDodgeCooldown = 163;
+	public int spotAirDodgeCooldown = 120;
+	
+	public int directionalAirDodgeStartup = 3;
+	public int directionalAirDodgeLength = 15;
+	public float directionalAirDodgeSpeed = 1500;
+	public int directionalAirDodgeEndlag = 3;
+	public int directionalAirDodgeCooldown = 120;
+	
 	public bool reduceDodgeCooldownOnGroundTouch = true;
+	public int groundTouchDodgeCooldownThreshold = 90;
+	
 	public bool reduceDodgeCooldownOnWallTouch = false;
-	public int groundTouchDodgeCooldownThreshold = 75;
 	public int wallTouchDodgeCooldownThreshold = 0;
+	
+	public bool reduceDodgeCooldownOnHitting = true;
+	public int hittingDodgeCooldownThreshold = 60;
+	
+	public bool reduceDodgeCooldownOnGettingHit = false;
+	public int gettingHitDodgeCooldownThreshold = 0;
+	
+	public string lastDodgeUsed = "";
 	
 	private int _invleft = 0;
 	public int InvincibilityLeft{get => _invleft; set => _invleft = value;}
 	
+	public int DodgeCooldown => GetActionCooldown("Dodge")??0;
 	////////////////////////////////////////////
 	public float ceilingBonkBounce = 0.25f;//how much speed is conserved when bonking
 	public float ceilingBounce = 0.95f;//how much speed is conserved when hitting a ceiling
@@ -174,6 +191,8 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public Vector2 PlatVel => grounded?fvel:walled?wvel:ceilinged?cvel:Vector2.Zero;
 	public float PlatFric => grounded?ffric:walled?wfric:ceilinged?cfric:1f;
 	public float PlatBounce => grounded?ffric:walled?wfric:ceilinged?cfric:1f;
+	
+	public float AppropriateFriction => PlatFric * (onSlope?slopeFriction:grounded?groundFriction:walled?wallFriction:airFriction);
 	
 	public bool fastfalling = false;//wether or not fastfalling
 	//public uint jumpCounter = 0;//how many air jumps have been used
@@ -402,14 +421,22 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		InvincibilityLeft = 0;//TODO: respawn i frames
 		fastfalling = false;
 		crouching = false;
-		RestoreOptionsOnGroundTouch();
+		currentClingsUsed = 0;
+		currentAirJumpsUsed = 0;
+		gotOptionsFromHitting = false;
+		gotOptionsFromGettingHit = false;
+		lastDodgeUsed = "";
 		ResetVelocity();
 		direction = 1;
 		SetCollisionMaskBit(DROP_THRU_BIT, true);
 		damage = 0f;
 		framesSinceLastHit = 0;
 		comboCount = 0;
-		
+		DisableAllProjectiles();
+	}
+	
+	public virtual void DisableAllProjectiles()
+	{
 		var activeProjectilesCopy = new Dictionary<string, HashSet<Projectile>>(activeProjectiles);
 		foreach(var entry in activeProjectilesCopy)
 		{
@@ -421,12 +448,34 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		}
 	}
 	
+	public virtual int GetAppropriateDodgeCooldown()
+	{
+		switch(lastDodgeUsed)
+		{
+			case "Directional":
+				return directionalAirDodgeCooldown;
+			case "Spot":
+			default:
+				return spotAirDodgeCooldown;
+		}
+	}
+	
 	public virtual void RestoreOptionsOnGroundTouch()
 	{
 		currentClingsUsed = 0;
 		currentAirJumpsUsed = 0;
 		gotOptionsFromHitting = false;
 		gotOptionsFromGettingHit = false;
+		
+		if(reduceDodgeCooldownOnGroundTouch)
+		{
+			if(GetAppropriateDodgeCooldown()-DodgeCooldown <= groundTouchDodgeCooldownThreshold)
+				SetActionCooldown("Dodge", groundTouchDodgeCooldownThreshold);
+			else
+				SetActionCooldown("Dodge", 0);
+		}
+		
+		
 		EmitSignal(nameof(OptionsRestoredFromGroundTouch));
 	}
 	
@@ -434,6 +483,15 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	{
 		currentClingsUsed++;
 		currentAirJumpsUsed = 0;
+		
+		if(reduceDodgeCooldownOnWallTouch)
+		{
+			if(GetAppropriateDodgeCooldown()-DodgeCooldown <= wallTouchDodgeCooldownThreshold)
+				SetActionCooldown("Dodge", wallTouchDodgeCooldownThreshold);
+			else
+				SetActionCooldown("Dodge", 0);
+		}
+		
 		EmitSignal(nameof(OptionsRestoredFromWallTouch));
 	}
 	
@@ -444,6 +502,15 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		if(currentClingsUsed < 0) currentClingsUsed = 0;
 		currentAirJumpsUsed -= givenAirJumpsOnHitting;
 		if(currentAirJumpsUsed < 0) currentAirJumpsUsed = 0;
+		
+		if(reduceDodgeCooldownOnHitting)
+		{
+			if(GetAppropriateDodgeCooldown()-DodgeCooldown <= hittingDodgeCooldownThreshold)
+				SetActionCooldown("Dodge", hittingDodgeCooldownThreshold);
+			else
+				SetActionCooldown("Dodge", 0);
+		}
+		
 		EmitSignal(nameof(OptionsRestoredFromHitting));
 		gotOptionsFromHitting = true;
 		//gotOptionsFromGettingHit = false;
@@ -456,6 +523,15 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		if(currentClingsUsed < 0) currentClingsUsed = 0;
 		currentAirJumpsUsed -= givenAirJumpsOnGettingHit;
 		if(currentAirJumpsUsed < 0) currentAirJumpsUsed = 0;
+		
+		if(reduceDodgeCooldownOnGettingHit)
+		{
+			if(GetAppropriateDodgeCooldown()-DodgeCooldown <= gettingHitDodgeCooldownThreshold)
+				SetActionCooldown("Dodge", gettingHitDodgeCooldownThreshold);
+			else
+				SetActionCooldown("Dodge", 0);
+		}
+		
 		EmitSignal(nameof(OptionsRestoredFromGettingHit));
 		gotOptionsFromGettingHit = true;
 	}
