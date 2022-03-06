@@ -717,7 +717,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	////////////////Attacks////////////////////
 	///////////////////////////////////////////
 	
-	public readonly static string[] ActionsWithCooldown = new string[]{"ForwardRoll", "BackRoll", "Dodge"};
+	public readonly static string[] ActionsWithCooldown = new string[]{"Dodge"};
 	public virtual void SetupCooldownDict()
 	{
 		foreach(var action in ActionsWithCooldown)
