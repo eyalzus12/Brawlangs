@@ -53,14 +53,15 @@ public class GenericInvincibleState : State
 	
 	protected override bool CalcStateChange()
 	{
-		if(frameCount >= startup+iframes+endlag)
-		{
-			ch.SetActionCooldown(actionName, cooldown);
-			DecideNextState();
-		}
+		if(frameCount >= startup+iframes+endlag) DecideNextState();
 		else return false;
 		
 		return true;
+	}
+	
+	public override void OnChange(State nextState)
+	{
+		ch.SetActionCooldown(actionName, cooldown);
 	}
 	
 	protected virtual void DecideNextState()

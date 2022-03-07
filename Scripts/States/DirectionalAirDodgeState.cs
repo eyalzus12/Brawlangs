@@ -10,12 +10,12 @@ public class DirectionalAirDodgeState : GenericInvincibleState
 	public bool touchedGround = false;
 	public Vector2 movement;
 	
-	public override bool IsActionable() => false;
+	public override bool IsActionable() => touchedGround;
 	
 	public override int Startup() => ch.directionalAirDodgeStartup;
 	public override int InvincibilityLength() => ch.directionalAirDodgeLength;
 	public override int Endlag() => ch.directionalAirDodgeEndlag;
-	public override int Cooldown() => ch.directionalAirDodgeCooldown;
+	public override int Cooldown() => touchedGround?ch.groundTouchDodgeCooldownThreshold:ch.directionalAirDodgeCooldown;
 	public override string ActionName() => "Dodge";
 	public override string Animation() => "DirectionAirDodge";
 	
@@ -45,6 +45,53 @@ public class DirectionalAirDodgeState : GenericInvincibleState
 	protected override void OnIFramesStart()
 	{
 		ch.vec = movement;
+	}
+	
+	protected override void DoJump()
+	{
+		if(!actionable) return;
+		ch.ChangeState("Jump");
+		MarkForDeletion("player_jump", true);
+	}
+	
+	protected override void LightAttack()
+	{
+		if(ch.upHeld) ch.ExecuteAttack("NLight");
+		else if(ch.downHeld) ch.ExecuteAttack("DLight");
+		else if(ch.rightHeld || ch.leftHeld) ch.ExecuteAttack("SLight");
+		else ch.ExecuteAttack("NLight");
+		
+		MarkForDeletion("player_light_attack", true);
+	}
+	
+	protected override void HeavyAttack()
+	{
+		if(ch.upHeld) ch.ExecuteAttack("NStrong");
+		else if(ch.downHeld) ch.ExecuteAttack("DStrong");
+		else if(ch.rightHeld || ch.leftHeld) ch.ExecuteAttack("SStrong");
+		else ch.ExecuteAttack("NStrong");
+		
+		MarkForDeletion("player_heavy_attack", true);
+	}
+	
+	protected override void SpecialAttack()
+	{
+		if(ch.upHeld) ch.ExecuteAttack("USpecial");
+		else if(ch.downHeld) ch.ExecuteAttack("DSpecial");
+		else if(ch.rightHeld || ch.leftHeld) ch.ExecuteAttack("SSpecial");
+		else ch.ExecuteAttack("NSpecial");
+		
+		MarkForDeletion("player_special_attack", true);
+	}
+	
+	protected override void Taunt()
+	{
+		if(ch.upHeld) ch.ExecuteAttack("UTaunt");
+		else if(ch.downHeld) ch.ExecuteAttack("DTaunt");
+		else if(ch.rightHeld || ch.leftHeld) ch.ExecuteAttack("STaunt");
+		else ch.ExecuteAttack("NTaunt");
+		
+		MarkForDeletion("player_taunt", true);
 	}
 	
 	protected override void DecideNextState()

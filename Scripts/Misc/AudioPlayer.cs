@@ -10,6 +10,7 @@ public class AudioPlayer : AudioStreamPlayer2D
 	public override void _Ready()
 	{
 		Connect("finished", this, nameof(OnFinish));
+		Attenuation = 0.5f;
 	}
 	
 	public void Play(AudioStream stream)
