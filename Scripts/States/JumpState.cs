@@ -56,7 +56,7 @@ public class JumpState : GroundedState
 	
 	protected override bool CalcStateChange()
 	{
-		if(!ch.grounded)
+		if(!ch.grounded && jumpActive)
 		{
 			ch.ApplySettings("Default");
 			ch.ChangeState("Air");
