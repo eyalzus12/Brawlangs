@@ -38,8 +38,7 @@ public class AirState : State
 	
 	protected override void DoGravity()
 	{
-		if(ch.fastfalling) DoFastFall();
-		else DoNormalGravity();
+		ch.vec.y.Lerp(ch.AppropriateFallingSpeed, ch.AppropriateGravity);
 	}
 	
 	protected override void DoJump()
@@ -164,15 +163,5 @@ public class AirState : State
 	{
 		ch.TurnConditional();
 		if(ch.crouching) ch.Uncrouch();
-	}
-	
-	protected virtual void DoNormalGravity()
-	{
-		ch.vec.y.Lerp(ch.fallSpeed, ch.gravity);
-	}
-	
-	protected virtual void DoFastFall()
-	{
-		ch.vec.y.Lerp(ch.fastFallSpeed, ch.fastFallGravity);
 	}
 }

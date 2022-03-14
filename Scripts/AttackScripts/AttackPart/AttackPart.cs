@@ -16,47 +16,22 @@ public class AttackPart : Node2D
 	public Dictionary<string, ParamRequest> LoadExtraProperties = new Dictionary<string, ParamRequest>();
 	
 	public bool active = false;
-	
-	[Export]
 	public int startup = 0;
-	
-	[Export]
 	public int endlag = 0;
-	
-	[Export]
 	public int length = 0;
-	
-	[Export]
 	public Vector2 movement = default;
-	
-	[Export]
+	public bool overwriteXMovement = false;
+	public bool overwriteYMovement = false;
 	public int missEndlag = 0;
-	
-	[Export]
 	public int cooldown = 0;
-	
-	[Export]
 	public int missCooldown = 0;
-	
-	[Export]
+	public float gravityMultiplier = 1f;
 	public float damageMult = 1f;
-	
-	[Export]
 	public float knockbackMult = 1f;
-	
-	[Export]
 	public int stunMult = 1;
-	
-	[Export]
 	public string startupAnimation;
-	
-	[Export]
 	public string attackAnimation;
-	
-	[Export]
 	public string endlagAnimation;
-	
-	[Export]
 	public string attackSound;
 	
 	public List<string> emittedProjectiles;
@@ -114,6 +89,9 @@ public class AttackPart : Node2D
 		hitboxPlayer.Play("HitboxActivation");
 		hitList.Clear();
 		ignoreList.Clear();
+		
+		if(overwriteXMovement) ch.vec.x = 0;
+		if(overwriteYMovement) ch.vec.y = 0;
 	}
 	
 	public override void _PhysicsProcess(float delta)

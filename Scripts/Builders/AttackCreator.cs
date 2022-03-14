@@ -92,10 +92,16 @@ public class AttackCreator
 		ap.cooldown = cd;
 		var mv = inif[section, "Movement", Vector2.Zero].v2();
 		ap.movement = mv;
+		var ox = inif[section, "OverwriteXMovement", false].b();
+		ap.overwriteXMovement = ox;
+		var oy = inif[section, "OverwriteYMovement", false].b();
+		ap.overwriteYMovement = oy;
 		var me = inif[section, "MissEndlag", 0].i();
 		ap.missEndlag = me;
 		var mc = inif[section, "MissCooldown", 0].i();
 		ap.missCooldown = mc;
+		var gm = inif[section, "GravityMultiplier", 1f].f();
+		ap.gravityMultiplier = gm;
 		var dm = inif[section, "DamageMult", 1f].f();
 		ap.damageMult = dm;
 		var km = inif[section, "KnockbackMult", 1f].f();

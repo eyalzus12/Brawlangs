@@ -37,11 +37,7 @@ public class AttackState : State
 	
 	protected override void DoGravity()
 	{
-		if(att.currentPart != null && Math.Abs(att.currentPart.movement.y) > 1f) 
-		{
-			Unsnap();
-			return;
-		}
+		if(att?.currentPart is null) return;
 		
 		if(ch.grounded)
 		{
@@ -52,7 +48,7 @@ public class AttackState : State
 			}
 			else Unsnap();
 		}
-		else ch.vec.y.Lerp(ch.fallSpeed, ch.gravity);
+		else ch.vec.y.Lerp(ch.AppropriateFallingSpeed, ch.AppropriateGravity);
 	}
 	
 	protected override void LoopActions()

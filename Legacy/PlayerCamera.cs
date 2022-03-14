@@ -13,7 +13,7 @@ public class PlayerCamera : Camera2D
 	public override void _Ready()
 	{
 		Character ch = (Character)GetParent();
-		exist = !ch.dummy;
+		exist = true;//!ch.dummy;
 		
 		Current = exist;
 	}

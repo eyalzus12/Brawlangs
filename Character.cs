@@ -49,8 +49,6 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public float verticalWallJump = 400f;//vertical velocity from wall jumping
 	public float fastfallMargin = -100f;
 	////////////////////////////////////////////
-	//public int jumpNum = 3;//how many air jump you have
-	//public int wallJumpNum = 5;//how many wall jumps you have
 	public int maxClingsAllowed = 2;
 	public int currentClingsUsed = 0;
 	
@@ -130,8 +128,6 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public int duckLength = 3;
 	public int getupLength = 4;
 	////////////////////////////////////////////
-	public bool dummy = false;
-	////////////////////////////////////////////
 	public float damage = 0f;
 	////////////////////////////////////////////
 	private float _damageTakenMult = 1f;
@@ -193,6 +189,10 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public float PlatBounce => grounded?ffric:walled?wfric:ceilinged?cfric:1f;
 	
 	public float AppropriateFriction => PlatFric * (onSlope?slopeFriction:grounded?groundFriction:walled?wallFriction:airFriction);
+	public float AppropriateAcceleration => (grounded?groundAcceleration:airAcceleration);
+	public float AppropriateSpeed => (crouching?crawlSpeed:grounded?groundSpeed:airSpeed);
+	public float AppropriateGravity => (currentAttack?.currentPart?.gravityMultiplier ?? 1f)*(fastfalling?fastFallGravity:gravity);
+	public float AppropriateFallingSpeed => (currentAttack?.currentPart?.gravityMultiplier ?? 1f)*(fastfalling?fastFallSpeed:fallSpeed);
 	
 	public bool fastfalling = false;//wether or not fastfalling
 	//public uint jumpCounter = 0;//how many air jumps have been used
@@ -243,7 +243,6 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public AudioManager audioManager;
 	
 	public Character() {}
-	public Character(bool dummy) {this.dummy = dummy;}
 	
 	public override void _Ready()
 	{
@@ -805,8 +804,9 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		
 		currentAttack = a;
 		currentAttack.Connect("AttackEnds", this, nameof(ResetCurrentAttack));
-		var s = ChangeState<AttackState>();
+		var s = GetState<AttackState>();
 		s.att = currentAttack;
+		ChangeState<AttackState>();
 		
 		currentAttack.Start();
 		return true;
