@@ -21,7 +21,7 @@ public class HitLagState : State
 	protected override void DoGravity()
 	{
 		if(ch.grounded) ch.vec.y = VCF;
-		else if(ch.fastfalling) ch.vec.y.Lerp(ch.fastFallSpeed, ch.fastFallGravity);
+		else if(ch.fastfalling) ch.vec.y.Towards(ch.fastFallSpeed, ch.fastFallGravity);
 	}
 	
 	public override void SetInputs()

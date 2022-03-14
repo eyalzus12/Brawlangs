@@ -24,16 +24,14 @@ public class GroundedState : State
 	{
 		var dir = ch.GetInputDirection();
 		float sped = dir * ch.groundSpeed * (2-ch.ffric);
-		float acc = dir * ch.groundAcceleration * ch.ffric;
+		float acc = ch.groundAcceleration * ch.ffric;
 		
-		ch.vec.x.Lerp(sped, acc);
+		ch.vec.x.Towards(sped, acc);
 	}
 	
 	protected void DoFriction()
 	{
-		float friction = ch.ffric * 
-			(ch.onSlope?ch.slopeFriction:ch.groundFriction);
-		
+		float friction = ch.ffric * (ch.onSlope?ch.slopeFriction:ch.groundFriction);
 		ch.vec.x *= (1-friction);
 	}
 	

@@ -28,7 +28,7 @@ public class AirState : State
 	
 	protected virtual void DoInputMovement()
 	{
-		ch.vec.x.Lerp(ch.direction * ch.airSpeed, ch.direction * ch.airAcceleration);
+		ch.vec.x.Towards(ch.direction * ch.airSpeed, ch.airAcceleration);
 	}
 	
 	protected virtual void DoFriction()
@@ -38,7 +38,7 @@ public class AirState : State
 	
 	protected override void DoGravity()
 	{
-		ch.vec.y.Lerp(ch.AppropriateFallingSpeed, ch.AppropriateGravity);
+		ch.vec.y.Towards(ch.AppropriateFallingSpeed, ch.AppropriateGravity);
 	}
 	
 	protected override void DoJump()

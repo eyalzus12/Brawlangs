@@ -22,8 +22,7 @@ public class WallState : State
 	
 	protected override void DoGravity()
 	{
-		if(ch.fastfalling) DoFastFall();
-		else DoNormalGravity();
+		ch.vec.y.Towards(ch.AppropriateFallingSpeed * (2-ch.wfric), ch.AppropriateGravity * (2-ch.wfric));
 	}
 	
 	protected override void DoJump()
@@ -70,18 +69,6 @@ public class WallState : State
 		}
 		
 		AdjustVelocity();
-	}
-	
-	protected virtual void DoNormalGravity()
-	{
-		ch.vec.y.Lerp(ch.wallFallSpeed * (2-ch.wfric),
-			ch.wallGravity*(2-ch.wfric));
-	}
-	
-	protected virtual void DoFastFall()
-	{
-		ch.vec.y.Lerp(ch.wallFastFallSpeed * (2-ch.wfric),
-			ch.wallFastFallGravity*(2-ch.wfric));
 	}
 	
 	protected override void AdjustVelocity()

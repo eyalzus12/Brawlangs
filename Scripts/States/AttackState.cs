@@ -29,8 +29,27 @@ public class AttackState : State
 	
 	protected override void DoMovement()
 	{
-		if(att is null) return;
+		if(att?.currentPart is null) return;
+		if(ch.InputtingHorizontalDirection()) DoInputMovement();
+		DoFriction();
 		
+	}
+	
+	protected virtual void DoInputMovement()
+	{
+		var idir = ch.GetInputDirection();
+		if(idir == ch.direction)
+		{
+			ch.vec.x.Towards(ch.direction * att.currentPart.driftForwardSpeed, att.currentPart.driftForwardAcceleration);
+		}
+		else
+		{
+			ch.vec.x.Towards(-ch.direction * att.currentPart.driftBackwardsSpeed, att.currentPart.driftBackwardsAcceleration);
+		}
+	}
+	
+	protected virtual void DoFriction()
+	{
 		var friction = att.attackFriction*(ch.grounded?ch.ffric:1f);
 		ch.vec.x *= (1f-friction);
 	}
@@ -48,7 +67,7 @@ public class AttackState : State
 			}
 			else Unsnap();
 		}
-		else ch.vec.y.Lerp(ch.AppropriateFallingSpeed, ch.AppropriateGravity);
+		else ch.vec.y.Towards(ch.AppropriateFallingSpeed, ch.AppropriateGravity);
 	}
 	
 	protected override void LoopActions()

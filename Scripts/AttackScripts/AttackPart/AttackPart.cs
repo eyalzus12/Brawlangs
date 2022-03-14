@@ -33,6 +33,10 @@ public class AttackPart : Node2D
 	public string attackAnimation;
 	public string endlagAnimation;
 	public string attackSound;
+	public float driftForwardAcceleration = 0f;
+	public float driftForwardSpeed = 0f;
+	public float driftBackwardsAcceleration = 0f;
+	public float driftBackwardsSpeed = 0f;
 	
 	public List<string> emittedProjectiles;
 	

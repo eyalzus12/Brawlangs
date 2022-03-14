@@ -96,6 +96,14 @@ public class AttackCreator
 		ap.overwriteXMovement = ox;
 		var oy = inif[section, "OverwriteYMovement", false].b();
 		ap.overwriteYMovement = oy;
+		var dfa = inif[section, "DriftForwardAcceleration", 0f].f();
+		ap.driftForwardAcceleration = dfa;
+		var dfs = inif[section, "DriftForwardSpeed", 0f].f();
+		ap.driftForwardSpeed = dfs;
+		var dba = inif[section, "DriftBackwardsAcceleration", 0f].f();
+		ap.driftBackwardsAcceleration = dba;
+		var dbs = inif[section, "DriftBackwardsSpeed", 0f].f();
+		ap.driftBackwardsSpeed = dbs;
 		var me = inif[section, "MissEndlag", 0].i();
 		ap.missEndlag = me;
 		var mc = inif[section, "MissCooldown", 0].i();

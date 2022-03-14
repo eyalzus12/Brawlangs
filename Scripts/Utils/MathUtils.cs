@@ -3,14 +3,17 @@ using System;
 
 public static class MathUtils
 {
-	public static float Lerp(this ref float val, float to, float @by)
+	public static float Towards(this ref float val, float to, float @by)
 	{
-		if(val.MoreThan(to)) val -= @by;
-		else 
+		if(val > to)
+		{
+			val -= @by;
+			if(val < to) val = to;
+		}
+		else
 		{
 			val += @by;
-			if(val.MoreThan(to)) val = to;
-			return val;
+			if(val > to) val = to;
 		}
 		
 		return val;

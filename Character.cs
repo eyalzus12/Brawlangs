@@ -191,8 +191,8 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public float AppropriateFriction => PlatFric * (onSlope?slopeFriction:grounded?groundFriction:walled?wallFriction:airFriction);
 	public float AppropriateAcceleration => (grounded?groundAcceleration:airAcceleration);
 	public float AppropriateSpeed => (crouching?crawlSpeed:grounded?groundSpeed:airSpeed);
-	public float AppropriateGravity => (currentAttack?.currentPart?.gravityMultiplier ?? 1f)*(fastfalling?fastFallGravity:gravity);
-	public float AppropriateFallingSpeed => (currentAttack?.currentPart?.gravityMultiplier ?? 1f)*(fastfalling?fastFallSpeed:fallSpeed);
+	public float AppropriateGravity => (currentAttack?.currentPart?.gravityMultiplier ?? 1f)*(fastfalling?walled?wallFastFallGravity:fastFallGravity:walled?wallGravity:gravity);
+	public float AppropriateFallingSpeed => (currentAttack?.currentPart?.gravityMultiplier ?? 1f)*(fastfalling?walled?wallFastFallSpeed:fastFallSpeed:walled?wallFallSpeed:fallSpeed);
 	
 	public bool fastfalling = false;//wether or not fastfalling
 	//public uint jumpCounter = 0;//how many air jumps have been used

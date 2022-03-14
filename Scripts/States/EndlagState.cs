@@ -41,7 +41,7 @@ public class EndlagState : State
 	
 	protected override void DoGravity()
 	{
-		if(!ch.grounded) ch.vec.y.Lerp(ch.fallSpeed, ch.gravity);
+		if(!ch.grounded) ch.vec.y.Towards(ch.fallSpeed, ch.gravity);
 	}
 	
 	protected override bool CalcStateChange()
