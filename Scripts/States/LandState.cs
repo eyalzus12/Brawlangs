@@ -37,12 +37,12 @@ public class LandState : GroundedState
 			if(Inputs.IsActionJustPressed("player_jump"))
 				ch.ChangeState("Jump");
 			else if(Inputs.IsActionPressed("player_down") && !ch.onSemiSolid) 
-				ch.ChangeState(ch.InputtingHorizontalDirection()?ch.walled?"CrawlWall":"Crawl":"Crouch");
-			else if(ch.IsIdle())
+				ch.ChangeState(ch.InputtingHorizontalDirection?ch.walled?"CrawlWall":"Crawl":"Crouch");
+			else if(ch.IsIdle)
 				ch.ChangeState("Idle");
 			else if(turn)
 				ch.ChangeState("WalkTurn");
-			else if(ch.InputtingHorizontalDirection())
+			else if(ch.InputtingHorizontalDirection)
 				ch.ChangeState(ch.walled?"WalkWall":"Walk");
 			else
 				ch.ChangeState("WalkStop");

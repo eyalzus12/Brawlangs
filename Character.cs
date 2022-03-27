@@ -195,6 +195,13 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public float AppropriateGravity => (currentAttack?.currentPart.gravityMultiplier ?? 1f)*(fastfalling?walled?wallFastFallGravity:fastFallGravity:walled?wallGravity:gravity);
 	public float AppropriateFallingSpeed => (currentAttack?.currentPart.gravityMultiplier ?? 1f)*(fastfalling?walled?wallFastFallSpeed:fastFallSpeed:walled?wallFallSpeed:fallSpeed);
 	
+	public bool InputtingTurn => (GetFutureDirection() != direction);
+	public bool InputtingHorizontalDirection => leftHeld||rightHeld;
+	public bool InputtingVerticalDirection => upHeld||downHeld;
+	public bool InputtingDirection => InputtingHorizontalDirection||InputtingVerticalDirection;
+	public bool IsIdle => (Math.Truncate(GetVelocity().x) == 0);
+	public bool IsStill => (IsIdle && !InputtingHorizontalDirection);
+	
 	public bool fastfalling = false;//wether or not fastfalling
 	
 	public bool grounded = false;//is on ground
@@ -385,8 +392,8 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		AddState(new AttackState(this));
 		AddState(new EndlagState(this));
 		
-		AddState(new ForwardRollState(this));
-		AddState(new BackRollState(this));
+		//AddState(new ForwardRollState(this));
+		//AddState(new BackRollState(this));
 		AddState(new SpotAirDodgeState(this));
 		AddState(new DirectionalAirDodgeState(this));
 	}
@@ -669,21 +676,13 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	
 	public void Turn() => direction *= -1;
 	
-	public bool InputtingTurn() => (GetFutureDirection() != direction);
-	public bool InputtingHorizontalDirection() => leftHeld||rightHeld;
-	public bool InputtingVerticalDirection() => upHeld||downHeld;
-	public bool InputtingDirection() => InputtingHorizontalDirection()||InputtingVerticalDirection();
-	
 	public bool TurnConditional()
 	{
-		if(InputtingTurn()) Turn();
+		if(InputtingTurn) Turn();
 		else return false;
 		
 		return true;
 	}
-	
-	public bool IsIdle() => (Math.Truncate(GetVelocity().x) == 0);
-	public bool IsStill() => (IsIdle() && !InputtingHorizontalDirection());
 	
 	public int GetInputDirection()
 	{
@@ -718,10 +717,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public readonly static string[] ActionsWithCooldown = new string[]{"Dodge"};
 	public virtual void SetupCooldownDict()
 	{
-		foreach(var action in ActionsWithCooldown)
-		{
-			actionCooldowns.Add(action, 0);
-		}
+		foreach(var action in ActionsWithCooldown) actionCooldowns.Add(action, 0);
 	}
 	
 	public virtual bool CanHit(IHittable hitObject) => (hitObject != this)&&(hitObject.InvincibilityLeft <= 0)&&(hitObject.TeamNumber!=_teamNumber||friendlyFire);
@@ -786,13 +782,6 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		var cd = GetActionCooldown(s);
 		if(cd is null) return false;
 		else return (cd>0);
-	}
-	
-	public virtual string DebugCooldownPrint()
-	{
-		var sb = new StringBuilder();
-		
-		return sb.ToString();
 	}
 	
 	public virtual bool ExecuteAttack(Attack a)

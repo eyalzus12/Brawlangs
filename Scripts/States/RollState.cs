@@ -29,7 +29,7 @@ public class RollState : GenericInvincibleState
 			ch.ChangeState("Duck");
 		else if(turn)
 			ch.ChangeState("WalkTurn");
-		else if(ch.InputtingHorizontalDirection())
+		else if(ch.InputtingHorizontalDirection)
 			ch.ChangeState(ch.walled?"WalkWall":"Walk");
 		else
 			ch.ChangeState("Idle");

@@ -57,13 +57,22 @@ public class EndlagState : State
 				if(!s.touchedGround) ch.RestoreOptionsOnGroundTouch();
 				if(ch.downHeld)
 				{
-					ch.Crouch();
-					ch.ChangeState(ch.IsIdle()?"Crouch":"Crawl");
+					if(ch.onSemiSolid)
+					{
+						ch.SetCollisionMaskBit(DROP_THRU_BIT, false);
+						ch.vic.y = VCF;
+						ch.ChangeState("Air");
+					}
+					else
+					{
+						ch.Crouch();
+						ch.ChangeState(ch.IsIdle?"Crouch":"Crawl");
+					}
 				}
 				else
 				{
 					ch.Uncrouch();
-					ch.ChangeState(ch.IsIdle()?"Idle":"Walk");
+					ch.ChangeState(ch.IsIdle?"Idle":"Walk");
 				}
 			}
 			else if(ch.walled && ch.currentClingsUsed < ch.maxClingsAllowed)

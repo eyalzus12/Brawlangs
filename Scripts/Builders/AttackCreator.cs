@@ -167,7 +167,7 @@ public class AttackCreator
 		var st = inif[section, "Stun", 0].i();
 		h.stun = st;
 		var hl = inif[section, "HitLag", 0].i();
-		h.hitlag = hp;
+		h.hitlag = hl;
 		var hp = inif[section, "ExtraOpponentHitlag", 0].i();
 		h.hitpause = hl+hp;
 		var dm = inif[section, "Damage", 0f].f();

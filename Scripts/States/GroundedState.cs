@@ -17,7 +17,7 @@ public class GroundedState : State
 	
 	protected override void DoMovement()
 	{
-		if(ch.InputtingHorizontalDirection()) DoInputMovement();
+		if(ch.InputtingHorizontalDirection) DoInputMovement();
 	}
 	
 	protected void DoInputMovement()

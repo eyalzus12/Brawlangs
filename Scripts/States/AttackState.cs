@@ -30,7 +30,7 @@ public class AttackState : State
 	protected override void DoMovement()
 	{
 		if(att?.currentPart is null) return;
-		if(ch.InputtingHorizontalDirection()) DoInputMovement();
+		if(ch.InputtingHorizontalDirection) DoInputMovement();
 		DoFriction();
 		
 	}
@@ -122,12 +122,12 @@ public class AttackState : State
 				if(ch.downHeld)
 				{
 					ch.Crouch();
-					ch.ChangeState(ch.IsIdle()?"Crouch":"Crawl");
+					ch.ChangeState(ch.IsIdle?"Crouch":"Crawl");
 				}
 				else
 				{
 					ch.Uncrouch();
-					ch.ChangeState(ch.IsIdle()?"Idle":"Walk");
+					ch.ChangeState(ch.IsIdle?"Idle":"Walk");
 				}
 			}
 			else if(ch.walled && touchedWall)

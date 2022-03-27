@@ -13,7 +13,7 @@ public class WalkWallState: GroundedState
 	
 	protected override void DoMovement()
 	{
-		if(ch.InputtingHorizontalDirection())
+		if(ch.InputtingHorizontalDirection)
 			ch.vec.x = ch.direction * ch.groundAcceleration;
 		else
 			ch.vec.x = 0;

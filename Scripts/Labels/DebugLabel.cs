@@ -26,8 +26,8 @@ public class DebugLabel : InfoLabel
 		Add("Crouch", ch.crouching);
 		Add("FallingThrough", !ch.GetCollisionMaskBit(1));
 		Add("Direction", GetStringDirection(ch.direction));
-		Add("Idle", ch.IsIdle());
-		Add("Turning", ch.InputtingTurn());
+		Add("Idle", ch.IsIdle);
+		Add("Turning", ch.InputtingTurn);
 		Newline();
 		Add("IFramesLeft", ch.InvincibilityLeft);
 		Add("LastDodgeUsed", ch.lastDodgeUsed);

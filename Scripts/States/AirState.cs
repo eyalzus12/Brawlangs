@@ -22,7 +22,7 @@ public class AirState : State
 	
 	protected override void DoMovement()
 	{
-		if(ch.InputtingHorizontalDirection()) DoInputMovement();
+		if(ch.InputtingHorizontalDirection) DoInputMovement();
 		else DoFriction();
 	}
 	
@@ -60,7 +60,7 @@ public class AirState : State
 	protected override void DoDodge()
 	{
 		if(!actionable || ch.IsActionInCooldown("Dodge")) return;
-		ch.ChangeState((ch.InputtingDirection()?"Directional":"Spot")+"AirDodge");
+		ch.ChangeState((ch.InputtingDirection?"Directional":"Spot")+"AirDodge");
 		MarkForDeletion("player_dodge", true);
 	}
 	

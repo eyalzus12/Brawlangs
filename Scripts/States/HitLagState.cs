@@ -34,7 +34,7 @@ public class HitLagState : State
 	{
 		if(frameCount >= hitLagLength)
 		{
-			ch.ChangeState("Attack");
+			ch.ChangeState<AttackState>();
 			ch.currentAttack.currentPart.Resume();
 			hitLagLength = 0;
 		}
@@ -49,7 +49,7 @@ public class HitLagState : State
 		{
 			var att = ch.currentAttack;
 			if(att is null) return;
-			att.Disconnect("AttackEnds", ch.GetState<Attack>(), "SetEnd");
+			att.Disconnect("AttackEnds", ch.GetState<AttackState>(), "SetEnd");
 			att.connected = null;
 			att.active = false;
 			att.OnEnd();
