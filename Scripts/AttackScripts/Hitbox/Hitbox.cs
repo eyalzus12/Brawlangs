@@ -8,27 +8,16 @@ public class Hitbox : Area2D
 	[Signal]
 	public delegate void HitboxHit(Hitbox hitbox, Area2D hurtbox);
 	
-	[Export]
 	public Vector2 setKnockback = Vector2.Zero;
-	[Export]
 	public Vector2 varKnockback = Vector2.Zero;
-	[Export]
-	public int stun = 0;
-	[Export]
+	public float stun = 0;
 	public int hitpause = 0;
-	[Export]
 	public int hitlag = 0;
-	[Export]
 	public float damage = 0f;
-	[Export]
 	public int hitPriority = 0;
-	[Export]
 	public float teamKnockbackMult = 1f;
-	[Export]
 	public float teamDamageMult = 1f;
-	[Export]
-	public int teamStunMult = 1;
-	[Export]
+	public float teamStunMult = 1;
 	public Vector2 momentumCarry = Vector2.Zero;
 	
 	public AudioStream hitSound;
@@ -43,9 +32,8 @@ public class Hitbox : Area2D
 	public List<Vector2> activeFrames = new List<Vector2>();
 	public Node2D owner;
 	
-	public Dictionary<string, float> stateKnockbackMult;
-	public Dictionary<string, float> stateDamageMult;
-	public Dictionary<string, float> stateStunMult;
+	public HashSet<string> whitelistedStates = new HashSet<string>();
+	public HashSet<string> blacklistedStates = new HashSet<string>();
 	
 	private bool active = false;
 	
@@ -125,6 +113,16 @@ public class Hitbox : Area2D
 	
 	public void OnAreaEnter(Area2D area)
 	{
+		if(area is Hurtbox hurtbox && hurtbox.owner is Character c)
+		{
+			for(var t = c.currentState.GetType(); t.Name != "State"; t = t.BaseType)
+			{
+				var whitelisted = (whitelistedStates.Count == 0 || whitelistedStates.Contains(t.Name));
+				var blacklisted = blacklistedStates.Contains(t.Name);
+				if(!whitelisted || blacklisted) return;
+			}
+		}
+		
 		OnHit(area);
 		EmitSignal(nameof(HitboxHit), this, area);
 		//GD.Print("hit");
@@ -172,9 +170,9 @@ public class Hitbox : Area2D
 		return 1f;
 	}
 	
-	public virtual float GetKnockbackMultiplier(IHittable n) => TeamMult(n, teamKnockbackMult) * StateMult(n, stateKnockbackMult);
-	public virtual float GetDamageMultiplier(IHittable n) => TeamMult(n, teamDamageMult) * StateMult(n, stateDamageMult);
-	public virtual int GetStunMultiplier(IHittable n) => (int)(TeamMult(n, (float)teamStunMult) * StateMult(n, stateStunMult));
+	public virtual float GetKnockbackMultiplier(IHittable n) => TeamMult(n, teamKnockbackMult);
+	public virtual float GetDamageMultiplier(IHittable n) => TeamMult(n, teamDamageMult);
+	public virtual float GetStunMultiplier(IHittable n) => TeamMult(n, teamStunMult);
 	
 	public virtual Vector2 KnockbackDir(Node2D hitChar) => new Vector2(
 		KnockbackDirX(hitChar),
@@ -242,15 +240,7 @@ public class Hitbox : Area2D
 		}
 	}
 	
-	public enum AngleFlipper
-	{
-		Direction,
-		Away,
-		AwayHitbox,
-		AwayCharacter,
-		None
-	}
-	
+	public enum AngleFlipper {Direction, Away, AwayHitbox, AwayCharacter, None}
 	
 	public virtual int GetDirection() => (owner?.Get("direction")??1).i();
 	public int direction => GetDirection();

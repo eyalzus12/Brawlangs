@@ -114,7 +114,7 @@ public class AttackCreator
 		ap.damageMult = dm;
 		var km = inif[section, "KnockbackMult", 1f].f();
 		ap.knockbackMult = km;
-		var sm = inif[section, "StunMult", 1].i();
+		var sm = inif[section, "StunMult", 1f].f();
 		ap.stunMult = sm;
 		var sa = inif[section, "StartupAnimation", "Default"].s();
 		ap.startupAnimation = sa;
@@ -164,7 +164,7 @@ public class AttackCreator
 		h.setKnockback = sk;
 		var vk = inif[section, "VarKnockback", Vector2.Zero].v2();
 		h.varKnockback = vk;
-		var st = inif[section, "Stun", 0].i();
+		var st = inif[section, "Stun", 0f].f();
 		h.stun = st;
 		var hl = inif[section, "HitLag", 0].i();
 		h.hitlag = hl;
@@ -204,43 +204,25 @@ public class AttackCreator
 		h.teamKnockbackMult = tkm;
 		var tdm = inif[section, "TeamDamageMultiplier", 1f].f();
 		h.teamDamageMult = tdm;
-		var tsm = inif[section, "TeamStunMultiplier", 1].i();
+		var tsm = inif[section, "TeamStunMultiplier", 1f].f();
 		h.teamStunMult = tsm;
 		
-		var kms = inif[section, "KnockbackStateMultipliers", ""].s();
-		if(kms != "")
+		var oWhitelistedStates = inif[section, "WhitelistedStates", null];
+		if(oWhitelistedStates is string)
+			h.whitelistedStates.Add(oWhitelistedStates.s());
+		else if(oWhitelistedStates is object)//not null
 		{
-			h.stateKnockbackMult = new Dictionary<string, float>();
-			foreach(var entry in inif[kms])
-			{
-				var stateName = entry.Key;
-				var mult = entry.Value.f();
-				h.stateKnockbackMult.Add(stateName, mult);
-			}
+			var whitelistedStates = oWhitelistedStates.ls();
+			foreach(var s in whitelistedStates) h.whitelistedStates.Add(s);
 		}
 		
-		var dms = inif[section, "DamageStateMultipliers", ""].s();
-		if(dms != "")
+		var oBlacklistedStates = inif[section, "BlacklistedStates", null];
+		if(oBlacklistedStates is string)
+			h.blacklistedStates.Add(oBlacklistedStates.s());
+		else if(oBlacklistedStates is object)//not null
 		{
-			h.stateDamageMult = new Dictionary<string, float>();
-			foreach(var entry in inif[dms])
-			{
-				var stateName = entry.Key;
-				var mult = entry.Value.f();
-				h.stateDamageMult.Add(stateName, mult);
-			}
-		}
-		
-		var sms = inif[section, "StunStateMultipliers", ""].s();
-		if(sms != "")
-		{
-			h.stateStunMult = new Dictionary<string, float>();
-			foreach(var entry in inif[sms])
-			{
-				var stateName = entry.Key;
-				var mult = entry.Value.i();
-				h.stateStunMult.Add(stateName, (float)mult);
-			}
+			var blacklistedStates = oBlacklistedStates.ls();
+			foreach(var s in blacklistedStates) h.blacklistedStates.Add(s);
 		}
 		
 		h.LoadProperties();

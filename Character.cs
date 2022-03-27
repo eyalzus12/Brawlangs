@@ -136,8 +136,8 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	private float _knockbackTakenMult = 1f;
 	public float KnockbackTakenMult{get => _knockbackTakenMult; set => _knockbackTakenMult = value;}
 	
-	private int _stunTakenMult = 1;
-	public int StunTakenMult{get => _stunTakenMult; set => _stunTakenMult = value;}
+	private float _stunTakenMult = 1f;
+	public float StunTakenMult{get => _stunTakenMult; set => _stunTakenMult = value;}
 	////////////////////////////////////////////
 	private float _damageDoneMult = 1f;
 	public float DamageDoneMult{get => _damageDoneMult; set => _damageDoneMult = value;}
@@ -145,8 +145,8 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	private float _knockbackDoneMult = 1f;
 	public float KnockbackDoneMult{get => _knockbackDoneMult; set => _knockbackDoneMult = value;}
 	
-	public int _stunDoneMult = 1;
-	public int StunDoneMult{get => _stunDoneMult; set => _stunDoneMult = value;}
+	public float _stunDoneMult = 1f;
+	public float StunDoneMult{get => _stunDoneMult; set => _stunDoneMult = value;}
 	////////////////////////////////////////////
 	public int direction = 1;//1 for right -1 for left
 	
@@ -154,6 +154,8 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public int TeamNumber{get => _teamNumber; set => _teamNumber=value;}
 	public bool friendlyFire = false;
 	public int stocks = 3;
+	
+	public float weight = 100f;
 	
 	public int framesSinceLastHit = 0;
 	public int comboCount = 0;
@@ -233,7 +235,6 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	
 	public List<Attack> attacks = new List<Attack>();
 	public Dictionary<string, Attack> attackDict = new Dictionary<string, Attack>();
-	//public Dictionary<Attack, int> attackCooldowns = new Dictionary<Attack, int>();
 	public Dictionary<string, int> actionCooldowns = new Dictionary<string, int>();
 	
 	public Dictionary<string, PackedScene> projectiles = new Dictionary<string, PackedScene>();
@@ -258,8 +259,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	
 	public bool ReadStats()
 	{
-		prop.ConfigFileToPropertyList(this, 
-		statConfigPath+name+".ini", statSectionName, StatList);
+		prop.ConfigFileToPropertyList(this, statConfigPath+name+".ini", statSectionName, StatList);
 		prop.LoadProperties(this);
 		return true;
 	}
@@ -733,21 +733,21 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		if(data.Hitee.owner == this) RestoreOptionsOnGettingHit();
 		
 		damage += d * DamageTakenMult;
-		var force = (skb + damage*vkb/100f) * KnockbackTakenMult;
+		var force = (skb + damage*vkb/100f) * KnockbackTakenMult * (100f/weight);
 		var stunlen = stun * StunTakenMult;
 		
 		if(hp > 0)
 		{
 			var s = ChangeState<HitPauseState>();
 			s.force = force;
-			s.stunLength = stunlen;
+			s.stunLength = (int)stunlen;
 			s.hitPauseLength = hp;
 		}
 		else if(stunlen > 0)
 		{
 			var s = ChangeState<StunState>();
 			s.Force = force;
-			s.stunLength = stunlen;
+			s.stunLength = (int)stunlen;
 		}
 		
 		if(force.x != 0f) direction = Math.Sign(force.x);

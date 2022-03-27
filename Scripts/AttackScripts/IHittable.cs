@@ -10,7 +10,7 @@ public interface IHittable
 	
 	float DamageTakenMult{get;set;}
 	float KnockbackTakenMult{get;set;}
-	int StunTakenMult{get;set;}
+	float StunTakenMult{get;set;}
 	
 	List<Hurtbox> Hurtboxes{get;set;}
 }

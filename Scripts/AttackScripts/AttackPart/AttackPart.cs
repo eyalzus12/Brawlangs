@@ -28,7 +28,7 @@ public class AttackPart : Node2D
 	public float gravityMultiplier = 1f;
 	public float damageMult = 1f;
 	public float knockbackMult = 1f;
-	public int stunMult = 1;
+	public float stunMult = 1f;
 	public string startupAnimation;
 	public string attackAnimation;
 	public string endlagAnimation;

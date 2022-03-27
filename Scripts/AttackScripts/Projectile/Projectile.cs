@@ -42,11 +42,11 @@ public class Projectile : Node2D, IHitter, IHittable
 	
 	public float DamageTakenMult{get=>1f;set{}}
 	public float KnockbackTakenMult{get=>1f;set{}}
-	public int StunTakenMult{get=>1;set{}}
+	public float StunTakenMult{get=>1f;set{}}
 
 	public float DamageDoneMult{get => OwnerObject.DamageDoneMult; set => OwnerObject.DamageDoneMult = value;}
 	public float KnockbackDoneMult{get => OwnerObject.KnockbackDoneMult; set => OwnerObject.KnockbackDoneMult = value;}
-	public int StunDoneMult{get => OwnerObject.StunDoneMult; set => OwnerObject.StunDoneMult = value;}
+	public float StunDoneMult{get => OwnerObject.StunDoneMult; set => OwnerObject.StunDoneMult = value;}
 	
 	private int _invleft = 0;
 	public int InvincibilityLeft{get => _invleft; set => _invleft = value;}
