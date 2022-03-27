@@ -67,22 +67,29 @@ public class MatchCamera : Camera2D
 		var Mx = middle.x+limits.x;
 		var my = middle.y-limits.y;
 		var My = middle.y+limits.y;
+		
 		//get positions, confined inside the limits
 		var positions = followed.Select(ch=>ch.Position.Clamp(mx,Mx,my,My));
+		
 		//get average position, including map center. this will be used for following
 		center = positions.Concat(middle).Avg();
-		//create a rect, starting at the center, that includes all positions
 		
+		//create a rect, starting at the center, that includes all positions
 		var initialRect = new Rect2(center, Vector2.Zero);
 		cameraRect = positions.Aggregate(initialRect, (a,v)=>a.Expand(v));
+		
+		//limit rect
 		cameraRect.Position -= middle;//make rect relative to map center
 		cameraRect = cameraRect.Limit(limits.x, limits.y);//limit the rectangle to the limits
 		cameraRect.Position += middle;//get non relative position
-		//now cameraRect is in the desired place and size for the camera;
+		
+		//now cameraRect is in the desired place and size for the camera
 		//so we need to set the camera's position and zoom to match
+		
 		//interpolate between the desired position and the current one, to smoothen it out
 		var desiredOffset = cameraRect.Center();
 		Offset = Offset.LinearInterpolate(desiredOffset, interpolationWeight);
+		
 		//interpolate between the desired zoom and the current one, to smoothen it out
 		var desiredZoom = CalculateZoom(cameraRect);
 		Zoom = Zoom.LinearInterpolate(desiredZoom, interpolationWeight);

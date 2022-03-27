@@ -49,7 +49,7 @@ public class HitLagState : State
 		{
 			var att = ch.currentAttack;
 			if(att is null) return;
-			att.Disconnect("AttackEnds", ch.GetState("Attack"), "SetEnd");
+			att.Disconnect("AttackEnds", ch.GetState<Attack>(), "SetEnd");
 			att.connected = null;
 			att.active = false;
 			att.OnEnd();

@@ -84,6 +84,9 @@ public class AttackPart : Node2D
 		hit = false;
 		frameCount = 0;
 		
+		if(overwriteXMovement) ch.vec.x = 0;
+		if(overwriteYMovement) ch.vec.y = 0;
+		
 		if(movement != Vector2.Zero)
 			ch.vec = movement * new Vector2(ch.direction, 1);
 		
@@ -93,9 +96,6 @@ public class AttackPart : Node2D
 		hitboxPlayer.Play("HitboxActivation");
 		hitList.Clear();
 		ignoreList.Clear();
-		
-		if(overwriteXMovement) ch.vec.x = 0;
-		if(overwriteYMovement) ch.vec.y = 0;
 	}
 	
 	public override void _PhysicsProcess(float delta)

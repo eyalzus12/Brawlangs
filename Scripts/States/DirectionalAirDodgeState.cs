@@ -25,6 +25,7 @@ public class DirectionalAirDodgeState : GenericInvincibleState
 		touchedWall = false;
 		touchedGround = false;
 		movement = ch.GetInputVector()*ch.directionalAirDodgeSpeed;
+		ch.fastfalling = false;
 	}
 	
 	protected override void LoopActions()

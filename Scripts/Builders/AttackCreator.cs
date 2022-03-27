@@ -166,10 +166,10 @@ public class AttackCreator
 		h.varKnockback = vk;
 		var st = inif[section, "Stun", 0].i();
 		h.stun = st;
-		var hp = inif[section, "HitPause", 0].i();
-		h.hitpause = hp;
 		var hl = inif[section, "HitLag", 0].i();
-		h.hitlag = hl;
+		h.hitlag = hp;
+		var hp = inif[section, "ExtraOpponentHitlag", 0].i();
+		h.hitpause = hl+hp;
 		var dm = inif[section, "Damage", 0f].f();
 		h.damage = dm;
 		var pr = inif[section, "Priority", 0].i();
@@ -259,9 +259,9 @@ public class AttackCreator
 		
 		var ps = new CapsuleShape2D();
 		
-		var rd = inif[section, "Radius", 16f].f();
+		var rd = inif[section, "Radius", 0f].f();
 		ps.Radius = rd;
-		var hg = inif[section, "Height", 16f].f();
+		var hg = inif[section, "Height", 0f].f();
 		ps.Height = hg;
 		
 		cs.Shape = ps;

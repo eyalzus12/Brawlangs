@@ -186,17 +186,16 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public float CharBounce => grounded?floorBounce:walled?wallBounce:ceilinged?ceilingBounce:0f;
 	public Vector2 PlatVel => grounded?fvel:walled?wvel:ceilinged?cvel:Vector2.Zero;
 	public float PlatFric => grounded?ffric:walled?wfric:ceilinged?cfric:1f;
-	public float PlatBounce => grounded?ffric:walled?wfric:ceilinged?cfric:1f;
+	public float PlatBounce => grounded?fbounce:walled?wbounce:ceilinged?cbounce:0f;
 	
 	public float AppropriateFriction => PlatFric * (onSlope?slopeFriction:grounded?groundFriction:walled?wallFriction:airFriction);
+	public float AppropriateBounce => PlatBounce * (grounded?floorBounce:walled?wallBounce:ceilinged?ceilingBounce:0f);
 	public float AppropriateAcceleration => (grounded?groundAcceleration:airAcceleration);
 	public float AppropriateSpeed => (crouching?crawlSpeed:grounded?groundSpeed:airSpeed);
-	public float AppropriateGravity => (currentAttack?.currentPart?.gravityMultiplier ?? 1f)*(fastfalling?walled?wallFastFallGravity:fastFallGravity:walled?wallGravity:gravity);
-	public float AppropriateFallingSpeed => (currentAttack?.currentPart?.gravityMultiplier ?? 1f)*(fastfalling?walled?wallFastFallSpeed:fastFallSpeed:walled?wallFallSpeed:fallSpeed);
+	public float AppropriateGravity => (currentAttack?.currentPart.gravityMultiplier ?? 1f)*(fastfalling?walled?wallFastFallGravity:fastFallGravity:walled?wallGravity:gravity);
+	public float AppropriateFallingSpeed => (currentAttack?.currentPart.gravityMultiplier ?? 1f)*(fastfalling?walled?wallFastFallSpeed:fastFallSpeed:walled?wallFallSpeed:fallSpeed);
 	
 	public bool fastfalling = false;//wether or not fastfalling
-	//public uint jumpCounter = 0;//how many air jumps have been used
-	//public uint wallJumpCounter = 0;//how many wall jumps have been used
 	
 	public bool grounded = false;//is on ground
 	public bool walled = false;//is on wall
