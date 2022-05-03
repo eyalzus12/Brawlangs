@@ -3,7 +3,7 @@ using System;
 
 public class AirState : State
 {
-	bool platformCancel = false;//currently disabled. dont pay attention
+	public bool jump = false;
 	
 	public AirState() : base() {}
 	public AirState(Character link): base(link) {}
@@ -14,6 +14,7 @@ public class AirState : State
 		Unsnap();
 		ch.onSemiSolid = false;
 		ch.onSlope = false;
+		jump = false;
 		if(ch.sprite.currentSheet.name.StartsWith("Jump"))
 			ch.QueueAnimation("Drift");
 		else
@@ -43,18 +44,7 @@ public class AirState : State
 	
 	protected override void DoJump()
 	{
-//		platformCancel = !ch.GetCollisionMaskBit(DROP_THRU_BIT);
-//		if(platformCancel) return;
-		
-		if(ch.currentAirJumpsUsed < ch.maxAirJumpsAllowed)
-		{
-			MarkForDeletion("player_jump", true);
-			ch.vec.y = -ch.doubleJumpHeight;
-			ch.currentAirJumpsUsed++;
-			ch.fastfalling = false;
-			ch.PlayAnimation("Jump");
-			ch.QueueAnimation("Drift");
-		}
+		if(ch.currentAirJumpsUsed < ch.maxAirJumpsAllowed) jump = true;
 	}
 	
 	protected override void DoDodge()
@@ -112,29 +102,17 @@ public class AirState : State
 	
 	protected override bool CalcStateChange()
 	{
-		if(platformCancel)//not active
-		{
-			var move = new Vector2(0f, -1000f);
-			ch.MoveAndCollide(move);
-			move *= -1;
-			ch.SetCollisionMaskBit(DROP_THRU_BIT, true);
-			GD.Print(ch.MoveAndCollide(move));
-		}
-		
-		if(ch.walled && ch.currentClingsUsed < ch.maxClingsAllowed) ch.ChangeState("WallLand");
+		if(jump) ch.ChangeState<AirJumpState>();
+		else if(ch.walled && ch.currentClingsUsed < ch.maxClingsAllowed) ch.ChangeState<WallLandState>();
 		else if(ch.grounded)
 		{
-			if(platformCancel) ch.ChangeState("Jump");//not active
-			else
+			if(ch.onSemiSolid && ch.downHeld)
 			{
-				if(ch.onSemiSolid && ch.downHeld)
-				{
-					ch.SetCollisionMaskBit(DROP_THRU_BIT, false);
-					ch.vic.y = VCF;
-					SetupCollisionParamaters();
-				}
-				else ch.ChangeState("Land");
+				ch.SetCollisionMaskBit(DROP_THRU_BIT, false);
+				ch.vic.y = VCF;
+				SetupCollisionParamaters();
 			}
+			else ch.ChangeState<LandState>();
 		}
 		else return false;
 		

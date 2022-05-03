@@ -31,10 +31,12 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public float fastFallSpeed = 1200f;//max fastfall speed
 	public float wallFallSpeed = 250f;//max wall fall speeed
 	public float wallFastFallSpeed = 450f;//max wall fastfall speed
+	public float stunFallSpeed = 800f;//max stun fall speed
 	public float gravity = 20f;//how fast you normally fall
 	public float fastFallGravity = 60f;//how fast you fastfall
 	public float wallGravity = 10f;//how fast you fall on a wall
 	public float wallFastFallGravity = 20f;//how fast you fastfall on a wall
+	public float stunGravity = 20f;//how fast you fall during stun
 	////////////////////////////////////////////
 	public float groundSpeed = 650f;//max ground speed
 	public float airSpeed = 600f;//max air speed
@@ -42,12 +44,14 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public float groundAcceleration = 75f;//how fast you reach groundSpeed
 	public float airAcceleration = 45f;//how fast you reach airSpeed
 	////////////////////////////////////////////
-	public float jumpHeight = 400f;//how high you jump
-	public float shorthopHeight = 200f;//how high you shorthop
-	public float doubleJumpHeight = 600f;//how high you jump in the air
+	public float jumpHeight = 600f;//how high you jump
+	public float shorthopHeight = 400f;//how high you shorthop
+	public float crouchJumpHeight = 600f;
+	public float crouchShorthopHeight = 400f;
+	public float doubleJumpHeight = 800f;//how high you jump in the air
 	public float horizontalWallJump = 400f;//horizontal velocity from wall jumping
-	public float verticalWallJump = 400f;//vertical velocity from wall jumping
-	public float fastfallMargin = -100f;
+	public float verticalWallJump = 500f;//vertical velocity from wall jumping
+	public float fastfallMargin = -400f;
 	////////////////////////////////////////////
 	public int maxClingsAllowed = 2;
 	public int currentClingsUsed = 0;
@@ -122,6 +126,8 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	////////////////////////////////////////////
 	public int impactLand = 2;//how many frames of inactionability there are after touching the ground
 	public int jumpSquat = 4;//how many frames before a ground jump comes out
+	public int crouchJumpSquat = 4;
+	public int airJumpSquat = 0;
 	public int wallLand = 2;//how many frames of inactionability there are after touching a wall
 	public int wallJumpSquat = 2;//how many frames before a wall jump comes out
 	public int walkTurn = 3;
@@ -194,8 +200,8 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public float AppropriateBounce => PlatBounce * (grounded?floorBounce:walled?wallBounce:ceilinged?ceilingBounce:0f);
 	public float AppropriateAcceleration => (grounded?groundAcceleration:airAcceleration);
 	public float AppropriateSpeed => (crouching?crawlSpeed:grounded?groundSpeed:airSpeed);
-	public float AppropriateGravity => (currentAttack?.currentPart.gravityMultiplier ?? 1f)*(fastfalling?walled?wallFastFallGravity:fastFallGravity:walled?wallGravity:gravity);
-	public float AppropriateFallingSpeed => (currentAttack?.currentPart.gravityMultiplier ?? 1f)*(fastfalling?walled?wallFastFallSpeed:fastFallSpeed:walled?wallFallSpeed:fallSpeed);
+	public float AppropriateGravity => (currentAttack?.currentPart.gravityMultiplier ?? 1f)*((currentState is StunState)?stunGravity:fastfalling?walled?wallFastFallGravity:fastFallGravity:walled?wallGravity:gravity);
+	public float AppropriateFallingSpeed => (currentAttack?.currentPart.gravityMultiplier ?? 1f)*((currentState is StunState)?stunFallSpeed:fastfalling?walled?wallFastFallSpeed:fastFallSpeed:walled?wallFallSpeed:fallSpeed);
 	
 	public bool InputtingTurn => (GetFutureDirection() != direction);
 	public bool InputtingHorizontalDirection => leftHeld||rightHeld;
@@ -253,6 +259,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	
 	public override void _Ready()
 	{
+		ZIndex = 4;
 		SetupStates();
 		SetupCooldownDict();
 	}
@@ -276,6 +283,13 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		currentState?.DoPhysics(delta);
 		
 		sprite.FlipH = DirectionToBool();
+		Update();
+	}
+	
+	public override void _Draw()
+	{
+		if(!this.GetRootNode<UpdateScript>("UpdateScript").debugCollision) return;
+		DrawCircle(Vector2.Zero, 5, new Color(0,0,0,1));
 	}
 	
 	public void PlayAnimation(string anm) => sprite.Play(anm);
@@ -365,6 +379,8 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	private void SetupStates()
 	{
 		AddState(new AirState(this));
+		//AddState(new AirTurnState(this));
+		AddState(new AirJumpState(this));
 		
 		AddState(new WallState(this));
 		AddState(new WallLandState(this));
@@ -385,6 +401,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		AddState(new CrouchState(this));
 		AddState(new CrawlState(this));
 		AddState(new CrawlWallState(this));
+		AddState(new CrouchJumpState(this));
 		
 		AddState(new StunState(this));
 		AddState(new HitPauseState(this));

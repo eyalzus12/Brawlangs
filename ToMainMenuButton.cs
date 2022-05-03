@@ -3,7 +3,7 @@ using System;
 
 public class ToMainMenuButton : OnPressButton
 {
-	public override void _PhysicsProcess(float delta)
+	public override void _Process(float delta)
 	{
 		if(Input.IsActionJustPressed("exit_game")) OnPress();
 	}

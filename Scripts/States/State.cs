@@ -290,23 +290,25 @@ public class State : Node
 				////////////////////////////////////////////////////////////////////////////////////////////////
 				
 				if(ch.onSemiSolid) continue;//character IS on semi solid, so skip checking for this collision body
-				var oneway = false;//init check if collided body is one way (only checks collision in a specific direction)
-				//this goes over all of the "shape owners" and checks if they have one way collision enabeled
-				if(body is CollisionObject2D col)//if the collider IS a collidable body, cuz trust is overrated
+				
+				var fallthrough = body.GetProp<bool?>("FallThroughPlatform", null);//get if can fall through the platform
+				
+				//the body doesn't have a FallThroughPlatform property, so go the long route and check if it has one way collision
+				if(fallthrough is null && body is CollisionObject2D col)
 				{
+					//go over the shape owners and check for each if it has one way collision enabled
 					foreach(var sh in col.GetShapeOwners())//check each collision shape owners
 					{
 						uint shid = Convert.ToUInt32(sh);//convert int to uint
 						if(col.IsShapeOwnerOneWayCollisionEnabled(shid))//name goes brrr
 						{
-							oneway = true;//set that shape is one way
+							fallthrough = true;//set that shape is one way
 							break;//finished checking
 						}
 					}
 				}
-			
-				var fallthrough = body.GetProp<bool>("FallThroughPlatform", oneway);//get if can fall through the platform
-				ch.onSemiSolid = fallthrough;//set fall through
+				
+				ch.onSemiSolid = fallthrough??false;//set on semi solid
 			}
 		}
 		

@@ -108,12 +108,9 @@ public class GroundedState : State
 	
 	protected override bool CalcStateChange()
 	{
-		if(jump)
-			ch.ChangeState("Jump");
-		else if(!ch.grounded)
-			ch.ChangeState("Air");
-		else if(ch.downHeld && !ch.crouching && !ch.onSemiSolid && ch.vec.y > 0f)
-			ch.ChangeState("Duck");
+		if(jump) ch.ChangeState<JumpState>();
+		else if(!ch.grounded) ch.ChangeState<AirState>();
+		else if(ch.downHeld && !ch.crouching && !ch.onSemiSolid && ch.vec.y > 0f) ch.ChangeState<DuckState>();
 		else return false;
 		
 		return true;

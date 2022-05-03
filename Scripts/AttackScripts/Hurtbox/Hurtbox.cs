@@ -44,6 +44,7 @@ public class Hurtbox : Area2D
 	
 	public override void _Ready()
 	{
+		ZIndex = 2;
 		var coli = new CollisionShape2D();
 		AddChild(coli);
 		col = coli;
@@ -98,7 +99,6 @@ public class Hurtbox : Area2D
 	public override void _Draw()
 	{
 		if(!this.GetRootNode<UpdateScript>("UpdateScript").debugCollision) return;
-		ZIndex = 2;
 		this.DrawCapsuleShape(Shape, CollisionPosition, CollisionRotation, GetDrawColor());
 	}
 	

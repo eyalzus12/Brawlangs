@@ -102,7 +102,7 @@ public class MapBase : Node2D
 		var bottomleft = new Vector2(topleft.x, bottomright.y);
 		var leftedge = new Vector2(bottomleft.x,bottomleft.y-CENTER_OFFSET);
 		var rightedge = new Vector2(bottomright.x,bottomright.y-CENTER_OFFSET);
-		return counts.GetLabelLocations(leftedge,rightedge,MARGIN);
+		return counts.GetLabelLocations(leftedge,rightedge,MARGIN).ToArray();
 	}
 	
 	public override void _Process(float delta)

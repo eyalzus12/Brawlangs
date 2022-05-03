@@ -46,7 +46,7 @@ public class StunState : State
 		++framesSinceLastBounce;
 		var friction = ch.grounded?ch.groundFriction*ch.ffric:ch.airFriction;
 		ch.voc.x *= (1f-friction);
-		if(!ch.grounded) ch.voc.y.Towards(ch.fallSpeed, ch.gravity);
+		if(!ch.grounded) ch.voc.y.Towards(ch.stunFallSpeed, ch.stunGravity);
 		
 		if(framesSinceLastBounce >= BOUNCE_PERIOD && !ch.aerial && (!ch.grounded || ch.voc.y > VCF))
 		{

@@ -18,9 +18,9 @@ public class BaseCrouchState : GroundedState
 	
 	protected override bool CalcStateChange()
 	{
-		if(base.CalcStateChange()) return true;
-		else if(!Inputs.IsActionPressed("player_down"))
-			ch.ChangeState("Getup");
+		if(jump) ch.ChangeState<CrouchJumpState>();
+		else if(base.CalcStateChange()) return true;
+		else if(!Inputs.IsActionPressed("player_down")) ch.ChangeState<GetupState>();
 		else return false;
 		
 		return true;
