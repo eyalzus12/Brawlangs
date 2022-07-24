@@ -50,34 +50,14 @@ public class AnimationSprite : Sprite
 	
 	public void Play(string animation)
 	{
-		try
-		{
-			SetSheet(animations[animation]);
-		}
-		catch(KeyNotFoundException)
-		{
-			try
-			{
-				SetSheet(animations["Default"]);
-			}
-			catch(KeyNotFoundException) {}
-		}
+		if(animations.ContainsKey(animation)) SetSheet(animations[animation]);
+		else if(animations.ContainsKey("Default")) SetSheet(animations["Default"]);
 	}
 	
 	public void Queue(string animation)
 	{
-		try
-		{
-			QueueSheet(animations[animation]);
-		}
-		catch(KeyNotFoundException)
-		{
-			try
-			{
-				QueueSheet(animations["Default"]);
-			}
-			catch(KeyNotFoundException) {}
-		}
+		if(animations.ContainsKey(animation)) QueueSheet(animations[animation]);
+		else if(animations.ContainsKey("Default")) QueueSheet(animations["Default"]);
 	}
 	
 	public void AnimationFinished(string anm = "")

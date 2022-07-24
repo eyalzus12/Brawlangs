@@ -85,12 +85,6 @@ public static class IterUtils
 	
 	public static void Debug(this object o) => ((IEnumerable<object>)o).Debug();
 	
-	public static TResult GetOrDefault<T, TResult>(this Dictionary<T, TResult> dict, T index, TResult @default)
-	{
-		//TOOD: create
-		return @default;
-	}
-	
 	public static Vector2 Sum(this IEnumerable<Vector2> e) => e.Aggregate(Vector2.Zero, (v1,v2)=>v1+v2);
 	public static Vector2 Avg(this IEnumerable<Vector2> e) => e.Sum()/e.Count();
 	

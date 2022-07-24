@@ -6,7 +6,7 @@ using System.Linq;
 public class Hitbox : Area2D
 {
 	[Signal]
-	public delegate void HitboxHit(Hitbox hitbox, Area2D hurtbox);
+	public delegate void HitboxHit(Hitbox hitbox, Hurtbox hurtbox);
 	
 	public Vector2 setKnockback = Vector2.Zero;
 	public Vector2 varKnockback = Vector2.Zero;
@@ -30,7 +30,7 @@ public class Hitbox : Area2D
 	public Dictionary<string, ParamRequest> LoadExtraProperties = new Dictionary<string, ParamRequest>();
 	
 	public List<Vector2> activeFrames = new List<Vector2>();
-	public Node2D owner;
+	public IHitter owner;
 	
 	public HashSet<string> whitelistedStates = new HashSet<string>();
 	public HashSet<string> blacklistedStates = new HashSet<string>();
@@ -59,7 +59,7 @@ public class Hitbox : Area2D
 		get => shape.Position;
 		set
 		{
-			var val = value*new Vector2(direction, 1);
+			var val = value*new Vector2(owner.Direction, 1);
 			shape?.SetDeferred("position", val);
 			originalPosition = value;
 		}
@@ -70,7 +70,7 @@ public class Hitbox : Area2D
 		get => shape.Rotation;
 		set
 		{
-			var val = value*direction;
+			var val = value*owner.Direction;
 			shape?.SetDeferred("rotation", val);
 			originalRotation = value;
 		}
@@ -115,20 +115,21 @@ public class Hitbox : Area2D
 	{
 		if(area is Hurtbox hurtbox && hurtbox.owner is Character c)
 		{
+			
 			for(var t = c.currentState.GetType(); t.Name != "State"; t = t.BaseType)
 			{
 				var whitelisted = (whitelistedStates.Count == 0 || whitelistedStates.Contains(t.Name));
 				var blacklisted = blacklistedStates.Contains(t.Name);
 				if(!whitelisted || blacklisted) return;
 			}
+			
+			hurtbox.HandleHit(this);
+			OnHit(hurtbox);
+			EmitSignal(nameof(HitboxHit), this, hurtbox);
 		}
-		
-		OnHit(area);
-		EmitSignal(nameof(HitboxHit), this, area);
-		//GD.Print("hit");
 	}
 	
-	public virtual void OnHit(Area2D area) {}
+	public virtual void OnHit(Hurtbox hurt) {}
 	
 	public override void _PhysicsProcess(float delta)
 	{
@@ -152,8 +153,7 @@ public class Hitbox : Area2D
 	
 	public virtual void Loop() {}
 	
-	public float TeamMult(IHittable n, float chooseFrom) => (n == owner || n.TeamNumber == TeamNumber)?chooseFrom:1f;
-	protected int TeamNumber => (owner.Get("TeamNumber")??-1).i();
+	public float TeamMult(IHittable n, float chooseFrom) => (n == owner || n.TeamNumber == owner.TeamNumber)?chooseFrom:1f;
 	
 	private float StateMult(IHittable n, Dictionary<string, float> chooseFrom)
 	{
@@ -174,12 +174,12 @@ public class Hitbox : Area2D
 	public virtual float GetDamageMultiplier(IHittable n) => TeamMult(n, teamDamageMult);
 	public virtual float GetStunMultiplier(IHittable n) => TeamMult(n, teamStunMult);
 	
-	public virtual Vector2 KnockbackDir(Node2D hitChar) => new Vector2(
+	public virtual Vector2 KnockbackDir(IHittable hitChar) => new Vector2(
 		KnockbackDirX(hitChar),
 		KnockbackDirY(hitChar)
 	);
 	
-	public virtual float KnockbackDirX(Node2D hitChar)
+	public virtual float KnockbackDirX(IHittable hitChar)
 	{
 		switch(horizontalAngleFlipper)
 		{
@@ -192,11 +192,11 @@ public class Hitbox : Area2D
 				return 1;
 			case AngleFlipper.Direction:
 			default:
-				return direction;
+				return owner.Direction;
 		}
 	}
 	
-	public virtual float KnockbackDirY(Node2D hitChar)
+	public virtual float KnockbackDirY(IHittable hitChar)
 	{
 		switch(verticalAngleFlipper)
 		{
@@ -241,7 +241,4 @@ public class Hitbox : Area2D
 	}
 	
 	public enum AngleFlipper {Direction, Away, AwayHitbox, AwayCharacter, None}
-	
-	public virtual int GetDirection() => (owner?.Get("direction")??1).i();
-	public int direction => GetDirection();
 }

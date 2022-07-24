@@ -92,7 +92,7 @@ public class Attack : Node2D
 	public virtual void OnStart() {}
 	public virtual void Loop() {}
 	public virtual void OnEnd() {}
-	public virtual void OnHit(Hitbox hitbox, Area2D hurtbox) {}
+	public virtual void OnHit(Hitbox hitbox, Hurtbox hurtbox) {}
 	public virtual bool CanActivate() => true;
 	
 	public void LoadExtraProperty<T>(string s, T @default = default(T))

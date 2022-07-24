@@ -4,16 +4,24 @@ using System.Collections.Generic;
 using System.Linq;
 using PartDir = System.Collections.Generic.Dictionary<string, AttackPart>;
 
-public class AttackPart : Node2D
+public class AttackPart : Node2D, IHitter
 {
 	public PartDir dir = new PartDir();
 	public int frameCount = 0;
 	
 	public List<Hitbox> hitboxes = new List<Hitbox>();
+	public List<Hitbox> Hitboxes{get => hitboxes; set => hitboxes = value;}
+	
 	public HashSet<IHittable> ignoreList = new HashSet<IHittable>();
+	public HashSet<IHittable> HitIgnoreList{get => ignoreList; set => ignoreList = value;}
+	
 	public Dictionary<Hurtbox, Hitbox> hitList = new Dictionary<Hurtbox, Hitbox>();
+	public Dictionary<Hurtbox, Hitbox> HitList{get => hitList; set => hitList = value;}
 	
 	public Dictionary<string, ParamRequest> LoadExtraProperties = new Dictionary<string, ParamRequest>();
+	
+	public int Direction {get => ch.direction; set => ch.direction = value;}
+	public int TeamNumber {get => ch.TeamNumber; set => ch.TeamNumber = value;}
 	
 	public bool active = false;
 	public int startup = 0;
@@ -41,19 +49,31 @@ public class AttackPart : Node2D
 	public List<string> emittedProjectiles;
 	
 	public bool hit = false;
+	public bool Hit{get => hit; set => hit = value;}
 	
 	public AnimationPlayer hitboxPlayer;
 	public Attack att;
+	
 	public Character ch;
+	public IAttacker OwnerObject{get => ch; set
+		{
+			if(value is Character c) ch = c;
+		}
+	}
 	
 	public override void _Ready()
 	{
 		frameCount = 0;
 		if(startup == 0) OnStartupFinish(); 
 		hitboxes = GetChildren().FilterType<Hitbox>().ToList();
-		hitboxes.ForEach(h => h.Connect("HitboxHit", this, nameof(HandleHit)));
+		ConnectSignals();
 		BuildHitboxAnimator();
 		Init();
+	}
+	
+	public void ConnectSignals()
+	{
+		hitboxes.ForEach(h => h.Connect("HitboxHit", this, nameof(HandleInitialHit)));
 	}
 	
 	public void LoadExtraProperty<T>(string s, T @default = default(T))
@@ -168,7 +188,7 @@ public class AttackPart : Node2D
 	public virtual void Loop() {}
 	public virtual void OnStart() {}
 	public virtual void OnEnd() {}
-	public virtual void OnHit(Hitbox hitbox, Area2D hurtbox) {}
+	public virtual void HitEvent(Hitbox hitbox, Hurtbox hurtbox) {}
 	
 	public virtual void cnp(string dummy="")
 	{
@@ -212,22 +232,23 @@ public class AttackPart : Node2D
 		catch(KeyNotFoundException) {return null;}
 	}
 	
-	public virtual void HandleHit(Hitbox hitbox, Area2D hurtbox)
+	public bool CanHit(IHittable h) => ch.CanHit(h) && !ignoreList.Contains(h);
+	
+	public virtual void HandleInitialHit(Hitbox hitbox, Hurtbox hurtbox)
 	{
 		if(!hitbox.Active) return;
-		if(!(hurtbox is Hurtbox realhurtbox)) return;//can only handle hurtboxes for hitting
-		var hitChar = realhurtbox.owner;
-		if(!ch.CanHit(hitChar) || ignoreList.Contains(hitChar)) return;
+		var hitChar = hurtbox.owner;
+		if(!CanHit(hitChar)) return;
 		
 		var current = new Hitbox();
-		if(hitList.TryGetValue(realhurtbox, out current))
+		if(hitList.TryGetValue(hurtbox, out current))
 		{
 			if(hitbox.hitPriority > current.hitPriority)
-				hitList[realhurtbox] = hitbox;
+				hitList[hurtbox] = hitbox;
 		}
 		else
 		{
-			hitList.Add(realhurtbox, hitbox);
+			hitList.Add(hurtbox, hitbox);
 		}
 	}
 	
@@ -241,24 +262,23 @@ public class AttackPart : Node2D
 			var hitChar = hurtbox.owner;
 			if(!ch.CanHit(hitChar) || ignoreList.Contains(hitChar)) continue;
 			hit = true;
-			OnHit(hitbox, hurtbox);
+			HitEvent(hitbox, hurtbox);
 			
 			var kmult = ch.KnockbackDoneMult*knockbackMult*att.knockbackMult*hitbox.GetKnockbackMultiplier(hitChar);
 			var dmult = ch.DamageDoneMult*damageMult*att.damageMult*hitbox.GetDamageMultiplier(hitChar);
 			var smult = ch.StunDoneMult*stunMult*att.stunMult*hitbox.GetStunMultiplier(hitChar);
 			
-			var nodeHitChar = (Node2D)hurtbox.GetParent();//owner is IHittable, so use parent
-			var dirvec = hitbox.KnockbackDir(nodeHitChar)*kmult;//owner is IHittable, so use parent
+			var dirvec = hitbox.KnockbackDir(hitChar)*kmult;
 			var skb = dirvec*hitbox.setKnockback + hitbox.momentumCarry*ch.GetVelocity();
 			var vkb = dirvec*hitbox.varKnockback;
 			var damage = hitbox.damage*dmult;
 			var stun = hitbox.stun*smult;
-			
+ 			
 			var data = new HitData(skb, vkb, damage, stun, hitbox.hitpause, hitbox, hurtbox);
 			
 			hitChar.HandleGettingHit(data);
 			ignoreList.Add(hitChar);
-			GD.Print($"{nodeHitChar.Name} was hit by {hitbox.Name}");
+			GD.Print($"{(hitChar as Node2D).Name} was hit by {hitbox.Name}");
 			att.OnHit(hitbox, hurtbox);
 			ch.HandleHitting(data);
 		}

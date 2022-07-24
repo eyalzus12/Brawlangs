@@ -20,7 +20,7 @@ public class GroundedState : State
 		if(ch.InputtingHorizontalDirection) DoInputMovement();
 	}
 	
-	protected void DoInputMovement()
+	protected virtual void DoInputMovement()
 	{
 		var dir = ch.GetInputDirection();
 		float sped = dir * ch.groundSpeed * (2-ch.ffric);
@@ -29,7 +29,7 @@ public class GroundedState : State
 		ch.vec.x.Towards(sped, acc);
 	}
 	
-	protected void DoFriction()
+	protected virtual void DoFriction()
 	{
 		float friction = ch.ffric * (ch.onSlope?ch.slopeFriction:ch.groundFriction);
 		ch.vec.x *= (1-friction);
@@ -44,9 +44,9 @@ public class GroundedState : State
 	
 	protected override void DoDodge()
 	{
-		/*if(!actionable || jump) return;
+		if(!actionable || jump) return;
 		
-		if(ch.InputtingHorizontalDirection())
+		if(ch.InputtingHorizontalDirection)
 		{
 			//var choice = (ch.InputtingTurn()?"Back":"Forward") + "Roll";
 			//if(!ch.IsActionInCooldown(choice)) ch.ChangeState(choice);
@@ -55,14 +55,14 @@ public class GroundedState : State
 				ch.ChangeState("DirectionalAirDodge");
 				MarkForDeletion("player_dodge", true);
 			}
-		}*/
+		}
 	}
 	
 	protected override void LightAttack()
 	{
 		if(jump) return;
 		
-		if(ch.upHeld) ch.ExecuteAttack("NLight");
+		if(ch.upHeld) ch.ExecuteAttack("ULight");
 		else if(ch.downHeld) ch.ExecuteAttack("DLight");
 		else if(ch.rightHeld || ch.leftHeld) ch.ExecuteAttack("SLight");
 		else ch.ExecuteAttack("NLight");
@@ -70,7 +70,7 @@ public class GroundedState : State
 		MarkForDeletion("player_light_attack", true);
 	}
 	
-	protected override void HeavyAttack()
+	/*protected override void HeavyAttack()
 	{
 		if(jump) return;
 		
@@ -80,7 +80,7 @@ public class GroundedState : State
 		else ch.ExecuteAttack("NStrong");
 		
 		MarkForDeletion("player_heavy_attack", true);
-	}
+	}*/
 	
 	protected override void SpecialAttack()
 	{
@@ -118,12 +118,9 @@ public class GroundedState : State
 	
 	protected override void LoopActions()
 	{
-		if(ch.onSemiSolid && ch.downHeld)
-		{
-			ch.SetCollisionMaskBit(DROP_THRU_BIT, false);
-			ch.vic.y = VCF;
-		}
+		if(ch.onSemiSolid && ch.downHeld) ch.vic.y = VCF;
 		else AdjustVelocity();
+		ch.SetCollisionMaskBit(DROP_THRU_BIT, !ch.downHeld);
 	}
 	
 	protected override void AdjustVelocity()

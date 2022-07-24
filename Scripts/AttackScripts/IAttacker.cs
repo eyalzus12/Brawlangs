@@ -3,6 +3,9 @@ using System;
 
 public interface IAttacker
 {
+	Vector2 Position{get; set;}
+	int Direction{get; set;}
+	
 	float DamageDoneMult{get; set;}
 	float KnockbackDoneMult{get; set;}
 	float StunDoneMult{get; set;}

@@ -17,21 +17,8 @@ public struct HitData
 		get => ExtraData[s];
 		set
 		{
-			try
-			{
-				ExtraData[s] = value;
-			}
-			catch(KeyNotFoundException)
-			{
-				try
-				{
-					ExtraData.Add(s, value);
-				}
-				catch(ArgumentException)
-				{
-					GD.Print($"WTF. For some fucking reason, the value {value} was not in the dictionary of this hit data, but couldnt be fucking added. WHY???");
-				}
-			}
+			if(ExtraData.ContainsKey(s)) ExtraData[s] = value;
+			else ExtraData.Add(s, value);
 		}
 	}
 	

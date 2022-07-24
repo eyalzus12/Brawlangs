@@ -54,15 +54,13 @@ public class State : Node
 		
 		if(Inputs.IsActionJustPressed("player_jump"))
 			DoJump();
-		if(Inputs.IsActionJustPressed("player_dodge"))
+		if(Inputs.IsActionJustPressed("player_dodge") && ch.hasDodge)
 			DoDodge();
 		
 		if(this == ch.currentState && actionable && ch.currentAttack is null)
 		{
 			if(Inputs.IsActionJustPressed("player_light_attack"))
 				LightAttack();
-			else if(Inputs.IsActionJustPressed("player_heavy_attack"))
-				HeavyAttack();
 			else if(Inputs.IsActionJustPressed("player_special_attack"))
 				SpecialAttack();
 			else if(Inputs.IsActionJustPressed("player_taunt"))
@@ -115,7 +113,6 @@ public class State : Node
 	protected virtual void RepeatActions() {}
 	public virtual void OnChange(State newState) {}
 	protected virtual void LightAttack() {}
-	protected virtual void HeavyAttack() {}
 	protected virtual void SpecialAttack() {}
 	protected virtual void Taunt() {}
 	

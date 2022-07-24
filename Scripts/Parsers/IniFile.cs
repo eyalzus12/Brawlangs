@@ -37,8 +37,8 @@ public class IniFile
 	{
 		get
 		{
-			try {return dict[section][key];}
-			catch(KeyNotFoundException) {return @default;}
+			if(dict.ContainsKey(section) && dict[section].ContainsKey(key)) return dict[section][key];
+			else return @default;
 		}
 	}
 	

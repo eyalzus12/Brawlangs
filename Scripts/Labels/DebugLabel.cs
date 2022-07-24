@@ -1,6 +1,6 @@
 using Godot;
 using System;
-
+using System.Text;
 
 public class DebugLabel : InfoLabel
 {
@@ -24,16 +24,10 @@ public class DebugLabel : InfoLabel
 		Newline();
 		Add("Fastfalling", ch.fastfalling);
 		Add("Crouch", ch.crouching);
-		Add("FallingThrough", !ch.GetCollisionMaskBit(1));
+		Add("FallThrough", !ch.GetCollisionMaskBit(1));
 		Add("Direction", GetStringDirection(ch.direction));
 		Add("Idle", ch.IsIdle);
 		Add("Turning", ch.InputtingTurn);
-		Newline();
-		Add("IFramesLeft", ch.InvincibilityLeft);
-		Add("LastDodgeUsed", ch.lastDodgeUsed);
-		Add("DodgeCooldown", ch.DodgeCooldown);
-		//Add("ForwardRollCooldown", ch.GetActionCooldown("ForwardRoll")??0);
-		//Add("BackRollCooldown", ch.GetActionCooldown("BackRoll")??0);
 		Newline();
 		Add("Ground", ch.grounded);
 		Add("Wall", ch.walled);
@@ -42,10 +36,13 @@ public class DebugLabel : InfoLabel
 		Add("SemiSolid", ch.onSemiSolid);
 		Add("Slope", ch.onSlope);
 		Newline();
+		Add("CollisionSetting", ch.currentCollisionSetting);
+		Newline();
 		Add("State", ch.currentState?.ToString()??"None");
 		Add("PrevState", ch.prevState?.ToString()??"None");
 		Add("PrevPrevState", ch.prevPrevState?.ToString()??"None");
 		Add("StateFrame", ch.currentState?.frameCount??0);
+		Add("Actionable", ch.currentState?.actionable);
 		Newline();
 		var attack = ch.currentAttack;
 		Add("Attack", attack?.Name??"None");
@@ -66,14 +63,15 @@ public class DebugLabel : InfoLabel
 		Newline();
 		Add("PlayedSounds", ch.audioManager.ToString());
 		Newline();
-		Add("CollisionSetting", ch.currentCollisionSetting);
-		Newline();
-		Add("Vel",  ch.GetRoundedVelocity());
-		Add("Pos", ch.GetRoundedPosition());
+		Add("Velocity",  ch.GetRoundedVelocity());
+		Add("Position", ch.GetRoundedPosition());
 		Newline();
 		Add("PlatformNormal", ch.Norm.Round(2));
 		Add("PlatformFriction", ch.PlatFric);
 		Add("PlatformBounce", ch.PlatBounce);
+		Add("Fvel", ch.fvel.Round());
+		Add("Wvel", ch.wvel.Round());
+		Add("Cvel", ch.cvel.Round(2));
 		Newline();
 		Add("Friction", ch.AppropriateFriction);
 		Add("Bounce", ch.AppropriateBounce);
@@ -81,10 +79,6 @@ public class DebugLabel : InfoLabel
 		Add("Speed", ch.AppropriateSpeed);
 		Add("Gravity", ch.AppropriateGravity);
 		Add("FallSpeed", ch.AppropriateFallingSpeed);
-		Newline();
-		Add("Fvel", ch.fvel.Round());
-		Add("Wvel", ch.wvel.Round());
-		Add("Cvel", ch.cvel.Round(2));
 		Newline();
 		Add("Left", ch.leftHeld);
 		Add("Right", ch.rightHeld);
@@ -95,23 +89,49 @@ public class DebugLabel : InfoLabel
 		Add("ClingsUsed", ch.currentClingsUsed);
 		Add("GotOptionsFromHitting", ch.gotOptionsFromHitting);
 		Add("GotOptionsFromGettingHit", ch.gotOptionsFromGettingHit);
+		Add("HasDodge", ch.hasDodge);
 		Newline();
 		Add("LeftInput",GetInputString("player_left"));
 		Add("RightInput", GetInputString("player_right"));
 		Add("DownInput", GetInputString("player_down"));
 		Add("UpInput", GetInputString("player_up"));
-		Newline();
 		Add("JumpInput", GetInputString("player_jump"));
 		Add("DodgeInput", GetInputString("player_dodge"));
 		Newline();
 		Add("LightAttackInput", GetInputString("player_light_attack"));
-		Add("HeavyAttackInput", GetInputString("player_heavy_attack"));
 		Add("SpecialAttackInput", GetInputString("player_special_attack"));
 		Add("TauntAttackInput", GetInputString("player_taunt"));
 		Newline();
+		
+		if(ch.Inputs is BufferInputManager buff)
+		{
+			Newline();
+			
+			var buffstring = new StringBuilder();
+			foreach(var entry in buff.buffer)
+				if(entry.Value.bufferTimeLeft >= 0)
+					buffstring.Append($"{entry.Key} : {entry.Value.bufferTimeLeft}\n");
+		
+			Add("Buffer", "\n"+buffstring.ToString());
+		}
+		
 		Newline();
-		Add("Buffer", "\n"+ch.Inputs.ToString());
+		
+		var cdstring = new StringBuilder();
+		foreach(var entry in ch.actionCooldowns)
+			if(entry.Value != 0)
+				cdstring.Append($"{entry.Key.ToString()} : {entry.Value.ToString()}\n");
+		
+		Add("Cooldowns", "\n"+cdstring.ToString());
 		Newline();
+		
+		var itstring = new StringBuilder();
+		foreach(var entry in ch.invincibilityTimers)
+			itstring.Append($"{entry.Key.ToString()} : {entry.Value.ToString()}\n");
+		
+		Add("InvincibilityTimers", "\n"+itstring.ToString());
+		Newline();
+		
 		Add("FPS", Engine.GetFramesPerSecond());
 		Add("PhysicsFrame", Engine.GetPhysicsFrames());
 		Add("DebugBuild", OS.IsDebugBuild());

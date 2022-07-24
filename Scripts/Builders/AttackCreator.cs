@@ -158,7 +158,7 @@ public class AttackCreator
 		var h = TypeUtils.LoadScript<Hitbox>(HitboxScript, new Hitbox(), baseFolder);
 		h.Name = section;
 		var ch = ap.ch;
-		h.owner = ch;
+		h.owner = ap;
 		
 		var sk = inif[section, "SetKnockback", Vector2.Zero].v2();
 		h.setKnockback = sk;
@@ -177,15 +177,8 @@ public class AttackCreator
 		var cm = inif[section, "MomentumCarry", Vector2.Zero].v2();
 		h.momentumCarry = cm;
 		var hs = inif[section, "HitSound", "DefaultHit"].s();
-		try
-		{
-			var ahs = ch.audioManager.sounds[hs];
-			h.hitSound = ahs;
-		}
-		catch(KeyNotFoundException)
-		{
-			GD.Print($"Hit sound {hs} for hitbox {section} in file at path {inif.filePath} could not be found.");
-		}
+		if(ch.audioManager.sounds.ContainsKey(hs)) h.hitSound = ch.audioManager.sounds[hs];
+		else GD.Print($"Hit sound {hs} for hitbox {section} in file at path {inif.filePath} could not be found.");
 		
 		var af = inif[section, "ActiveFrames", new List<Vector2>()];
 		if(af is Vector2) h.activeFrames = new List<Vector2> {af.v2()};

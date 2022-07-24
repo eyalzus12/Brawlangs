@@ -49,14 +49,14 @@ public class AirState : State
 	
 	protected override void DoDodge()
 	{
-		if(!actionable || ch.IsActionInCooldown("Dodge")) return;
+		if(!actionable/* || ch.IsActionInCooldown("Dodge")*/) return;
 		ch.ChangeState((ch.InputtingDirection?"Directional":"Spot")+"AirDodge");
 		MarkForDeletion("player_dodge", true);
 	}
 	
 	protected override void LightAttack()
 	{
-		if(ch.upHeld) ch.ExecuteAttack("NAir");
+		if(ch.upHeld) ch.ExecuteAttack("UAir");
 		else if(ch.downHeld) ch.ExecuteAttack("DAir");
 		else if(ch.rightHeld || ch.leftHeld) ch.ExecuteAttack("SAir");
 		else ch.ExecuteAttack("NAir");
@@ -64,7 +64,7 @@ public class AirState : State
 		MarkForDeletion("player_light_attack", true);
 	}
 	
-	protected override void HeavyAttack()
+	/*protected override void HeavyAttack()
 	{
 		if(ch.upHeld) ch.ExecuteAttack("NSlam");
 		else if(ch.downHeld) ch.ExecuteAttack("DSlam");
@@ -72,14 +72,14 @@ public class AirState : State
 		else ch.ExecuteAttack("NSlam");
 		
 		MarkForDeletion("player_heavy_attack", true);
-	}
+	}*/
 	
 	protected override void SpecialAttack()
 	{
-		if(ch.upHeld) ch.ExecuteAttack("USpecial");
-		else if(ch.downHeld) ch.ExecuteAttack("DSpecial");
-		else if(ch.rightHeld || ch.leftHeld) ch.ExecuteAttack("SSpecial");
-		else ch.ExecuteAttack("NSpecial");
+		if(ch.upHeld) ch.ExecuteAttack("AUSpecial");
+		else if(ch.downHeld) ch.ExecuteAttack("ADSpecial");
+		else if(ch.rightHeld || ch.leftHeld) ch.ExecuteAttack("ASSpecial");
+		else ch.ExecuteAttack("ANSpecial");
 		
 		MarkForDeletion("player_special_attack", true);
 	}
@@ -141,5 +141,7 @@ public class AirState : State
 	{
 		ch.TurnConditional();
 		if(ch.crouching) ch.Uncrouch();
+		
+		ch.SetCollisionMaskBit(DROP_THRU_BIT, !ch.downHeld);
 	}
 }

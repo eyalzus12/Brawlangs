@@ -14,8 +14,6 @@ public class GenericInvincibleState : State
 	public int iframes => InvincibilityLength();
 	public virtual int Endlag() => 0;
 	public int endlag => Endlag();
-	public virtual int Cooldown() => 0;
-	public int cooldown => Cooldown();
 	public virtual string ActionName() => ToString();
 	public string actionName => ActionName();
 	public virtual string Animation() => "Default";
@@ -35,14 +33,14 @@ public class GenericInvincibleState : State
 	{
 		if(!IFramesStarted && frameCount >= startup)
 		{
-			if(ch.InvincibilityLeft < iframes) ch.InvincibilityLeft = iframes;
+			ch.AddInvincibility(actionName, iframes);
 			OnIFramesStart();
 			IFramesStarted = true;
 		}
 		
 		if(!IsInEndlag && frameCount >= iframes+startup)
 		{
-			ch.InvincibilityLeft = 0;
+			ch.RemoveInvincibility(actionName);
 			OnEndlagStart();
 			IsInEndlag = true;
 		}
@@ -59,13 +57,8 @@ public class GenericInvincibleState : State
 		return true;
 	}
 	
-	public override void OnChange(State nextState)
-	{
-		ch.SetActionCooldown(actionName, cooldown);
-	}
-	
 	protected virtual void DecideNextState()
 	{
-		ch.ChangeState("Air");
+		ch.ChangeState<AirState>();
 	}
 }

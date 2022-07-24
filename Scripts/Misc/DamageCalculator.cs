@@ -1,31 +1,42 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 
 public class DamageCalculator
 {
-	public readonly static (float,Color)[] VALUES = 
+	public static readonly (float,Color)[] VALUES =
 	{
-		(50, new Color(0, 0, 255)),
-		(50, new Color(0, 102, 0)),
-		(50, new Color(0, 153, 0)),
-		(50, new Color(64, 0, 0)),
-		(50, new Color(51, 0, 0)),
-		(50, new Color(66, 0, 0))
+		(0, new Color(1, 1, 1)),
+		(50, new Color(1, 1, 0)),
+		(100, new Color(1, 0.6f, 0)),
+		(150, new Color(1, 0, 0)),
+		(200, new Color(0.75f, 0, 0)),// 191/255
+		(250, new Color(0.55f, 0, 0)),// 140/255
+		(300, new Color(0.3f, 0, 0))// 74/255
 	};
 	
 	public static Color DamageToColor(float damage)
 	{
-		var color = new Color(0f, 0f, 0f, 1f);//black
+		if(damage <= VALUES[0].Item1) return VALUES[0].Item2;
+		if(damage >= VALUES[VALUES.Length-1].Item1) return VALUES[VALUES.Length-1].Item2;
 		
-		foreach(var val in VALUES)
-		{
-			if(damage <= 0f) break;
-			var step = val.Item1;//how much to go until next addition
-			var amount = val.Item2 / 255f;//how much to add by step
-			color += amount * Math.Min(damage/step, 1f);//add
-			damage -= step;//next addition
-		}
+		int idx = Array.BinarySearch<(float,Color)>(VALUES, (damage, new Color()), new FirstItemComparar());
 		
-		return color.Inverted();//make all that addition a reduction
+		if(idx < 0) idx = ~idx;
+		
+		if(idx == 0) return VALUES[0].Item2;
+		if(idx >= VALUES.Length) return VALUES[VALUES.Length-1].Item2;
+		
+		var prevDamage = VALUES[idx-1].Item1;
+		var nextDamage = VALUES[idx].Item1;
+		var prevColor = VALUES[idx-1].Item2;
+		var nextColor = VALUES[idx].Item2;
+		var weight = (damage-prevDamage)/(nextDamage-prevDamage);
+		return prevColor.LinearInterpolate(nextColor, weight);
+	}
+	
+	private class FirstItemComparar : IComparer<(float, Color)>
+	{
+		public int Compare((float, Color) fc1, (float, Color) fc2) => fc1.Item1.CompareTo(fc2.Item1);
 	}
 }

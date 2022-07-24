@@ -16,6 +16,8 @@ public class Projectile : Node2D, IHitter, IHittable
 	public int maxLifetime = 0;
 	
 	public int direction = 1;
+	public int Direction{get => direction; set => direction = value;}
+	
 	public ProjectileMovementFunction Movement;
 	public int frameCount = 0;
 	
@@ -48,14 +50,9 @@ public class Projectile : Node2D, IHitter, IHittable
 	public float KnockbackDoneMult{get => OwnerObject.KnockbackDoneMult; set => OwnerObject.KnockbackDoneMult = value;}
 	public float StunDoneMult{get => OwnerObject.StunDoneMult; set => OwnerObject.StunDoneMult = value;}
 	
-	private int _invleft = 0;
-	public int InvincibilityLeft{get => _invleft; set => _invleft = value;}
-	
 	public AudioManager audioManager;
 	public void PlaySound(string sound) => audioManager.Play(sound);
 	public void PlaySound(AudioStream sound) => audioManager.Play(sound);
-	
-	
 	
 	public Dictionary<string, ParamRequest> LoadExtraProperties = new Dictionary<string, ParamRequest>();
 	public virtual void LoadProperties() {}
@@ -136,11 +133,7 @@ public class Projectile : Node2D, IHitter, IHittable
 	
 	public virtual void ConnectSignals()
 	{
-		foreach(var h in Hitboxes)
-		{
-			h.Connect("HitboxHit", this, nameof(HandleInitialHit));
-			h.owner = this;
-		}
+		Hitboxes.ForEach(h => h.Connect("HitboxHit", this, nameof(HandleInitialHit)));
 	}
 	
 	public virtual void DisonnectSignals()
@@ -152,22 +145,21 @@ public class Projectile : Node2D, IHitter, IHittable
 		}
 	}
 	
-	public void HandleInitialHit(Hitbox hitbox, Area2D hurtbox)
+	public void HandleInitialHit(Hitbox hitbox, Hurtbox hurtbox)
 	{
 		if(!hitbox.Active) return;
-		if(!(hurtbox is Hurtbox realhurtbox)) return;//can only handle hurtboxes for hitting
-		var hitChar = realhurtbox.owner;
-		if(hitChar == this || !OwnerObject.CanHit(hitChar) || HitIgnoreList.Contains(hitChar)) return;
+		var hitChar = hurtbox.owner;
+		if(!CanHit(hitChar)) return;
 		
 		Hitbox current;
-		if(HitList.TryGetValue(realhurtbox, out current))
+		if(HitList.TryGetValue(hurtbox, out current))
 		{
 			if(hitbox.hitPriority > current.hitPriority)
-				HitList[realhurtbox] = hitbox;
+				HitList[hurtbox] = hitbox;
 		}
 		else
 		{
-			HitList.Add(realhurtbox, hitbox);
+			HitList.Add(hurtbox, hitbox);
 		}
 	}
 	
@@ -178,7 +170,7 @@ public class Projectile : Node2D, IHitter, IHittable
 			Hitbox hitbox = entry.Value;
 			Hurtbox hurtbox = entry.Key;
 			var hitChar = hurtbox.owner;
-			if(!OwnerObject.CanHit(hitChar) || HitIgnoreList.Contains(hitChar)) continue;//already hit or cant hit
+			if(!CanHit(hitChar)) continue;//already hit or cant hit
 			HitEvent(hitbox, hurtbox);
 			Hit = true;
 			
@@ -186,8 +178,7 @@ public class Projectile : Node2D, IHitter, IHittable
 			var dmult = OwnerObject.DamageDoneMult*DamageDoneMult*hitbox.GetDamageMultiplier(hitChar);
 			var smult = OwnerObject.StunDoneMult*StunDoneMult*hitbox.GetStunMultiplier(hitChar);
 			
-			var nodeHitChar = (Node2D)hurtbox.GetParent();//owner is IHittable, so use parent
-			var dirvec = hitbox.KnockbackDir(nodeHitChar)*kmult;
+			var dirvec = hitbox.KnockbackDir(hitChar)*kmult;
 			
 			var skb = dirvec*hitbox.setKnockback;
 			var vkb = dirvec*hitbox.varKnockback;
@@ -199,7 +190,7 @@ public class Projectile : Node2D, IHitter, IHittable
 			hitChar.HandleGettingHit(data);
 			OwnerObject.HandleHitting(data);
 			HitIgnoreList.Add(hitChar);
-			GD.Print($"{nodeHitChar.Name} was hit by {hitbox.Name}");
+			GD.Print($"{(hitChar as Node2D).Name} was hit by {hitbox.Name}");
 		}
 		if(HitList.Count > 0) DidHit();
 		HitList.Clear();
@@ -212,11 +203,10 @@ public class Projectile : Node2D, IHitter, IHittable
 	}
 	
 	public virtual void HitEvent(Hitbox hitbox, Hurtbox hurtbox) {}
-	
 	public virtual void DidHit() => Destruct();
+	public virtual void HandleGettingHit(HitData data) => Destruct();
 	
-	public virtual void HandleGettingHit(HitData data)
-	{
-		Destruct();
-	}
+	public bool CanHit(IHittable h) => (h != this) && OwnerObject.CanHit(h) && !HitIgnoreList.Contains(h);
+	
+	public virtual bool IsInvincible() => false;
 }

@@ -18,14 +18,13 @@ public class PublicData : Node
 	{
 		get
 		{
-			try {return dict[index];}
-			catch(KeyNotFoundException) {return null;}
+			if(dict.ContainsKey(index)) return dict[index];
+			else return null;
 		}
 		
 		set
 		{
-			try{dict[index] = value;}
-			catch(KeyNotFoundException) {}
+			if(dict.ContainsKey(index)) dict[index] = value;
 		}
 	}
 	
@@ -34,20 +33,20 @@ public class PublicData : Node
 	
 	public void Add(string str, object obj)
 	{
-		try {dict.Add(str, obj);}
-		catch(ArgumentException) {}
+		if(!dict.ContainsKey(str)) dict.Add(str, obj);
 	}
 	
 	public void AddOverride(string str, object obj)
 	{
-		try {dict.Add(str, obj);}
-		catch(ArgumentException) {dict[str]=obj;}
+		if(dict.ContainsKey(str)) dict[str]=obj;
+		else dict.Add(str, obj);
 	}
 	
 	public bool Remove(string str) => dict.Remove(str);
 	public bool HasKey(string str) => dict.ContainsKey(str);
 	public bool HasValue(object obj) => dict.ContainsValue(obj);
 	public bool TryGet(string str, out object o) => dict.TryGetValue(str, out o);
+	
 	public bool TryGet<T>(string str, out T t)
 	{
 		object o;
@@ -55,11 +54,13 @@ public class PublicData : Node
 		t = (T)o;
 		return res;
 	}
+	
 	public object GetOrDefault(string str, object @default)
 	{
-		try {return dict[str];}
-		catch(KeyNotFoundException) {return @default;}
+		if(dict.ContainsKey(str)) return dict[str];
+		else return @default;
 	}
+	
 	//public T GetOrDefault<T>(string str, T @default) => (T)GetOrDefault(str, @default);
 	public void Clear() => dict.Clear();
 	public bool Empty => (Count == 0);
@@ -67,7 +68,7 @@ public class PublicData : Node
 	public override string ToString()
 	{
 		var res = new StringBuilder();
-		foreach(var entry in dict) res.Append($"{{{entry.Key}, {entry.Value.ToString()}}}\n");
+		foreach(var entry in dict) res.Append($"{entry.Key} : {entry.Value.ToString()}\n");
 		return res.ToString();
 	}
 }

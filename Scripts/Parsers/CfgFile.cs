@@ -26,8 +26,8 @@ public class CfgFile
 	{
 		get
 		{
-			try {return dict[key];}
-			catch(KeyNotFoundException) {return @default;}
+			if(dict.ContainsKey(key)) return dict[key];
+			else return @default;
 		}
 	}
 	

@@ -45,7 +45,8 @@ public class CrouchJumpState : BaseCrouchState
 	protected override void DoDodge()
 	{
 		if(ch.IsActionInCooldown("Dodge")) return;
-		ch.ChangeState<DirectionalAirDodgeState>();
+		ch.ChangeState("DirectionalAirDodge");
+		MarkForDeletion("player_dodge", true);
 	}
 	
 	protected override void DoMovement()

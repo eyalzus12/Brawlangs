@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Text.RegularExpressions;
+using System.Text;
 using System.Collections.Generic;
 
 public static class StringUtils

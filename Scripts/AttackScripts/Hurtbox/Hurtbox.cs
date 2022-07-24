@@ -102,6 +102,11 @@ public class Hurtbox : Area2D
 		this.DrawCapsuleShape(Shape, CollisionPosition, CollisionRotation, GetDrawColor());
 	}
 	
+	public virtual void HandleHit(Hitbox hit)
+	{
+		
+	}
+	
 	public virtual Color GetDrawColor() => new Color(0,1,0,1);
 	
 	public virtual int GetDirection() => (((Node2D)owner)?.Get("direction")??1).i();

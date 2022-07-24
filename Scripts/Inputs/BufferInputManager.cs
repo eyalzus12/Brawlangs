@@ -57,13 +57,9 @@ public class BufferInputManager : InputManager
 		{
 			if(InputMap.ActionHasEvent(action, @event))
 			{
-				try
-				{
-					if(!@event.IsEcho() && @event.IsPressed())
-					//only saves input if it was just pressed
-						buffer[action].Activate(-1);
-				}
-				catch(KeyNotFoundException) {}
+				//only saves input if it was just pressed
+				if(!@event.IsEcho() && @event.IsPressed() && buffer.ContainsKey(action))
+					buffer[action].Activate(-1);
 			}
 		}
 	}
@@ -72,56 +68,37 @@ public class BufferInputManager : InputManager
 	{
 		action = $"{action}_{playerDeviceNumber}";
 		
-		try
+		if(buffer.ContainsKey(action))
 		{
 			if(now) buffer[action].Delete();
 			else buffer[action].markedForDeletion = true;
 		}
-		catch(KeyNotFoundException) {}
 	}
 	
 	public override bool IsActionJustPressed(string str)
 	{
 		str = $"{str}_{playerDeviceNumber}";
 		
-		try
-		{
-			return buffer[str].IsActive();
-		}
-		catch(KeyNotFoundException)
-		{
-			return base.IsActionJustPressed(str);
-		}
+		if(buffer.ContainsKey(str)) return buffer[str].IsActive();
+		else return base.IsActionJustPressed(str);
 	}
 	
 	public override bool IsActionPressed(string str)
 	{
 		str = $"{str}_{playerDeviceNumber}";
 		
-		try
-		{
-			return buffer[str].IsActive() || base.IsActionPressed(str);
-		}
-		catch(KeyNotFoundException)
-		{
-			return base.IsActionPressed(str);
-		}
+		if(buffer.ContainsKey(str)) return buffer[str].IsActive() || base.IsActionPressed(str);
+		else return base.IsActionPressed(str);
 	}
 	
 	public override bool IsActionJustReleased(string str)
 	{
 		str = $"{str}_{playerDeviceNumber}";
 		
-		try
-		{
-			return
+		if(buffer.ContainsKey(str)) return
 			!base.IsActionPressed(str) && //ensure input not existent
 			buffer[str].bufferTimeLeft == 0;//ensure just released
-		}
-		catch(KeyNotFoundException)
-		{
-			return base.IsActionJustReleased(str);
-		}
+		else return base.IsActionJustReleased(str);
 	}
 	
 	public override bool IsActionReallyJustPressed(string str) => base.IsActionJustPressed($"{str}_{playerDeviceNumber}");

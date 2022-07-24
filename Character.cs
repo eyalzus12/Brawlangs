@@ -71,13 +71,11 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public int forwardRollLength;
 	public float forwardRollSpeed;
 	public int forwardRollEndlag;
-	public int forwardRollCooldown;
 	
 	public int backRollStartup;
 	public int backRollLength;
 	public float backRollSpeed;
 	public int backRollEndlag;
-	public int backRollCooldown;
 	
 	public int dashStartup;
 	public int dashLength;
@@ -87,32 +85,19 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public int spotAirDodgeStartup = 3;
 	public int spotAirDodgeLength = 15;
 	public int spotAirDodgeEndlag = 3;
-	public int spotAirDodgeCooldown = 120;
 	
 	public int directionalAirDodgeStartup = 3;
 	public int directionalAirDodgeLength = 15;
 	public float directionalAirDodgeSpeed = 1500;
 	public int directionalAirDodgeEndlag = 3;
-	public int directionalAirDodgeCooldown = 120;
 	
-	public bool reduceDodgeCooldownOnGroundTouch = true;
-	public int groundTouchDodgeCooldownThreshold = 90;
+	public bool restoreDodgeOnGroundTouch = true;
+	public bool restoreDodgeOnWallTouch = false;
+	public bool restoreDodgeOnHitting = true;
+	public bool restoreDodgeOnGettingHit = false;
 	
-	public bool reduceDodgeCooldownOnWallTouch = false;
-	public int wallTouchDodgeCooldownThreshold = 0;
+	public bool hasDodge = true;
 	
-	public bool reduceDodgeCooldownOnHitting = true;
-	public int hittingDodgeCooldownThreshold = 60;
-	
-	public bool reduceDodgeCooldownOnGettingHit = false;
-	public int gettingHitDodgeCooldownThreshold = 0;
-	
-	public string lastDodgeUsed = "";
-	
-	private int _invleft = 0;
-	public int InvincibilityLeft{get => _invleft; set => _invleft = value;}
-	
-	public int DodgeCooldown => GetActionCooldown("Dodge")??0;
 	////////////////////////////////////////////
 	public float ceilingBonkBounce = 0.25f;//how much speed is conserved when bonking
 	public float ceilingBounce = 0.95f;//how much speed is conserved when hitting a ceiling
@@ -155,6 +140,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public float StunDoneMult{get => _stunDoneMult; set => _stunDoneMult = value;}
 	////////////////////////////////////////////
 	public int direction = 1;//1 for right -1 for left
+	public int Direction{get => direction; set => direction = value;}
 	
 	private int _teamNumber = 0;
 	public int TeamNumber{get => _teamNumber; set => _teamNumber=value;}
@@ -207,7 +193,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public bool InputtingHorizontalDirection => leftHeld||rightHeld;
 	public bool InputtingVerticalDirection => upHeld||downHeld;
 	public bool InputtingDirection => InputtingHorizontalDirection||InputtingVerticalDirection;
-	public bool IsIdle => (Math.Truncate(GetVelocity().x) == 0);
+	public bool IsIdle => (Math.Truncate(GetVelocity().x / 100f) == 0);
 	public bool IsStill => (IsIdle && !InputtingHorizontalDirection);
 	
 	public bool fastfalling = false;//wether or not fastfalling
@@ -241,7 +227,9 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	
 	public List<Attack> attacks = new List<Attack>();
 	public Dictionary<string, Attack> attackDict = new Dictionary<string, Attack>();
+	
 	public Dictionary<string, int> actionCooldowns = new Dictionary<string, int>();
+	public Dictionary<string, int> invincibilityTimers = new Dictionary<string, int>();
 	
 	public Dictionary<string, PackedScene> projectiles = new Dictionary<string, PackedScene>();
 	public Dictionary<string, HashSet<Projectile>> activeProjectiles = new Dictionary<string, HashSet<Projectile>>();
@@ -274,10 +262,10 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public override void _PhysicsProcess(float delta)
 	{
 		++framesSinceLastHit;
-		if(InvincibilityLeft > 0) InvincibilityLeft--;
 		StoreVelocities();
 		TruncateVelocityIfInsignificant();
 		UpdateActionCooldowns();
+		UpdateInvincibilityTimers();
 		if(Input.IsActionJustPressed("reset")) Respawn();
 		currentState?.SetInputs();
 		currentState?.DoPhysics(delta);
@@ -304,14 +292,10 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	//this function returns the appropriate state
 	public State GetState(string state)
 	{
-		try
-		{
-			return states[state];
-		}
-		catch (KeyNotFoundException)
+		if(states.ContainsKey(state)) return states[state];
+		else
 		{
 			GD.Print($"{name}: Could not find {state}State");
-			
 			return null;
 		}
 	}
@@ -413,6 +397,8 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		//AddState(new BackRollState(this));
 		AddState(new SpotAirDodgeState(this));
 		AddState(new DirectionalAirDodgeState(this));
+		
+		AddState(new WavedashState(this));
 	}
 	
 	///////////////////////////////////////////
@@ -440,14 +426,14 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		ApplySettings("Default");
 		ChangeState("Air");
 		Position = Vector2.Zero;
-		InvincibilityLeft = 0;//TODO: respawn i frames
+		invincibilityTimers.Clear();//todo: respawn i-frames
 		fastfalling = false;
 		crouching = false;
 		currentClingsUsed = 0;
 		currentAirJumpsUsed = 0;
 		gotOptionsFromHitting = false;
 		gotOptionsFromGettingHit = false;
-		lastDodgeUsed = "";
+		hasDodge = true;
 		ResetVelocity();
 		direction = 1;
 		SetCollisionMaskBit(DROP_THRU_BIT, true);
@@ -461,25 +447,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	{
 		var activeProjectilesCopy = new Dictionary<string, HashSet<Projectile>>(activeProjectiles);
 		foreach(var entry in activeProjectilesCopy)
-		{
-			var list = entry.Value.ToList();
-			foreach(var projectile in list)
-			{
-				projectile.Destruct();
-			}
-		}
-	}
-	
-	public virtual int GetAppropriateDodgeCooldown()
-	{
-		switch(lastDodgeUsed)
-		{
-			case "Directional":
-				return directionalAirDodgeCooldown;
-			case "Spot":
-			default:
-				return spotAirDodgeCooldown;
-		}
+			entry.Value.ToList().ForEach(p => p.Destruct());
 	}
 	
 	public virtual void RestoreOptionsOnGroundTouch()
@@ -489,14 +457,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		gotOptionsFromHitting = false;
 		gotOptionsFromGettingHit = false;
 		
-		if(reduceDodgeCooldownOnGroundTouch)
-		{
-			if(GetAppropriateDodgeCooldown()-DodgeCooldown <= groundTouchDodgeCooldownThreshold)
-				SetActionCooldown("Dodge", groundTouchDodgeCooldownThreshold);
-			else
-				SetActionCooldown("Dodge", 0);
-		}
-		
+		if(restoreDodgeOnGroundTouch) hasDodge = true;
 		
 		EmitSignal(nameof(OptionsRestoredFromGroundTouch));
 	}
@@ -506,13 +467,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		currentClingsUsed++;
 		currentAirJumpsUsed = 0;
 		
-		if(reduceDodgeCooldownOnWallTouch)
-		{
-			if(GetAppropriateDodgeCooldown()-DodgeCooldown <= wallTouchDodgeCooldownThreshold)
-				SetActionCooldown("Dodge", wallTouchDodgeCooldownThreshold);
-			else
-				SetActionCooldown("Dodge", 0);
-		}
+		if(restoreDodgeOnWallTouch) hasDodge = true;
 		
 		EmitSignal(nameof(OptionsRestoredFromWallTouch));
 	}
@@ -525,13 +480,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		currentAirJumpsUsed -= givenAirJumpsOnHitting;
 		if(currentAirJumpsUsed < 0) currentAirJumpsUsed = 0;
 		
-		if(reduceDodgeCooldownOnHitting)
-		{
-			if(GetAppropriateDodgeCooldown()-DodgeCooldown <= hittingDodgeCooldownThreshold)
-				SetActionCooldown("Dodge", hittingDodgeCooldownThreshold);
-			else
-				SetActionCooldown("Dodge", 0);
-		}
+		if(restoreDodgeOnHitting) hasDodge = true;
 		
 		EmitSignal(nameof(OptionsRestoredFromHitting));
 		gotOptionsFromHitting = true;
@@ -546,13 +495,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		currentAirJumpsUsed -= givenAirJumpsOnGettingHit;
 		if(currentAirJumpsUsed < 0) currentAirJumpsUsed = 0;
 		
-		if(reduceDodgeCooldownOnGettingHit)
-		{
-			if(GetAppropriateDodgeCooldown()-DodgeCooldown <= gettingHitDodgeCooldownThreshold)
-				SetActionCooldown("Dodge", gettingHitDodgeCooldownThreshold);
-			else
-				SetActionCooldown("Dodge", 0);
-		}
+		if(restoreDodgeOnGettingHit) hasDodge = true;
 		
 		EmitSignal(nameof(OptionsRestoredFromGettingHit));
 		gotOptionsFromGettingHit = true;
@@ -731,13 +674,13 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	////////////////Attacks////////////////////
 	///////////////////////////////////////////
 	
-	public readonly static string[] ActionsWithCooldown = new string[]{"Dodge"};
+	public readonly static string[] ActionsWithCooldown = new string[]{"PlaceholderAction"};
 	public virtual void SetupCooldownDict()
 	{
 		foreach(var action in ActionsWithCooldown) actionCooldowns.Add(action, 0);
 	}
 	
-	public virtual bool CanHit(IHittable hitObject) => (hitObject != this)&&(hitObject.InvincibilityLeft <= 0)&&(hitObject.TeamNumber!=_teamNumber||friendlyFire);
+	public virtual bool CanHit(IHittable hitObject) => (hitObject != this)&&(!hitObject.IsInvincible())&&(hitObject.TeamNumber!=_teamNumber||friendlyFire);
 	
 	public void HandleGettingHit(HitData data)
 	{
@@ -821,11 +764,8 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	
 	public Attack GetAttack(string s)
 	{
-		try
-		{
-			return attackDict[s];
-		}
-		catch(KeyNotFoundException)
+		if(attackDict.ContainsKey(s)) return attackDict[s];
+		else
 		{
 			GD.Print($"No attack {s} found. You probably forgot to add it to the loading list");
 			return null;
@@ -834,27 +774,14 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	
 	public int? GetActionCooldown(string s)
 	{
-		try
-		{
-			return actionCooldowns[s];
-		}
-		catch(KeyNotFoundException)
-		{
-			GD.Print($"Could not get cooldown for action {s} as it does not exist in the cooldown dictionary");
-			return null;
-		}
+		if(actionCooldowns.ContainsKey(s)) return actionCooldowns[s];
+		else return null;
 	}
 	
 	public void SetActionCooldown(string s, int cd)
 	{
-		try
-		{
-			actionCooldowns[s] = cd;
-		}
-		catch(KeyNotFoundException)
-		{
-			GD.Print($"Could not set cooldown for action {s} as it does not exist in the cooldown dictionary");
-		}
+		if(actionCooldowns.ContainsKey(s)) actionCooldowns[s] = cd;
+		else GD.Print($"Could not set cooldown for action {s} as it does not exist in the cooldown dictionary");
 	}
 	
 	public void UpdateActionCooldowns()
@@ -925,6 +852,29 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		var cd = currentAttack.GetEndlag() + currentAttack.GetCooldown();
 		SetActionCooldown(currentAttack.Name, cd);
 	}
+	
+	///////////////////////////////////////////
+	/////////////Invincibility/////////////////
+	///////////////////////////////////////////
+	
+	public void AddInvincibility(string source, int length) => invincibilityTimers.Add(source, length);
+	public void RemoveInvincibility(string source) => invincibilityTimers.Remove(source);
+	public void HasInvincibilityFrom(string source) => invincibilityTimers.ContainsKey(source);
+	public int InvincibilityLeftFrom(string source) => invincibilityTimers[source];
+	
+	public void UpdateInvincibilityTimers()
+	{
+		var keys = new List<string>(invincibilityTimers.Keys);
+		foreach(var k in keys)
+		{
+			var currentTime = invincibilityTimers[k];
+			currentTime--;
+			if(currentTime == 0) invincibilityTimers.Remove(k);
+			else invincibilityTimers[k] = currentTime;
+		}
+	}
+	
+	public bool IsInvincible() => invincibilityTimers.Count > 0;
 	
 	///////////////////////////////////////////
 }

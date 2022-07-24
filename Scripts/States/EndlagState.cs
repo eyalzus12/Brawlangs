@@ -16,9 +16,14 @@ public class EndlagState : State
 		endlag = 0;
 		att = null;
 		SetupCollisionParamaters();
-		ch.SetCollisionMaskBit(DROP_THRU_BIT, !ch.downHeld);
 		//ch.PlayAnimation(att.endlagAnimation);
 		//figure out a way to set the animation after the attack exists
+	}
+	
+	public override void SetInputs()
+	{
+		base.SetInputs();
+		SetFastFallInput();
 	}
 	
 	protected override void DoMovement()
@@ -35,13 +40,12 @@ public class EndlagState : State
 	
 	protected override void RepeatActions()
 	{
-		if(Inputs.IsActionReallyJustReleased("player_down"))
-			ch.SetCollisionMaskBit(DROP_THRU_BIT, true);
+		ch.SetCollisionMaskBit(DROP_THRU_BIT, !ch.downHeld);
 	}
 	
 	protected override void DoGravity()
 	{
-		if(!ch.grounded) ch.vec.y.Towards(ch.fallSpeed, ch.gravity);
+		if(!ch.grounded) ch.vec.y.Towards(ch.AppropriateFallingSpeed, ch.AppropriateGravity);
 	}
 	
 	protected override bool CalcStateChange()

@@ -18,13 +18,18 @@ public class AttackState : State
 		Unsnap();
 		touchedWall = false;
 		touchedGround = false;
-		ch.SetCollisionMaskBit(DROP_THRU_BIT, !ch.downHeld);
 		
 		/*if(ch.grounded)
 		{
 			if(!ch.crouching && ch.downHeld) ch.Crouch();
 			else if(ch.crouching && !ch.downHeld) ch.Uncrouch();
 		}*/
+	}
+	
+	public override void SetInputs()
+	{
+		base.SetInputs();
+		SetFastFallInput();
 	}
 	
 	protected override void DoMovement()
@@ -72,10 +77,6 @@ public class AttackState : State
 	protected override void LoopActions()
 	{
 		SetupCollisionParamaters();
-		if(Inputs.IsActionReallyJustPressed("player_down"))
-			ch.SetCollisionMaskBit(DROP_THRU_BIT, false);
-		if(Inputs.IsActionReallyJustReleased("player_down"))
-			ch.SetCollisionMaskBit(DROP_THRU_BIT, true);
 		//SetupCollisionParamaters();
 		if(ch.walled && ch.currentClingsUsed < ch.maxClingsAllowed && !touchedWall)
 		{
@@ -91,32 +92,48 @@ public class AttackState : State
 		}
 	}
 	
+	protected override void RepeatActions()
+	{
+		ch.SetCollisionMaskBit(DROP_THRU_BIT, !ch.downHeld);
+	}
+	
 	public void SetEnd(Attack a)
 	{
+		//remove signal
 		a.Disconnect("AttackEnds", this, nameof(SetEnd));
 		a.connected = null;
 		
+		//disable attack
 		if(a.active)
 		{
 			a.active = false;
+			//call ending function
 			a.OnEnd();
+			//stop attack part
 			if(a.currentPart != null) a.currentPart.Stop();
+			//reset character attack
 			ch.ResetCurrentAttack(a);
+			//revert attack state
 			a.currentPart = null;
 		}
 		
+		//apply enflag
 		int endlag = a.GetEndlag();
-		if(endlag > 0)
+		if(endlag > 0)//has endlag to apply
 		{
+			//switch state
 			var s = ch.ChangeState<EndlagState>();
+			//supply state with endlag
 			s.endlag = endlag;
+			//supply state with attack
 			s.att = a;
 		}
-		else
+		else//no endlag. state transition immedietly
 		{
+			//turnaroujnd
 			ch.TurnConditional();
-			ch.SetCollisionMaskBit(DROP_THRU_BIT, true);
 			
+			//transition to appropriate state
 			if(ch.grounded)
 			{
 				if(ch.downHeld)
@@ -138,12 +155,14 @@ public class AttackState : State
 			else ch.ChangeState("Air");
 		}
 		
+		//forget attack
 		att = null;
-		ch.SetCollisionMaskBit(DROP_THRU_BIT, !ch.downHeld);
 	}
 	
+	//handle state change
 	public override void OnChange(State newState)
 	{
+		//got hit
 		if(newState is StunState || newState is HitPauseState)
 		{
 			att.Disconnect("AttackEnds", this, nameof(SetEnd));

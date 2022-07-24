@@ -124,6 +124,7 @@ public class ProjectileCreator
 		var HitboxScript = inif[section, "Script", ""].s();
 		var baseFolder = path.SplitByLast('/')[0];
 		var h = TypeUtils.LoadScript<Hitbox>(HitboxScript, new Hitbox(), baseFolder);
+		h.owner = p;
 		h.Name = section;
 		
 		var sk = inif[section, "SetKnockback", Vector2.Zero].v2();
@@ -142,15 +143,8 @@ public class ProjectileCreator
 		//h.momentumCarry = cm;
 		
 		var hs = inif[section, "HitSound", "DefaultHit"].s();
-		try
-		{
-			var ahs = p.audioManager.sounds[hs];
-			h.hitSound = ahs;
-		}
-		catch(KeyNotFoundException)
-		{
-			GD.Print($"Hit sound {hs} for hitbox {section} in file at path {inif.filePath} could not be found.");
-		}
+		if(p.audioManager.sounds.ContainsKey(hs)) h.hitSound = p.audioManager.sounds[hs];
+		else GD.Print($"Hit sound {hs} for hitbox {section} in file at path {inif.filePath} could not be found.");
 		
 		var hafs = inif[section, "HorizontalAngleFlipper", "Directional"].s();
 		Hitbox.AngleFlipper haf;

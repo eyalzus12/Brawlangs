@@ -19,6 +19,13 @@ public static class MathUtils
 		return val;
 	}
 	
+	public static Vector2 Towards(this ref Vector2 v, Vector2 to, Vector2 @by)
+	{
+		v.x.Towards(to.x, @by.x);
+		v.y.Towards(to.y, @by.y);
+		return v;
+	}
+	
 	public static void TruncateIfInsignificant(this ref float i)
 	{
 		if(Math.Abs(i) < 1f) i = 0f;

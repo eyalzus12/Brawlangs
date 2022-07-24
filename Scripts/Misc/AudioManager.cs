@@ -37,11 +37,8 @@ public class AudioManager : Node
 	
 	public void Play(string sound)
 	{
-		try {Play(sounds[sound]);}
-		catch(KeyNotFoundException)
-		{
-			if(sound != "") GD.Print($"Could not play sound {sound} as it does not exist");
-		}
+		if(sounds.ContainsKey(sound)) Play(sounds[sound]);
+		else if(sound != "") GD.Print($"Could not play sound {sound} as it does not exist");
 	}
 	
 	public void AddSound(string name, AudioStream audio) => sounds.Add(name, audio);
@@ -77,8 +74,6 @@ public class AudioManager : Node
 			}
 			
 		});
-		
-		
 	}
 	
 	public override void _ExitTree()
