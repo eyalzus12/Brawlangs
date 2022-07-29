@@ -54,18 +54,18 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public float fastfallMargin = -400f;
 	////////////////////////////////////////////
 	public int maxClingsAllowed = 2;
-	public int currentClingsUsed = 0;
-	
 	public int maxAirJumpsAllowed = 2;
-	public int currentAirJumpsUsed = 0;
+	public int maxDodgesAllowed = 1;
 	
 	public int givenClingsOnHitting = 2;
-	public int givenAirJumpsOnHitting = 1;
-	public bool gotOptionsFromHitting = false;
-	
 	public int givenClingsOnGettingHit = 1;
+	
+	public int givenAirJumpsOnHitting = 1;
 	public int givenAirJumpsOnGettingHit = 1;
-	public bool gotOptionsFromGettingHit = false;
+	
+	public int givenDodgesOnHitting = 1;
+	public int givenDodgesOnGettingHit = 1;
+	
 	////////////////////////////////////////////
 	public int forwardRollStartup;
 	public int forwardRollLength;
@@ -95,8 +95,6 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public bool restoreDodgeOnWallTouch = false;
 	public bool restoreDodgeOnHitting = true;
 	public bool restoreDodgeOnGettingHit = false;
-	
-	public bool hasDodge = true;
 	
 	////////////////////////////////////////////
 	public float ceilingBonkBounce = 0.25f;//how much speed is conserved when bonking
@@ -215,21 +213,29 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public State prevState;//previously used state
 	public State prevPrevState;//the one before that
 	
-	public Attack currentAttack;
-	
 	public Dictionary<string, State> states = new Dictionary<string, State>();
 	
-	public string currentCollisionSetting;
 	private List<Hurtbox> _hurtboxes = new List<Hurtbox>();
 	public List<Hurtbox> Hurtboxes{get => _hurtboxes; set => _hurtboxes=value;}
+	
+	public string currentCollisionSetting;
 	public CharacterCollision collision;
 	public PlatformDropDetector DropDetector;
 	
-	public List<Attack> attacks = new List<Attack>();
-	public Dictionary<string, Attack> attackDict = new Dictionary<string, Attack>();
+	public Attack currentAttack;
+	public Attack CurrentAttack{get => currentAttack; set => currentAttack = value;}
 	
-	public Dictionary<string, int> actionCooldowns = new Dictionary<string, int>();
+	private bool hasHit;
+	public bool IsHitting{get => hasHit; set => hasHit = value;}
+	private IHittable lastHit;
+	public IHittable LastHit{get => lastHit; set => lastHit = value;}
+	
+	public Dictionary<string, Attack> attackDict = new Dictionary<string, Attack>();
+	public Dictionary<string, Attack> Attacks{get => attackDict; set => attackDict = value;}
+	
+	public Dictionary<string, int> cooldowns = new Dictionary<string, int>();
 	public Dictionary<string, int> invincibilityTimers = new Dictionary<string, int>();
+	public Dictionary<string, int> resources = new Dictionary<string, int>();
 	
 	public Dictionary<string, PackedScene> projectiles = new Dictionary<string, PackedScene>();
 	public Dictionary<string, HashSet<Projectile>> activeProjectiles = new Dictionary<string, HashSet<Projectile>>();
@@ -241,7 +247,8 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public InputManager Inputs;
 	
 	public AnimationSprite sprite;
-	public AudioManager audioManager;
+	protected AudioManager audioManager;
+	public AudioManager Audio{get => audioManager; set => audioManager = value;}
 	
 	public Character() {}
 	
@@ -249,7 +256,6 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	{
 		ZIndex = 4;
 		SetupStates();
-		SetupCooldownDict();
 	}
 	
 	public bool ReadStats()
@@ -261,10 +267,11 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 
 	public override void _PhysicsProcess(float delta)
 	{
+		IsHitting = false;
 		++framesSinceLastHit;
 		StoreVelocities();
 		TruncateVelocityIfInsignificant();
-		UpdateActionCooldowns();
+		UpdateCooldowns();
 		UpdateInvincibilityTimers();
 		if(Input.IsActionJustPressed("reset")) Respawn();
 		currentState?.SetInputs();
@@ -277,6 +284,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public override void _Draw()
 	{
 		if(!this.GetRootNode<UpdateScript>("UpdateScript").debugCollision) return;
+		ZIndex = 10;
 		DrawCircle(Vector2.Zero, 5, new Color(0,0,0,1));
 	}
 	
@@ -429,11 +437,6 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		invincibilityTimers.Clear();//todo: respawn i-frames
 		fastfalling = false;
 		crouching = false;
-		currentClingsUsed = 0;
-		currentAirJumpsUsed = 0;
-		gotOptionsFromHitting = false;
-		gotOptionsFromGettingHit = false;
-		hasDodge = true;
 		ResetVelocity();
 		direction = 1;
 		SetCollisionMaskBit(DROP_THRU_BIT, true);
@@ -452,53 +455,40 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	
 	public virtual void RestoreOptionsOnGroundTouch()
 	{
-		currentClingsUsed = 0;
-		currentAirJumpsUsed = 0;
-		gotOptionsFromHitting = false;
-		gotOptionsFromGettingHit = false;
-		
-		if(restoreDodgeOnGroundTouch) hasDodge = true;
-		
+		SetResource("Clings", maxClingsAllowed);
+		SetResource("AirJumps", maxAirJumpsAllowed);
+		SetResource("OnHittingOptionRestoration", 1);
+		SetResource("OnGettingHitOptionRestoration", 1);
+		if(restoreDodgeOnGroundTouch) SetResource("Dodge", maxDodgesAllowed);
 		EmitSignal(nameof(OptionsRestoredFromGroundTouch));
 	}
 	
 	public virtual void RestoreOptionsOnWallTouch()
 	{
-		currentClingsUsed++;
-		currentAirJumpsUsed = 0;
-		
-		if(restoreDodgeOnWallTouch) hasDodge = true;
-		
+		GiveResource("Clings", -1);
+		SetResource("AirJumps", maxAirJumpsAllowed);
+		if(restoreDodgeOnWallTouch) SetResource("Dodge", maxDodgesAllowed);
 		EmitSignal(nameof(OptionsRestoredFromWallTouch));
 	}
 	
 	public virtual void RestoreOptionsOnHitting()
 	{
-		if(gotOptionsFromHitting) return;
-		currentClingsUsed -= givenClingsOnHitting;
-		if(currentClingsUsed < 0) currentClingsUsed = 0;
-		currentAirJumpsUsed -= givenAirJumpsOnHitting;
-		if(currentAirJumpsUsed < 0) currentAirJumpsUsed = 0;
-		
-		if(restoreDodgeOnHitting) hasDodge = true;
-		
+		if(!HasResource("OnHittingOptionRestoration")) return;
+		GiveResource("Clings", givenClingsOnHitting, maxClingsAllowed);
+		GiveResource("AirJumps", givenAirJumpsOnHitting, maxAirJumpsAllowed);
+		if(restoreDodgeOnHitting) GiveResource("Dodge", givenDodgesOnHitting, maxDodgesAllowed);
 		EmitSignal(nameof(OptionsRestoredFromHitting));
-		gotOptionsFromHitting = true;
-		//gotOptionsFromGettingHit = false;
+		GiveResource("OnHittingOptionRestoration", -1);
 	}
 	
 	public virtual void RestoreOptionsOnGettingHit()
 	{
-		if(gotOptionsFromGettingHit) return;
-		currentClingsUsed -= givenClingsOnGettingHit;
-		if(currentClingsUsed < 0) currentClingsUsed = 0;
-		currentAirJumpsUsed -= givenAirJumpsOnGettingHit;
-		if(currentAirJumpsUsed < 0) currentAirJumpsUsed = 0;
-		
-		if(restoreDodgeOnGettingHit) hasDodge = true;
-		
+		if(!HasResource("OnGettingHitOptionRestoration")) return;
+		GiveResource("Clings", givenClingsOnGettingHit, maxClingsAllowed);
+		GiveResource("AirJumps", givenAirJumpsOnGettingHit, maxAirJumpsAllowed);
+		if(restoreDodgeOnGettingHit) GiveResource("Dodge", givenDodgesOnGettingHit, maxDodgesAllowed);
 		EmitSignal(nameof(OptionsRestoredFromGettingHit));
-		gotOptionsFromGettingHit = true;
+		GiveResource("OnGettingHitOptionRestoration", -1);
 	}
 	
 	public virtual void StoreVelocities()
@@ -674,23 +664,18 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	////////////////Attacks////////////////////
 	///////////////////////////////////////////
 	
-	public readonly static string[] ActionsWithCooldown = new string[]{"PlaceholderAction"};
-	public virtual void SetupCooldownDict()
-	{
-		foreach(var action in ActionsWithCooldown) actionCooldowns.Add(action, 0);
-	}
-	
 	public virtual bool CanHit(IHittable hitObject) => (hitObject != this)&&(!hitObject.IsInvincible())&&(hitObject.TeamNumber!=_teamNumber||friendlyFire);
 	
 	public void HandleGettingHit(HitData data)
 	{
+		GD.Print($"Character {Name} got hit on {Engine.GetPhysicsFrames()}");
 		var skb = data.Skb;
 		var vkb = data.Vkb;
 		var d = data.Damage;
 		var stun = data.Stun;
 		var hp = data.Hitpause;
 		
-		if(data.Hitee.owner == this) RestoreOptionsOnGettingHit();
+		RestoreOptionsOnGettingHit();
 		
 		damage += d * DamageTakenMult;
 		var force = (skb + damage*vkb/100f) * KnockbackTakenMult * (100f/weight);
@@ -725,10 +710,16 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	
 	public void HandleHitting(HitData data)
 	{
+		GD.Print($"Character {Name} hit something on {Engine.GetPhysicsFrames()}");
 		Hitbox hitbox = data.Hitter;
 		Hurtbox hurtbox = data.Hitee;
 		
-		if(hitbox.owner == this) RestoreOptionsOnHitting();
+		if(hurtbox.OwnerObject is IAttacker attackerOwner && attackerOwner.IsHitting && attackerOwner.LastHit == this)
+		{
+			GD.Print("CLASH");//TODO: decide what should happen
+		}
+		
+		RestoreOptionsOnHitting();
 		
 		if(hitbox.hitlag > 0)
 		{
@@ -737,16 +728,13 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		}
 	}
 	
-	public virtual bool IsActionInCooldown(string s)
-	{
-		var cd = GetActionCooldown(s);
-		if(cd is null) return false;
-		else return (cd>0);
-	}
+	public virtual bool InCooldown(string s) => GetCooldown(s) > 0;
+	
+	public virtual bool AttackInCooldown(Attack a) => a.sharesCooldownWith.Concat(a.Name).Any(InCooldown);
 	
 	public virtual bool ExecuteAttack(Attack a)
 	{
-		if(a is null || !a.CanActivate() || IsActionInCooldown(a.Name)) return false;
+		if(a is null || !a.CanActivate() || AttackInCooldown(a)) return false;
 		
 		if(currentAttack != null) ResetCurrentAttack(null);
 		
@@ -767,27 +755,31 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		if(attackDict.ContainsKey(s)) return attackDict[s];
 		else
 		{
-			GD.Print($"No attack {s} found. You probably forgot to add it to the loading list");
+			GD.Print($"No attack {s} found on character {Name}");
 			return null;
 		}
 	}
 	
-	public int? GetActionCooldown(string s)
+	public int GetCooldown(string s)
 	{
-		if(actionCooldowns.ContainsKey(s)) return actionCooldowns[s];
-		else return null;
+		if(cooldowns.ContainsKey(s)) return cooldowns[s];
+		else return 0;
 	}
 	
-	public void SetActionCooldown(string s, int cd)
+	public void SetCooldown(string s, int cd)
 	{
-		if(actionCooldowns.ContainsKey(s)) actionCooldowns[s] = cd;
-		else GD.Print($"Could not set cooldown for action {s} as it does not exist in the cooldown dictionary");
+		if(cooldowns.ContainsKey(s)) cooldowns[s] = cd;
+		else cooldowns.Add(s, cd);
 	}
 	
-	public void UpdateActionCooldowns()
+	public void UpdateCooldowns()
 	{
-		var keys = new List<string>(actionCooldowns.Keys);
-		foreach(var k in keys) actionCooldowns[k] = Math.Max(0, actionCooldowns[k] - 1);
+		var keys = new List<string>(cooldowns.Keys);
+		foreach(var k in keys)
+		{
+			cooldowns[k]--;
+			if(cooldowns[k] <= 0) cooldowns.Remove(k);
+		}
 	}
 	
 	public void ResetCurrentAttack(Attack a)
@@ -850,7 +842,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public virtual void SetAttackCooldowns()
 	{
 		var cd = currentAttack.GetEndlag() + currentAttack.GetCooldown();
-		SetActionCooldown(currentAttack.Name, cd);
+		SetCooldown(currentAttack.Name, cd);
 	}
 	
 	///////////////////////////////////////////
@@ -867,14 +859,44 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		var keys = new List<string>(invincibilityTimers.Keys);
 		foreach(var k in keys)
 		{
-			var currentTime = invincibilityTimers[k];
-			currentTime--;
-			if(currentTime == 0) invincibilityTimers.Remove(k);
-			else invincibilityTimers[k] = currentTime;
+			invincibilityTimers[k]--;
+			if(invincibilityTimers[k] <= 0) invincibilityTimers.Remove(k);
 		}
 	}
 	
 	public bool IsInvincible() => invincibilityTimers.Count > 0;
 	
 	///////////////////////////////////////////
+	/////////////////Resources/////////////////
+	///////////////////////////////////////////
+	
+	public void GiveResource(string resource, int amount, int min, int max)
+	{
+		if(resources.ContainsKey(resource))
+		{
+			int desired = Math.Max(Math.Min(resources[resource] + amount, max), Math.Max(min,0));
+			if(desired == 0) resources.Remove(resource);
+			else resources[resource] = desired;
+		}
+		else if(amount > 0) resources.Add(resource, amount);
+	}
+	
+	public void GiveResource(string resource, int amount, int max) => GiveResource(resource, amount, 0, max);
+	public void GiveResource(string resource, int amount) => GiveResource(resource, amount, int.MaxValue);
+	
+	public void SetResource(string resource, int amount)
+	{
+		if(amount <= 0) RemoveResource(resource);
+		else if(resources.ContainsKey(resource)) resources[resource] = amount;
+		else resources.Add(resource, amount);
+	}
+	
+	public void RemoveResource(string resource)
+	{
+		if(resources.ContainsKey(resource)) resources.Remove(resource);
+	}
+	
+	public int ResourceCount(string resource) => resources.ContainsKey(resource)?resources[resource]:0;
+	public bool HasResource(string resource) => HasResourceBeyondThreshold(resource, 0);
+	public bool HasResourceBeyondThreshold(string resource, int threshold) => resources.ContainsKey(resource) && (resources[resource] > threshold);
 }

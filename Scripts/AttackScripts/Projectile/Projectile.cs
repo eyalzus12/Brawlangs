@@ -141,14 +141,14 @@ public class Projectile : Node2D, IHitter, IHittable
 		foreach(var h in Hitboxes)
 		{
 			h.Disconnect("HitboxHit", this, nameof(HandleInitialHit));
-			h.owner = this;
+			h.OwnerObject = this;
 		}
 	}
 	
 	public void HandleInitialHit(Hitbox hitbox, Hurtbox hurtbox)
 	{
 		if(!hitbox.Active) return;
-		var hitChar = hurtbox.owner;
+		var hitChar = hurtbox.OwnerObject;
 		if(!CanHit(hitChar)) return;
 		
 		Hitbox current;
@@ -169,7 +169,7 @@ public class Projectile : Node2D, IHitter, IHittable
 		{
 			Hitbox hitbox = entry.Value;
 			Hurtbox hurtbox = entry.Key;
-			var hitChar = hurtbox.owner;
+			var hitChar = hurtbox.OwnerObject;
 			if(!CanHit(hitChar)) continue;//already hit or cant hit
 			HitEvent(hitbox, hurtbox);
 			Hit = true;

@@ -35,7 +35,7 @@ public class CollisionCreator
 			{
 				var hr = new Hurtbox();
 				hr.Name = hurtbox;
-				hr.owner = ch;
+				hr.OwnerObject = ch;
 				ch.AddChild(hr);
 				ch.Hurtboxes.Add(hr);
 				BuildHurtbox(hr, state+hurtbox, state);
@@ -46,7 +46,7 @@ public class CollisionCreator
 				{
 					var hr = new Hurtbox();
 					hr.Name = hurtboox;
-					hr.owner = ch;
+					hr.OwnerObject = ch;
 					ch.AddChild(hr);
 					ch.Hurtboxes.Add(hr);
 					BuildHurtbox(hr, state+hurtboox, state);
@@ -64,7 +64,7 @@ public class CollisionCreator
 			{
 				var hr = new Hurtbox();
 				hr.Name = hurtbox;
-				hr.owner = ch;
+				hr.OwnerObject = ch;
 				ch.AddChild(hr);
 				ch.Hurtboxes.Add(hr);
 				foreach(var staate in oStates.ls())
@@ -76,7 +76,7 @@ public class CollisionCreator
 				{
 					var hr = new Hurtbox();
 					hr.Name = hurtboox;
-					hr.owner = ch;
+					hr.OwnerObject = ch;
 					ch.AddChild(hr);
 					ch.Hurtboxes.Add(hr);
 					foreach(var staate in oStates.ls())

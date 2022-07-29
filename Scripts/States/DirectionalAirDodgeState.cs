@@ -20,7 +20,6 @@ public class DirectionalAirDodgeState : GenericInvincibleState
 	public override void Init()
 	{
 		base.Init();
-		ch.hasDodge = false;
 		touchedWall = false;
 		movement = ch.GetInputVector()*ch.directionalAirDodgeSpeed;
 		ch.fastfalling = false;
@@ -32,7 +31,7 @@ public class DirectionalAirDodgeState : GenericInvincibleState
 		base.LoopActions();
 		ch.vec.x *= (1f-ch.AppropriateFriction);
 		ch.vec.y *= (1f-ch.airFriction);
-		if(ch.walled && ch.currentClingsUsed < ch.maxClingsAllowed) touchedWall = true;
+		if(ch.walled && ch.HasResource("Clings")) touchedWall = true;
 		CheckWavedashOption();
 	}
 	
@@ -64,7 +63,7 @@ public class DirectionalAirDodgeState : GenericInvincibleState
 		if(touchedWall) ch.RestoreOptionsOnWallTouch();
 		
 		if(ch.grounded) ch.ChangeState<WavedashState>();
-		else if(ch.walled && ch.currentClingsUsed < ch.maxClingsAllowed)
+		else if(ch.walled && ch.HasResource("Clings"))
 		{
 			ch.ApplySettings("Wall");
 			ch.ChangeState<WallState>();

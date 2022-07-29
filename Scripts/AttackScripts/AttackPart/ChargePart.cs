@@ -24,12 +24,7 @@ public class ChargePart : AttackPart
 	
 	public override void Loop()
 	{
-		var inputsuffix = (ChargeInput == "taunt")?"":"_attack";
-		var inputname = $"player_{ChargeInput}{inputsuffix}"; 
-		if(!ch.Inputs.IsActionPressed(inputname))
-		{
-			ChangePart(GetNextPart());
-		}
+		if(!ch.Inputs.IsActionPressed(ChargeInput)) ChangePart(GetNextPart());
 	}
 	
 	public override void OnEnd()

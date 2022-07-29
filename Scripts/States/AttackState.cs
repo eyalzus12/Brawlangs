@@ -18,12 +18,6 @@ public class AttackState : State
 		Unsnap();
 		touchedWall = false;
 		touchedGround = false;
-		
-		/*if(ch.grounded)
-		{
-			if(!ch.crouching && ch.downHeld) ch.Crouch();
-			else if(ch.crouching && !ch.downHeld) ch.Uncrouch();
-		}*/
 	}
 	
 	public override void SetInputs()
@@ -37,7 +31,6 @@ public class AttackState : State
 		if(att?.currentPart is null) return;
 		if(ch.InputtingHorizontalDirection) DoInputMovement();
 		DoFriction();
-		
 	}
 	
 	protected virtual void DoInputMovement()
@@ -57,28 +50,22 @@ public class AttackState : State
 	
 	protected override void DoGravity()
 	{
-		if(att?.currentPart is null) return;
-		
-		if(ch.grounded)
-		{
-			if(att.currentPart.movement.y >= 0)
-			{
-				ch.vec.y = VCF;
-				snapVector = -VCF * ch.fnorm;
-			}
-			else Unsnap();
-		}
+		//aerial
+		if(!ch.grounded) ch.vec.y.Towards(ch.AppropriateFallingSpeed, ch.AppropriateGravity);
+		//grounded and moves up
+		else if((att?.currentPart?.movement.y ?? 0) < 0) Unsnap();
+		//grounded and moves down
 		else
 		{
-			ch.vec.y.Towards(ch.AppropriateFallingSpeed, ch.AppropriateGravity);
+			ch.vec.y = VCF;
+			snapVector = -VCF * ch.fnorm;
 		}
 	}
 	
 	protected override void LoopActions()
 	{
 		SetupCollisionParamaters();
-		//SetupCollisionParamaters();
-		if(ch.walled && ch.currentClingsUsed < ch.maxClingsAllowed && !touchedWall)
+		if(ch.walled && ch.HasResource("Clings") && !touchedWall)
 		{
 			ch.RestoreOptionsOnWallTouch();
 			ch.vec.y *= (1-ch.wallFriction*ch.wfric);

@@ -6,7 +6,13 @@ public class Attack : Node2D
 {
 	public AttackPart start;
 	public AttackPart currentPart;
-	public Character ch;
+	
+	protected Character ch;
+	public IAttacker OwnerObject{get => ch; set
+		{
+			if(value is Character c) ch = c;
+		}
+	}
 	
 	public AttackPart lastUsedPart;
 	
@@ -18,6 +24,8 @@ public class Attack : Node2D
 	public int stunMult = 1;
 	
 	public State connected = null;
+	
+	public List<string> sharesCooldownWith = new List<string>();
 	
 	public Dictionary<string, ParamRequest> LoadExtraProperties = new Dictionary<string, ParamRequest>();
 	

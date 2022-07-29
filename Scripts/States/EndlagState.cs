@@ -79,7 +79,7 @@ public class EndlagState : State
 					ch.ChangeState(ch.IsIdle?"Idle":"Walk");
 				}
 			}
-			else if(ch.walled && ch.currentClingsUsed < ch.maxClingsAllowed)
+			else if(ch.walled && ch.HasResource("Clings"))
 			{
 				if(!s.touchedWall) ch.RestoreOptionsOnWallTouch();
 				else ch.vec.y *= (1-ch.wallFriction*ch.wfric);

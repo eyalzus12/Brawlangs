@@ -26,6 +26,7 @@ public class GenericInvincibleState : State
 	{
 		IFramesStarted = false;
 		IsInEndlag = false;
+		ch.GiveResource(ActionName(), -1);
 		ch.PlayAnimation(animation);
 	}
 	

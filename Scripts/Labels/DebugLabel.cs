@@ -61,7 +61,7 @@ public class DebugLabel : InfoLabel
 		Add("AnimationLooping", ch.sprite.currentSheet.loop);
 		Add("AnimationFrame", ch.sprite.Frame);
 		Newline();
-		Add("PlayedSounds", ch.audioManager.ToString());
+		Add("PlayedSounds", ch.Audio.ToString());
 		Newline();
 		Add("Velocity",  ch.GetRoundedVelocity());
 		Add("Position", ch.GetRoundedPosition());
@@ -84,12 +84,6 @@ public class DebugLabel : InfoLabel
 		Add("Right", ch.rightHeld);
 		Add("Down", ch.downHeld);
 		Add("Up", ch.upHeld);
-		Newline();
-		Add("AirJumpsUsed", ch.currentAirJumpsUsed);
-		Add("ClingsUsed", ch.currentClingsUsed);
-		Add("GotOptionsFromHitting", ch.gotOptionsFromHitting);
-		Add("GotOptionsFromGettingHit", ch.gotOptionsFromGettingHit);
-		Add("HasDodge", ch.hasDodge);
 		Newline();
 		Add("LeftInput",GetInputString("player_left"));
 		Add("RightInput", GetInputString("player_right"));
@@ -118,9 +112,8 @@ public class DebugLabel : InfoLabel
 		Newline();
 		
 		var cdstring = new StringBuilder();
-		foreach(var entry in ch.actionCooldowns)
-			if(entry.Value != 0)
-				cdstring.Append($"{entry.Key.ToString()} : {entry.Value.ToString()}\n");
+		foreach(var entry in ch.cooldowns)
+			cdstring.Append($"{entry.Key.ToString()} : {entry.Value.ToString()}\n");
 		
 		Add("Cooldowns", "\n"+cdstring.ToString());
 		Newline();
@@ -132,6 +125,13 @@ public class DebugLabel : InfoLabel
 		Add("InvincibilityTimers", "\n"+itstring.ToString());
 		Newline();
 		
+		var rstring = new StringBuilder();
+		foreach(var entry in ch.resources)
+			rstring.Append($"{entry.Key.ToString()} : {entry.Value.ToString()}\n");
+		
+		Add("Resources", "\n"+rstring.ToString());
+		Newline();
+		
 		Add("FPS", Engine.GetFramesPerSecond());
 		Add("PhysicsFrame", Engine.GetPhysicsFrames());
 		Add("DebugBuild", OS.IsDebugBuild());
@@ -141,19 +141,19 @@ public class DebugLabel : InfoLabel
 	protected override bool EnsureCorrectAppearence() => (this.GetDataOrDefault("CurrentInfoLabelCharacter",0).i() == ch.TeamNumber);
 	
 	private string GetInputString(string s) =>
-		ch.Inputs.IsActionJustPressed(s)?"Pressed":
-		ch.Inputs.IsActionPressed(s)?"Held":
-		ch.Inputs.IsActionJustReleased(s)?"Released":
-		"Free";
+		ch.Inputs.IsActionJustPressed(s)?"P"://press
+		ch.Inputs.IsActionPressed(s)?"H"://hold
+		ch.Inputs.IsActionJustReleased(s)?"R"://release
+		"F";//free
 		
 	private string GetStringDirection(int dir)
 	{
 		switch(dir)
 		{
-			case 1: return "Right";
-			case -1: return "Left";
-			case 0: return "None";
-			default: return "ERROR";
+			case 1: return "R";
+			case -1: return "L";
+			case 0: return "N";
+			default: return "E R R O R";
 		}
 	}
 }

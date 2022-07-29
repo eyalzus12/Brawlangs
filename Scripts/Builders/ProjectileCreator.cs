@@ -74,7 +74,7 @@ public class ProjectileCreator
 		{
 			var hr = new Hurtbox();
 			hr.Name = hurtbox;
-			hr.owner = proj;
+			hr.OwnerObject = proj;
 			proj.AddChild(hr);
 			hr.Owner = proj;
 			proj.Hurtboxes.Add(hr);
@@ -84,7 +84,7 @@ public class ProjectileCreator
 		{
 			var hr = new Hurtbox();
 			hr.Name = hurtboox;
-			hr.owner = proj;
+			hr.OwnerObject = proj;
 			proj.AddChild(hr);
 			hr.Owner = proj;
 			proj.Hurtboxes.Add(hr);
@@ -124,7 +124,7 @@ public class ProjectileCreator
 		var HitboxScript = inif[section, "Script", ""].s();
 		var baseFolder = path.SplitByLast('/')[0];
 		var h = TypeUtils.LoadScript<Hitbox>(HitboxScript, new Hitbox(), baseFolder);
-		h.owner = p;
+		h.OwnerObject = p;
 		h.Name = section;
 		
 		var sk = inif[section, "SetKnockback", Vector2.Zero].v2();

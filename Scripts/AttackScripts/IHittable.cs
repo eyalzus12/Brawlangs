@@ -5,6 +5,7 @@ using System.Collections.Generic;
 public interface IHittable
 {
 	Vector2 Position{get; set;}
+	int Direction{get; set;}
 	
 	int TeamNumber{get; set;}
 	void HandleGettingHit(HitData data);

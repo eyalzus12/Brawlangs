@@ -148,7 +148,7 @@ public class CharacterCreator
 		}
 		
 		ch.AddChild(am);
-		ch.audioManager = am;
+		ch.Audio = am;
 	}
 	
 	public AudioStream GenerateAudioFromPath(string path, bool loop = false)

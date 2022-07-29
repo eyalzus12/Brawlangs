@@ -27,7 +27,7 @@ public class AirJumpState : AirState
 		{
 			jumpActive = true;
 			ch.vec.y = -ch.doubleJumpHeight;
-			ch.currentAirJumpsUsed++;
+			ch.GiveResource("AirJumps", -1);
 			ch.fastfalling = false;
 			Unsnap();
 		}

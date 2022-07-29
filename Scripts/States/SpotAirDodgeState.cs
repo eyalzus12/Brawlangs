@@ -14,12 +14,6 @@ public class SpotAirDodgeState : GenericInvincibleState
 	public override string ActionName() => "Dodge";
 	public override string Animation() => "SpotAirDodge";
 	
-	public override void Init()
-	{
-		base.Init();
-		ch.hasDodge = false;
-	}
-	
 	protected override void OnIFramesStart()
 	{
 		ch.vec = Vector2.Zero;

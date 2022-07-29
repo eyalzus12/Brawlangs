@@ -45,7 +45,7 @@ public class JumpState : GroundedState
 	
 	protected override void DoDodge()
 	{
-		if(ch.IsActionInCooldown("Dodge")) return;
+		if(ch.InCooldown("Dodge")) return;
 		ch.ChangeState("DirectionalAirDodge");
 		MarkForDeletion("player_dodge", true);
 	}

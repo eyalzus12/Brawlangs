@@ -54,7 +54,7 @@ public class AttackPart : Node2D, IHitter
 	public AnimationPlayer hitboxPlayer;
 	public Attack att;
 	
-	public Character ch;
+	protected Character ch;
 	public IAttacker OwnerObject{get => ch; set
 		{
 			if(value is Character c) ch = c;
@@ -237,8 +237,10 @@ public class AttackPart : Node2D, IHitter
 	public virtual void HandleInitialHit(Hitbox hitbox, Hurtbox hurtbox)
 	{
 		if(!hitbox.Active) return;
-		var hitChar = hurtbox.owner;
-		if(!CanHit(hitChar)) return;
+		hit = true;
+		ch.IsHitting = true;
+		ch.LastHit = hurtbox.OwnerObject;
+		var hitChar = hurtbox.OwnerObject;
 		
 		var current = new Hitbox();
 		if(hitList.TryGetValue(hurtbox, out current))
@@ -259,9 +261,8 @@ public class AttackPart : Node2D, IHitter
 		{
 			Hitbox hitbox = entry.Value;
 			Hurtbox hurtbox = entry.Key;
-			var hitChar = hurtbox.owner;
-			if(!ch.CanHit(hitChar) || ignoreList.Contains(hitChar)) continue;
-			hit = true;
+			var hitChar = hurtbox.OwnerObject;
+			
 			HitEvent(hitbox, hurtbox);
 			
 			var kmult = ch.KnockbackDoneMult*knockbackMult*att.knockbackMult*hitbox.GetKnockbackMultiplier(hitChar);
@@ -276,11 +277,11 @@ public class AttackPart : Node2D, IHitter
  			
 			var data = new HitData(skb, vkb, damage, stun, hitbox.hitpause, hitbox, hurtbox);
 			
-			hitChar.HandleGettingHit(data);
 			ignoreList.Add(hitChar);
-			GD.Print($"{(hitChar as Node2D).Name} was hit by {hitbox.Name}");
+			//GD.Print($"{(hitChar as Node2D).Name} was hit by {hitbox.Name} on {Engine.GetPhysicsFrames()}");
 			att.OnHit(hitbox, hurtbox);
 			ch.HandleHitting(data);
+			hitChar.HandleGettingHit(data);
 		}
 		hitList.Clear();
 	}

@@ -3,23 +3,24 @@ using System;
 
 public class LimitedAttack : Attack
 {
-	public int amountUsed;
-	public int AmountCanUse = -1;
+	public string ResourceName;
+	public int AmountCanUse;
 	
 	public override void Init()
 	{
-		amountUsed = 0;
+		ch.GiveResource(ResourceName, AmountCanUse);
 	}
 	
 	public override void LoadProperties()
 	{
-		LoadExtraProperty<int>("AmountCanUse", -1);
+		LoadExtraProperty<int>("AmountCanUse", 1);
+		LoadExtraProperty<string>("ResourceName", "");
 	}
 	
 	public override void OnStart()
 	{
-		amountUsed++;
+		ch.GiveResource(ResourceName, -1);
 	}
 	
-	public override bool CanActivate() => (AmountCanUse <= -1)||(amountUsed < AmountCanUse);
+	public override bool CanActivate() => ch.HasResource(ResourceName);
 }

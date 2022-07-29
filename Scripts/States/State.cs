@@ -54,7 +54,7 @@ public class State : Node
 		
 		if(Inputs.IsActionJustPressed("player_jump"))
 			DoJump();
-		if(Inputs.IsActionJustPressed("player_dodge") && ch.hasDodge)
+		if(Inputs.IsActionJustPressed("player_dodge"))
 			DoDodge();
 		
 		if(this == ch.currentState && actionable && ch.currentAttack is null)

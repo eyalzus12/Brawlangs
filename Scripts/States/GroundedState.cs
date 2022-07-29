@@ -44,17 +44,12 @@ public class GroundedState : State
 	
 	protected override void DoDodge()
 	{
-		if(!actionable || jump) return;
+		if(!actionable || jump || !ch.HasResource("Dodge")) return;
 		
-		if(ch.InputtingHorizontalDirection)
+		if(ch.InputtingHorizontalDirection && !ch.InCooldown("Dodge"))
 		{
-			//var choice = (ch.InputtingTurn()?"Back":"Forward") + "Roll";
-			//if(!ch.IsActionInCooldown(choice)) ch.ChangeState(choice);
-			if(!ch.IsActionInCooldown("Dodge"))
-			{
-				ch.ChangeState("DirectionalAirDodge");
-				MarkForDeletion("player_dodge", true);
-			}
+			ch.ChangeState("DirectionalAirDodge");
+			MarkForDeletion("player_dodge", true);
 		}
 	}
 	

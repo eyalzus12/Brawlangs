@@ -45,11 +45,15 @@ public class AttackCreator
 		var baseFolder = path.SplitByLast('/')[0];
 		var a = TypeUtils.LoadScript<Attack>(AttackScript, new Attack(), baseFolder);
 		var ch = n as Character;
-		a.ch = ch;
+		a.OwnerObject = ch;
 		a.Name = section;
 		
 		var fric = inif[section, "Friction", 1f].f();
 		a.attackFriction = fric;
+		
+		object oSharesCooldownWith = inif[section, "SharesCooldownWith", new List<string>()];
+		if(oSharesCooldownWith is string CooldownShareStr) a.sharesCooldownWith.Add(CooldownShareStr);
+		else a.sharesCooldownWith.AddRange(oSharesCooldownWith.ls());
 		
 		var StartPartSection = inif[section, "StartPart", ""].s();
 		object oPartSections = inif[section, "Parts", new List<string>()];
@@ -67,9 +71,9 @@ public class AttackCreator
 		
 		n.AddChild(a);
 		a.Owner = n;//for scene packing
-		ch.attacks.Add(a);
+		//ch.attacks.Add(a);
 		ch.attackDict.Add(a.Name, a);
-		ch.actionCooldowns.Add(a.Name, 0);
+		//ch.cooldowns.Add(a.Name, 0);
 	}
 	
 	public AttackPart BuildPart(Attack a, string section, string start)
@@ -78,7 +82,7 @@ public class AttackCreator
 		var baseFolder = path.SplitByLast('/')[0];
 		var ap = TypeUtils.LoadScript<AttackPart>(PartScript, new AttackPart(), baseFolder);
 		ap.att = a;
-		ap.ch = a.ch;
+		ap.OwnerObject = a.OwnerObject;
 		ap.Name = section;
 		if(section == start) a.start = ap;
 		
@@ -157,8 +161,7 @@ public class AttackCreator
 		var baseFolder = path.SplitByLast('/')[0];
 		var h = TypeUtils.LoadScript<Hitbox>(HitboxScript, new Hitbox(), baseFolder);
 		h.Name = section;
-		var ch = ap.ch;
-		h.owner = ap;
+		h.OwnerObject = ap;
 		
 		var sk = inif[section, "SetKnockback", Vector2.Zero].v2();
 		h.setKnockback = sk;
@@ -177,7 +180,7 @@ public class AttackCreator
 		var cm = inif[section, "MomentumCarry", Vector2.Zero].v2();
 		h.momentumCarry = cm;
 		var hs = inif[section, "HitSound", "DefaultHit"].s();
-		if(ch.audioManager.sounds.ContainsKey(hs)) h.hitSound = ch.audioManager.sounds[hs];
+		if(ap.OwnerObject.Audio.sounds.ContainsKey(hs)) h.hitSound = ap.OwnerObject.Audio.sounds[hs];
 		else GD.Print($"Hit sound {hs} for hitbox {section} in file at path {inif.filePath} could not be found.");
 		
 		var af = inif[section, "ActiveFrames", new List<Vector2>()];

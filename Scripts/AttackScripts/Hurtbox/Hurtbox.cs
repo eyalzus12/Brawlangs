@@ -20,7 +20,7 @@ public class Hurtbox : Area2D
 		get => col.Position;
 		set
 		{
-			var val = value*new Vector2(direction, 1);
+			var val = value*new Vector2(OwnerObject.Direction, 1);
 			col?.SetDeferred("position", val);
 			originalPosition = value;
 		}
@@ -31,7 +31,7 @@ public class Hurtbox : Area2D
 		get => col.Rotation;
 		set
 		{
-			var val = value*direction;
+			var val = value*OwnerObject.Direction;
 			col?.SetDeferred("rotation", val);
 			originalRotation = value;
 		}
@@ -40,7 +40,7 @@ public class Hurtbox : Area2D
 	public Vector2 originalPosition = Vector2.Zero;
 	public float originalRotation = 0f;
 	
-	public IHittable owner;
+	public IHittable OwnerObject{get; set;}
 	
 	public override void _Ready()
 	{
@@ -108,7 +108,4 @@ public class Hurtbox : Area2D
 	}
 	
 	public virtual Color GetDrawColor() => new Color(0,1,0,1);
-	
-	public virtual int GetDirection() => (((Node2D)owner)?.Get("direction")??1).i();
-	public int direction => GetDirection();
 }

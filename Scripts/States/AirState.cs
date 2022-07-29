@@ -44,12 +44,12 @@ public class AirState : State
 	
 	protected override void DoJump()
 	{
-		if(ch.currentAirJumpsUsed < ch.maxAirJumpsAllowed) jump = true;
+		if(ch.HasResource("AirJumps")) jump = true;
 	}
 	
 	protected override void DoDodge()
 	{
-		if(!actionable/* || ch.IsActionInCooldown("Dodge")*/) return;
+		if(!actionable || !ch.HasResource("Dodge") || ch.InCooldown("Dodge")) return;
 		ch.ChangeState((ch.InputtingDirection?"Directional":"Spot")+"AirDodge");
 		MarkForDeletion("player_dodge", true);
 	}
@@ -103,7 +103,7 @@ public class AirState : State
 	protected override bool CalcStateChange()
 	{
 		if(jump) ch.ChangeState<AirJumpState>();
-		else if(ch.walled && ch.currentClingsUsed < ch.maxClingsAllowed) ch.ChangeState<WallLandState>();
+		else if(ch.walled && ch.HasResource("Clings")) ch.ChangeState<WallLandState>();
 		else if(ch.grounded)
 		{
 			if(ch.onSemiSolid && ch.downHeld)
