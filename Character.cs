@@ -184,8 +184,8 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public float AppropriateBounce => PlatBounce * (grounded?floorBounce:walled?wallBounce:ceilinged?ceilingBounce:0f);
 	public float AppropriateAcceleration => (grounded?groundAcceleration:airAcceleration);
 	public float AppropriateSpeed => (crouching?crawlSpeed:grounded?groundSpeed:airSpeed);
-	public float AppropriateGravity => (currentAttack?.currentPart.gravityMultiplier ?? 1f)*((currentState is StunState)?stunGravity:fastfalling?walled?wallFastFallGravity:fastFallGravity:walled?wallGravity:gravity);
-	public float AppropriateFallingSpeed => (currentAttack?.currentPart.gravityMultiplier ?? 1f)*((currentState is StunState)?stunFallSpeed:fastfalling?walled?wallFastFallSpeed:fastFallSpeed:walled?wallFallSpeed:fallSpeed);
+	public float AppropriateGravity => (currentAttack?.currentPart?.gravityMultiplier ?? 1f)*((currentState is StunState)?stunGravity:fastfalling?walled?wallFastFallGravity:fastFallGravity:walled?wallGravity:gravity);
+	public float AppropriateFallingSpeed => (currentAttack?.currentPart?.gravityMultiplier ?? 1f)*((currentState is StunState)?stunFallSpeed:fastfalling?walled?wallFastFallSpeed:fastFallSpeed:walled?wallFallSpeed:fallSpeed);
 	
 	public bool InputtingTurn => (GetFutureDirection() != direction);
 	public bool InputtingHorizontalDirection => leftHeld||rightHeld;

@@ -82,23 +82,27 @@ public class IniFile
 	{
 		var ll = Clean(l);
 		var section = "";
-		foreach(var s in ll)
+		for(int i = 0; i < ll.Count; ++i)
 		{
-			if(s[0] == '[' && s[s.Length - 1] == ']')
+			var s = ll[i];
+			if(s[0] == '[')
 			{
+				if(s[s.Length - 1] != ']') throw new Exception($"File {filePath}: Opening [ without closing ] found in line {i}");
 				section = s.Substring(1, s.Length-2);
+				if(dict.ContainsKey(section)) throw new Exception($"File {filePath}: Duplicate section name {section} in line {i}");
 				dict.Add(section, new Dictionary<string, object>());
 			}
 			else
 			{
-				Store(section, s);
+				Store(section, s, i);
 			}
 		}
 	}
 	
-	private void Store(string key, string line)
+	private void Store(string key, string line, int lineCount)
 	{
 		var leftright = line.Split('=');//split to left side and right side
+		if(leftright.Length != 2) throw new Exception($"File {filePath}: Improper amount of =s in line {lineCount}");
 		var left = leftright[0].Trim();//left side
 		var right = leftright[1].Trim();//right side
 		var parts = right.Split(',');//split right side to parts by commas
@@ -119,6 +123,7 @@ public class IniFile
 					}
 					else
 					{
+						if(parts.Length <= 2) throw new Exception($"File {filePath}: No closing ) found in line {lineCount}");
 						var trim2 = parts[i+2].Trim();//get third element
 						if(trim2[trim2.Length-1] == ')')//is really a vector
 						{
@@ -127,11 +132,16 @@ public class IniFile
 						}
 						else
 						{
+							if(parts.Length <= 3) throw new Exception($"File {filePath}: No closing ) found in line {lineCount}");
 							var trim3 = parts[i+3].Trim();//get fourth element
 							if(trim3[trim3.Length-1] == ')')//is really a vector
 							{
 								store.Add(element + ',' + trim1 + ',' + trim2 + ',' + trim3);//add
 								i += 3;
+							}
+							else
+							{
+								throw new Exception($"File {filePath}: Too many arguments in vector in line {lineCount}");
 							}
 						}//end of Quat else
 					}//end of Vector3 else
@@ -141,6 +151,7 @@ public class IniFile
 		}//end of list check
 		else store.Add(right);
 		
+		if(dict[key].ContainsKey(left)) throw new Exception($"File {filePath}: Duplicate property {left} in line {lineCount}");
 		dict[key].Add(left, Norm(store));
 	}
 	
@@ -154,9 +165,6 @@ public class IniFile
 				return Norm(l[0]);
 			default:
 				return l.Select(Norm).ToList();
-				/*var lo = new List<object>();
-				foreach(var s in l) lo.Add(Norm(s));
-				return lo;*/
 		}
 	}
 	
@@ -250,17 +258,6 @@ public class IniFile
 	}
 	
 	private Strl Clean(Strl l) => l.Select(Clean).Where(s => s != "").ToList<string>();
-	/*{
-		Strl ll = new Strl();
-		
-		foreach(var s in l)
-		{
-			string h = Clean(s);
-			if(h != "") ll.Add(h);
-		}
-		
-		return ll;
-	}*/
 	
 	private string Clean(string s) => s.Split(';')[0].Trim();
 }

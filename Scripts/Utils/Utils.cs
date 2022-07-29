@@ -17,7 +17,6 @@ public static class Utils
 	
 	public static bool Flip(ref this bool b) => (b = !b);
 	
-	
 	public static TResult Fork<T, T1, T2, TResult>(this T o, Func<T, T1> f1, Func<T, T2> f2, Func<T1, T2, TResult> f) => f(f1(o), f2(o));
 	public static object Fork(this object o, Func<object, object> f1, Func<object, object> f2, Func<object, object, object> f) => o.Fork<object, object, object, object>(f1, f2, f);
 	

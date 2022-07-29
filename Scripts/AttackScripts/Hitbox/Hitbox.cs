@@ -190,7 +190,7 @@ public class Hitbox : Area2D
 		{
 			case AngleFlipper.Away:
 			case AngleFlipper.AwayCharacter:
-				return Math.Sign((hitChar.Position-OwnerObject.Position).x);
+				return Math.Sign((hitChar.Position-OwnerObject.OwnerObject.Position).x);
 			case AngleFlipper.AwayHitbox:
 				return Math.Sign((hitChar.Position-Position).x);
 			case AngleFlipper.None:
@@ -207,7 +207,7 @@ public class Hitbox : Area2D
 		{
 			case AngleFlipper.Away:
 			case AngleFlipper.AwayCharacter:
-				return Math.Sign((hitChar.Position-OwnerObject.Position).y);
+				return Math.Sign((hitChar.Position-OwnerObject.OwnerObject.Position).y);
 			case AngleFlipper.AwayHitbox:
 				return Math.Sign((hitChar.Position-Position).y);
 			case AngleFlipper.None:

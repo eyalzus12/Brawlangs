@@ -68,7 +68,6 @@ public class Attack : Node2D
 	
 	public void SetPart(AttackPart newPart)
 	{
-		//GD.Print($"Part set to {newPart}. current is {currentPart}");
 		if(newPart is null) Stop();
 		else if(currentPart != newPart)
 		{
