@@ -6,8 +6,6 @@ public class WavedashState : GroundedState
 	public WavedashState() : base() {}
 	public WavedashState(Character link) : base(link) {}
 	
-	public override bool IsActionable() => true;
-	
 	public override void Init()
 	{
 		ch.vec.y = VCF;
@@ -20,7 +18,8 @@ public class WavedashState : GroundedState
 	
 	protected override void LoopActions()
 	{
-		if(Math.Sign(ch.vec.x) != ch.direction && ch.GetInputDirection() == ch.direction)//koopabackdashwaveslidehoverwalkmoonlanding
+		//koopabackdashwaveslidehoverwalkmoonlanding
+		if(Math.Sign(ch.vec.x) != ch.Direction && ch.InputDirection == ch.Direction)
 		{
 			ch.vec.x.Towards(0, ch.groundAcceleration);
 		}
@@ -36,7 +35,7 @@ public class WavedashState : GroundedState
 	protected override void DoJump()
 	{
 		ch.TurnConditional();
-		ch.ChangeState("Jump");
+		ch.States.Change("Jump");
 		MarkForDeletion("player_jump", true);
 	}
 	
@@ -76,11 +75,11 @@ public class WavedashState : GroundedState
 	protected override bool CalcStateChange()
 	{
 		if(base.CalcStateChange()) return true;
-		else if(ch.IsIdle) ch.ChangeState<IdleState>();
+		else if(ch.Idle) ch.States.Change("Idle");
 		else if(Math.Abs(ch.vec.x) < ch.groundSpeed)
 		{
-			if(ch.InputtingHorizontalDirection) ch.ChangeState<WalkState>();
-			else ch.ChangeState<WalkStopState>();
+			if(ch.InputtingHorizontalDirection) ch.States.Change("Walk");
+			else ch.States.Change("WalkStop");
 		}
 		else return false;
 			

@@ -6,7 +6,7 @@ public class DuckState : BaseCrouchState
 	public DuckState() : base() {}
 	public DuckState(Character link) : base(link) {}
 	
-	public override bool IsActionable() => false;
+	public override bool Actionable => false;
 	
 	public override void Init()
 	{
@@ -24,8 +24,8 @@ public class DuckState : BaseCrouchState
 		if(base.CalcStateChange()) return true;
 		else if(frameCount >= ch.duckLength)
 		{
-			if(ch.InputtingHorizontalDirection) ch.ChangeState("Crawl");
-			else ch.ChangeState("Crouch");
+			if(ch.InputtingHorizontalDirection) ch.States.Change("Crawl");
+			else ch.States.Change("Crouch");
 		}
 		else return false;
 		

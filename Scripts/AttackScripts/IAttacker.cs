@@ -12,8 +12,12 @@ public interface IAttacker
 	float StunDoneMult{get; set;}
 	int TeamNumber{get; set;}
 	
-	bool IsHitting{get; set;}
-	IHittable LastHit{get; set;}
+	bool Hitting{get; set;}
+	IHittable LastHitee{get; set;}
+	
+	bool Clashing{get; set;}
+	HitData ClashData{get; set;}
+	void HandleClashing(HitData data);
 	
 	Attack CurrentAttack{get; set;}
 	Dictionary<string, Attack> Attacks{get; set;}

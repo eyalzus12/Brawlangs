@@ -6,12 +6,11 @@ public class RollState : GenericInvincibleState
 	public RollState() : base() {}
 	public RollState(Character link) : base(link) {}
 	
-	public virtual float Speed() => 0f;
-	public float speed => Speed();
+	public virtual float Speed{get;}
 	
 	protected override void OnIFramesStart()
 	{
-		ch.vec = new Vector2(ch.direction*speed, VCF);
+		ch.vec = new Vector2(ch.Direction*Speed, VCF);
 	}
 	
 	protected override void OnEndlagStart()
@@ -23,15 +22,10 @@ public class RollState : GenericInvincibleState
 	{
 		bool turn = ch.TurnConditional();
 		
-		if(Inputs.IsActionJustPressed("player_jump"))
-			ch.ChangeState("Jump");
-		else if(Inputs.IsActionPressed("player_down") && !ch.onSemiSolid) 
-			ch.ChangeState("Duck");
-		else if(turn)
-			ch.ChangeState("WalkTurn");
-		else if(ch.InputtingHorizontalDirection)
-			ch.ChangeState(ch.walled?"WalkWall":"Walk");
-		else
-			ch.ChangeState("Idle");
+		if(Inputs.IsActionJustPressed("player_jump")) ch.States.Change("Jump");
+		else if(Inputs.IsActionPressed("player_down") && !ch.onSemiSolid) ch.States.Change("Duck");
+		else if(turn) ch.States.Change("WalkTurn");
+		else if(ch.InputtingHorizontalDirection) ch.States.Change(ch.walled?"WalkWall":"Walk");
+		else ch.States.Change("Idle");
 	}
 }

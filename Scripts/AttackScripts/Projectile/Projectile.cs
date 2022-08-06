@@ -15,30 +15,28 @@ public class Projectile : Node2D, IHitter, IHittable
 	[Export]
 	public int maxLifetime = 0;
 	
-	public int direction = 1;
-	public int Direction{get => direction; set => direction = value;}
+	public int Direction{get; set;}
 	
 	public ProjectileMovementFunction Movement;
 	public int frameCount = 0;
 	
-	private List<Hitbox> _hitboxes = new List<Hitbox>();
-	public List<Hitbox> Hitboxes{get => _hitboxes; set => _hitboxes=value;}
+	public List<Hitbox> Hitboxes{get; set;} = new List<Hitbox>();
 	
-	private HashSet<IHittable> _ignoreList = new HashSet<IHittable>();
-	public HashSet<IHittable> HitIgnoreList{get => _ignoreList; set => _ignoreList=value;}
+	public Dictionary<Hurtbox, Hitbox> HitList{get; set;} = new Dictionary<Hurtbox, Hitbox>();
+	public HashSet<IHittable> HitIgnoreList{get; set;} = HashSet<IHittable>();
 	
-	private Dictionary<Hurtbox, Hitbox> _hitList = new Dictionary<Hurtbox, Hitbox>();
-	public Dictionary<Hurtbox, Hitbox> HitList{get => _hitList; set => _hitList=value;}
+	public bool HasHit{get; set;}
+	public bool GettingHit{get; set;}
+	public IHitter LastHitter{get; set;}
 	
-	private bool _hit = false;
-	public bool Hit{get => _hit; set => _hit=value;}
-	
-	private IAttacker _owner;
-	public IAttacker OwnerObject{get => _owner; set => _owner=value;}
+	public IAttacker OwnerObject{get; set;}
 	
 	public string currentCollisionSetting;
-	private List<Hurtbox> _hurtboxes = new List<Hurtbox>();
-	public List<Hurtbox> Hurtboxes{get => _hurtboxes; set => _hurtboxes=value;}
+	
+	public InvincibilityManager IFrames{get; set;} = new InvincibilityManager();
+	public bool Invincible => IFrames.Count > 0;
+	
+	public List<Hurtbox> Hurtboxes{get; set;} = new List<Hurtbox>();
 	
 	public int TeamNumber{get => OwnerObject.TeamNumber; set => OwnerObject.TeamNumber = value;}
 	
@@ -79,9 +77,10 @@ public class Projectile : Node2D, IHitter, IHittable
 	public override void _Ready()
 	{
 		frameCount = 0;
-		Position = spawningPosition+((Node2D)OwnerObject).Position;
+		Position = spawningPosition + OwnerObject.Position;
 		ConnectSignals();
-		Hit = false;
+		HasHit = false;
+		GettingHit = false;
 		Init();
 		Active = true;
 		Hitboxes.ForEach(InitHitbox);
@@ -98,6 +97,7 @@ public class Projectile : Node2D, IHitter, IHittable
 	public override void _PhysicsProcess(float delta)
 	{
 		if(!Active) return;
+		GettingHit = false;
 		++frameCount;
 		HandleHits();
 		Loop();
@@ -115,6 +115,7 @@ public class Projectile : Node2D, IHitter, IHittable
 	public void Destruct()
 	{
 		OnRemove();
+		GettingHit = false;
 		Hitboxes.ForEach(h => h.Active = false);
 		DisonnectSignals();
 		Active = false;
@@ -172,7 +173,6 @@ public class Projectile : Node2D, IHitter, IHittable
 			var hitChar = hurtbox.OwnerObject;
 			if(!CanHit(hitChar)) continue;//already hit or cant hit
 			HitEvent(hitbox, hurtbox);
-			Hit = true;
 			
 			var kmult = OwnerObject.KnockbackDoneMult*KnockbackDoneMult*hitbox.GetKnockbackMultiplier(hitChar);
 			var dmult = OwnerObject.DamageDoneMult*DamageDoneMult*hitbox.GetDamageMultiplier(hitChar);
@@ -207,6 +207,4 @@ public class Projectile : Node2D, IHitter, IHittable
 	public virtual void HandleGettingHit(HitData data) => Destruct();
 	
 	public bool CanHit(IHittable h) => (h != this) && OwnerObject.CanHit(h) && !HitIgnoreList.Contains(h);
-	
-	public virtual bool IsInvincible() => false;
 }

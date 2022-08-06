@@ -7,6 +7,7 @@ public class PlatformDropDetector : Area2D
 	public Shape2D Shape{get => collision.Shape; set => collision.Shape = value;}
 	public RectangleShape2D RShape{get => (RectangleShape2D)Shape; set => Shape = value;}
 	public Vector2 Extents{get => RShape.Extents; set => RShape.Extents = value;}
+	public int Direction => owner.Direction;
 	public Character owner;
 	public Vector2 originalPosition = Vector2.Zero;
 	
@@ -15,7 +16,7 @@ public class PlatformDropDetector : Area2D
 		get => collision.Position;
 		set
 		{
-			var val = value*new Vector2(direction, 1);
+			var val = value*new Vector2(Direction, 1);
 			collision?.SetDeferred("position", val);
 			originalPosition = value;
 		}
@@ -28,12 +29,10 @@ public class PlatformDropDetector : Area2D
 		collision.Name = "DropCollision";
 		AddChild(collision);
 		originalPosition = CollisionPosition;
-		Connect("body_exited", owner, "OnSemiSolidLeave");
+		//Connect("body_exited", owner, "OnSemiSolidLeave");
 		CollisionLayer = 0;
 		CollisionMask = 0b10;
 	}
-	
-	
 	
 	public void UpdateBasedOnCollisionShape() => UpdateBasedOnCollisionShape(owner.collision);
 	private const float Y_EXTENTS = 1f;
@@ -59,7 +58,4 @@ public class PlatformDropDetector : Area2D
 		Extents = desiredExtents;
 		CollisionPosition = desiredPosition;
 	}
-	
-	public virtual int GetDirection() => owner.direction;
-	public int direction => GetDirection();
 }

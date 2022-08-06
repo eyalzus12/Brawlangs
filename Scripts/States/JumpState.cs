@@ -8,7 +8,7 @@ public class JumpState : GroundedState
 	public JumpState() : base() {}
 	public JumpState(Character link) : base(link) {}
 	
-	public override bool IsActionable() => false;
+	public override bool Actionable => false;
 	
 	public override void Init()
 	{
@@ -17,7 +17,7 @@ public class JumpState : GroundedState
 		ch.vac = Vector2.Zero;
 		jump = false;
 		jumpActive = false;
-		if(ch.currentAttack is null)
+		if(ch.CurrentAttack is null)
 		{
 			SetupCollisionParamaters();
 			AdjustVelocity();
@@ -45,8 +45,8 @@ public class JumpState : GroundedState
 	
 	protected override void DoDodge()
 	{
-		if(ch.InCooldown("Dodge")) return;
-		ch.ChangeState("DirectionalAirDodge");
+		if(ch.Cooldowns.InCooldown("Dodge")) return;
+		ch.States.Change("DirectionalAirDodge");
 		MarkForDeletion("player_dodge", true);
 	}
 	
@@ -60,7 +60,7 @@ public class JumpState : GroundedState
 		if(!ch.grounded && jumpActive)
 		{
 			ch.ApplySettings("Default");
-			ch.ChangeState("Air");
+			ch.States.Change("Air");
 		}
 		else return false;
 		

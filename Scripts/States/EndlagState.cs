@@ -9,7 +9,7 @@ public class EndlagState : State
 	public int endlag = 0;
 	public Attack att = null;
 	
-	public override bool IsActionable() => false;
+	public override bool Actionable => false;
 	
 	public override void Init()
 	{
@@ -52,7 +52,7 @@ public class EndlagState : State
 	{
 		if(frameCount >= endlag)
 		{
-			var s = ch.GetState<AttackState>();
+			var s = ch.States.Get<AttackState>();
 			ch.TurnConditional();
 			ch.SetCollisionMaskBit(DROP_THRU_BIT, true);
 			
@@ -65,28 +65,28 @@ public class EndlagState : State
 					{
 						ch.SetCollisionMaskBit(DROP_THRU_BIT, false);
 						ch.vic.y = VCF;
-						ch.ChangeState("Air");
+						ch.States.Change("Air");
 					}
 					else
 					{
 						ch.Crouch();
-						ch.ChangeState(ch.IsIdle?"Crouch":"Crawl");
+						ch.States.Change(ch.Idle?"Crouch":"Crawl");
 					}
 				}
 				else
 				{
 					ch.Uncrouch();
-					ch.ChangeState(ch.IsIdle?"Idle":"Walk");
+					ch.States.Change(ch.Idle?"Idle":"Walk");
 				}
 			}
-			else if(ch.walled && ch.HasResource("Clings"))
+			else if(ch.walled && ch.Resources.Has("Clings"))
 			{
 				if(!s.touchedWall) ch.RestoreOptionsOnWallTouch();
 				else ch.vec.y *= (1-ch.wallFriction*ch.wfric);
 				ch.ApplySettings("Wall");
-				ch.ChangeState("Wall");
+				ch.States.Change("Wall");
 			}
-			else ch.ChangeState("Air");
+			else ch.States.Change("Air");
 		}
 		else return false;
 		

@@ -59,8 +59,8 @@ public class Attack : Node2D
 		active = true;
 		EmitSignal(nameof(AttackStarts), this);
 		if(connected != null) Disconnect("AttackEnds", connected, "SetEnd");
-		Connect("AttackEnds", ch.currentState, "SetEnd");
-		connected = ch.currentState;
+		Connect("AttackEnds", ch.States.Current, "SetEnd");
+		connected = ch.States.Current;
 		currentPart = start;
 		OnStart();
 		currentPart.Activate();

@@ -15,9 +15,9 @@ public class CrawlState : BaseCrouchState
 	{
 		if(base.CalcStateChange()) return true;
 		else if(ch.walled)
-			ch.ChangeState("CrawlWall");
+			ch.States.Change("CrawlWall");
 		else if(!ch.InputtingHorizontalDirection)
-			ch.ChangeState("Crouch");
+			ch.States.Change("Crouch");
 		else return false;
 		
 		return true;

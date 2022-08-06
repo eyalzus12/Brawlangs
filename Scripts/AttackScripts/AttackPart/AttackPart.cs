@@ -9,18 +9,13 @@ public class AttackPart : Node2D, IHitter
 	public PartDir dir = new PartDir();
 	public int frameCount = 0;
 	
-	public List<Hitbox> hitboxes = new List<Hitbox>();
-	public List<Hitbox> Hitboxes{get => hitboxes; set => hitboxes = value;}
-	
-	public HashSet<IHittable> ignoreList = new HashSet<IHittable>();
-	public HashSet<IHittable> HitIgnoreList{get => ignoreList; set => ignoreList = value;}
-	
-	public Dictionary<Hurtbox, Hitbox> hitList = new Dictionary<Hurtbox, Hitbox>();
-	public Dictionary<Hurtbox, Hitbox> HitList{get => hitList; set => hitList = value;}
+	public List<Hitbox> Hitboxes{get; set;}
+	public HashSet<IHittable> HitIgnoreList{get; set;} = new HashSet<IHittable>();
+	public Dictionary<Hurtbox, Hitbox> HitList{get; set;} = new Dictionary<Hurtbox, Hitbox>();
 	
 	public Dictionary<string, ParamRequest> LoadExtraProperties = new Dictionary<string, ParamRequest>();
 	
-	public int Direction {get => ch.direction; set => ch.direction = value;}
+	public int Direction {get => ch.Direction; set => ch.Direction = value;}
 	public int TeamNumber {get => ch.TeamNumber; set => ch.TeamNumber = value;}
 	
 	public bool active = false;
@@ -48,8 +43,7 @@ public class AttackPart : Node2D, IHitter
 	
 	public List<string> emittedProjectiles;
 	
-	public bool hit = false;
-	public bool Hit{get => hit; set => hit = value;}
+	public bool HasHit{get; set;}
 	
 	public AnimationPlayer hitboxPlayer;
 	public Attack att;
@@ -64,8 +58,9 @@ public class AttackPart : Node2D, IHitter
 	public override void _Ready()
 	{
 		frameCount = 0;
-		if(startup == 0) OnStartupFinish(); 
-		hitboxes = GetChildren().FilterType<Hitbox>().ToList();
+		if(startup == 0) OnStartupFinish();
+		
+		Hitboxes = GetChildren().FilterType<Hitbox>().ToList();
 		ConnectSignals();
 		BuildHitboxAnimator();
 		Init();
@@ -73,7 +68,7 @@ public class AttackPart : Node2D, IHitter
 	
 	public void ConnectSignals()
 	{
-		hitboxes.ForEach(h => h.Connect("HitboxHit", this, nameof(HandleInitialHit)));
+		Hitboxes.ForEach(h => h.Connect("HitboxHit", this, nameof(HandleInitialHit)));
 	}
 	
 	public void LoadExtraProperty<T>(string s, T @default = default(T))
@@ -98,24 +93,24 @@ public class AttackPart : Node2D, IHitter
 	
 	public virtual void Activate()
 	{
+		HasHit = false;
+		
 		ch.PlayAnimation(startupAnimation);
 		ch.PlaySound(attackSound);
 		active = true;
-		hit = false;
 		frameCount = 0;
 		
 		if(overwriteXMovement) ch.vec.x = 0;
 		if(overwriteYMovement) ch.vec.y = 0;
 		
 		if(movement != Vector2.Zero)
-			ch.vec = movement * new Vector2(ch.direction, 1);
+			ch.vec = movement * new Vector2(ch.Direction, 1);
 		
 		OnStart();
-		//hitboxPlayer = GetNode("AttackPlayer") as AnimationPlayer;
-		//GD.Print("activating");
 		hitboxPlayer.Play("HitboxActivation");
-		hitList.Clear();
-		ignoreList.Clear();
+		
+		HitList.Clear();
+		HitIgnoreList.Clear();
 	}
 	
 	public override void _PhysicsProcess(float delta)
@@ -133,6 +128,7 @@ public class AttackPart : Node2D, IHitter
 		emittedProjectiles?.ForEach(s=>ch.EmitProjectile(s));
 	}
 	
+	const float FPS = 60f;
 	public void BuildHitboxAnimator()
 	{
 		hitboxPlayer = new AnimationPlayer();
@@ -140,9 +136,9 @@ public class AttackPart : Node2D, IHitter
 		hitboxPlayer.Name = "AttackPlayer";
 		AddChild(hitboxPlayer);
 		var anm = new Animation();
-		anm.Length = (startup+length/*+endlag*/)/60f;
+		anm.Length = (startup+length/*+endlag*/)/FPS;
 		hitboxPlayer.AddAnimation("HitboxActivation", anm);
-		foreach(var h in hitboxes)
+		foreach(var h in Hitboxes)
 		{
 			int trc = anm.AddTrack(Animation.TrackType.Value);
 			var path = h.GetPath() + ":Active";
@@ -150,8 +146,8 @@ public class AttackPart : Node2D, IHitter
 			
 			foreach(var v in h.activeFrames)
 			{
-				anm.TrackInsertKey(trc, (startup+v.x)/60f, true);
-				anm.TrackInsertKey(trc, (startup+v.y)/60f, false);
+				anm.TrackInsertKey(trc, (startup+v.x)/FPS, true);
+				anm.TrackInsertKey(trc, (startup+v.y)/FPS, false);
 			}
 		}
 		
@@ -176,11 +172,11 @@ public class AttackPart : Node2D, IHitter
 	public virtual void Stop()
 	{
 		hitboxPlayer.Stop(true);
-		hitboxes.ForEach(h => h.Active = false);
+		Hitboxes.ForEach(h => h.Active = false);
 		active = false;
 		OnEnd();
-		hitList.Clear();
-		ignoreList.Clear();
+		HitList.Clear();
+		HitIgnoreList.Clear();
 	}
 	
 	public virtual void Pause() {hitboxPlayer.Stop();}
@@ -196,24 +192,20 @@ public class AttackPart : Node2D, IHitter
 		ChangePart(GetNextPart());
 	}
 	
-	private List<string> Describe(Character c)
+	private IEnumerable<string> Describe(Character c)
 	{
-		var l = new List<string>();
-		if(c.ceilinged) l.Add("Ceiling");
-		if(c.walled) l.Add("Wall");
-		if(c.grounded) l.Add("Grounded");
-		else l.Add("Aerial");
-		if(true) l.Add("");
-		return l;
+		if(c.ceilinged) yield return "Ceiling";
+		if(c.walled) yield return "Wall";
+		yield return c.grounded?"Grounded":"Aerial";
 	}
 	
 	public virtual string GetNextPart()
 	{
 		foreach(var property in Describe(ch))
 		{
-			if(hit && dir.ContainsKey($"{property}Hit")) return $"{property}Hit";
+			if(HasHit && dir.ContainsKey($"{property}Hit")) return $"{property}Hit";
 			if(dir.ContainsKey($"{property}Miss")) return $"{property}Miss";
-			if(property != "" && dir.ContainsKey(property)) return property;
+			if(dir.ContainsKey(property)) return property;
 		}
 		
 		return "Next";
@@ -228,41 +220,58 @@ public class AttackPart : Node2D, IHitter
 	
 	public AttackPart GetConnectedPart(string name)
 	{
-		try {return dir[name];}
-		catch(KeyNotFoundException) {return null;}
+		if(dir.ContainsKey(name)) return dir[name];
+		else return null;
 	}
 	
-	public bool CanHit(IHittable h) => ch.CanHit(h) && !ignoreList.Contains(h);
+	public bool CanHit(IHittable h) => ch.CanHit(h) && !HitIgnoreList.Contains(h);
 	
 	public virtual void HandleInitialHit(Hitbox hitbox, Hurtbox hurtbox)
 	{
+		//GD.Print($"{OwnerObject} attack part is signaled Handle Initial Hit");
 		if(!hitbox.Active) return;
-		hit = true;
-		ch.IsHitting = true;
-		ch.LastHit = hurtbox.OwnerObject;
+		
+		//GD.Print($"{OwnerObject} attack part Has Hit = true");
+		HasHit = true;
+		
+		//GD.Print($"{OwnerObject} Hitting = true");
+		ch.Hitting = true;
+		//GD.Print($"{OwnerObject} Last Hitee = {hurtbox.OwnerObject}");
+		ch.LastHitee = hurtbox.OwnerObject;
+		
+		//GD.Print($"{hurtbox.OwnerObject} Getting Hit = true");
+		hurtbox.OwnerObject.GettingHit = true;
+		//GD.Print($"{hurtbox.OwnerObject} Last Hitter = {this.OwnerObject}");
+		hurtbox.OwnerObject.LastHitter = this;
+		
 		var hitChar = hurtbox.OwnerObject;
 		
 		var current = new Hitbox();
-		if(hitList.TryGetValue(hurtbox, out current))
+		if(HitList.TryGetValue(hurtbox, out current))
 		{
 			if(hitbox.hitPriority > current.hitPriority)
-				hitList[hurtbox] = hitbox;
+				HitList[hurtbox] = hitbox;
 		}
 		else
 		{
-			hitList.Add(hurtbox, hitbox);
+			//GD.Print($"{OwnerObject} attack part adds hitbox to Hit List");
+			HitList.Add(hurtbox, hitbox);
 		}
 	}
 	
 	public virtual void HandleHits()
 	{
+		//GD.Print($"{OwnerObject} attack part runs Handle Hits");
 		if(!active) return;
-		foreach(var entry in hitList)
+		var velocity = ch.Velocity;
+		foreach(var entry in HitList)
 		{
+			//GD.Print($"{OwnerObject} attack part iterates Hit List");
 			Hitbox hitbox = entry.Value;
 			Hurtbox hurtbox = entry.Key;
 			var hitChar = hurtbox.OwnerObject;
 			
+			//GD.Print($"{OwnerObject} attack part runs Hit Event");
 			HitEvent(hitbox, hurtbox);
 			
 			var kmult = ch.KnockbackDoneMult*knockbackMult*att.knockbackMult*hitbox.GetKnockbackMultiplier(hitChar);
@@ -270,22 +279,27 @@ public class AttackPart : Node2D, IHitter
 			var smult = ch.StunDoneMult*stunMult*att.stunMult*hitbox.GetStunMultiplier(hitChar);
 			
 			var dirvec = hitbox.KnockbackDir(hitChar)*kmult;
-			var skb = dirvec*hitbox.setKnockback + hitbox.momentumCarry*ch.GetVelocity();
+			var skb = dirvec*hitbox.setKnockback + hitbox.momentumCarry*velocity;
 			var vkb = dirvec*hitbox.varKnockback;
 			var damage = hitbox.damage*dmult;
 			var stun = hitbox.stun*smult;
  			
 			var data = new HitData(skb, vkb, damage, stun, hitbox.hitpause, hitbox, hurtbox);
 			
-			ignoreList.Add(hitChar);
-			//GD.Print($"{(hitChar as Node2D).Name} was hit by {hitbox.Name} on {Engine.GetPhysicsFrames()}");
+			//GD.Print($"{OwnerObject} attack part adds {hitChar} to Hit Ignore List");
+			HitIgnoreList.Add(hitChar);
+			//GD.Print($"{OwnerObject} attack parts calls attack's On Hit");
 			att.OnHit(hitbox, hurtbox);
+			//GD.Print($"{OwnerObject} attack part calls {OwnerObject} Handle Hitting");
 			ch.HandleHitting(data);
+			//GD.Print($"{OwnerObject} attack part calls {hitChar} Handle Getting Hit");
 			hitChar.HandleGettingHit(data);
 		}
-		hitList.Clear();
+		
+		//GD.Print($"{OwnerObject} attack part clears Hit List");
+		HitList.Clear();
 	}
 	
-	public virtual int GetEndlag() => endlag + (hit?0:missEndlag);
-	public virtual int GetCooldown() => cooldown + (hit?0:missCooldown);
+	public virtual int GetEndlag() => endlag + (HasHit?0:missEndlag);
+	public virtual int GetCooldown() => cooldown + (HasHit?0:missCooldown);
 }

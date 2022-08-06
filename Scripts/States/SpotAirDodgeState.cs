@@ -6,13 +6,13 @@ public class SpotAirDodgeState : GenericInvincibleState
 	public SpotAirDodgeState() : base() {}
 	public SpotAirDodgeState(Character link) : base(link) {}
 	
-	public override bool IsActionable() => false;
+	public override bool Actionable => false;
 	
-	public override int Startup() => ch.spotAirDodgeStartup;
-	public override int InvincibilityLength() => ch.spotAirDodgeLength;
-	public override int Endlag() => ch.spotAirDodgeEndlag;
-	public override string ActionName() => "Dodge";
-	public override string Animation() => "SpotAirDodge";
+	public override int Startup => ch.spotAirDodgeStartup;
+	public override int IFrames => ch.spotAirDodgeLength;
+	public override int Endlag => ch.spotAirDodgeEndlag;
+	public override string ActionName => "Dodge";
+	public override string StateAnimation => "SpotAirDodge";
 	
 	protected override void OnIFramesStart()
 	{
@@ -22,6 +22,6 @@ public class SpotAirDodgeState : GenericInvincibleState
 	protected override void DecideNextState()
 	{
 		bool turn = ch.TurnConditional();
-		ch.ChangeState<AirState>();
+		ch.States.Change("Air");
 	}
 }

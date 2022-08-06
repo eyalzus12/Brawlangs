@@ -8,7 +8,7 @@ public class LimitedAttack : Attack
 	
 	public override void Init()
 	{
-		ch.GiveResource(ResourceName, AmountCanUse);
+		ch.Resources.Give(ResourceName, AmountCanUse);
 	}
 	
 	public override void LoadProperties()
@@ -19,8 +19,8 @@ public class LimitedAttack : Attack
 	
 	public override void OnStart()
 	{
-		ch.GiveResource(ResourceName, -1);
+		ch.Resources.Give(ResourceName, -1);
 	}
 	
-	public override bool CanActivate() => ch.HasResource(ResourceName);
+	public override bool CanActivate() => ch.Resources.Has(ResourceName);
 }

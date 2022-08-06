@@ -83,7 +83,6 @@ public class Hitbox : Area2D
 		Init();
 		
 		Active = false;
-		Visible = false;
 		
 		Connect("area_entered", this, nameof(OnAreaEnter));
 		
@@ -117,7 +116,7 @@ public class Hitbox : Area2D
 		{
 			if(hurtbox.OwnerObject is Character c)
 			{
-				for(var t = c.currentState.GetType(); t.Name != "State"; t = t.BaseType)
+				for(var t = c.States.Current.GetType(); t.Name != "State"; t = t.BaseType)
 				{
 					var whitelisted = (whitelistedStates.Count == 0 || whitelistedStates.Contains(t.Name));
 					var blacklisted = blacklistedStates.Contains(t.Name);
@@ -125,8 +124,12 @@ public class Hitbox : Area2D
 				}
 			}
 			
+			//GD.Print($"{OwnerObject.OwnerObject} hitbox detects hurtbox");
+			//GD.Print($"{OwnerObject.OwnerObject} calls hurtbox Handle Hit");
 			hurtbox.HandleHit(this);
+			//GD.Print($"{OwnerObject.OwnerObject} hitbox calls self On Hit");
 			OnHit(hurtbox);
+			//GD.Print($"{OwnerObject.OwnerObject} hitbox emits signal Hitbox Hit");
 			EmitSignal(nameof(HitboxHit), this, hurtbox);
 		}
 	}
@@ -166,7 +169,7 @@ public class Hitbox : Area2D
 		
 		var f = 1f;
 		
-		for(var t = c.currentState.GetType(); t.Name != "State"; t = t.BaseType)
+		for(var t = c.States.Current.GetType(); t.Name != "State"; t = t.BaseType)
 		{
 			if(chooseFrom.TryGetValue(t.Name.Replace("State", ""), out f))
 				return f;

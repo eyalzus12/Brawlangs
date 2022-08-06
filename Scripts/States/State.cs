@@ -8,7 +8,7 @@ public class State : Node
 	[Signal]
 	public delegate void StateEnd(State s);
 	
-	public bool actionable => IsActionable();
+	public virtual bool Actionable => true;
 	
 	public const int DROP_THRU_BIT = 1;
 	public const float HCF = 20f;//check force
@@ -34,13 +34,11 @@ public class State : Node
 		ch = link;
 	}
 	
-	public virtual bool IsActionable() => true;
-	
 	public override string ToString() => GetType().Name.Replace("State", "");
 	
 	public virtual void DoPhysics(float delta)
 	{
-		if(this != ch.currentState) return;
+		if(this != ch.States.Current) return;
 		
 		if(!justInit) LoopActions();
 		else justInit = false;
@@ -57,7 +55,7 @@ public class State : Node
 		if(Inputs.IsActionJustPressed("player_dodge"))
 			DoDodge();
 		
-		if(this == ch.currentState && actionable && ch.currentAttack is null)
+		if(this == ch.States.Current && Actionable && ch.CurrentAttack is null)
 		{
 			if(Inputs.IsActionJustPressed("player_light_attack"))
 				LightAttack();
@@ -67,10 +65,10 @@ public class State : Node
 				Taunt();
 		}
 		
-		if(this != ch.currentState) return;
+		if(this != ch.States.Current) return;
 		
 		var norm = ch.grounded?ch.fnorm:Vector2.Zero;
-		var v = ch.GetVelocity().TiltToNormal(norm);
+		var v = ch.Velocity.TiltToNormal(norm);
 		
 		var moveRes = ch.
 			MoveAndSlideWithSnap(v, snapVector, Vector2.Up,
@@ -205,13 +203,13 @@ public class State : Node
 	protected void SetFastFallInput()
 	{
 		if(Inputs.IsActionJustPressed("player_down")
-		&& ch.GetVelocity().y >= ch.fastfallMargin)
+		&& ch.Velocity.y >= ch.fastfallMargin)
 		{
 			ch.fastfalling = true;
 		}
 		
 		if(!Inputs.IsActionPressed("player_down")
-		|| ch.GetVelocity().y < ch.fastfallMargin)
+		|| ch.Velocity.y < ch.fastfallMargin)
 		{
 			ch.fastfalling = false;
 		}

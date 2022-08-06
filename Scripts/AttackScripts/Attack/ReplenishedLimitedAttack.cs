@@ -21,8 +21,8 @@ public class ReplenishedLimitedAttack : LimitedAttack
 		ch.Connect("OptionsRestoredFromGettingHit", this, nameof(GettingHit));
 	}
 	
-	public virtual void GroundTouch() {if(RestoreOnGround) ch.SetResource(ResourceName, AmountCanUse);}
-	public virtual void WallTouch() {if(RestoreOnWall) ch.SetResource(ResourceName, AmountCanUse);}
-	public virtual void Hitting() {if(RestoreOnHitting) ch.SetResource(ResourceName, AmountCanUse);}
-	public virtual void GettingHit() {if(RestoreOnGettingHit) ch.SetResource(ResourceName, AmountCanUse);}
+	public virtual void GroundTouch() {if(RestoreOnGround) ch.Resources[ResourceName] = AmountCanUse;}
+	public virtual void WallTouch() {if(RestoreOnWall) ch.Resources[ResourceName] = AmountCanUse;}
+	public virtual void Hitting() {if(RestoreOnHitting) ch.Resources[ResourceName] = AmountCanUse;}
+	public virtual void GettingHit() {if(RestoreOnGettingHit) ch.Resources[ResourceName] = AmountCanUse;}
 }

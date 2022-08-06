@@ -24,9 +24,6 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public delegate void OptionsRestoredFromGettingHit();
 	
 	////////////////////////////////////////////
-	[Export]
-	public string name = "Unnamed";//name used for debuging
-	////////////////////////////////////////////
 	public float fallSpeed = 800f;//max fall speed
 	public float fastFallSpeed = 1200f;//max fastfall speed
 	public float wallFallSpeed = 250f;//max wall fall speeed
@@ -117,31 +114,22 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public int duckLength = 3;
 	public int getupLength = 4;
 	////////////////////////////////////////////
+	public float clashStun = 10f;
+	public float clashForce = 100f;
+	////////////////////////////////////////////
 	public float damage = 0f;
 	////////////////////////////////////////////
-	private float _damageTakenMult = 1f;
-	public float DamageTakenMult{get => _damageTakenMult; set => _damageTakenMult = value;}
-	
-	private float _knockbackTakenMult = 1f;
-	public float KnockbackTakenMult{get => _knockbackTakenMult; set => _knockbackTakenMult = value;}
-	
-	private float _stunTakenMult = 1f;
-	public float StunTakenMult{get => _stunTakenMult; set => _stunTakenMult = value;}
+	public float DamageTakenMult{get; set;} = 1f;
+	public float KnockbackTakenMult{get; set;} = 1f;
+	public float StunTakenMult{get; set;} = 1f;
 	////////////////////////////////////////////
-	private float _damageDoneMult = 1f;
-	public float DamageDoneMult{get => _damageDoneMult; set => _damageDoneMult = value;}
-	
-	private float _knockbackDoneMult = 1f;
-	public float KnockbackDoneMult{get => _knockbackDoneMult; set => _knockbackDoneMult = value;}
-	
-	public float _stunDoneMult = 1f;
-	public float StunDoneMult{get => _stunDoneMult; set => _stunDoneMult = value;}
+	public float DamageDoneMult{get; set;} = 1f;
+	public float KnockbackDoneMult{get; set;} = 1f;
+	public float StunDoneMult{get; set;} = 1f;
 	////////////////////////////////////////////
-	public int direction = 1;//1 for right -1 for left
-	public int Direction{get => direction; set => direction = value;}
+	public int Direction{get; set;}//1 for right -1 for left
 	
-	private int _teamNumber = 0;
-	public int TeamNumber{get => _teamNumber; set => _teamNumber=value;}
+	public int TeamNumber{get; set;}
 	public bool friendlyFire = false;
 	public int stocks = 3;
 	
@@ -158,6 +146,10 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public Vector2 vuc = new Vector2();
 	public Vector2 vyc = new Vector2();
 	public Vector2 vwc = new Vector2();
+	
+	public Vector2 Velocity => vs.Aggregate(Vector2.Zero, (a,v)=>a+v);
+	public Vector2 RoundedVelocity => Velocity.Round();
+	public Vector2 RoundedPosition => Position.Round();
 	
 	public Vector2 fnorm = new Vector2();//floor normal
 	public Vector2 fvel = new Vector2();//floor velocity
@@ -184,15 +176,19 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public float AppropriateBounce => PlatBounce * (grounded?floorBounce:walled?wallBounce:ceilinged?ceilingBounce:0f);
 	public float AppropriateAcceleration => (grounded?groundAcceleration:airAcceleration);
 	public float AppropriateSpeed => (crouching?crawlSpeed:grounded?groundSpeed:airSpeed);
-	public float AppropriateGravity => (currentAttack?.currentPart?.gravityMultiplier ?? 1f)*((currentState is StunState)?stunGravity:fastfalling?walled?wallFastFallGravity:fastFallGravity:walled?wallGravity:gravity);
-	public float AppropriateFallingSpeed => (currentAttack?.currentPart?.gravityMultiplier ?? 1f)*((currentState is StunState)?stunFallSpeed:fastfalling?walled?wallFastFallSpeed:fastFallSpeed:walled?wallFallSpeed:fallSpeed);
+	public float AppropriateGravity => (CurrentAttack?.currentPart?.gravityMultiplier ?? 1f)*((States.Current is StunState)?stunGravity:fastfalling?walled?wallFastFallGravity:fastFallGravity:walled?wallGravity:gravity);
+	public float AppropriateFallingSpeed => (CurrentAttack?.currentPart?.gravityMultiplier ?? 1f)*((States.Current is StunState)?stunFallSpeed:fastfalling?walled?wallFastFallSpeed:fastFallSpeed:walled?wallFallSpeed:fallSpeed);
 	
-	public bool InputtingTurn => (GetFutureDirection() != direction);
+	public int InputDirection => rightHeld?(leftHeld?0:1):(leftHeld?-1:0);
+	public int FutureDirection => rightHeld?(leftHeld?0:1):(leftHeld?-1:Direction);
+	public Vector2 InputVector => new Vector2((rightHeld?1:leftHeld?-1:0),(downHeld?1:upHeld?-1:0)).Normalized();
+	
+	public bool InputtingTurn => (FutureDirection != Direction);
 	public bool InputtingHorizontalDirection => leftHeld||rightHeld;
 	public bool InputtingVerticalDirection => upHeld||downHeld;
 	public bool InputtingDirection => InputtingHorizontalDirection||InputtingVerticalDirection;
-	public bool IsIdle => (Math.Truncate(GetVelocity().x / 100f) == 0);
-	public bool IsStill => (IsIdle && !InputtingHorizontalDirection);
+	public bool Idle => (Math.Truncate(Velocity.x / 100f) == 0);
+	public bool Still => (Idle && !InputtingHorizontalDirection);
 	
 	public bool fastfalling = false;//wether or not fastfalling
 	
@@ -209,204 +205,125 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public bool downHeld = false;//is down currently held
 	public bool upHeld = false;//is up currently held
 	
-	public State currentState;//currently used state
-	public State prevState;//previously used state
-	public State prevPrevState;//the one before that
+	public StateMachine States{get; set;}
 	
-	public Dictionary<string, State> states = new Dictionary<string, State>();
-	
-	private List<Hurtbox> _hurtboxes = new List<Hurtbox>();
-	public List<Hurtbox> Hurtboxes{get => _hurtboxes; set => _hurtboxes=value;}
+	public List<Hurtbox> Hurtboxes{get; set;} = new List<Hurtbox>();
 	
 	public string currentCollisionSetting;
 	public CharacterCollision collision;
 	public PlatformDropDetector DropDetector;
 	
-	public Attack currentAttack;
+	private Attack currentAttack;
 	public Attack CurrentAttack{get => currentAttack; set => currentAttack = value;}
 	
-	private bool hasHit;
-	public bool IsHitting{get => hasHit; set => hasHit = value;}
-	private IHittable lastHit;
-	public IHittable LastHit{get => lastHit; set => lastHit = value;}
+	public bool Hitting{get; set;}
+	public IHittable LastHitee{get; set;}
+	public bool GettingHit{get; set;}
+	public IHitter LastHitter{get; set;}
 	
-	public Dictionary<string, Attack> attackDict = new Dictionary<string, Attack>();
+	public bool Clashing{get; set;}
+	public HitData ClashData{get; set;}
+	
+	private Dictionary<string, Attack> attackDict = new Dictionary<string, Attack>();
 	public Dictionary<string, Attack> Attacks{get => attackDict; set => attackDict = value;}
 	
-	public Dictionary<string, int> cooldowns = new Dictionary<string, int>();
-	public Dictionary<string, int> invincibilityTimers = new Dictionary<string, int>();
-	public Dictionary<string, int> resources = new Dictionary<string, int>();
+	public CooldownManager Cooldowns{get; set;} = new CooldownManager();
+	
+	public InvincibilityManager IFrames{get; set;} = new InvincibilityManager();
+	public bool Invincible => IFrames.Count > 0;
+	
+	public ResourceManager Resources{get; set;} = new ResourceManager();
 	
 	public Dictionary<string, PackedScene> projectiles = new Dictionary<string, PackedScene>();
 	public Dictionary<string, HashSet<Projectile>> activeProjectiles = new Dictionary<string, HashSet<Projectile>>();
-	public ProjectilePool objectPool;
+	public ProjectilePool projPool;
 	
 	public List<string> StatList = new List<string>();
 	public PropertyMap prop = new PropertyMap();
 	
 	public InputManager Inputs;
 	
-	public AnimationSprite sprite;
-	protected AudioManager audioManager;
-	public AudioManager Audio{get => audioManager; set => audioManager = value;}
+	public AnimationSprite CharacterSprite{get; set;}
+	public AudioManager Audio{get; set;}
 	
 	public Character() {}
 	
 	public override void _Ready()
 	{
 		ZIndex = 4;
-		SetupStates();
-	}
-	
-	public bool ReadStats()
-	{
-		prop.ConfigFileToPropertyList(this, statConfigPath+name+".ini", statSectionName, StatList);
-		prop.LoadProperties(this);
-		return true;
+		States = new StateMachine(CreateStates());
 	}
 
 	public override void _PhysicsProcess(float delta)
 	{
-		IsHitting = false;
+		if(Clashing) HandleClashing(ClashData);
+		Clashing = false;
+		Hitting = false;
+		GettingHit = false;
+		
 		++framesSinceLastHit;
 		StoreVelocities();
 		TruncateVelocityIfInsignificant();
-		UpdateCooldowns();
-		UpdateInvincibilityTimers();
+		Cooldowns.Update();
+		IFrames.Update();
+		States.Update(delta);
 		if(Input.IsActionJustPressed("reset")) Respawn();
-		currentState?.SetInputs();
-		currentState?.DoPhysics(delta);
 		
-		sprite.FlipH = DirectionToBool();
+		CharacterSprite.FlipH = (Direction == -1);
 		Update();
 	}
 	
 	public override void _Draw()
 	{
 		if(!this.GetRootNode<UpdateScript>("UpdateScript").debugCollision) return;
-		ZIndex = 10;
 		DrawCircle(Vector2.Zero, 5, new Color(0,0,0,1));
 	}
 	
-	public void PlayAnimation(string anm) => sprite.Play(anm);
-	public void QueueAnimation(string anm) => sprite.Queue(anm);
-	public void PlaySound(string sound) => audioManager.Play(sound);
-	public void PlaySound(AudioStream sound) => audioManager.Play(sound);
+	public void PlayAnimation(string anm) => CharacterSprite.Play(anm);
+	public void QueueAnimation(string anm) => CharacterSprite.Queue(anm);
+	public void PlaySound(string sound) => Audio.Play(sound);
+	public void PlaySound(AudioStream sound) => Audio.Play(sound);
 	
 	///////////////////////////////////////////
 	///////////////States//////////////////////
 	///////////////////////////////////////////
 	
-	//this function returns the appropriate state
-	public State GetState(string state)
+	private IEnumerable<State> CreateStates()
 	{
-		if(states.ContainsKey(state)) return states[state];
-		else
-		{
-			GD.Print($"{name}: Could not find {state}State");
-			return null;
-		}
-	}
-	
-	public string GetStateName<T>() where T : State => typeof(T).Name.Replace("State", "");
-	
-	public T GetState<T>() where T : State => (T)GetState(GetStateName<T>());
-	
-	public bool HasState(string state) => states.ContainsKey(state);
-	
-	public bool AddState(State state)
-	{
-		try
-		{
-			states.Add(state.ToString(), state);
-			return true;
-		}
-		catch (ArgumentException)
-		{
-			GD.Print($"{name}: Attempt to add state {state}State failed because that state already exists");
-			return false;
-		}
-	}
-	
-	public T ChangeState<T>() where T : State => (T)ChangeState(GetStateName<T>());
-	
-	//this function handles state changes
-	public State ChangeState(string state)
-	{
-		var tempState = GetState(state);
+		yield return new AirState(this);
+		yield return new AirJumpState(this);
 		
-		if(tempState is null)
-		{
-			GD.Print($"{name}: Failed to switch to {state}State because that state is null or doesn't exist");
-			return null;
-		}
+		yield return new WallState(this);
+		yield return new WallLandState(this);
+		yield return new WallJumpState(this);
 		
-		currentState?.OnChange(tempState);
-		currentState?.EmitSignal("StateEnd", currentState);
+		yield return new GroundedState(this);
+		yield return new LandState(this);
+		yield return new JumpState(this);
 		
-		if(currentState == tempState)
-		{
-			currentState.ForcedInit();
-			return currentState;
-		}
+		yield return new IdleState(this);
+		yield return new WalkState(this);
+		yield return new WalkTurnState(this);
+		yield return new WalkStopState(this);
+		yield return new WalkWallState(this);
 		
-		#if DEBUG_STATES
-		GD.Print('\n');
-		GD.Print("Character num " + teamNumber);
-		GD.Print("New state is " + tempState?.ToString() ?? "null");
-		GD.Print("Current state is " + currentState?.ToString() ?? "null");
-		GD.Print("Prev state is " + prevState?.ToString() ?? "null");
-		GD.Print("Prev prev state is " + prevPrevState?.ToString() ?? "null");
-		#endif
+		yield return new GetupState(this);
+		yield return new DuckState(this);
+		yield return new CrouchState(this);
+		yield return new CrawlState(this);
+		yield return new CrawlWallState(this);
+		yield return new CrouchJumpState(this);
 		
-		prevPrevState = prevState;
-		prevState = currentState;
-		currentState = tempState;
-		currentState.ForcedInit();
+		yield return new StunState(this);
+		yield return new HitPauseState(this);
+		yield return new HitLagState(this);
+		yield return new AttackState(this);
+		yield return new EndlagState(this);
 		
-		return currentState;
-	}
-	
-	//initializes the states
-	private void SetupStates()
-	{
-		AddState(new AirState(this));
-		//AddState(new AirTurnState(this));
-		AddState(new AirJumpState(this));
+		yield return new SpotAirDodgeState(this);
+		yield return new DirectionalAirDodgeState(this);
 		
-		AddState(new WallState(this));
-		AddState(new WallLandState(this));
-		AddState(new WallJumpState(this));
-		
-		AddState(new GroundedState(this));
-		AddState(new LandState(this));
-		AddState(new JumpState(this));
-		
-		AddState(new IdleState(this));
-		AddState(new WalkState(this));
-		AddState(new WalkTurnState(this));
-		AddState(new WalkStopState(this));
-		AddState(new WalkWallState(this));
-		
-		AddState(new GetupState(this));
-		AddState(new DuckState(this));
-		AddState(new CrouchState(this));
-		AddState(new CrawlState(this));
-		AddState(new CrawlWallState(this));
-		AddState(new CrouchJumpState(this));
-		
-		AddState(new StunState(this));
-		AddState(new HitPauseState(this));
-		AddState(new HitLagState(this));
-		AddState(new AttackState(this));
-		AddState(new EndlagState(this));
-		
-		//AddState(new ForwardRollState(this));
-		//AddState(new BackRollState(this));
-		AddState(new SpotAirDodgeState(this));
-		AddState(new DirectionalAirDodgeState(this));
-		
-		AddState(new WavedashState(this));
+		yield return new WavedashState(this);
 	}
 	
 	///////////////////////////////////////////
@@ -415,11 +332,11 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	
 	public void Die()
 	{
-		GD.Print($"Character {Name} died with {stocks} stocks");
+		GD.Print($"Character {this} died with {stocks} stocks");
 		--stocks;
 		if(stocks <= 0)
 		{
-			GD.Print($"Character {Name} took the L and is eliminated");
+			GD.Print($"Character {this} took the L and is eliminated");
 			EmitSignal(nameof(Dead), this);
 			QueueFree();
 		}
@@ -430,15 +347,15 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	{
 		GD.Print("\nRespawning...");
 		Inputs?.MarkAllForDeletion();
-		currentAttack?.Stop();
+		CurrentAttack?.Stop();
 		ApplySettings("Default");
-		ChangeState("Air");
+		States.Change("Air");
 		Position = Vector2.Zero;
-		invincibilityTimers.Clear();//todo: respawn i-frames
+		IFrames.Clear();//todo: respawn i-frames
 		fastfalling = false;
 		crouching = false;
 		ResetVelocity();
-		direction = 1;
+		Direction = 1;
 		SetCollisionMaskBit(DROP_THRU_BIT, true);
 		damage = 0f;
 		framesSinceLastHit = 0;
@@ -455,40 +372,40 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	
 	public virtual void RestoreOptionsOnGroundTouch()
 	{
-		SetResource("Clings", maxClingsAllowed);
-		SetResource("AirJumps", maxAirJumpsAllowed);
-		SetResource("OnHittingOptionRestoration", 1);
-		SetResource("OnGettingHitOptionRestoration", 1);
-		if(restoreDodgeOnGroundTouch) SetResource("Dodge", maxDodgesAllowed);
+		Resources["Clings"] = maxClingsAllowed;
+		Resources["AirJumps"] = maxAirJumpsAllowed;
+		Resources["OnHittingOptionRestoration"] = 1;
+		Resources["OnGettingHitOptionRestoration"] = 1;
+		if(restoreDodgeOnGroundTouch) Resources["Dodge"] = maxDodgesAllowed;
 		EmitSignal(nameof(OptionsRestoredFromGroundTouch));
 	}
 	
 	public virtual void RestoreOptionsOnWallTouch()
 	{
-		GiveResource("Clings", -1);
-		SetResource("AirJumps", maxAirJumpsAllowed);
-		if(restoreDodgeOnWallTouch) SetResource("Dodge", maxDodgesAllowed);
+		Resources.Give("Clings", -1);
+		Resources["AirJumps"] = maxAirJumpsAllowed;
+		if(restoreDodgeOnWallTouch) Resources["Dodge"] = maxDodgesAllowed;
 		EmitSignal(nameof(OptionsRestoredFromWallTouch));
 	}
 	
 	public virtual void RestoreOptionsOnHitting()
 	{
-		if(!HasResource("OnHittingOptionRestoration")) return;
-		GiveResource("Clings", givenClingsOnHitting, maxClingsAllowed);
-		GiveResource("AirJumps", givenAirJumpsOnHitting, maxAirJumpsAllowed);
-		if(restoreDodgeOnHitting) GiveResource("Dodge", givenDodgesOnHitting, maxDodgesAllowed);
+		if(!Resources.Has("OnHittingOptionRestoration")) return;
+		Resources.Give("Clings", givenClingsOnHitting, maxClingsAllowed);
+		Resources.Give("AirJumps", givenAirJumpsOnHitting, maxAirJumpsAllowed);
+		if(restoreDodgeOnHitting) Resources.Give("Dodge", givenDodgesOnHitting, maxDodgesAllowed);
 		EmitSignal(nameof(OptionsRestoredFromHitting));
-		GiveResource("OnHittingOptionRestoration", -1);
+		Resources.Give("OnHittingOptionRestoration", -1);
 	}
 	
 	public virtual void RestoreOptionsOnGettingHit()
 	{
-		if(!HasResource("OnGettingHitOptionRestoration")) return;
-		GiveResource("Clings", givenClingsOnGettingHit, maxClingsAllowed);
-		GiveResource("AirJumps", givenAirJumpsOnGettingHit, maxAirJumpsAllowed);
-		if(restoreDodgeOnGettingHit) GiveResource("Dodge", givenDodgesOnGettingHit, maxDodgesAllowed);
+		if(!Resources.Has("OnGettingHitOptionRestoration")) return;
+		Resources.Give("Clings", givenClingsOnGettingHit, maxClingsAllowed);
+		Resources.Give("AirJumps", givenAirJumpsOnGettingHit, maxAirJumpsAllowed);
+		if(restoreDodgeOnGettingHit) Resources.Give("Dodge", givenDodgesOnGettingHit, maxDodgesAllowed);
 		EmitSignal(nameof(OptionsRestoredFromGettingHit));
-		GiveResource("OnGettingHitOptionRestoration", -1);
+		Resources.Give("OnGettingHitOptionRestoration", -1);
 	}
 	
 	public virtual void StoreVelocities()
@@ -527,32 +444,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		LoadVelocities();
 	}
 	
-	public override string ToString() => name;
-	
-	public Vector2 GetVelocity() => vs.Aggregate(Vector2.Zero, (a,v)=>a+v);
-	public Vector2 GetRoundedVelocity() => GetVelocity().Round();
-	public Vector2 GetRoundedPosition() => Position.Round();
-	
-	public string GetWallDirection()
-	{
-		if(walled) switch(direction)
-		{
-			case 1: return "Right";
-			case -1: return "Left";
-			default: return "WTF";
-		}
-		else return "None";
-	}
-	
-	//FIX: this doesnt account for inheritence
-	//TODO: just use some function like IsActionable
-	public readonly static Type[] ignoreTypes = new Type[]{typeof(AttackState), typeof(EndlagState), typeof(StunState)};
-	
-	public virtual void OnSemiSolidLeave(Godot.Object body) 
-	{
-		foreach(var t in ignoreTypes) if(currentState.GetType() == t) return;
-		SetCollisionMaskBit(DROP_THRU_BIT, true);
-	}
+	public override string ToString() => Name;
 	
 	public void AttachEffect(Effect e)
 	{
@@ -624,7 +516,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	/////////////////Inputs////////////////////
 	///////////////////////////////////////////
 	
-	public void Turn() => direction *= -1;
+	public void Turn() => Direction *= -1;
 	
 	public bool TurnConditional()
 	{
@@ -634,117 +526,134 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		return true;
 	}
 	
-	public int GetInputDirection()
-	{
-		if(leftHeld && rightHeld) return 0;
-		else if(rightHeld) return 1;
-		else if(leftHeld) return -1;
-		else return 0;
-	}
-	
-	public int GetFutureDirection()
-	{
-		if(rightHeld && leftHeld) return 0;
-		else if(rightHeld) return 1;
-		else if(leftHeld) return -1;
-		else return direction;
-	}
-	
-	public bool DirectionToBool() => (direction != 1);
-	//false = right, left = true. used for flipping sprite;
-	
-	public Vector2 GetInputVector()
-	{
-		var x = rightHeld?1:leftHeld?-1:0;
-		var y = downHeld?1:upHeld?-1:0;
-		return new Vector2(x,y).Normalized();
-	}
-	
 	///////////////////////////////////////////
 	////////////////Attacks////////////////////
 	///////////////////////////////////////////
 	
-	public virtual bool CanHit(IHittable hitObject) => (hitObject != this)&&(!hitObject.IsInvincible())&&(hitObject.TeamNumber!=_teamNumber||friendlyFire);
+	public virtual bool CanHit(IHittable hitObject) => (hitObject != this)&&(!hitObject.Invincible)&&(hitObject.TeamNumber!=TeamNumber||friendlyFire);
 	
-	public void HandleGettingHit(HitData data)
+	public virtual void HandleGettingHit(HitData data)
 	{
-		GD.Print($"Character {Name} got hit on {Engine.GetPhysicsFrames()}");
+		//GD.Print($"{this} runs Handle Getting Hit");
 		var skb = data.Skb;
 		var vkb = data.Vkb;
 		var d = data.Damage;
 		var stun = data.Stun;
 		var hp = data.Hitpause;
-		
-		RestoreOptionsOnGettingHit();
+		Hitbox hitbox = data.Hitter;
+		Hurtbox hurtbox = data.Hitee;
+		var hitSound = hitbox.hitSound;
 		
 		damage += d * DamageTakenMult;
+		RestoreOptionsOnGettingHit();
+		
+		//GD.Print($"{this} checks if clashing");
+		if(Clashing)
+		{
+			//GD.Print($"{this} is clashing. records data");
+			ClashData = data;
+			return;
+		}
+		
+		//GD.Print($"{this} is not clashing. doing hit stuff");
 		var force = (skb + damage*vkb/100f) * KnockbackTakenMult * (100f/weight);
 		var stunlen = stun * StunTakenMult;
 		
 		if(hp > 0)
 		{
-			var s = ChangeState<HitPauseState>();
+			var s = States.Change<HitPauseState>();
 			s.force = force;
 			s.stunLength = (int)stunlen;
 			s.hitPauseLength = hp;
 		}
 		else if(stunlen > 0)
 		{
-			var s = ChangeState<StunState>();
+			var s = States.Change<StunState>();
 			s.Force = force;
 			s.stunLength = (int)stunlen;
 		}
 		
-		if(force.x != 0f) direction = Math.Sign(force.x);
+		if(force.x != 0f) Direction = Math.Sign(force.x);
 		
-		GD.Print($"\nLast hit was {framesSinceLastHit} frames ago");
+		//GD.Print($"\nLast hit was {framesSinceLastHit} frames ago");
 		
 		if(framesSinceLastHit <= 0) ++comboCount;
 		else comboCount = 0;
-		GD.Print($"Combo count is {comboCount+1}");
+		//GD.Print($"Combo count is {comboCount+1}");
 		
 		framesSinceLastHit = 0;
 		
-		PlaySound(data.Hitter.hitSound);
+		PlaySound(hitSound);
 	}
 	
-	public void HandleHitting(HitData data)
+	public virtual void HandleHitting(HitData data)
 	{
-		GD.Print($"Character {Name} hit something on {Engine.GetPhysicsFrames()}");
+		//GD.Print($"{this} runs Handle Hitting");
+		
 		Hitbox hitbox = data.Hitter;
 		Hurtbox hurtbox = data.Hitee;
 		
-		if(hurtbox.OwnerObject is IAttacker attackerOwner && attackerOwner.IsHitting && attackerOwner.LastHit == this)
-		{
-			GD.Print("CLASH");//TODO: decide what should happen
-		}
-		
 		RestoreOptionsOnHitting();
 		
+		//GD.Print($"{this} ensures not clashing");
+		if(Clashing) return;
+		//GD.Print($"{this} not currently clashing");
+		
+		if(hurtbox.OwnerObject is IAttacker attackerOwner && attackerOwner.Hitting && attackerOwner.LastHitee == this)
+		{
+			//GD.Print($"{this} detected a clash and is setting the clashing paramaters");
+			Clashing = true;
+			attackerOwner.Clashing = true;
+			return;
+		}
+		
+		//GD.Print($"{this} is really not clashing so is entering Hit Lag State");
 		if(hitbox.hitlag > 0)
 		{
-			var s = ChangeState<HitLagState>();
+			var s = States.Change<HitLagState>();
 			s.hitLagLength = hitbox.hitlag;
 		}
 	}
 	
-	public virtual bool InCooldown(string s) => GetCooldown(s) > 0;
+	public virtual void HandleClashing(HitData data)
+	{
+		//GD.Print($"{this} gets Handle Clashing called and calls self's attack part's Handle Hits");
+		GD.Print("CLASH");
+		CurrentAttack?.currentPart?.HandleHits();
+		var skb = data.Skb;
+		var vkb = data.Vkb;
+		
+		var force = (skb + damage*vkb/100f) * KnockbackTakenMult * (100f/weight);
+		if(force != Vector2.Zero) force = force.Normalized() * clashForce;
+		var stun = clashStun;
+		
+		if(stun > 0)
+		{
+			var s = States.Change<StunState>();
+			s.Force = force;
+			s.stunLength = (int)stun;
+		}
+		
+		if(force.x != 0f) Direction = Math.Sign(force.x);
+		
+		//PlaySound("Clash");
+	}
 	
-	public virtual bool AttackInCooldown(Attack a) => a.sharesCooldownWith.Concat(a.Name).Any(InCooldown);
+	public virtual bool AttackInCooldown(Attack a) => a.sharesCooldownWith.Concat(a.Name).Any(Cooldowns.InCooldown);
 	
 	public virtual bool ExecuteAttack(Attack a)
 	{
 		if(a is null || !a.CanActivate() || AttackInCooldown(a)) return false;
 		
-		if(currentAttack != null) ResetCurrentAttack(null);
+		if(CurrentAttack != null) ResetCurrentAttack(null);
 		
-		currentAttack = a;
-		currentAttack.Connect("AttackEnds", this, nameof(ResetCurrentAttack));
-		var s = GetState<AttackState>();
-		s.att = currentAttack;
-		ChangeState<AttackState>();
+		CurrentAttack = a;
+		CurrentAttack.Connect("AttackEnds", this, nameof(ResetCurrentAttack));
+		var s = States.Get<AttackState>();
+		s.att = CurrentAttack;
+		States.Change("Attack");
 		
-		currentAttack.Start();
+		CurrentAttack.Start();
 		return true;
 	}
 	
@@ -752,7 +661,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	
 	public Attack GetAttack(string s)
 	{
-		if(attackDict.ContainsKey(s)) return attackDict[s];
+		if(Attacks.ContainsKey(s)) return Attacks[s];
 		else
 		{
 			GD.Print($"No attack {s} found on character {Name}");
@@ -760,143 +669,55 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		}
 	}
 	
-	public int GetCooldown(string s)
-	{
-		if(cooldowns.ContainsKey(s)) return cooldowns[s];
-		else return 0;
-	}
-	
-	public void SetCooldown(string s, int cd)
-	{
-		if(cooldowns.ContainsKey(s)) cooldowns[s] = cd;
-		else cooldowns.Add(s, cd);
-	}
-	
-	public void UpdateCooldowns()
-	{
-		var keys = new List<string>(cooldowns.Keys);
-		foreach(var k in keys)
-		{
-			cooldowns[k]--;
-			if(cooldowns[k] <= 0) cooldowns.Remove(k);
-		}
-	}
-	
 	public void ResetCurrentAttack(Attack a)
 	{
-		if(currentAttack is null) return;
-		currentAttack.Disconnect("AttackEnds", this, nameof(ResetCurrentAttack));
+		if(CurrentAttack is null) return;
+		CurrentAttack.Disconnect("AttackEnds", this, nameof(ResetCurrentAttack));
 		SetAttackCooldowns();
-		currentAttack = null;
+		CurrentAttack = null;
 	}
 	
 	public virtual void EmitProjectile(string proj)
 	{
-		try
+		//get pooled projectile
+		var generatedProjectile = projPool.GetProjectile(proj);
+		if(generatedProjectile is null)
 		{
-			//get pooled projectile
-			var generatedProjectile = objectPool.GetProjectile(proj);
-			if(generatedProjectile is null)
-			{
-				GD.Print($"Failed to emit projectile {proj} because the object pool returned a null");
-			}
-			else
-			{
-				if(!activeProjectiles.ContainsKey(proj))//projectile havent been used yet. create storage
-					activeProjectiles.Add(proj, new HashSet<Projectile>());
-				//set direction
-				generatedProjectile.direction = direction;
-				//add owner
-				//generatedProjectile.OwnerObject = this;
-				//connect destruction signal
-				generatedProjectile.Connect("ProjectileDied", this, nameof(HandleProjectileDestruction));
-				//store as active
-				activeProjectiles[proj].Add(generatedProjectile);
-				//request that _Ready will be called
-				generatedProjectile.RequestReady();
-				//add to scene
-				GetParent().AddChild(generatedProjectile);
-			}
+			GD.Print($"Failed to emit projectile {proj} because the object pool returned a null");
 		}
-		catch(KeyNotFoundException)
+		else
 		{
-			GD.Print($"Character {Name} does not have projectile {proj} defined, you idiot");
+			if(!activeProjectiles.ContainsKey(proj))//projectile havent been used yet. create storage
+				activeProjectiles.Add(proj, new HashSet<Projectile>());
+			//set direction
+			generatedProjectile.Direction = Direction;
+			//add owner
+			//generatedProjectile.OwnerObject = this;
+			//connect destruction signal
+			generatedProjectile.Connect("ProjectileDied", this, nameof(HandleProjectileDestruction));
+			//store as active
+			activeProjectiles[proj].Add(generatedProjectile);
+			//request that _Ready will be called
+			generatedProjectile.RequestReady();
+			//add to scene
+			GetParent().AddChild(generatedProjectile);
 		}
 	}
 	
 	public virtual void HandleProjectileDestruction(Projectile who)
 	{
 		var identifier = who.identifier;
-		try
-		{
-			activeProjectiles[identifier].Remove(who);
-			objectPool.InsertProjectile(who);
-			who.Disconnect("ProjectileDied", this, nameof(HandleProjectileDestruction));
-		}
-		catch(KeyNotFoundException)
-		{
-			GD.Print($"Projectile {identifier} died but was never reported as active. TF");
-		}
+		
+		if(!activeProjectiles.ContainsKey(identifier))
+			throw new Exception($"Projectile {identifier} died but was never reported as active");
+		
+		activeProjectiles[identifier].Remove(who);
+		projPool.InsertProjectile(who);
+		who.Disconnect("ProjectileDied", this, nameof(HandleProjectileDestruction));
 	}
 	
 	public virtual void SetAttackCooldowns()
 	{
-		var cd = currentAttack.GetEndlag() + currentAttack.GetCooldown();
-		SetCooldown(currentAttack.Name, cd);
+		Cooldowns[CurrentAttack.Name] = CurrentAttack.GetEndlag() + CurrentAttack.GetCooldown();
 	}
-	
-	///////////////////////////////////////////
-	/////////////Invincibility/////////////////
-	///////////////////////////////////////////
-	
-	public void AddInvincibility(string source, int length) => invincibilityTimers.Add(source, length);
-	public void RemoveInvincibility(string source) => invincibilityTimers.Remove(source);
-	public void HasInvincibilityFrom(string source) => invincibilityTimers.ContainsKey(source);
-	public int InvincibilityLeftFrom(string source) => invincibilityTimers[source];
-	
-	public void UpdateInvincibilityTimers()
-	{
-		var keys = new List<string>(invincibilityTimers.Keys);
-		foreach(var k in keys)
-		{
-			invincibilityTimers[k]--;
-			if(invincibilityTimers[k] <= 0) invincibilityTimers.Remove(k);
-		}
-	}
-	
-	public bool IsInvincible() => invincibilityTimers.Count > 0;
-	
-	///////////////////////////////////////////
-	/////////////////Resources/////////////////
-	///////////////////////////////////////////
-	
-	public void GiveResource(string resource, int amount, int min, int max)
-	{
-		if(resources.ContainsKey(resource))
-		{
-			int desired = Math.Max(Math.Min(resources[resource] + amount, max), Math.Max(min,0));
-			if(desired == 0) resources.Remove(resource);
-			else resources[resource] = desired;
-		}
-		else if(amount > 0) resources.Add(resource, amount);
-	}
-	
-	public void GiveResource(string resource, int amount, int max) => GiveResource(resource, amount, 0, max);
-	public void GiveResource(string resource, int amount) => GiveResource(resource, amount, int.MaxValue);
-	
-	public void SetResource(string resource, int amount)
-	{
-		if(amount <= 0) RemoveResource(resource);
-		else if(resources.ContainsKey(resource)) resources[resource] = amount;
-		else resources.Add(resource, amount);
-	}
-	
-	public void RemoveResource(string resource)
-	{
-		if(resources.ContainsKey(resource)) resources.Remove(resource);
-	}
-	
-	public int ResourceCount(string resource) => resources.ContainsKey(resource)?resources[resource]:0;
-	public bool HasResource(string resource) => HasResourceBeyondThreshold(resource, 0);
-	public bool HasResourceBeyondThreshold(string resource, int threshold) => resources.ContainsKey(resource) && (resources[resource] > threshold);
 }

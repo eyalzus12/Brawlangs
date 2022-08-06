@@ -15,7 +15,7 @@ public class AirState : State
 		ch.onSemiSolid = false;
 		ch.onSlope = false;
 		jump = false;
-		if(ch.sprite.currentSheet.name.StartsWith("Jump"))
+		if(ch.CharacterSprite.currentSheet.name.StartsWith("Jump"))
 			ch.QueueAnimation("Drift");
 		else
 			ch.PlayAnimation("Drift");
@@ -29,7 +29,7 @@ public class AirState : State
 	
 	protected virtual void DoInputMovement()
 	{
-		ch.vec.x.Towards(ch.direction * ch.airSpeed, ch.airAcceleration);
+		ch.vec.x.Towards(ch.Direction * ch.airSpeed, ch.airAcceleration);
 	}
 	
 	protected virtual void DoFriction()
@@ -44,13 +44,13 @@ public class AirState : State
 	
 	protected override void DoJump()
 	{
-		if(ch.HasResource("AirJumps")) jump = true;
+		if(ch.Resources.Has("AirJumps")) jump = true;
 	}
 	
 	protected override void DoDodge()
 	{
-		if(!actionable || !ch.HasResource("Dodge") || ch.InCooldown("Dodge")) return;
-		ch.ChangeState((ch.InputtingDirection?"Directional":"Spot")+"AirDodge");
+		if(!Actionable || !ch.Resources.Has("Dodge") || ch.Cooldowns.InCooldown("Dodge")) return;
+		ch.States.Change((ch.InputtingDirection?"Directional":"Spot")+"AirDodge");
 		MarkForDeletion("player_dodge", true);
 	}
 	
@@ -102,8 +102,8 @@ public class AirState : State
 	
 	protected override bool CalcStateChange()
 	{
-		if(jump) ch.ChangeState<AirJumpState>();
-		else if(ch.walled && ch.HasResource("Clings")) ch.ChangeState<WallLandState>();
+		if(jump) ch.States.Change("AirJump");
+		else if(ch.walled && ch.Resources.Has("Clings")) ch.States.Change("WallLand");
 		else if(ch.grounded)
 		{
 			if(ch.onSemiSolid && ch.downHeld)
@@ -112,7 +112,7 @@ public class AirState : State
 				ch.vic.y = VCF;
 				SetupCollisionParamaters();
 			}
-			else ch.ChangeState<LandState>();
+			else ch.States.Change("Land");
 		}
 		else return false;
 		

@@ -17,13 +17,13 @@ public class CrouchState : BaseCrouchState
 		ch.TurnConditional();
 		
 		if(ch.InputtingHorizontalDirection)
-			ch.vec.x = ch.GetInputDirection() * ch.groundAcceleration;
+			ch.vec.x = ch.InputDirection * ch.groundAcceleration;
 	}
 	
 	protected override bool CalcStateChange()
 	{
 		if(base.CalcStateChange()) return true;
-		else if(ch.InputtingHorizontalDirection) ch.ChangeState("Crawl");
+		else if(ch.InputtingHorizontalDirection) ch.States.Change("Crawl");
 		else return false;
 		
 		return true;

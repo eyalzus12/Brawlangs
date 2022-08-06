@@ -14,6 +14,7 @@ public class CharacterCollision : CollisionShape2D
 	
 	public Vector2 originalPosition = Vector2.Zero;
 	
+	public int Direction => owner.Direction;
 	public Character owner;
 	
 	public Vector2 DynamicPosition
@@ -21,7 +22,7 @@ public class CharacterCollision : CollisionShape2D
 		get => Position;
 		set
 		{
-			var val = value*new Vector2(direction, 1);
+			var val = value*new Vector2(Direction, 1);
 			SetDeferred("position", val);
 			originalPosition = value;
 		}
@@ -52,12 +53,12 @@ public class CharacterCollision : CollisionShape2D
 	
 	public virtual void ChangeState(string newState)
 	{
-		try
+		if(states.ContainsKey(newState))
 		{
 			var changeTo = states[newState];
 			ChangeState(changeTo);
 		}
-		catch(KeyNotFoundException)
+		else
 		{
 			GD.Print($"Collision State {newState} is not defined for collision {this}");
 		}
@@ -79,7 +80,4 @@ public class CharacterCollision : CollisionShape2D
 	}
 	
 	public virtual Color GetDrawColor() => new Color(1,1,0,1);
-	
-	public virtual int GetDirection() => owner.direction;
-	public int direction => GetDirection();
 }

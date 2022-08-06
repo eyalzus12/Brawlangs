@@ -8,14 +8,14 @@ public class HitLagState : State
 	public HitLagState() : base() {}
 	public HitLagState(Character link) : base(link) {}
 	
-	public override bool IsActionable() => false;
+	public override bool Actionable => false;
 	
 	public override void Init()
 	{
 		ch.ResetVelocity();
 		//pause animation
 		ch.fastfalling = false;
-		ch.currentAttack?.currentPart?.Pause();
+		ch.CurrentAttack?.currentPart?.Pause();
 	}
 	
 	protected override void DoGravity()
@@ -34,8 +34,8 @@ public class HitLagState : State
 	{
 		if(frameCount >= hitLagLength)
 		{
-			ch.ChangeState<AttackState>();
-			ch.currentAttack.currentPart.Resume();
+			ch.States.Change("Attack");
+			ch.CurrentAttack.currentPart.Resume();
 			hitLagLength = 0;
 		}
 		else return false;
@@ -47,9 +47,9 @@ public class HitLagState : State
 	{
 		if(newState is StunState || newState is HitPauseState)
 		{
-			var att = ch.currentAttack;
+			var att = ch.CurrentAttack;
 			if(att is null) return;
-			att.Disconnect("AttackEnds", ch.GetState<AttackState>(), "SetEnd");
+			att.Disconnect("AttackEnds", ch.States["Attack"], "SetEnd");
 			att.connected = null;
 			att.active = false;
 			att.OnEnd();

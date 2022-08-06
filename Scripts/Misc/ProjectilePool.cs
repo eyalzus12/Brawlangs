@@ -89,7 +89,7 @@ public class ProjectilePool : Node
 			var obj = h.Item2;
 			if(obj is null || !Godot.Object.IsInstanceValid(obj))
 			{
-				GD.Print($"aaaa {obj}");
+				GD.Print($"Invalid instance of object {obj} was found while cealning return queue. Cheese fucked up somewhere.");
 				continue;
 			}
 			

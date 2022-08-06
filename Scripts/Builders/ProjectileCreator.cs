@@ -42,7 +42,7 @@ public class ProjectileCreator
 		var proj = new Projectile();
 		
 		proj.OwnerObject = (IAttacker)n;
-		var characterAudioManager = n.Get("audioManager") as AudioManager;
+		var characterAudioManager = proj.OwnerObject.Audio;
 		var am = new AudioManager(2);
 		am.Name = "AudioManager";
 		am.sounds = characterAudioManager.sounds;
@@ -206,9 +206,7 @@ public class ProjectileCreator
 		cs.Name = section + "Collision";
 		h.shape = cs;
 		h.AddChild(cs);
-		//cs.Owner = h;//for scene packing
 		p.AddChild(h);
-		//h.Owner = p;//for scene packing
 		p.Hitboxes.Add(h);
 	}
 	

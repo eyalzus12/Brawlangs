@@ -9,7 +9,7 @@ public class AttackState : State
 	public AttackState() : base() {}
 	public AttackState(Character link) : base(link) {}
 	
-	public override bool IsActionable() => false;
+	public override bool Actionable => false;
 	
 	public Attack att;
 	
@@ -35,11 +35,10 @@ public class AttackState : State
 	
 	protected virtual void DoInputMovement()
 	{
-		var idir = ch.GetInputDirection();
-		if(idir == ch.direction)
-			ch.vec.x.Towards(ch.direction * att.currentPart.driftForwardSpeed, att.currentPart.driftForwardAcceleration);
+		if(ch.InputDirection == ch.Direction)
+			ch.vec.x.Towards(ch.Direction * att.currentPart.driftForwardSpeed, att.currentPart.driftForwardAcceleration);
 		else
-			ch.vec.x.Towards(-ch.direction * att.currentPart.driftBackwardsSpeed, att.currentPart.driftBackwardsAcceleration);
+			ch.vec.x.Towards(-ch.Direction * att.currentPart.driftBackwardsSpeed, att.currentPart.driftBackwardsAcceleration);
 	}
 	
 	protected virtual void DoFriction()
@@ -65,7 +64,7 @@ public class AttackState : State
 	protected override void LoopActions()
 	{
 		SetupCollisionParamaters();
-		if(ch.walled && ch.HasResource("Clings") && !touchedWall)
+		if(ch.walled && ch.Resources.Has("Clings") && !touchedWall)
 		{
 			ch.RestoreOptionsOnWallTouch();
 			ch.vec.y *= (1-ch.wallFriction*ch.wfric);
@@ -109,7 +108,7 @@ public class AttackState : State
 		if(endlag > 0)//has endlag to apply
 		{
 			//switch state
-			var s = ch.ChangeState<EndlagState>();
+			var s = ch.States.Change<EndlagState>();
 			//supply state with endlag
 			s.endlag = endlag;
 			//supply state with attack
@@ -126,20 +125,20 @@ public class AttackState : State
 				if(ch.downHeld)
 				{
 					ch.Crouch();
-					ch.ChangeState(ch.IsIdle?"Crouch":"Crawl");
+					ch.States.Change(ch.Idle?"Crouch":"Crawl");
 				}
 				else
 				{
 					ch.Uncrouch();
-					ch.ChangeState(ch.IsIdle?"Idle":"Walk");
+					ch.States.Change(ch.Idle?"Idle":"Walk");
 				}
 			}
 			else if(ch.walled && touchedWall)
 			{
 				ch.ApplySettings("Wall");
-				ch.ChangeState("Wall");
+				ch.States.Change("Wall");
 			}
-			else ch.ChangeState("Air");
+			else ch.States.Change("Air");
 		}
 		
 		//forget attack
@@ -149,9 +148,12 @@ public class AttackState : State
 	//handle state change
 	public override void OnChange(State newState)
 	{
+		//GD.Print($"{ch} is changing from Attack State");
+		
 		//got hit
 		if(newState is StunState || newState is HitPauseState)
 		{
+			//GD.Print($"{ch} is changing to Stun or Hit Pause State so need to cleanup");
 			att.Disconnect("AttackEnds", this, nameof(SetEnd));
 			att.connected = null;
 			att.active = false;

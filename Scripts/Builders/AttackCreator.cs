@@ -72,7 +72,7 @@ public class AttackCreator
 		n.AddChild(a);
 		a.Owner = n;//for scene packing
 		//ch.attacks.Add(a);
-		ch.attackDict.Add(a.Name, a);
+		ch.Attacks.Add(a.Name, a);
 		//ch.cooldowns.Add(a.Name, 0);
 	}
 	

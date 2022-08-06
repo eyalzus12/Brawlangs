@@ -6,7 +6,7 @@ public class GetupState : GroundedState
 	public GetupState() : base() {}
 	public GetupState(Character link) : base(link) {}
 	
-	public override bool IsActionable() => false;
+	public override bool Actionable => false;
 	
 	public override void Init()
 	{
@@ -24,7 +24,7 @@ public class GetupState : GroundedState
 		ch.TurnConditional();
 		
 		if(ch.InputtingHorizontalDirection)
-			ch.vec.x = ch.direction * ch.crawlSpeed;
+			ch.vec.x = ch.Direction * ch.crawlSpeed;
 		else ch.vec.x = 0;
 	}
 	
@@ -33,9 +33,9 @@ public class GetupState : GroundedState
 		if(base.CalcStateChange()) return true;
 		else if(frameCount >= ch.getupLength)
 		{
-			if(ch.IsIdle) ch.ChangeState("Idle");
-			else if(ch.InputtingHorizontalDirection) ch.ChangeState("Walk");
-			else ch.ChangeState("WalkStop");
+			if(ch.Idle) ch.States.Change("Idle");
+			else if(ch.InputtingHorizontalDirection) ch.States.Change("Walk");
+			else ch.States.Change("WalkStop");
 		}
 		else return false;
 		

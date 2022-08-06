@@ -8,7 +8,7 @@ public class CrouchJumpState : BaseCrouchState
 	public CrouchJumpState() : base() {}
 	public CrouchJumpState(Character link) : base(link) {}
 	
-	public override bool IsActionable() => false;
+	public override bool Actionable => false;
 	
 	public override void Init()
 	{
@@ -17,7 +17,7 @@ public class CrouchJumpState : BaseCrouchState
 		ch.vac = Vector2.Zero;
 		jump = false;
 		jumpActive = false;
-		if(ch.currentAttack is null)
+		if(ch.CurrentAttack is null)
 		{
 			SetupCollisionParamaters();
 			AdjustVelocity();
@@ -44,8 +44,8 @@ public class CrouchJumpState : BaseCrouchState
 	
 	protected override void DoDodge()
 	{
-		if(ch.InCooldown("Dodge")) return;
-		ch.ChangeState("DirectionalAirDodge");
+		if(ch.Cooldowns.InCooldown("Dodge")) return;
+		ch.States.Change("DirectionalAirDodge");
 		MarkForDeletion("player_dodge", true);
 	}
 	
@@ -59,7 +59,7 @@ public class CrouchJumpState : BaseCrouchState
 		if(!ch.grounded && jumpActive)
 		{
 			ch.ApplySettings("Default");
-			ch.ChangeState("Air");
+			ch.States.Change("Air");
 		}
 		else return false;
 		

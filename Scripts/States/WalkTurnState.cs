@@ -15,20 +15,20 @@ public class WalkTurnState : GroundedSlowdownState
 	
 	protected override void DoDodge()
 	{
-		if(!actionable || jump) return;
+		if(!Actionable || jump) return;
 		
 		if(ch.InputtingHorizontalDirection && !ch.InputtingTurn)
 		{
-			ch.direction *= -1;
-			ch.ChangeState("DirectionalAirDodge");
+			ch.Turn();
+			ch.States.Change("DirectionalAirDodge");
 		}
 	}
 	
 	protected override bool CalcStateChange()
 	{
 		//if(ch.currentAttack != null) return false;
-		if(!ch.grounded) ch.ChangeState("Air");
-		else if(frameCount >= ch.walkTurn + Math.Round(TURNING_MULT*(1-ch.ffric))) ch.ChangeState("Walk");
+		if(!ch.grounded) ch.States.Change("Air");
+		else if(frameCount >= ch.walkTurn + Math.Round(TURNING_MULT*(1-ch.ffric))) ch.States.Change("Walk");
 		else return false;
 		
 		return true;

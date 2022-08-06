@@ -22,7 +22,7 @@ public class GroundedState : State
 	
 	protected virtual void DoInputMovement()
 	{
-		var dir = ch.GetInputDirection();
+		var dir = ch.InputDirection;
 		float sped = dir * ch.groundSpeed * (2-ch.ffric);
 		float acc = ch.groundAcceleration * ch.ffric;
 		
@@ -37,18 +37,18 @@ public class GroundedState : State
 	
 	protected override void DoJump()
 	{
-		if(!actionable) return;
+		if(!Actionable) return;
 		MarkForDeletion("player_jump", true);
 		jump = true;
 	}
 	
 	protected override void DoDodge()
 	{
-		if(!actionable || jump || !ch.HasResource("Dodge")) return;
+		if(!Actionable || jump || !ch.Resources.Has("Dodge")) return;
 		
-		if(ch.InputtingHorizontalDirection && !ch.InCooldown("Dodge"))
+		if(ch.InputtingHorizontalDirection && !ch.Cooldowns.InCooldown("Dodge"))
 		{
-			ch.ChangeState("DirectionalAirDodge");
+			ch.States.Change("DirectionalAirDodge");
 			MarkForDeletion("player_dodge", true);
 		}
 	}
@@ -103,9 +103,9 @@ public class GroundedState : State
 	
 	protected override bool CalcStateChange()
 	{
-		if(jump) ch.ChangeState<JumpState>();
-		else if(!ch.grounded) ch.ChangeState<AirState>();
-		else if(ch.downHeld && !ch.crouching && !ch.onSemiSolid && ch.vec.y > 0f) ch.ChangeState<DuckState>();
+		if(jump) ch.States.Change("Jump");
+		else if(!ch.grounded) ch.States.Change("Air");
+		else if(ch.downHeld && !ch.crouching && !ch.onSemiSolid && ch.vec.y > 0f) ch.States.Change("Duck");
 		else return false;
 		
 		return true;

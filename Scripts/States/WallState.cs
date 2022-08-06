@@ -17,7 +17,7 @@ public class WallState : State
 	protected override void DoMovement()
 	{
 		if(ch.TurnConditional())
-			ch.vec.x = ch.direction * ch.airAcceleration;
+			ch.vec.x = ch.Direction * ch.airAcceleration;
 	}
 	
 	protected override void DoGravity()
@@ -43,13 +43,11 @@ public class WallState : State
 	
 	protected override bool CalcStateChange()
 	{
-		if(ch.grounded)
-			ch.ChangeState("Land");
-		else if(!ch.walled)
-			ch.ChangeState("Air");
+		if(ch.grounded) ch.States.Change("Land");
+		else if(!ch.walled) ch.States.Change("Air");
 		else 
 		{
-			if(jump) ch.ChangeState("WallJump");
+			if(jump) ch.States.Change("WallJump");
 			else return false;
 			return true;
 		}
@@ -73,11 +71,11 @@ public class WallState : State
 	
 	protected override void AdjustVelocity()
 	{
-		if(ch.direction * ch.wvel.x > 0)
+		if(ch.Direction * ch.wvel.x > 0)
 			ch.vec.x = ch.wvel.x;
 		else ch.vec.x = 0;
 		
-		ch.vec.x += ch.direction * HCF;
+		ch.vec.x += ch.Direction * HCF;
 		ch.vac.y = ch.wvel.y;
 	}
 }

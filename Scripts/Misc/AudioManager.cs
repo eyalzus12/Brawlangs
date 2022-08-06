@@ -24,12 +24,13 @@ public class AudioManager : Node
 	
 	public override void _Ready()
 	{
-		foreach(var player in players) AddChild(player);
+		players.ForEach(a => AddChild(a));
+		//foreach(var player in players) AddChild(player);
 	}
 	
 	public void Play(AudioStream stream)
 	{
-		if(available.Count <= 0) return;//TODO: add a waiting queue for sounds, that plays them at the fitting time
+		if(stream is null || available.Count <= 0) return;//TODO: add a waiting queue for sounds, that plays them at the fitting time
 		var use = available.Dequeue();
 		use.Play(stream);
 		use.Connect("FinishedPlaying", this, nameof(StreamFinished));
@@ -72,7 +73,6 @@ public class AudioManager : Node
 				player.Disconnect("FinishedPlaying", this, nameof(StreamFinished));
 				available.Enqueue(player);
 			}
-			
 		});
 	}
 	

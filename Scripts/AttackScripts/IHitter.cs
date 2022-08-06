@@ -11,8 +11,9 @@ public interface IHitter
 	List<Hitbox> Hitboxes{get;set;}
 	HashSet<IHittable> HitIgnoreList{get;set;}
 	Dictionary<Hurtbox, Hitbox> HitList{get;set;}
-	bool Hit{get;set;}
 	IAttacker OwnerObject{get;set;}
+	
+	bool HasHit{get; set;}
 	
 	void ConnectSignals();
 	void HandleInitialHit(Hitbox hitbox, Hurtbox hurtbox);

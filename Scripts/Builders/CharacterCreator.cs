@@ -25,9 +25,9 @@ public class CharacterCreator
 		//load name
 		ch.Name = name + teamNum;
 		
-		var objectPool = new ProjectilePool(ch); 
-		ch.AddChild(objectPool);
-		ch.objectPool = objectPool;
+		var projPool = new ProjectilePool(ch); 
+		ch.AddChild(projPool);
+		ch.projPool = projPool;
 		
 		
 		ch.CollisionLayer = 0b100;
@@ -67,7 +67,7 @@ public class CharacterCreator
 		var projFile = charinif["Projectiles", ""].s();
 		//create attacks
 		var projCreator = new ProjectileCreator($"{directoryPath}/{projFile}.ini");
-		ch.objectPool.ProjCreate = projCreator;
+		ch.projPool.ProjCreate = projCreator;
 		/*var projectilesBuilt = projCreator.Build(ch);
 		foreach(var sp in projectilesBuilt)
 		{
@@ -104,7 +104,7 @@ public class CharacterCreator
 			spr.AddSheet(texture, animationName, frames, loop);
 		}
 		
-		ch.sprite = spr;
+		ch.CharacterSprite = spr;
 		ch.AddChild(spr);
 	}
 	

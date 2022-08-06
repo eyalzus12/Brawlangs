@@ -14,6 +14,11 @@ public class PublicData : Node
 	public Dictionary<string, object>.KeyCollection Keys => dict.Keys;
 	public Dictionary<string, object>.ValueCollection Values => dict.Values;
 	
+	public override void _Ready()
+	{
+		PauseMode = Node.PauseModeEnum.Process;
+	}
+	
 	public object this[string index]
 	{
 		get

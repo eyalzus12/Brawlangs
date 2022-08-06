@@ -6,18 +6,13 @@ public class GenericInvincibleState : State
 	public GenericInvincibleState() : base() {}
 	public GenericInvincibleState(Character link) : base(link) {}
 	
-	public override bool IsActionable() => false;
+	public override bool Actionable => false;
 	
-	public virtual int Startup() => 0;
-	public int startup => Startup();
-	public virtual int InvincibilityLength() => 0;
-	public int iframes => InvincibilityLength();
-	public virtual int Endlag() => 0;
-	public int endlag => Endlag();
-	public virtual string ActionName() => ToString();
-	public string actionName => ActionName();
-	public virtual string Animation() => "Default";
-	public string animation => Animation();
+	public virtual int Startup{get;}
+	public virtual int IFrames{get;}
+	public virtual int Endlag{get;}
+	public virtual string ActionName{get;}
+	public virtual string StateAnimation{get;}
 	
 	public bool IFramesStarted = false;
 	public bool IsInEndlag = false;
@@ -26,22 +21,22 @@ public class GenericInvincibleState : State
 	{
 		IFramesStarted = false;
 		IsInEndlag = false;
-		ch.GiveResource(ActionName(), -1);
-		ch.PlayAnimation(animation);
+		ch.Resources.Give(ActionName, -1);
+		ch.PlayAnimation(StateAnimation);
 	}
 	
 	protected override void LoopActions()
 	{
-		if(!IFramesStarted && frameCount >= startup)
+		if(!IFramesStarted && frameCount >= Startup)
 		{
-			ch.AddInvincibility(actionName, iframes);
+			ch.IFrames.Add(ActionName, IFrames);
 			OnIFramesStart();
 			IFramesStarted = true;
 		}
 		
-		if(!IsInEndlag && frameCount >= iframes+startup)
+		if(!IsInEndlag && frameCount >= IFrames+Startup)
 		{
-			ch.RemoveInvincibility(actionName);
+			ch.IFrames.Remove(ActionName);
 			OnEndlagStart();
 			IsInEndlag = true;
 		}
@@ -52,7 +47,7 @@ public class GenericInvincibleState : State
 	
 	protected override bool CalcStateChange()
 	{
-		if(frameCount >= startup+iframes+endlag) DecideNextState();
+		if(frameCount >= Startup+IFrames+Endlag) DecideNextState();
 		else return false;
 		
 		return true;
@@ -60,6 +55,6 @@ public class GenericInvincibleState : State
 	
 	protected virtual void DecideNextState()
 	{
-		ch.ChangeState<AirState>();
+		ch.States.Change("Air");
 	}
 }

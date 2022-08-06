@@ -11,16 +11,16 @@ public class BaseCrouchState : GroundedState
 		ch.TurnConditional();
 		
 		if(ch.InputtingHorizontalDirection)
-			ch.vec.x = ch.direction * ch.crawlSpeed;
+			ch.vec.x = ch.Direction * ch.crawlSpeed;
 		else
 			ch.vec.x = 0;
 	}
 	
 	protected override bool CalcStateChange()
 	{
-		if(jump) ch.ChangeState<CrouchJumpState>();
+		if(jump) ch.States.Change("CrouchJump");
 		else if(base.CalcStateChange()) return true;
-		else if(!Inputs.IsActionPressed("player_down")) ch.ChangeState<GetupState>();
+		else if(!Inputs.IsActionPressed("player_down")) ch.States.Change("Getup");
 		else return false;
 		
 		return true;

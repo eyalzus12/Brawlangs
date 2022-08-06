@@ -18,9 +18,9 @@ public class ArtemisPart : AttackPart
 	{
 		if(frameCount < startup) {}
 		else if(frameCount < startup + MoveLength)
-			ch.vuc.x = ForwardSpeed * ch.direction;
+			ch.vuc.x = ForwardSpeed * ch.Direction;
 		else if(frameCount < startup + MoveLength + Math.Round(MoveLength*ForwardSpeed/BackSpeed))
-			ch.vuc.x = -BackSpeed * ch.direction;
+			ch.vuc.x = -BackSpeed * ch.Direction;
 		else ch.vuc = Vector2.Zero;
 	}
 	

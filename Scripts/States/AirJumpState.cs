@@ -8,7 +8,7 @@ public class AirJumpState : AirState
 	public AirJumpState() : base() {}
 	public AirJumpState(Character link) : base(link) {}
 	
-	public override bool IsActionable() => false;
+	public override bool Actionable => false;
 	
 	public override void Init()
 	{
@@ -27,7 +27,7 @@ public class AirJumpState : AirState
 		{
 			jumpActive = true;
 			ch.vec.y = -ch.doubleJumpHeight;
-			ch.GiveResource("AirJumps", -1);
+			ch.Resources.Give("AirJumps", -1);
 			ch.fastfalling = false;
 			Unsnap();
 		}
@@ -42,7 +42,7 @@ public class AirJumpState : AirState
 	
 	protected override bool CalcStateChange()
 	{
-		if(jumpActive) ch.ChangeState<AirState>();
+		if(jumpActive) ch.States.Change("Air");
 		return true;
 	}
 }

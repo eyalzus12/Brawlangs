@@ -49,7 +49,7 @@ public class BlastZone : Node2D
 			if(
 				c.Position.x <= Bounds.Position.x ||//Left
 				c.Position.x >= Bounds.End.x  ||//Right
-				(c.Position.y <= Bounds.Position.y && c.currentState is StunState) || //Top
+				(c.Position.y <= Bounds.Position.y && c.States.Current is StunState) || //Top
 				c.Position.y >= Bounds.End.y //Bottom
 				)
 			{

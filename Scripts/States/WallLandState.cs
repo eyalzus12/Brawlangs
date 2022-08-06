@@ -6,7 +6,7 @@ public class WallLandState : WallState
 	public WallLandState() : base() {}
 	public WallLandState(Character link) : base(link) {}
 	
-	public override bool IsActionable() => false;
+	public override bool Actionable => false;
 	
 	public override void Init()
 	{
@@ -27,10 +27,10 @@ public class WallLandState : WallState
 	{
 		if(!ch.walled)
 		{
-			ch.ChangeState("Air");
+			ch.States.Change("Air");
 			ch.ApplySettings("Default");
 		}
-		else if(frameCount >= ch.wallLand) ch.ChangeState("Wall");
+		else if(frameCount >= ch.wallLand) ch.States.Change("Wall");
 		else return false;
 		
 		return true;

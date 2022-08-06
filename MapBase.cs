@@ -61,7 +61,7 @@ public class MapBase : Node2D
 		var cr = new CharacterCreator(path);
 		var c = cr.Build(this, i-1);
 		
-		c.sprite.SelfModulate = colorlist[i-1];
+		c.CharacterSprite.SelfModulate = colorlist[i-1];
 		c.Respawn();
 		
 		var im = new BufferInputManager(c.TeamNumber);

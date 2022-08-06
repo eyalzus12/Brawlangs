@@ -13,7 +13,7 @@ public class StunState : State
 	public StunState() : base() {}
 	public StunState(Character link) : base(link) {}
 	
-	public override bool IsActionable() => false;
+	public override bool Actionable => false;
 	
 	public override void Init()
 	{
@@ -69,7 +69,7 @@ public class StunState : State
 		{
 			ch.SetCollisionMaskBit(DROP_THRU_BIT, true);
 			ch.framesSinceLastHit = 0;
-			ch.ChangeState(ch.grounded?"Idle":ch.walled?"Wall":"Air");
+			ch.States.Change(ch.grounded?"Idle":ch.walled?"Wall":"Air");
 		}
 		else return false;
 		

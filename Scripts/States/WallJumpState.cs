@@ -8,7 +8,7 @@ public class WallJumpState : WallState
 	public WallJumpState() : base() {}
 	public WallJumpState(Character link) : base(link) {}
 	
-	public override bool IsActionable() => false;
+	public override bool Actionable => false;
 	
 	public override void Init()
 	{
@@ -30,17 +30,15 @@ public class WallJumpState : WallState
 		
 		jumpActive = true;
 		ch.Turn();
-		ch.vec.x = ch.direction * ch.horizontalWallJump;
+		ch.vec.x = ch.Direction * ch.horizontalWallJump;
 		ch.vec.y = -ch.verticalWallJump;
 		ch.fastfalling = false;
 	}
 	
 	protected override bool CalcStateChange()
 	{
-		if(ch.grounded)
-			ch.ChangeState("Land");
-		else if(jumpActive)
-			ch.ChangeState("Air");
+		if(ch.grounded) ch.States.Change("Land");
+		else if(jumpActive) ch.States.Change("Air");
 		else return false;
 		
 		ch.ApplySettings("Default");
