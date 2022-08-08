@@ -639,7 +639,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		//PlaySound("Clash");
 	}
 	
-	public virtual bool AttackInCooldown(Attack a) => a.sharesCooldownWith.Concat(a.Name).Any(Cooldowns.InCooldown);
+	public virtual bool AttackInCooldown(Attack a) => a.sharesCooldownWith.Append(a.Name).Any(Cooldowns.InCooldown);
 	
 	public virtual bool ExecuteAttack(Attack a)
 	{

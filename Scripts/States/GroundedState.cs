@@ -38,7 +38,7 @@ public class GroundedState : State
 	protected override void DoJump()
 	{
 		if(!Actionable) return;
-		MarkForDeletion("player_jump", true);
+		MarkForDeletion("jump", true);
 		jump = true;
 	}
 	
@@ -49,7 +49,7 @@ public class GroundedState : State
 		if(ch.InputtingHorizontalDirection && !ch.Cooldowns.InCooldown("Dodge"))
 		{
 			ch.States.Change("DirectionalAirDodge");
-			MarkForDeletion("player_dodge", true);
+			MarkForDeletion("dodge", true);
 		}
 	}
 	
@@ -62,20 +62,8 @@ public class GroundedState : State
 		else if(ch.rightHeld || ch.leftHeld) ch.ExecuteAttack("SLight");
 		else ch.ExecuteAttack("NLight");
 		
-		MarkForDeletion("player_light_attack", true);
+		MarkForDeletion("light", true);
 	}
-	
-	/*protected override void HeavyAttack()
-	{
-		if(jump) return;
-		
-		if(ch.upHeld) ch.ExecuteAttack("NStrong");
-		else if(ch.downHeld) ch.ExecuteAttack("DStrong");
-		else if(ch.rightHeld || ch.leftHeld) ch.ExecuteAttack("SStrong");
-		else ch.ExecuteAttack("NStrong");
-		
-		MarkForDeletion("player_heavy_attack", true);
-	}*/
 	
 	protected override void SpecialAttack()
 	{
@@ -86,7 +74,7 @@ public class GroundedState : State
 		else if(ch.rightHeld || ch.leftHeld) ch.ExecuteAttack("SSpecial");
 		else ch.ExecuteAttack("NSpecial");
 		
-		MarkForDeletion("player_special_attack", true);
+		MarkForDeletion("special", true);
 	}
 	
 	protected override void Taunt()
@@ -98,7 +86,7 @@ public class GroundedState : State
 		else if(ch.rightHeld || ch.leftHeld) ch.ExecuteAttack("STaunt");
 		else ch.ExecuteAttack("NTaunt");
 		
-		MarkForDeletion("player_taunt", true);
+		MarkForDeletion("taunt", true);
 	}
 	
 	protected override bool CalcStateChange()

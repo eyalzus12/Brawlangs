@@ -197,6 +197,7 @@ public class AttackPart : Node2D, IHitter
 		if(c.ceilinged) yield return "Ceiling";
 		if(c.walled) yield return "Wall";
 		yield return c.grounded?"Grounded":"Aerial";
+		yield return "";
 	}
 	
 	public virtual string GetNextPart()

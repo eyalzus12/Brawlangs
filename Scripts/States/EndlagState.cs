@@ -54,7 +54,7 @@ public class EndlagState : State
 		{
 			var s = ch.States.Get<AttackState>();
 			ch.TurnConditional();
-			ch.SetCollisionMaskBit(DROP_THRU_BIT, true);
+			ch.SetCollisionMaskBit(DROP_THRU_BIT, !ch.downHeld);
 			
 			if(ch.grounded)
 			{

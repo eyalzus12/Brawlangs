@@ -26,6 +26,7 @@ public class CharacterCreator
 		ch.Name = name + teamNum;
 		
 		var projPool = new ProjectilePool(ch); 
+		projPool.Name = "ProjectilePool";
 		ch.AddChild(projPool);
 		ch.projPool = projPool;
 		
@@ -84,7 +85,7 @@ public class CharacterCreator
 	public void BuildAnimations(Character ch, string animationsFolder)
 	{
 		var spr = new AnimationSprite();
-		spr.Name = "Sprite";
+		spr.Name = "CharacterSprite";
 		
 		var files = ListPostImportDirectoryFiles(animationsFolder, ".png").Distinct().ToList();
 		foreach(var file in files)

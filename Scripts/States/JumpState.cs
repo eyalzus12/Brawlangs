@@ -13,7 +13,7 @@ public class JumpState : GroundedState
 	public override void Init()
 	{
 		ch.TurnConditional();
-		MarkForDeletion("player_jump", true);
+		MarkForDeletion("jump", true);
 		ch.vac = Vector2.Zero;
 		jump = false;
 		jumpActive = false;
@@ -34,7 +34,7 @@ public class JumpState : GroundedState
 		{
 			jumpActive = true;
 			//ch.vec.x *= (1f-Math.Abs(ch.fnorm.x));
-			var height = Inputs.IsActionReallyPressed("player_jump")?ch.jumpHeight:ch.shorthopHeight;
+			var height = Inputs.IsActionReallyPressed("jump")?ch.jumpHeight:ch.shorthopHeight;
 			ch.fnorm = new Vector2(0,-1);
 			ch.vec.y = -height;
 			Unsnap();
@@ -47,7 +47,7 @@ public class JumpState : GroundedState
 	{
 		if(ch.Cooldowns.InCooldown("Dodge")) return;
 		ch.States.Change("DirectionalAirDodge");
-		MarkForDeletion("player_dodge", true);
+		MarkForDeletion("dodge", true);
 	}
 	
 	protected override void DoMovement()

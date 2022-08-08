@@ -13,7 +13,7 @@ public class CrouchJumpState : BaseCrouchState
 	public override void Init()
 	{
 		ch.TurnConditional();
-		MarkForDeletion("player_jump", true);
+		MarkForDeletion("jump", true);
 		ch.vac = Vector2.Zero;
 		jump = false;
 		jumpActive = false;
@@ -33,7 +33,7 @@ public class CrouchJumpState : BaseCrouchState
 		if(frameCount >= ch.crouchJumpSquat)
 		{
 			jumpActive = true;
-			var height = Inputs.IsActionReallyPressed("player_jump")?ch.crouchJumpHeight:ch.crouchShorthopHeight;
+			var height = Inputs.IsActionReallyPressed("jump")?ch.crouchJumpHeight:ch.crouchShorthopHeight;
 			ch.fnorm = new Vector2(0,-1);
 			ch.vec.y = -height;
 			Unsnap();
@@ -46,7 +46,7 @@ public class CrouchJumpState : BaseCrouchState
 	{
 		if(ch.Cooldowns.InCooldown("Dodge")) return;
 		ch.States.Change("DirectionalAirDodge");
-		MarkForDeletion("player_dodge", true);
+		MarkForDeletion("dodge", true);
 	}
 	
 	protected override void DoMovement()

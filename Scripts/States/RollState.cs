@@ -22,8 +22,8 @@ public class RollState : GenericInvincibleState
 	{
 		bool turn = ch.TurnConditional();
 		
-		if(Inputs.IsActionJustPressed("player_jump")) ch.States.Change("Jump");
-		else if(Inputs.IsActionPressed("player_down") && !ch.onSemiSolid) ch.States.Change("Duck");
+		if(Inputs.IsActionJustPressed("jump")) ch.States.Change("Jump");
+		else if(Inputs.IsActionPressed("down") && !ch.onSemiSolid) ch.States.Change("Duck");
 		else if(turn) ch.States.Change("WalkTurn");
 		else if(ch.InputtingHorizontalDirection) ch.States.Change(ch.walled?"WalkWall":"Walk");
 		else ch.States.Change("Idle");

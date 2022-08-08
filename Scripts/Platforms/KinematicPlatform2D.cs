@@ -43,5 +43,5 @@ public class KinematicPlatform2D : KinematicBody2D
 	
 	//public void LoadExtraProperty<T>(string s) => LoadExtraProperties.Add(s, typeof(T));
 	
-	private List<CollisionShape2D> getshape() => GetChildren().Enumerable().FilterType<CollisionShape2D>().ToList();
+	private List<CollisionShape2D> getshape() => GetChildren().FilterType<CollisionShape2D>().ToList();
 }

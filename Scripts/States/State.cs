@@ -50,18 +50,18 @@ public class State : Node
 		DoMovement();
 		DoGravity();
 		
-		if(Inputs.IsActionJustPressed("player_jump"))
+		if(Inputs.IsActionJustPressed("jump"))
 			DoJump();
-		if(Inputs.IsActionJustPressed("player_dodge"))
+		if(Inputs.IsActionJustPressed("dodge"))
 			DoDodge();
 		
 		if(this == ch.States.Current && Actionable && ch.CurrentAttack is null)
 		{
-			if(Inputs.IsActionJustPressed("player_light_attack"))
+			if(Inputs.IsActionJustPressed("light"))
 				LightAttack();
-			else if(Inputs.IsActionJustPressed("player_special_attack"))
+			else if(Inputs.IsActionJustPressed("special"))
 				SpecialAttack();
-			else if(Inputs.IsActionJustPressed("player_taunt"))
+			else if(Inputs.IsActionJustPressed("taunt"))
 				Taunt();
 		}
 		
@@ -116,99 +116,99 @@ public class State : Node
 	
 	protected void SetHorizontalAlternatingInputs()
 	{
-		if(Inputs.IsActionJustPressed("player_left"))
+		if(Inputs.IsActionJustPressed("left"))
 		{
 			if(ch.rightHeld && !ch.leftHeld)
 				ch.rightHeld = false;
 			ch.leftHeld = true;
 		}
 		
-		if(Inputs.IsActionJustReleased("player_left"))
+		if(Inputs.IsActionJustReleased("left"))
 		{
 			ch.leftHeld = false;
-			if(Inputs.IsActionPressed("player_right"))
+			if(Inputs.IsActionPressed("right"))
 				ch.rightHeld = true;
 		}
 		
-		if(Inputs.IsActionPressed("player_left") && !ch.leftHeld && !ch.rightHeld)
+		if(Inputs.IsActionPressed("left") && !ch.leftHeld && !ch.rightHeld)
 			ch.leftHeld = true;
 		
-		if(!Inputs.IsActionPressed("player_left") && ch.leftHeld)
+		if(!Inputs.IsActionPressed("left") && ch.leftHeld)
 			ch.leftHeld = false;
 		
-		if(Inputs.IsActionJustPressed("player_right"))
+		if(Inputs.IsActionJustPressed("right"))
 		{
 			if(ch.leftHeld && !ch.rightHeld) 
 				ch.leftHeld = false;
 			ch.rightHeld = true;
 		}
 		
-		if(Inputs.IsActionJustReleased("player_right"))
+		if(Inputs.IsActionJustReleased("right"))
 		{
 			ch.rightHeld = false;
-			if(Inputs.IsActionPressed("player_left")) 
+			if(Inputs.IsActionPressed("left")) 
 				ch.leftHeld = true;
 		}
 		
-		if(Inputs.IsActionPressed("player_right") && !ch.leftHeld && !ch.rightHeld)
+		if(Inputs.IsActionPressed("right") && !ch.leftHeld && !ch.rightHeld)
 			ch.rightHeld = true;
 		
-		if(!Inputs.IsActionPressed("player_right") && ch.rightHeld)
+		if(!Inputs.IsActionPressed("right") && ch.rightHeld)
 			ch.rightHeld = false;
 	}
 	
 	protected void SetVerticalAlternatingInputs()
 	{
-		if(Inputs.IsActionJustPressed("player_up"))
+		if(Inputs.IsActionJustPressed("up"))
 		{
 			if(ch.downHeld && !ch.upHeld)
 				ch.downHeld = false;
 			ch.upHeld = true;
 		}
 		
-		if(Inputs.IsActionJustReleased("player_up"))
+		if(Inputs.IsActionJustReleased("up"))
 		{
 			ch.upHeld = false;
-			if(Inputs.IsActionPressed("player_down"))
+			if(Inputs.IsActionPressed("down"))
 				ch.downHeld = true;
 		}
 		
-		if(Inputs.IsActionPressed("player_up") && !ch.upHeld && !ch.downHeld)
+		if(Inputs.IsActionPressed("up") && !ch.upHeld && !ch.downHeld)
 			ch.upHeld = true;
 		
-		if(!Inputs.IsActionPressed("player_up") && ch.upHeld)
+		if(!Inputs.IsActionPressed("up") && ch.upHeld)
 			ch.upHeld = false;
 		
-		if(Inputs.IsActionJustPressed("player_down"))
+		if(Inputs.IsActionJustPressed("down"))
 		{
 			if(ch.upHeld && !ch.downHeld) 
 				ch.upHeld = false;
 			ch.downHeld = true;
 		}
 		
-		if(Inputs.IsActionJustReleased("player_down"))
+		if(Inputs.IsActionJustReleased("down"))
 		{
 			ch.downHeld = false;
-			if(Inputs.IsActionPressed("player_up")) 
+			if(Inputs.IsActionPressed("up")) 
 				ch.upHeld = true;
 		}
 		
-		if(Inputs.IsActionPressed("player_down") && !ch.upHeld && !ch.downHeld)
+		if(Inputs.IsActionPressed("down") && !ch.upHeld && !ch.downHeld)
 			ch.downHeld = true;
 		
-		if(!Inputs.IsActionPressed("player_down") && ch.downHeld)
+		if(!Inputs.IsActionPressed("down") && ch.downHeld)
 			ch.downHeld = false;
 	}
 	
 	protected void SetFastFallInput()
 	{
-		if(Inputs.IsActionJustPressed("player_down")
+		if(Inputs.IsActionJustPressed("down")
 		&& ch.Velocity.y >= ch.fastfallMargin)
 		{
 			ch.fastfalling = true;
 		}
 		
-		if(!Inputs.IsActionPressed("player_down")
+		if(!Inputs.IsActionPressed("down")
 		|| ch.Velocity.y < ch.fastfallMargin)
 		{
 			ch.fastfalling = false;
@@ -216,8 +216,8 @@ public class State : Node
 	}
 	
 	
-	protected void SetDownHoldingInput() => ch.downHeld = Inputs.IsActionPressed("player_down");
-	protected void SetUpHoldingInput() => ch.upHeld = Inputs.IsActionPressed("player_up");
+	protected void SetDownHoldingInput() => ch.downHeld = Inputs.IsActionPressed("down");
+	protected void SetUpHoldingInput() => ch.upHeld = Inputs.IsActionPressed("up");
 	
 	public void Unsnap() => snapVector = Vector2.Zero;
 	

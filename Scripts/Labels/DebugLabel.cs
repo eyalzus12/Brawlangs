@@ -82,16 +82,16 @@ public class DebugLabel : InfoLabel
 		Add("Down", ch.downHeld);
 		Add("Up", ch.upHeld);
 		Newline();
-		Add("LeftInput",GetInputString("player_left"));
-		Add("RightInput", GetInputString("player_right"));
-		Add("DownInput", GetInputString("player_down"));
-		Add("UpInput", GetInputString("player_up"));
-		Add("JumpInput", GetInputString("player_jump"));
-		Add("DodgeInput", GetInputString("player_dodge"));
+		Add("LeftInput",GetInputString("left"));
+		Add("RightInput", GetInputString("right"));
+		Add("DownInput", GetInputString("down"));
+		Add("UpInput", GetInputString("up"));
+		Add("JumpInput", GetInputString("jump"));
+		Add("DodgeInput", GetInputString("dodge"));
 		Newline();
-		Add("LightAttackInput", GetInputString("player_light_attack"));
-		Add("SpecialAttackInput", GetInputString("player_special_attack"));
-		Add("TauntAttackInput", GetInputString("player_taunt"));
+		Add("LightAttackInput", GetInputString("light"));
+		Add("SpecialAttackInput", GetInputString("special"));
+		Add("TauntAttackInput", GetInputString("taunt"));
 		Newline();
 		
 		if(ch.Inputs is BufferInputManager buff)

@@ -7,15 +7,10 @@ using System.Linq;
 public class BufferInputManager : InputManager
 {
 	protected const string CONFIG_PATH = "res://buffer.cfg";
-	protected const string LENGTH_SECTION = "length";
 		
-	public Dictionary<string, BufferInfo> buffer = 
-		new Dictionary<string, BufferInfo>();
+	public Dictionary<string, BufferInfo> buffer = new Dictionary<string, BufferInfo>();
 		
 	CfgFile config = new CfgFile();
-	
-	//public bool filterByDeviceID = false;
-	//public HashSet<int> deviceIDFilter = new HashSet<int>();
 	
 	public int playerDeviceNumber = 0;
 		
@@ -44,7 +39,7 @@ public class BufferInputManager : InputManager
 		foreach(var key in config.Keys)
 		{
 			int res = config[key, 1].i();
-			buffer.Add($"{key}_{playerDeviceNumber}", new BufferInfo(res));
+			buffer.Add($"{playerDeviceNumber}_{key}", new BufferInfo(res));
 		}
 	}
 		
@@ -66,7 +61,7 @@ public class BufferInputManager : InputManager
 	
 	public override void MarkForDeletion(string action, bool now=false)
 	{
-		action = $"{action}_{playerDeviceNumber}";
+		action = $"{playerDeviceNumber}_{action}";
 		
 		if(buffer.ContainsKey(action))
 		{
@@ -77,7 +72,7 @@ public class BufferInputManager : InputManager
 	
 	public override bool IsActionJustPressed(string str)
 	{
-		str = $"{str}_{playerDeviceNumber}";
+		str = $"{playerDeviceNumber}_{str}";
 		
 		if(buffer.ContainsKey(str)) return buffer[str].IsActive();
 		else return base.IsActionJustPressed(str);
@@ -85,7 +80,7 @@ public class BufferInputManager : InputManager
 	
 	public override bool IsActionPressed(string str)
 	{
-		str = $"{str}_{playerDeviceNumber}";
+		str = $"{playerDeviceNumber}_{str}";
 		
 		if(buffer.ContainsKey(str)) return buffer[str].IsActive() || base.IsActionPressed(str);
 		else return base.IsActionPressed(str);
@@ -93,7 +88,7 @@ public class BufferInputManager : InputManager
 	
 	public override bool IsActionJustReleased(string str)
 	{
-		str = $"{str}_{playerDeviceNumber}";
+		str = $"{playerDeviceNumber}_{str}";
 		
 		if(buffer.ContainsKey(str)) return
 			!base.IsActionPressed(str) && //ensure input not existent
@@ -101,9 +96,9 @@ public class BufferInputManager : InputManager
 		else return base.IsActionJustReleased(str);
 	}
 	
-	public override bool IsActionReallyJustPressed(string str) => base.IsActionJustPressed($"{str}_{playerDeviceNumber}");
-	public override bool IsActionReallyPressed(string str) => base.IsActionPressed($"{str}_{playerDeviceNumber}");
-	public override bool IsActionReallyJustReleased(string str) => base.IsActionJustReleased($"{str}_{playerDeviceNumber}");
+	public override bool IsActionReallyJustPressed(string str) => base.IsActionJustPressed($"{playerDeviceNumber}_{str}");
+	public override bool IsActionReallyPressed(string str) => base.IsActionPressed($"{playerDeviceNumber}_{str}");
+	public override bool IsActionReallyJustReleased(string str) => base.IsActionJustReleased($"{playerDeviceNumber}_{str}");
 	
 	public override void _PhysicsProcess(float delta)
 	{
@@ -124,7 +119,6 @@ public class BufferInputManager : InputManager
 	
 	public override void MarkAllForDeletion()
 	{
-		foreach(var buff in buffer.Values)
-			buff.Delete();
+		foreach(var buff in buffer.Values) buff.Delete();
 	}
 }

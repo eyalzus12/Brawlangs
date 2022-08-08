@@ -20,7 +20,7 @@ public class BaseCrouchState : GroundedState
 	{
 		if(jump) ch.States.Change("CrouchJump");
 		else if(base.CalcStateChange()) return true;
-		else if(!Inputs.IsActionPressed("player_down")) ch.States.Change("Getup");
+		else if(!Inputs.IsActionPressed("down")) ch.States.Change("Getup");
 		else return false;
 		
 		return true;

@@ -34,9 +34,9 @@ public class LandState : GroundedState
 		{
 			bool turn = ch.TurnConditional();
 			
-			if(Inputs.IsActionJustPressed("player_jump"))
+			if(Inputs.IsActionJustPressed("jump"))
 				ch.States.Change("Jump");
-			else if(Inputs.IsActionPressed("player_down") && !ch.onSemiSolid) 
+			else if(Inputs.IsActionPressed("down") && !ch.onSemiSolid) 
 				ch.States.Change(ch.InputtingHorizontalDirection?ch.walled?"CrawlWall":"Crawl":"Crouch");
 			else if(ch.Idle)
 				ch.States.Change("Idle");

@@ -72,7 +72,7 @@ public class MatchCamera : Camera2D
 		var positions = followed.Select(ch=>ch.Position.Clamp(mx,Mx,my,My));
 		
 		//get average position, including map center. this will be used for following
-		center = positions.Concat(middle).Avg();
+		center = positions.Append(middle).Avg();
 		
 		//create a rect, starting at the center, that includes all positions
 		var initialRect = new Rect2(center, Vector2.Zero);

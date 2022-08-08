@@ -51,7 +51,7 @@ public class AirState : State
 	{
 		if(!Actionable || !ch.Resources.Has("Dodge") || ch.Cooldowns.InCooldown("Dodge")) return;
 		ch.States.Change((ch.InputtingDirection?"Directional":"Spot")+"AirDodge");
-		MarkForDeletion("player_dodge", true);
+		MarkForDeletion("dodge", true);
 	}
 	
 	protected override void LightAttack()
@@ -61,18 +61,8 @@ public class AirState : State
 		else if(ch.rightHeld || ch.leftHeld) ch.ExecuteAttack("SAir");
 		else ch.ExecuteAttack("NAir");
 		
-		MarkForDeletion("player_light_attack", true);
+		MarkForDeletion("light", true);
 	}
-	
-	/*protected override void HeavyAttack()
-	{
-		if(ch.upHeld) ch.ExecuteAttack("NSlam");
-		else if(ch.downHeld) ch.ExecuteAttack("DSlam");
-		else if(ch.rightHeld || ch.leftHeld) ch.ExecuteAttack("SSlam");
-		else ch.ExecuteAttack("NSlam");
-		
-		MarkForDeletion("player_heavy_attack", true);
-	}*/
 	
 	protected override void SpecialAttack()
 	{
@@ -81,7 +71,7 @@ public class AirState : State
 		else if(ch.rightHeld || ch.leftHeld) ch.ExecuteAttack("ASSpecial");
 		else ch.ExecuteAttack("ANSpecial");
 		
-		MarkForDeletion("player_special_attack", true);
+		MarkForDeletion("special", true);
 	}
 	
 	protected override void Taunt()
@@ -91,7 +81,7 @@ public class AirState : State
 		else if(ch.rightHeld || ch.leftHeld) ch.ExecuteAttack("STaunt");
 		else ch.ExecuteAttack("NTaunt");
 		
-		MarkForDeletion("player_taunt", true);
+		MarkForDeletion("taunt", true);
 	}
 	
 	public override void SetInputs()

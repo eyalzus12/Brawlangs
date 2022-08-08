@@ -6,6 +6,8 @@ using System.Collections.Generic;
 
 public static class StringUtils
 {
+	public const string FLOAT_PATTERN = @"[+-]?(?:\d*.)?\d+";
+	
 	public static string GetExtension(string str) => System.IO.Path.GetExtension(str);
 	public static string RemoveExtension(string str) => System.IO.Path.GetFileNameWithoutExtension(str);
 	public static string PascalCaseToSentence(string str) => Regex.Replace(str, "([A-Z])", " $1", RegexOptions.Compiled).Trim();

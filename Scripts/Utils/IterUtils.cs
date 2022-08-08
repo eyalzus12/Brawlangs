@@ -22,29 +22,20 @@ public static class IterUtils
 		int i = 0; foreach(var o in e) yield return (i++, o);
 	}
 	
-	public static IEnumerable<(int, object)> Indexed(this IEnumerable<object> e) => e.Indexed<object>();
-	
 	public static IEnumerable<TResult> Accumulate<TResult, T>(this IEnumerable<T> e, TResult seed, Func<TResult, T, TResult> accum)
 	{
 		foreach(var o in e) yield return (seed = accum(seed, o));
 	}
-	
-	public static IEnumerable<object> Accumulate(this IEnumerable<object> e, object seed, Func<object, object, object> accum) => e.Accumulate<object>(seed, accum);
-	public static IEnumerable<T> Accumulate<T>(this IEnumerable<object> e, T seed, Func<T, object, T> accum) => e.Accumulate<T, object>(seed, accum);
 	
 	public static IEnumerable<TResult> SelectWhere<T, TResult>(this IEnumerable<T> e, Func<T, TResult> selector, Func<T, bool> checker)
 	{
 		foreach(var o in e) if(checker(o)) yield return selector(o);
 	}
 	
-	public static IEnumerable<object> SelectWhere(this IEnumerable<object> e, Func<object, object> selector, Func<object, bool> checker) => e.SelectWhere<object, object>(selector, checker);
-	
 	public static IEnumerable<TResult> FilterType<T, TResult>(this IEnumerable<T> e)
 	{
 		foreach(var o in e) if(o is TResult t) yield return t;
 	}
-	
-	public static IEnumerable<T> FilterType<T>(this IEnumerable<object> e) => e.FilterType<object, T>();
 	
 	public static IEnumerable<T> FilterType<T>(this Godot.Collections.Array a)
 	{
@@ -73,20 +64,18 @@ public static class IterUtils
 		foreach(var o1 in e1) foreach(var o2 in e2) yield return (o1, o2);
 	}
 	
-	public static IEnumerable<(object, object)> Product(this IEnumerable<object> e1, IEnumerable<object> e2) => e1.Product<object, object>(e2);
-	
-	public static IEnumerable<T> Concat<T>(this IEnumerable<T> e, T @add) => e.Concat<T>(new T[]{@add});
-	public static IEnumerable<object> Concat(this IEnumerable<object> e, object @add) => e.Concat<object>(@add);
-	
-	public static void Debug(this IEnumerable<object> e)
+	public static void Debug<T>(this IEnumerable<T> e)
 	{
 		foreach(var o in e) GD.Print(o.ToString());
 	}
-	
-	public static void Debug(this object o) => ((IEnumerable<object>)o).Debug();
 	
 	public static Vector2 Sum(this IEnumerable<Vector2> e) => e.Aggregate(Vector2.Zero, (v1,v2)=>v1+v2);
 	public static Vector2 Avg(this IEnumerable<Vector2> e) => e.Sum()/e.Count();
 	
 	public static void Rotate<T>(this Queue<T> q) => q.Enqueue(q.Dequeue());
+	
+	public static void ForEach<T>(this IEnumerable<T> e, Action<T> a)
+	{
+		foreach(var h in e) a(h);
+	}
 }

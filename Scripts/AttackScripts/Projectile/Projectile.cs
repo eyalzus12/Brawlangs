@@ -23,7 +23,7 @@ public class Projectile : Node2D, IHitter, IHittable
 	public List<Hitbox> Hitboxes{get; set;} = new List<Hitbox>();
 	
 	public Dictionary<Hurtbox, Hitbox> HitList{get; set;} = new Dictionary<Hurtbox, Hitbox>();
-	public HashSet<IHittable> HitIgnoreList{get; set;} = HashSet<IHittable>();
+	public HashSet<IHittable> HitIgnoreList{get; set;} = new HashSet<IHittable>();
 	
 	public bool HasHit{get; set;}
 	public bool GettingHit{get; set;}

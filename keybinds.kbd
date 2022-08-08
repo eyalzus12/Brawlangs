@@ -1,0 +1,95 @@
+0:
+left = 0_K65
+right = 0_K68
+down = 0_K83
+up = 0_K87
+jump = 0_K32
+light = 0_K74
+special = 0_K75
+taunt = 0_K69
+dodge = 0_K16777237 0_K76
+run = 
+
+1:
+left = 0_K16777231
+right = 0_K16777233
+down = 0_K16777234
+up = 0_K16777232
+jump = 0_K90
+light = 0_K88
+special = 0_K67
+taunt = 0_K70
+dodge = 0_K86
+; run = 
+
+; 2:
+; left = 
+; right = 
+; up = 
+; down = 
+; jump = 
+; light = 
+; special = 
+; taunt = 
+; dodge = 
+; run = 
+
+; 3:
+; left = 
+; right = 
+; up = 
+; down = 
+; jump = 
+; light = 
+; special = 
+; taunt = 
+; dodge = 
+; run = 
+
+; 4:
+; left = 
+; right = 
+; up = 
+; down = 
+; jump = 
+; light = 
+; special = 
+; taunt = 
+; dodge = 
+; run = 
+
+; 5:
+; left = 
+; right = 
+; up = 
+; down = 
+; jump = 
+; light = 
+; special = 
+; taunt = 
+; dodge = 
+; run = 
+
+; 6:
+; left = 
+; right = 
+; up = 
+; down = 
+; jump = 
+; light = 
+; special = 
+; taunt = 
+; dodge = 
+; run = 
+
+; 7:
+; left = 
+; right = 
+; up = 
+; down = 
+; jump = 
+; light = 
+; special = 
+; taunt = 
+; dodge = 
+; run = 

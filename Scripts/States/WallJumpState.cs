@@ -16,7 +16,7 @@ public class WallJumpState : WallState
 		jumpActive = false;
 		SetupCollisionParamaters();
 		AdjustVelocity();
-		MarkForDeletion("player_jump", true);
+		MarkForDeletion("jump", true);
 		ch.PlayAnimation("WallJumpReady");
 		ch.QueueAnimation("WallJump");
 	}

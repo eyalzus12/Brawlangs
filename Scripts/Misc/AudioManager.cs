@@ -66,14 +66,14 @@ public class AudioManager : Node
 	
 	public void Cleanup()
 	{
-		players.ForEach(player => {
-			if(player.Playing)
-			{
-				player.Stop();
-				player.Disconnect("FinishedPlaying", this, nameof(StreamFinished));
-				available.Enqueue(player);
-			}
-		});
+		players.Where(p=>p.Playing).ForEach(CleanAfter);
+	}
+	
+	public void CleanAfter(AudioPlayer player)
+	{
+		player.Stop();
+		player.Disconnect("FinishedPlaying", this, nameof(StreamFinished));
+		available.Enqueue(player);
 	}
 	
 	public override void _ExitTree()
