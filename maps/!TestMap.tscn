@@ -1,7 +1,6 @@
-[gd_scene load_steps=46 format=2]
+[gd_scene load_steps=45 format=2]
 
 [ext_resource path="res://MapBase.cs" type="Script" id=1]
-[ext_resource path="res://Legacy/MovementPlayer.cs" type="Script" id=2]
 [ext_resource path="res://MovingPlatformAnimations/TestMovingPlatform5Anm.tres" type="Animation" id=3]
 [ext_resource path="res://MovingPlatformAnimations/TestMovingSemiSolidPlatform2Anm.tres" type="Animation" id=4]
 [ext_resource path="res://MovingPlatformAnimations/TestMovingPlatform3Anm.tres" type="Animation" id=5]
@@ -385,7 +384,6 @@ autoplay = "TestMapMovingPlatform1"
 playback_process_mode = 0
 anims/TestMapMovingPlatform1 = ExtResource( 16 )
 anims/TestMovingPlatform1Anm = ExtResource( 16 )
-script = ExtResource( 2 )
 
 [node name="Label" type="Label" parent="MovingPlatform1"]
 margin_left = -16.0
@@ -413,7 +411,6 @@ shape = SubResource( 15 )
 autoplay = "TestMovingPlatform2"
 playback_process_mode = 0
 anims/TestMovingPlatform2 = ExtResource( 17 )
-script = ExtResource( 2 )
 
 [node name="MovingPlatform3" type="KinematicBody2D" parent="."]
 position = Vector2( 2000, 150 )
@@ -430,7 +427,6 @@ shape = SubResource( 16 )
 autoplay = "TestMovingPlatform3"
 playback_process_mode = 0
 anims/TestMovingPlatform3 = ExtResource( 5 )
-script = ExtResource( 2 )
 
 [node name="MovingPlatform4" type="KinematicBody2D" parent="."]
 position = Vector2( -1208, 1072 )
@@ -447,7 +443,6 @@ shape = SubResource( 17 )
 autoplay = "TestMovingPlatform4"
 playback_process_mode = 0
 anims/TestMovingPlatform4 = ExtResource( 7 )
-script = ExtResource( 2 )
 
 [node name="MovingPlatform5" type="KinematicBody2D" parent="."]
 position = Vector2( -4944, -168 )
@@ -464,7 +459,6 @@ shape = SubResource( 18 )
 autoplay = "TestMovingPlatform5"
 playback_process_mode = 0
 anims/TestMovingPlatform5 = ExtResource( 3 )
-script = ExtResource( 2 )
 
 [node name="MovingPlatform6" type="KinematicBody2D" parent="."]
 position = Vector2( -3000, 550 )
@@ -481,7 +475,6 @@ shape = SubResource( 19 )
 autoplay = "TestMovingPlatform6"
 playback_process_mode = 0
 anims/TestMovingPlatform6 = ExtResource( 6 )
-script = ExtResource( 2 )
 
 [node name="MovingSemiSolidPlatform1" type="KinematicBody2D" parent="."]
 position = Vector2( -2448, -2076 )
@@ -501,7 +494,6 @@ one_way_collision = true
 autoplay = "TestMovingSemiSolidPlatform1Anm"
 playback_process_mode = 0
 anims/TestMovingSemiSolidPlatform1Anm = ExtResource( 8 )
-script = ExtResource( 2 )
 
 [node name="Label" type="Label" parent="MovingSemiSolidPlatform1"]
 margin_left = -32.0
@@ -534,7 +526,6 @@ autoplay = "TestMovingSemiSolidPlatform2Anm"
 playback_process_mode = 0
 anims/TestMovingSemiSolidPlatform1Anm = SubResource( 21 )
 anims/TestMovingSemiSolidPlatform2Anm = SubResource( 22 )
-script = ExtResource( 2 )
 
 [node name="Label" type="Label" parent="MovingSemiSolidPlatform2"]
 margin_left = -80.0
@@ -568,7 +559,6 @@ autoplay = "TestMovingPlatform7Anm"
 playback_process_mode = 0
 anims/TestMovingPlatform7Anm = ExtResource( 4 )
 anims/TestMovingSemiSolidPlatform1Anm = SubResource( 24 )
-script = ExtResource( 2 )
 
 [node name="Label" type="Label" parent="MovingPlatform7"]
 margin_left = -80.0

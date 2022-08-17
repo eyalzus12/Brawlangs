@@ -12,6 +12,7 @@ public class WallState : State
 	{
 		jump = false;
 		ch.PlayAnimation("WallIdle");
+		ch.vuc.x = 0;
 	}
 	
 	protected override void DoMovement()
@@ -23,15 +24,12 @@ public class WallState : State
 	protected override void DoGravity()
 	{
 		ch.vec.y.Towards(ch.AppropriateFallingSpeed * (2-ch.wfric), ch.AppropriateGravity * (2-ch.wfric));
+		ch.vuc.y.Towards(0, ch.AppropriateGravity * (2-ch.wfric));
 	}
 	
 	protected override void DoJump()
 	{
 		jump = true;
-//		ch.Turn();
-//		ch.vec.x = ch.direction * ch.horizontalWallJump;
-//		ch.vec.y = -ch.verticalWallJump;
-//		ch.fastfalling = false;
 	}
 	
 	public override void SetInputs()

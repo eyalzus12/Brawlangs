@@ -100,6 +100,9 @@ public class MatchCamera : Camera2D
 	
 	public Vector2 CalculateZoom(Rect2 cameraRect)
 	{
+		//don't change zoom if the viewport rect has 0 size
+		if(viewportRect.Size.x == 0 || viewportRect.Size.y == 0) return Zoom; 
+		
 		//get the zoom that'll match on the xy
 		var cameraZoomXY = cameraRect.Size/viewportRect.Size;
 		//get desired matching zoom

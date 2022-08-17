@@ -166,17 +166,18 @@ public class AttackPart : Node2D, IHitter
 		GD.Print("-------------------------------------------");
 		#endif
 		
-		hitboxPlayer.Connect("animation_finished", this, "cnp");
+		hitboxPlayer.Connect("animation_finished", this, "ChangeToNext");
 	}
 	
 	public virtual void Stop()
 	{
+		HandleHits();
 		hitboxPlayer.Stop(true);
 		Hitboxes.ForEach(h => h.Active = false);
-		active = false;
 		OnEnd();
 		HitList.Clear();
 		HitIgnoreList.Clear();
+		active = false;
 	}
 	
 	public virtual void Pause() {hitboxPlayer.Stop();}
@@ -186,7 +187,7 @@ public class AttackPart : Node2D, IHitter
 	public virtual void OnEnd() {}
 	public virtual void HitEvent(Hitbox hitbox, Hurtbox hurtbox) {}
 	
-	public virtual void cnp(string dummy="")
+	public virtual void ChangeToNext(string dummy="")
 	{
 		if(!active) return;
 		ChangePart(GetNextPart());

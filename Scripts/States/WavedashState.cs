@@ -3,6 +3,10 @@ using System;
 
 public class WavedashState : GroundedState
 {
+	public override string LightAttackType => "Light";
+	public override string SpecialAttackType => "Special";
+	public override string TauntType => "Taunt";
+	
 	public WavedashState() : base() {}
 	public WavedashState(Character link) : base(link) {}
 	
@@ -19,64 +23,50 @@ public class WavedashState : GroundedState
 	protected override void LoopActions()
 	{
 		//koopabackdashwaveslidehoverwalkmoonlanding
-		if(Math.Sign(ch.vec.x) != ch.Direction && ch.InputDirection == ch.Direction)
+		if(Math.Sign(ch.vuc.x) != ch.Direction && ch.InputDirection == ch.Direction)
 		{
-			ch.vec.x.Towards(0, ch.groundAcceleration);
+			ch.vuc.x.Towards(0, ch.groundAcceleration);
 		}
 		else
 		{
-			ch.vec.x *= (1f-ch.AppropriateFriction);
+			ch.vuc.x *= (1f-ch.AppropriateFriction);
 		}
 	}
 	
-	protected override void DoInputMovement() {}
+	protected override void DoMovement() {}
 	protected override void DoFriction() {}
 	
 	protected override void DoJump()
 	{
 		ch.TurnConditional();
 		ch.States.Change("Jump");
-		MarkForDeletion("jump", true);
+		MarkForDeletion("Jump", true);
 	}
 	
 	protected override void LightAttack()
 	{
 		ch.TurnConditional();
-		if(ch.upHeld) ch.ExecuteAttack("ULight");
-		else if(ch.downHeld) ch.ExecuteAttack("DLight");
-		else if(ch.rightHeld || ch.leftHeld) ch.ExecuteAttack("SLight");
-		else ch.ExecuteAttack("NLight");
-		
-		MarkForDeletion("light", true);
+		base.LightAttack();
 	}
 	
 	protected override void SpecialAttack()
 	{
 		ch.TurnConditional();
-		if(ch.upHeld) ch.ExecuteAttack("USpecial");
-		else if(ch.downHeld) ch.ExecuteAttack("DSpecial");
-		else if(ch.rightHeld || ch.leftHeld) ch.ExecuteAttack("SSpecial");
-		else ch.ExecuteAttack("NSpecial");
-		
-		MarkForDeletion("special", true);
+		base.SpecialAttack();
 	}
 	
 	protected override void Taunt()
 	{
 		ch.TurnConditional();
-		if(ch.upHeld) ch.ExecuteAttack("UTaunt");
-		else if(ch.downHeld) ch.ExecuteAttack("DTaunt");
-		else if(ch.rightHeld || ch.leftHeld) ch.ExecuteAttack("STaunt");
-		else ch.ExecuteAttack("NTaunt");
-		
-		MarkForDeletion("taunt", true);
+		base.Taunt();
 	}
 	
 	protected override bool CalcStateChange()
 	{
-		if(base.CalcStateChange()) return true;
+		if(jump) ch.States.Change("Jump");
+		else if(!ch.grounded) ch.States.Change("Air");
 		else if(ch.Idle) ch.States.Change("Idle");
-		else if(Math.Abs(ch.vec.x) < ch.groundSpeed)
+		else if(Math.Abs(ch.vuc.x) < ch.groundSpeed)
 		{
 			if(ch.InputtingHorizontalDirection) ch.States.Change("Walk");
 			else ch.States.Change("WalkStop");

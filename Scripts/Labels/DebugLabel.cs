@@ -82,16 +82,13 @@ public class DebugLabel : InfoLabel
 		Add("Down", ch.downHeld);
 		Add("Up", ch.upHeld);
 		Newline();
-		Add("LeftInput",GetInputString("left"));
-		Add("RightInput", GetInputString("right"));
-		Add("DownInput", GetInputString("down"));
-		Add("UpInput", GetInputString("up"));
-		Add("JumpInput", GetInputString("jump"));
-		Add("DodgeInput", GetInputString("dodge"));
+		Add("Jump", GetInputString("Jump"));
+		Add("Dodge", GetInputString("Dodge"));
+		Add("Run", GetInputString("Run"));
 		Newline();
-		Add("LightAttackInput", GetInputString("light"));
-		Add("SpecialAttackInput", GetInputString("special"));
-		Add("TauntAttackInput", GetInputString("taunt"));
+		Add("Light", GetInputString("Light"));
+		Add("Special", GetInputString("Special"));
+		Add("Taunt", GetInputString("Taunt"));
 		Newline();
 		
 		if(ch.Inputs is BufferInputManager buff)

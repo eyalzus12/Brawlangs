@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class IdleState : GroundedState
+public class IdleState : GroundedSlowdownState
 {
 	public IdleState(): base() {}
 	public IdleState(Character link): base(link) {}
@@ -10,12 +10,6 @@ public class IdleState : GroundedState
 	{
 		ch.vec.x = 0;
 		ch.PlayAnimation("Idle");
-	}
-	
-	protected override void DoMovement()
-	{
-		if(ch.InputtingHorizontalDirection)
-			ch.vec.x = ch.InputDirection * ch.groundAcceleration;
 	}
 	
 	protected override bool CalcStateChange()

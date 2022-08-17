@@ -5,6 +5,7 @@ public class AttackState : State
 {
 	public bool touchedWall = false;
 	public bool touchedGround = false;
+	public override bool ShouldDrop => ch.downHeld && ch.HoldingRun;
 	
 	public AttackState() : base() {}
 	public AttackState(Character link) : base(link) {}
@@ -43,20 +44,25 @@ public class AttackState : State
 	
 	protected virtual void DoFriction()
 	{
-		var friction = att.attackFriction*(ch.grounded?ch.ffric:1f);
-		ch.vec.x *= (1f-friction);
+		ch.vec.x *= (1f-ch.AppropriateFriction);
+		ch.vuc.x *= (1f-ch.AppropriateFriction);
 	}
 	
 	protected override void DoGravity()
 	{
 		//aerial
-		if(!ch.grounded) ch.vec.y.Towards(ch.AppropriateFallingSpeed, ch.AppropriateGravity);
+		if(!ch.grounded)
+		{
+			ch.vec.y.Towards(ch.AppropriateFallingSpeed, ch.AppropriateGravity);
+			ch.vuc.y.Towards(0, ch.AppropriateGravity);
+		}
 		//grounded and moves up
 		else if((att?.currentPart?.movement.y ?? 0) < 0) Unsnap();
 		//grounded and moves down
 		else
 		{
 			ch.vec.y = VCF;
+			ch.vuc.y = 0;
 			snapVector = -VCF * ch.fnorm;
 		}
 	}
@@ -78,10 +84,10 @@ public class AttackState : State
 		}
 	}
 	
-	protected override void RepeatActions()
+	/*protected override void RepeatActions()
 	{
 		ch.SetCollisionMaskBit(DROP_THRU_BIT, !ch.downHeld);
-	}
+	}*/
 	
 	public void SetEnd(Attack a)
 	{

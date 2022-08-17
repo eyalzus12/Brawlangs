@@ -6,6 +6,8 @@ public class DirectionalAirDodgeState : GenericInvincibleState
 	public DirectionalAirDodgeState() : base() {}
 	public DirectionalAirDodgeState(Character link) : base(link) {}
 	
+	public override bool ShouldDrop => ch.downHeld && ch.HoldingRun;
+	
 	public bool touchedWall = false;
 	public Vector2 movement;
 	
@@ -29,15 +31,17 @@ public class DirectionalAirDodgeState : GenericInvincibleState
 	protected override void LoopActions()
 	{
 		base.LoopActions();
-		ch.vec.x *= (1f-ch.AppropriateFriction);
-		ch.vec.y *= (1f-ch.airFriction);
-		if(ch.walled && ch.Resources.Has("Clings")) touchedWall = true;
 		CheckWavedashOption();
+		if(ch.walled && ch.Resources.Has("Clings")) touchedWall = true;
+		if(IFramesStarted)
+		{
+			ch.vuc.x *= (1f-ch.AppropriateFriction);
+			ch.vuc.y *= (1f-ch.airFriction);
+		}
 	}
 	
 	protected override void RepeatActions()
 	{
-		ch.SetCollisionMaskBit(DROP_THRU_BIT, !ch.downHeld);
 		if(ch.grounded) ch.RestoreOptionsOnGroundTouch();
 	}
 	
@@ -46,6 +50,7 @@ public class DirectionalAirDodgeState : GenericInvincibleState
 		if(ch.grounded && !IsInEndlag && movement.y >= 0)
 		{
 			if(!IFramesStarted) OnIFramesStart();
+			ch.vuc.y = 0;
 			ch.vec.y = VCF;
 			ch.States.Change("Wavedash");
 		}
@@ -53,7 +58,8 @@ public class DirectionalAirDodgeState : GenericInvincibleState
 	
 	protected override void OnIFramesStart()
 	{
-		ch.vec = movement;
+		ch.vec = Vector2.Zero;
+		ch.vuc = movement;
 	}
 	
 	protected override void DecideNextState()

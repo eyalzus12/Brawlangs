@@ -6,9 +6,6 @@ using System.Linq;
 
 public class KeybindsParser
 {
-	private const string DATA_PATTERN = @"^(?<device>[0-9]+)_(?<type>[BJKM])(?<data>[0-9]+)$";
-	private static readonly Regex DATA_REGEX = new Regex(DATA_PATTERN, RegexOptions.Compiled);
-	
 	public static Error Load(string path)
 	{
 		File f = new File();//create new file
@@ -23,102 +20,61 @@ public class KeybindsParser
 		//in which case an error was thrown anyways
 	}
 	
-	private static void Parse(string s) => ParseAndApplyLines(s.Split('\n'));
+	private static void Parse(string s) => SplitToSections(EnsureNoPreData(RemoveRedundantLines(s))).ForEach(dat => ParseData(dat.Item1, dat.Item2));
 	
-	private static void ParseAndApplyLines(IEnumerable<string> lines) => ParseLines(lines)
-		.ForEach(h => ApplyLine(h.Item1, h.Item2, h.Item3, h.Item4));
+	private const string IGNORE_LINE = @"^(?:;.*|[\s\n\r]*)";
+	private static readonly Regex IGNORE_REGEX = new Regex(IGNORE_LINE, RegexOptions.Compiled | RegexOptions.Multiline);
+	private static string RemoveRedundantLines(string s) => IGNORE_REGEX.Replace(s, "");
 	
-	private static void ApplyLine(int section, string action, float deadzone, IEnumerable<InputEvent> inputs)
+	private const string NO_DATA_PRE = @"^[0-9]+:";
+	private static readonly Regex NO_PRE_REGEX = new Regex(NO_DATA_PRE, RegexOptions.Compiled);
+	private static string EnsureNoPreData(string s)
 	{
-		var actionName = $"{section}_{action}";
-		if(!InputMap.HasAction(actionName)) InputMap.AddAction(actionName, deadzone);
-		inputs.ForEach(input => InputMap.ActionAddEvent(actionName, input));
+		if(!NO_PRE_REGEX.IsMatch(s)) throw new FormatException("Keybinds config: non comment lines before first section");
+		return s;
 	}
 	
-	private static IEnumerable<(int, string, float, IEnumerable<InputEvent>)> ParseLines(IEnumerable<string> lines)
+	private const string SECTION_SPLITTER = @"(?<section>[0-9]+):(?:\s*;\w*)?[\r\n]+(?<data>(?:.(?![0-9]+:))*)";
+	private static readonly Regex SECTION_REGEX = new Regex(SECTION_SPLITTER, RegexOptions.Compiled | RegexOptions.Singleline);
+	private static IEnumerable<(int, string)> SplitToSections(string s) => SECTION_REGEX
+		.Matches(s)
+		.Cast<Match>()
+		.Select(m => (int.Parse(m.Groups["section"].Value), m.Groups["data"].Value));
+	
+	private const string DATA_PARSER = @"^(?<action>\w+)\s*=\s*(?:@(?<deadzone>[+-]?[0-9]*.[0-9]+))?(?:\s+(?<device>[0-9]+)_(?<type>[a-zA-Z]*)(?<data>[0-9]+))*\s*(?:;.*)?$";
+	private static readonly Regex DATA_REGEX = new Regex(DATA_PARSER, RegexOptions.Compiled | RegexOptions.Multiline);
+	private static void ParseData(int section, string s)
 	{
-		IEnumerable<(int, IEnumerable<string>)> partitionedLines = PartitionLines(lines);
-		int i = 0;
-		foreach((int section, IEnumerable<string> sectionLines) in partitionedLines)
+		var matches = DATA_REGEX.Matches(s);
+		foreach(Match match in matches)
 		{
-			//GD.Print($"{i} {section}:");
-			++i;
-			foreach(var line in sectionLines)
-			{
-				//GD.Print($"{i} {line}");
-				if(!CommentLine(line))
-				{
-					(string action, float deadzone, IEnumerable<InputEvent> inputs) = ParseLine(line, i);
-					yield return (section, action, deadzone, inputs);
-				}
-				++i;
-			}
+			var groups = match.Groups;
+			
+			var action = groups["action"].Value;
+			var string_deadzone = groups["deadzone"].Value;
+			var deadzone = (string_deadzone == "")?0.5f:float.Parse(string_deadzone);
+			
+			var actionName = $"{section}_{action}";
+			if(!InputMap.HasAction(actionName)) InputMap.AddAction(actionName, deadzone);
+			
+			var devices = groups["device"].Captures.Cast<Capture>();
+			var types = groups["type"].Captures.Cast<Capture>();
+			var datas = groups["data"].Captures.Cast<Capture>();
+			IterUtils
+				.TriZip(devices, types, datas)
+				.ForEach
+				(
+					t => InputMap.ActionAddEvent(
+						actionName,
+						CreateInput(int.Parse(t.Item1.Value), t.Item2.Value[0], int.Parse(t.Item3.Value))
+					)
+				);
 		}
 	}
 	
-	private static bool CommentLine(string s) => s.StartsWith(";") || string.IsNullOrWhiteSpace(s);
-	
-	private static IEnumerable<(int, IEnumerable<string>)> PartitionLines(IEnumerable<string> lines)
+	private static InputEvent CreateInput(int device, char type, int data)
 	{
-		if(!lines.SkipWhile(CommentLine).First().EndsWith(":")) throw new FormatException("Keybinds config: data before first section");
-		int? currentSection = null;
-		IEnumerable<string> currentLines = Enumerable.Empty<string>();
-		foreach(var line in lines)//go over lines
-		{
-			if(!CommentLine(line) && line.EndsWith(":"))//found section
-			{
-				if(currentSection != null) yield return (currentSection ?? 0, currentLines);
-				currentSection = int.Parse(line.Substring(0, line.Length-1));
-				currentLines = Enumerable.Empty<string>();
-			}
-			else
-			{
-				currentLines = currentLines.Append(line);
-			}
-		}
-		yield return (currentSection ?? 0, currentLines);
-	}
-	
-	private static (string, float, IEnumerable<InputEvent>) ParseLine(string s, int line)
-	{
-		var parts = s.Split('=');
-		if(parts.Length != 2) throw new FormatException($"Keybinds config: invalid input format in line {line}");
-		string action = parts[0].Trim();
-		(float deadzone, IEnumerable<InputEvent> inputs) = ParseActionList(parts[1].Trim(), line);
-		return (action, deadzone, inputs);
-	}
-	
-	private static (float, IEnumerable<InputEvent>) ParseActionList(string s, int line)
-	{
-		if(s.Contains("@"))
-		{
-			var parts = s.Split(new char[]{' '}, 2);
-			if(parts.Length != 2) throw new FormatException($"Keybinds config: invalid input format in line {line}");
-			float deadzone = float.Parse(parts[0].Trim().Substring(1));
-			IEnumerable<InputEvent> inputs = ParseInputLine(parts[1].Trim(), line);
-			return (deadzone, inputs);
-		}
-		else
-		{
-			return (0.5f, ParseInputLine(s.Trim(), line));
-		}
-	}
-	
-	private static IEnumerable<InputEvent> ParseInputLine(string s, int line) => s.Split(' ').Select(h => ParseInputString(h.Trim(), line)).Where(h => h != null);
-	
-	private static InputEvent ParseInputString(string s, int line)
-	{
-		if(CommentLine(s)) return null;
-		Match match = DATA_REGEX.Match(s);
-		if(!match.Success) throw new FormatException($"Keybinds config: invalid input format {s} in line {line}");
-		
-		int device = int.Parse(match.Groups["device"].Value);
-		string s_type = match.Groups["type"].Value;
-		char type = s_type[0];
-		if(s_type.Length > 1) throw new FormatException($"Keybinds config: invalid input type {s_type} in line {line}");
-		int data = int.Parse(match.Groups["data"].Value);
-		
-		InputEvent input = GenerateInputEvent(type, line);
+		InputEvent input = InputEventForType(type);
 		input.Set("button_index", data);
 		input.Set("scancode", data);
 		input.Set("axis", data);
@@ -126,7 +82,7 @@ public class KeybindsParser
 		return input;
 	}
 	
-	private static InputEvent GenerateInputEvent(char type, int line)
+	private static InputEvent InputEventForType(char type)
 	{
 		switch(type)
 		{
@@ -134,7 +90,7 @@ public class KeybindsParser
 			case 'J': return new InputEventJoypadMotion();
 			case 'K': return new InputEventKey();
 			case 'M': return new InputEventMouseButton();
-			default: throw new FormatException($"Keybinds config: invalid input type {type} in line {line}");
+			default: throw new FormatException($"Keybinds config: invalid input type {type}");
 		}
 	}
 }

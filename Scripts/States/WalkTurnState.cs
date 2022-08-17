@@ -17,17 +17,21 @@ public class WalkTurnState : GroundedSlowdownState
 	{
 		if(!Actionable || jump) return;
 		
-		if(ch.InputtingHorizontalDirection && !ch.InputtingTurn)
+		if(!ch.InputtingTurn)
 		{
 			ch.Turn();
-			ch.States.Change("DirectionalAirDodge");
+			base.DoDodge();
 		}
 	}
 	
 	protected override bool CalcStateChange()
 	{
-		//if(ch.currentAttack != null) return false;
-		if(!ch.grounded) ch.States.Change("Air");
+		if(Actionable && ch.ShouldInitiateRun)
+		{
+			ch.TurnConditional();
+			ch.States.Change("RunStartup");
+		}
+		else if(!ch.grounded) ch.States.Change("Air");
 		else if(frameCount >= ch.walkTurn + Math.Round(TURNING_MULT*(1-ch.ffric))) ch.States.Change("Walk");
 		else return false;
 		

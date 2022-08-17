@@ -6,15 +6,12 @@ public class LandState : GroundedState
 	public LandState() : base() {}
 	public LandState(Character link) : base(link) {}
 	
+	public override bool ShouldDrop => ch.downHeld && ch.HoldingRun;
+	
 	public override void Init()
 	{
-		if(ch.onSemiSolid && ch.downHeld)
-		{
-			ch.SetCollisionMaskBit(DROP_THRU_BIT, false);
-			ch.vic.y = VCF;
-			SetupCollisionParamaters();
-			return;
-		}
+		SetPlatformDropping();
+		if(ch.onSemiSolid && ShouldDrop) return;
 		
 		ch.vac = Vector2.Zero;
 		ch.RestoreOptionsOnGroundTouch();
@@ -34,9 +31,9 @@ public class LandState : GroundedState
 		{
 			bool turn = ch.TurnConditional();
 			
-			if(Inputs.IsActionJustPressed("jump"))
+			if(Inputs.IsActionJustPressed("Jump"))
 				ch.States.Change("Jump");
-			else if(Inputs.IsActionPressed("down") && !ch.onSemiSolid) 
+			else if(Inputs.IsActionPressed("Down") && !ch.onSemiSolid) 
 				ch.States.Change(ch.InputtingHorizontalDirection?ch.walled?"CrawlWall":"Crawl":"Crouch");
 			else if(ch.Idle)
 				ch.States.Change("Idle");

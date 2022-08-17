@@ -1,3 +1,5 @@
+//#define DEBUG_INPUT_EVENTS
+
 using Godot;
 using System;
 using System.Collections.Generic;
@@ -45,18 +47,15 @@ public class BufferInputManager : InputManager
 		
 	public override void _UnhandledInput(InputEvent @event)
 	{
-		if(@event is InputEventMouseMotion) return;
-		//yeets the input if it's a mouse motion
-		//because fuck mouse motions
-		foreach(string action in InputMap.GetActions())
-		{
-			if(InputMap.ActionHasEvent(action, @event))
-			{
-				//only saves input if it was just pressed
-				if(!@event.IsEcho() && @event.IsPressed() && buffer.ContainsKey(action))
-					buffer[action].Activate(-1);
-			}
-		}
+		if(@event is InputEventMouseMotion || @event.IsEcho() || !@event.IsPressed()) return;
+		
+		#if DEBUG_INPUT_EVENTS
+		GD.Print(@event.AsText());
+		#endif
+		
+		buffer.Keys
+			.Where(action => @event.IsAction(action))
+			.ForEach(action => buffer[action].Activate(-1));
 	}
 	
 	public override void MarkForDeletion(string action, bool now=false)

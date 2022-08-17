@@ -62,7 +62,6 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	
 	public int givenDodgesOnHitting = 1;
 	public int givenDodgesOnGettingHit = 1;
-	
 	////////////////////////////////////////////
 	public int forwardRollStartup;
 	public int forwardRollLength;
@@ -73,26 +72,34 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public int backRollLength;
 	public float backRollSpeed;
 	public int backRollEndlag;
+	////////////////////////////////////////////
+	public int spotAirDodgeStartup;
+	public int spotAirDodgeLength;
+	public int spotAirDodgeEndlag;
 	
-	public int dashStartup;
-	public int dashLength;
-	public int dashSpeed;
-	public int dashCancelWindow;
+	public int directionalAirDodgeStartup;
+	public int directionalAirDodgeLength;
+	public float directionalAirDodgeSpeed;
+	public int directionalAirDodgeEndlag;
 	
-	public int spotAirDodgeStartup = 3;
-	public int spotAirDodgeLength = 15;
-	public int spotAirDodgeEndlag = 3;
-	
-	public int directionalAirDodgeStartup = 3;
-	public int directionalAirDodgeLength = 15;
-	public float directionalAirDodgeSpeed = 1500;
-	public int directionalAirDodgeEndlag = 3;
-	
+	public int spotGroundedDodgeStartup;
+	public int spotGroundedDodgeLength;
+	public int spotGroundedDodgeEndlag;
+	public int spotGroundedDodgeCooldown;
+	////////////////////////////////////////////
+	public int runStartup = 2;
+	public float runInitialSpeed = 600f;
+	public float runAcceleration = 60f;
+	public float runSpeed = 700f;
+	public int runTurn = 3;
+	public int runJumpSquat = 1;
+	public float runJumpHeight = 450f;
+	public float runJumpSpeed = 550f;
+	////////////////////////////////////////////
 	public bool restoreDodgeOnGroundTouch = true;
 	public bool restoreDodgeOnWallTouch = false;
 	public bool restoreDodgeOnHitting = true;
 	public bool restoreDodgeOnGettingHit = false;
-	
 	////////////////////////////////////////////
 	public float ceilingBonkBounce = 0.25f;//how much speed is conserved when bonking
 	public float ceilingBounce = 0.95f;//how much speed is conserved when hitting a ceiling
@@ -138,14 +145,15 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public int framesSinceLastHit = 0;
 	public int comboCount = 0;
 	
-	public Vector2[] vs = new Vector2[7]{Vector2.Zero,Vector2.Zero,Vector2.Zero,Vector2.Zero,Vector2.Zero,Vector2.Zero,Vector2.Zero};
+	public Vector2[] vs = new Vector2[8]{Vector2.Zero,Vector2.Zero,Vector2.Zero,Vector2.Zero,Vector2.Zero,Vector2.Zero,Vector2.Zero,Vector2.Zero};
 	public Vector2 vec = new Vector2();//normal velocity from movement
 	public Vector2 vac = new Vector2();//speed transferred from moving platforms
 	public Vector2 vic = new Vector2();//momentary force
 	public Vector2 voc = new Vector2();//knockback
-	public Vector2 vuc = new Vector2();
+	public Vector2 vuc = new Vector2();//burst movements that should only have friction applied
 	public Vector2 vyc = new Vector2();
 	public Vector2 vwc = new Vector2();
+	public Vector2 vvc = new Vector2();
 	
 	public Vector2 Velocity => vs.Aggregate(Vector2.Zero, (a,v)=>a+v);
 	public Vector2 RoundedVelocity => Velocity.Round();
@@ -174,10 +182,10 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	
 	public float AppropriateFriction => PlatFric * (onSlope?slopeFriction:grounded?groundFriction:walled?wallFriction:airFriction);
 	public float AppropriateBounce => PlatBounce * (grounded?floorBounce:walled?wallBounce:ceilinged?ceilingBounce:0f);
-	public float AppropriateAcceleration => (grounded?groundAcceleration:airAcceleration);
-	public float AppropriateSpeed => (crouching?crawlSpeed:grounded?groundSpeed:airSpeed);
-	public float AppropriateGravity => (CurrentAttack?.currentPart?.gravityMultiplier ?? 1f)*((States.Current is StunState)?stunGravity:fastfalling?walled?wallFastFallGravity:fastFallGravity:walled?wallGravity:gravity);
-	public float AppropriateFallingSpeed => (CurrentAttack?.currentPart?.gravityMultiplier ?? 1f)*((States.Current is StunState)?stunFallSpeed:fastfalling?walled?wallFastFallSpeed:fastFallSpeed:walled?wallFallSpeed:fallSpeed);
+	public float AppropriateAcceleration => (grounded?groundAcceleration*ffric:airAcceleration);
+	public float AppropriateSpeed => (crouching?crawlSpeed:grounded?(groundSpeed*(2-ffric)):airSpeed);
+	public float AppropriateGravity => (CurrentAttack?.currentPart?.gravityMultiplier ?? 1f)*((States.Current is StunState)?stunGravity:fastfalling?walled?wallFastFallGravity:fastFallGravity:walled?wallGravity*(2-wfric):gravity);
+	public float AppropriateFallingSpeed => (CurrentAttack?.currentPart?.gravityMultiplier ?? 1f)*((States.Current is StunState)?stunFallSpeed:fastfalling?walled?wallFastFallSpeed:fastFallSpeed:walled?wallFallSpeed*(2-wfric):fallSpeed);
 	
 	public int InputDirection => rightHeld?(leftHeld?0:1):(leftHeld?-1:0);
 	public int FutureDirection => rightHeld?(leftHeld?0:1):(leftHeld?-1:Direction);
@@ -185,10 +193,35 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	
 	public bool InputtingTurn => (FutureDirection != Direction);
 	public bool InputtingHorizontalDirection => leftHeld||rightHeld;
+	public bool NowInputtingHorizontalDirection => Inputs.IsActionJustPressed("Left")||Inputs.IsActionJustPressed("Right");
 	public bool InputtingVerticalDirection => upHeld||downHeld;
+	public bool NowInputtingVerticalDirection => Inputs.IsActionJustPressed("Up")||Inputs.IsActionJustPressed("Down");
 	public bool InputtingDirection => InputtingHorizontalDirection||InputtingVerticalDirection;
+	public bool NowInputtingDirection => NowInputtingHorizontalDirection||NowInputtingVerticalDirection;
+	
 	public bool Idle => (Math.Truncate(Velocity.x / 100f) == 0);
 	public bool Still => (Idle && !InputtingHorizontalDirection);
+	public string AttackDirPrefix => upHeld?"U":downHeld?"D":leftHeld?"S":rightHeld?"S":"N";
+	public bool InputtingDodge => Inputs.IsActionJustPressed("NDodge") || Inputs.IsActionJustPressed("Dodge");
+	public bool InputtingNatDodge => Inputs.IsActionJustPressed("NDodge") || (!InputtingDirection && Inputs.IsActionJustPressed("Dodge"));
+	public bool InputtingJump => Inputs.IsActionJustPressed("Jump");
+	public bool HoldingJump => Inputs.IsActionPressed("Jump");
+	public bool InputtingRun => Inputs.IsActionJustPressed("Run");
+	public bool HoldingRun => Inputs.IsActionPressed("Run");
+	public bool ReleasingRun => Inputs.IsActionJustReleased("Run");
+	
+	public bool ShouldInitiateRun => (HoldingRun&&NowInputtingHorizontalDirection) || (InputtingHorizontalDirection&&InputtingRun);
+	
+	public static readonly string[] INPUT_DIRS = {"U", "D", "S", "N", ""};
+	public bool InputtingAttack(string type) => INPUT_DIRS.Any(s => Inputs.IsActionJustPressed($"{s}{type}"));
+	
+	public string AttackInputDir(string type)
+	{
+		var input = INPUT_DIRS.FirstOrDefault(s => Inputs.IsActionJustPressed($"{s}{type}"), "_");
+		if(input == "_") return "";
+		if(input == "") input = AttackDirPrefix;
+		return input;
+	}
 	
 	public bool fastfalling = false;//wether or not fastfalling
 	
@@ -322,6 +355,14 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		
 		yield return new SpotAirDodgeState(this);
 		yield return new DirectionalAirDodgeState(this);
+		yield return new SpotGroundedDodgeState(this);
+		
+		yield return new RunStartupState(this);
+		yield return new RunState(this);
+		yield return new RunStopState(this);
+		yield return new RunJumpState(this);
+		yield return new RunTurnState(this);
+		yield return new RunWallState(this);
 		
 		yield return new WavedashState(this);
 	}
@@ -410,37 +451,25 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	
 	public virtual void StoreVelocities()
 	{
-		vs[0] = vec;
-		vs[1] = vac;
-		vs[2] = vic;
-		vs[3] = voc;
-		vs[4] = vuc;
-		vs[5] = vyc;
-		vs[6] = vwc;
+		vs[0] = vec; vs[1] = vac; vs[2] = vic; vs[3] = voc;
+		vs[4] = vuc; vs[5] = vyc; vs[6] = vwc; vs[7] = vvc;
 	}
 	
 	public virtual void LoadVelocities()
 	{
-		vec = vs[0];
-		vac = vs[1];
-		vic = vs[2];
-		voc = vs[3];
-		vuc = vs[4];
-		vyc = vs[5];
-		vwc = vs[6];
+		vec = vs[0]; vac = vs[1]; vic = vs[2]; voc = vs[3];
+		vuc = vs[4]; vyc = vs[5]; vwc = vs[6]; vvc = vs[7];
 	}
 	
 	public virtual void ResetVelocity()
 	{
-		for(int i = 0; i < vs.Length; ++i)
-			vs[i] = Vector2.Zero;
+		for(int i = 0; i < vs.Length; ++i) vs[i] = Vector2.Zero;
 		LoadVelocities();
 	}
 	
 	public virtual void TruncateVelocityIfInsignificant()
 	{
-		for(int i = 0; i < vs.Length; ++i)
-			vs[i].TruncateIfInsignificant();
+		for(int i = 0; i < vs.Length; ++i) vs[i].TruncateIfInsignificant();
 		LoadVelocities();
 	}
 	

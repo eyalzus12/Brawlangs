@@ -1,12 +1,12 @@
 using Godot;
 using System;
 
-public class CrouchJumpState : BaseCrouchState
+public class RunJumpState : RunState
 {
-	bool jumpActive = false;
+	public RunJumpState() : base() {}
+	public RunJumpState(Character link) : base(link) {}
 	
-	public CrouchJumpState() : base() {}
-	public CrouchJumpState(Character link) : base(link) {}
+	public bool jumpActive = false;
 	
 	public override bool Actionable => false;
 	
@@ -22,33 +22,26 @@ public class CrouchJumpState : BaseCrouchState
 			SetupCollisionParamaters();
 			AdjustVelocity();
 		}
-		ch.PlayAnimation("CrouchJumpReady");
-		ch.QueueAnimation("CrouchJump");
+		ch.PlayAnimation("JumpRunReady");
+		ch.QueueAnimation("JumpRun");
 	}
 	
 	protected override void LoopActions()
 	{
 		AdjustVelocity();
 		
-		if(frameCount >= ch.crouchJumpSquat)
+		if(frameCount >= ch.runJumpSquat)
 		{
 			jumpActive = true;
-			var height = Inputs.IsActionReallyPressed("Jump")?ch.crouchJumpHeight:ch.crouchShorthopHeight;
 			ch.fnorm = new Vector2(0,-1);
-			ch.vec.y = -height;
+			ch.vuc.x = ch.Direction * ch.runJumpSpeed * (2-ch.ffric);
+			ch.vuc.y = -ch.runJumpHeight;
 			Unsnap();
 		}
 	}
 	
 	protected override void DoJump() {}
-	
-	protected override void DoDodge()
-	{
-		if(ch.Cooldowns.InCooldown("Dodge") || !ch.Resources.Has("Dodge")) return;
-		ch.States.Change((ch.InputtingNatDodge?"Spot":"Directional") + "AirDodge");
-		MarkForDeletion("Dodge", true);
-		MarkForDeletion("NDodge", true);
-	}
+	protected override void DoDodge() {}
 	
 	protected override void DoMovement()
 	{

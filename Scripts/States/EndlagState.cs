@@ -10,6 +10,7 @@ public class EndlagState : State
 	public Attack att = null;
 	
 	public override bool Actionable => false;
+	public override bool ShouldDrop => ch.downHeld && ch.HoldingRun;
 	
 	public override void Init()
 	{
@@ -29,8 +30,13 @@ public class EndlagState : State
 	protected override void DoMovement()
 	{
 		if(att is null) return;
-		var friction = att?.attackFriction ?? 0f;
-		ch.vec.x *= 1f-friction*(ch.grounded?ch.ffric:1f);
+		DoFriction();
+	}
+	
+	protected virtual void DoFriction()
+	{
+		ch.vec.x *= (1f-ch.AppropriateFriction);
+		ch.vuc.x *= (1f-ch.AppropriateFriction);
 	}
 	
 	protected override void FirstFrameAfterInit()
@@ -38,14 +44,13 @@ public class EndlagState : State
 		ch.PlayAnimation(att.GetEndlagAnimation());
 	}
 	
-	protected override void RepeatActions()
-	{
-		ch.SetCollisionMaskBit(DROP_THRU_BIT, !ch.downHeld);
-	}
-	
 	protected override void DoGravity()
 	{
-		if(!ch.grounded) ch.vec.y.Towards(ch.AppropriateFallingSpeed, ch.AppropriateGravity);
+		if(!ch.grounded)
+		{
+			ch.vec.y.Towards(ch.AppropriateFallingSpeed, ch.AppropriateGravity);
+			ch.vuc.y.Towards(0, ch.AppropriateGravity);
+		}
 	}
 	
 	protected override bool CalcStateChange()
@@ -54,24 +59,14 @@ public class EndlagState : State
 		{
 			var s = ch.States.Get<AttackState>();
 			ch.TurnConditional();
-			ch.SetCollisionMaskBit(DROP_THRU_BIT, !ch.downHeld);
 			
 			if(ch.grounded)
 			{
 				if(!s.touchedGround) ch.RestoreOptionsOnGroundTouch();
 				if(ch.downHeld)
 				{
-					if(ch.onSemiSolid)
-					{
-						ch.SetCollisionMaskBit(DROP_THRU_BIT, false);
-						ch.vic.y = VCF;
-						ch.States.Change("Air");
-					}
-					else
-					{
-						ch.Crouch();
-						ch.States.Change(ch.Idle?"Crouch":"Crawl");
-					}
+					ch.Crouch();
+					ch.States.Change(ch.Idle?"Crouch":"Crawl");
 				}
 				else
 				{

@@ -19,7 +19,11 @@ public class StunState : State
 	{
 		SetupCollisionParamaters();
 		stunLength = 0;
-		ch.vec = Vector2.Zero;
+		
+		force = ch.voc;//store
+		ch.ResetVelocity();
+		ch.voc = force;//retrieve
+		
 		framesSinceLastBounce = 0;
 		ch.PlayAnimation("Stun");
 		
@@ -63,11 +67,12 @@ public class StunState : State
 		ch.SetCollisionMaskBit(DROP_THRU_BIT, Force.y <= 0);
 	}
 	
+	protected override void SetPlatformDropping() {}
+	
 	protected override bool CalcStateChange()
 	{
 		if(frameCount >= stunLength)
 		{
-			ch.SetCollisionMaskBit(DROP_THRU_BIT, true);
 			ch.framesSinceLastHit = 0;
 			ch.States.Change(ch.grounded?"Idle":ch.walled?"Wall":"Air");
 		}
@@ -78,7 +83,7 @@ public class StunState : State
 	
 	public override void OnChange(State newState)
 	{
-		ch.vec = ch.voc;
+		ch.vuc = ch.voc;
 		Force = Vector2.Zero;
 	}
 }

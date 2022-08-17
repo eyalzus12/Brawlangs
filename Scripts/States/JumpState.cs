@@ -3,7 +3,8 @@ using System;
 
 public class JumpState : GroundedState
 {
-	bool jumpActive = false;
+	public bool jumpActive = false;
+	public bool forceShortHop = false;
 	
 	public JumpState() : base() {}
 	public JumpState(Character link) : base(link) {}
@@ -13,9 +14,10 @@ public class JumpState : GroundedState
 	public override void Init()
 	{
 		ch.TurnConditional();
-		MarkForDeletion("jump", true);
+		MarkForDeletion("Jump", true);
 		ch.vac = Vector2.Zero;
 		jump = false;
+		forceShortHop = false;
 		jumpActive = false;
 		if(ch.CurrentAttack is null)
 		{
@@ -28,13 +30,14 @@ public class JumpState : GroundedState
 	
 	protected override void LoopActions()
 	{
+		if(Inputs.IsActionPressed("Run")) forceShortHop = true;
 		AdjustVelocity();
 		
 		if(frameCount >= ch.jumpSquat)
 		{
 			jumpActive = true;
 			//ch.vec.x *= (1f-Math.Abs(ch.fnorm.x));
-			var height = Inputs.IsActionReallyPressed("jump")?ch.jumpHeight:ch.shorthopHeight;
+			var height = (!forceShortHop && Inputs.IsActionReallyPressed("Jump"))?ch.jumpHeight:ch.shorthopHeight;
 			ch.fnorm = new Vector2(0,-1);
 			ch.vec.y = -height;
 			Unsnap();
@@ -45,9 +48,10 @@ public class JumpState : GroundedState
 	
 	protected override void DoDodge()
 	{
-		if(ch.Cooldowns.InCooldown("Dodge")) return;
-		ch.States.Change("DirectionalAirDodge");
-		MarkForDeletion("dodge", true);
+		if(ch.Cooldowns.InCooldown("Dodge") || !ch.Resources.Has("Dodge")) return;
+		ch.States.Change((ch.InputtingNatDodge?"Spot":"Directional") + "AirDodge");
+		MarkForDeletion("Dodge", true);
+		MarkForDeletion("NDodge", true);
 	}
 	
 	protected override void DoMovement()

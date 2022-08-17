@@ -9,7 +9,11 @@ public class State : Node
 	public delegate void StateEnd(State s);
 	
 	public virtual bool Actionable => true;
-	
+	public virtual string LightAttackType => "";
+	public virtual string SpecialAttackType => "";
+	public virtual string TauntType => "";
+	public virtual bool ShouldDrop => false;
+		
 	public const int DROP_THRU_BIT = 1;
 	public const float HCF = 20f;//check force
 	public const float VCF = 20f;//check force
@@ -47,22 +51,18 @@ public class State : Node
 		
 		frameCount++;
 		RepeatActions();
+		SetPlatformDropping();
 		DoMovement();
 		DoGravity();
 		
-		if(Inputs.IsActionJustPressed("jump"))
-			DoJump();
-		if(Inputs.IsActionJustPressed("dodge"))
-			DoDodge();
+		if(ch.InputtingJump) DoJump();
+		if(ch.InputtingDodge) DoDodge();
 		
 		if(this == ch.States.Current && Actionable && ch.CurrentAttack is null)
 		{
-			if(Inputs.IsActionJustPressed("light"))
-				LightAttack();
-			else if(Inputs.IsActionJustPressed("special"))
-				SpecialAttack();
-			else if(Inputs.IsActionJustPressed("taunt"))
-				Taunt();
+			if(ch.InputtingAttack("Light")) LightAttack();
+			if(ch.InputtingAttack("Special")) SpecialAttack();
+			if(ch.InputtingAttack("Taunt")) Taunt();
 		}
 		
 		if(this != ch.States.Current) return;
@@ -95,8 +95,10 @@ public class State : Node
 	
 	protected virtual void DoMovement() {}
 	protected virtual void DoGravity() {}
+	
 	protected virtual void DoJump() {}
 	protected virtual void DoDodge() {}
+	
 	protected virtual void AdjustVelocity() {}
 	
 	public virtual void SetInputs()
@@ -110,114 +112,119 @@ public class State : Node
 	protected virtual void LoopActions() {}
 	protected virtual void RepeatActions() {}
 	public virtual void OnChange(State newState) {}
-	protected virtual void LightAttack() {}
-	protected virtual void SpecialAttack() {}
-	protected virtual void Taunt() {}
+	
+	protected virtual void LightAttack() => HandleAttack("Light", LightAttackType);
+	protected virtual void SpecialAttack() => HandleAttack("Special", SpecialAttackType);
+	protected virtual void Taunt() => HandleAttack("Taunt", TauntType);
+	
+	protected void HandleAttack(string baseInput, string attackType)
+	{
+		if(attackType == "") return;
+		ch.ExecuteAttack(ch.AttackInputDir(baseInput) + attackType);
+		Character.INPUT_DIRS.ForEach(s => MarkForDeletion(s + baseInput, true));
+	}
 	
 	protected void SetHorizontalAlternatingInputs()
 	{
-		if(Inputs.IsActionJustPressed("left"))
+		if(Inputs.IsActionJustPressed("Left"))
 		{
 			if(ch.rightHeld && !ch.leftHeld)
 				ch.rightHeld = false;
 			ch.leftHeld = true;
 		}
 		
-		if(Inputs.IsActionJustReleased("left"))
+		if(Inputs.IsActionJustReleased("Left"))
 		{
 			ch.leftHeld = false;
-			if(Inputs.IsActionPressed("right"))
+			if(Inputs.IsActionPressed("Right"))
 				ch.rightHeld = true;
 		}
 		
-		if(Inputs.IsActionPressed("left") && !ch.leftHeld && !ch.rightHeld)
+		if(Inputs.IsActionPressed("Left") && !ch.leftHeld && !ch.rightHeld)
 			ch.leftHeld = true;
 		
-		if(!Inputs.IsActionPressed("left") && ch.leftHeld)
+		if(!Inputs.IsActionPressed("Left") && ch.leftHeld)
 			ch.leftHeld = false;
 		
-		if(Inputs.IsActionJustPressed("right"))
+		if(Inputs.IsActionJustPressed("Right"))
 		{
 			if(ch.leftHeld && !ch.rightHeld) 
 				ch.leftHeld = false;
 			ch.rightHeld = true;
 		}
 		
-		if(Inputs.IsActionJustReleased("right"))
+		if(Inputs.IsActionJustReleased("Right"))
 		{
 			ch.rightHeld = false;
-			if(Inputs.IsActionPressed("left")) 
+			if(Inputs.IsActionPressed("Left")) 
 				ch.leftHeld = true;
 		}
 		
-		if(Inputs.IsActionPressed("right") && !ch.leftHeld && !ch.rightHeld)
+		if(Inputs.IsActionPressed("Right") && !ch.leftHeld && !ch.rightHeld)
 			ch.rightHeld = true;
 		
-		if(!Inputs.IsActionPressed("right") && ch.rightHeld)
+		if(!Inputs.IsActionPressed("Right") && ch.rightHeld)
 			ch.rightHeld = false;
 	}
 	
 	protected void SetVerticalAlternatingInputs()
 	{
-		if(Inputs.IsActionJustPressed("up"))
+		if(Inputs.IsActionJustPressed("Up"))
 		{
 			if(ch.downHeld && !ch.upHeld)
 				ch.downHeld = false;
 			ch.upHeld = true;
 		}
 		
-		if(Inputs.IsActionJustReleased("up"))
+		if(Inputs.IsActionJustReleased("Up"))
 		{
 			ch.upHeld = false;
-			if(Inputs.IsActionPressed("down"))
+			if(Inputs.IsActionPressed("Down"))
 				ch.downHeld = true;
 		}
 		
-		if(Inputs.IsActionPressed("up") && !ch.upHeld && !ch.downHeld)
+		if(Inputs.IsActionPressed("Up") && !ch.upHeld && !ch.downHeld)
 			ch.upHeld = true;
 		
-		if(!Inputs.IsActionPressed("up") && ch.upHeld)
+		if(!Inputs.IsActionPressed("Up") && ch.upHeld)
 			ch.upHeld = false;
 		
-		if(Inputs.IsActionJustPressed("down"))
+		if(Inputs.IsActionJustPressed("Down"))
 		{
 			if(ch.upHeld && !ch.downHeld) 
 				ch.upHeld = false;
 			ch.downHeld = true;
 		}
 		
-		if(Inputs.IsActionJustReleased("down"))
+		if(Inputs.IsActionJustReleased("Down"))
 		{
 			ch.downHeld = false;
-			if(Inputs.IsActionPressed("up")) 
+			if(Inputs.IsActionPressed("Up")) 
 				ch.upHeld = true;
 		}
 		
-		if(Inputs.IsActionPressed("down") && !ch.upHeld && !ch.downHeld)
+		if(Inputs.IsActionPressed("Down") && !ch.upHeld && !ch.downHeld)
 			ch.downHeld = true;
 		
-		if(!Inputs.IsActionPressed("down") && ch.downHeld)
+		if(!Inputs.IsActionPressed("Down") && ch.downHeld)
 			ch.downHeld = false;
 	}
 	
 	protected void SetFastFallInput()
 	{
-		if(Inputs.IsActionJustPressed("down")
-		&& ch.Velocity.y >= ch.fastfallMargin)
-		{
+		if(ch.InputtingRun && ch.Velocity.y >= ch.fastfallMargin)
 			ch.fastfalling = true;
-		}
-		
-		if(!Inputs.IsActionPressed("down")
-		|| ch.Velocity.y < ch.fastfallMargin)
-		{
+		if(!ch.HoldingRun || ch.Velocity.y < ch.fastfallMargin)
 			ch.fastfalling = false;
-		}
 	}
 	
+	protected virtual void SetPlatformDropping()
+	{
+		ch.SetCollisionMaskBit(DROP_THRU_BIT, !ShouldDrop);
+	}
 	
-	protected void SetDownHoldingInput() => ch.downHeld = Inputs.IsActionPressed("down");
-	protected void SetUpHoldingInput() => ch.upHeld = Inputs.IsActionPressed("up");
+	protected void SetDownHoldingInput() => ch.downHeld = Inputs.IsActionPressed("Down");
+	protected void SetUpHoldingInput() => ch.upHeld = Inputs.IsActionPressed("Up");
 	
 	public void Unsnap() => snapVector = Vector2.Zero;
 	

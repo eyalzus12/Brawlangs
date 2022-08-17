@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 public static class IterUtils
 {
@@ -77,5 +78,19 @@ public static class IterUtils
 	public static void ForEach<T>(this IEnumerable<T> e, Action<T> a)
 	{
 		foreach(var h in e) a(h);
+	}
+	
+	public static IEnumerable<(T1,T2,T3)> TriZip<T1,T2,T3>(IEnumerable<T1> e1, IEnumerable<T2> e2, IEnumerable<T3> e3)
+	{
+		var en1 = e1.GetEnumerator();
+		var en2 = e2.GetEnumerator();
+		var en3 = e3.GetEnumerator();
+		while(en1.MoveNext() && en2.MoveNext() && en3.MoveNext()) yield return (en1.Current, en2.Current, en3.Current);
+	}
+	
+	public static T FirstOrDefault<T>(this IEnumerable<T> e, Func<T, bool> predicate, T @default = default)
+	{
+		foreach(var h in e) if(predicate(h)) return h;
+		return @default;
 	}
 }

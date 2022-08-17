@@ -13,7 +13,7 @@ public class AirJumpState : AirState
 	public override void Init()
 	{
 		ch.TurnConditional();
-		MarkForDeletion("jump", true);
+		MarkForDeletion("Jump", true);
 		ch.vac = Vector2.Zero;
 		jump = false;
 		jumpActive = false;

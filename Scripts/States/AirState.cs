@@ -3,6 +3,10 @@ using System;
 
 public class AirState : State
 {
+	public override string LightAttackType => "Air";
+	public override string SpecialAttackType => "ASpecial";
+	public override bool ShouldDrop => ch.downHeld && ch.HoldingRun;
+	
 	public bool jump = false;
 	
 	public AirState() : base() {}
@@ -25,63 +29,38 @@ public class AirState : State
 	{
 		if(ch.InputtingHorizontalDirection) DoInputMovement();
 		else DoFriction();
+		ch.vuc.x *= (1-ch.AppropriateFriction);
 	}
 	
 	protected virtual void DoInputMovement()
 	{
-		ch.vec.x.Towards(ch.Direction * ch.airSpeed, ch.airAcceleration);
+		ch.vec.x.Towards(ch.Direction * ch.AppropriateSpeed, ch.AppropriateAcceleration);
 	}
 	
 	protected virtual void DoFriction()
 	{
-		ch.vec.x *= (1f-ch.airFriction);
+		ch.vec.x *= (1f-ch.AppropriateFriction);
 	}
 	
 	protected override void DoGravity()
 	{
 		ch.vec.y.Towards(ch.AppropriateFallingSpeed, ch.AppropriateGravity);
+		ch.vuc.y.Towards(0, ch.AppropriateGravity);
 	}
 	
 	protected override void DoJump()
 	{
-		if(ch.Resources.Has("AirJumps")) jump = true;
+		if(!Actionable || !ch.Resources.Has("AirJumps")) return;
+		jump = true;
+		MarkForDeletion("Jump", true);
 	}
 	
 	protected override void DoDodge()
 	{
 		if(!Actionable || !ch.Resources.Has("Dodge") || ch.Cooldowns.InCooldown("Dodge")) return;
-		ch.States.Change((ch.InputtingDirection?"Directional":"Spot")+"AirDodge");
-		MarkForDeletion("dodge", true);
-	}
-	
-	protected override void LightAttack()
-	{
-		if(ch.upHeld) ch.ExecuteAttack("UAir");
-		else if(ch.downHeld) ch.ExecuteAttack("DAir");
-		else if(ch.rightHeld || ch.leftHeld) ch.ExecuteAttack("SAir");
-		else ch.ExecuteAttack("NAir");
-		
-		MarkForDeletion("light", true);
-	}
-	
-	protected override void SpecialAttack()
-	{
-		if(ch.upHeld) ch.ExecuteAttack("AUSpecial");
-		else if(ch.downHeld) ch.ExecuteAttack("ADSpecial");
-		else if(ch.rightHeld || ch.leftHeld) ch.ExecuteAttack("ASSpecial");
-		else ch.ExecuteAttack("ANSpecial");
-		
-		MarkForDeletion("special", true);
-	}
-	
-	protected override void Taunt()
-	{
-		if(ch.upHeld) ch.ExecuteAttack("UTaunt");
-		else if(ch.downHeld) ch.ExecuteAttack("DTaunt");
-		else if(ch.rightHeld || ch.leftHeld) ch.ExecuteAttack("STaunt");
-		else ch.ExecuteAttack("NTaunt");
-		
-		MarkForDeletion("taunt", true);
+		ch.States.Change((ch.InputtingNatDodge?"Spot":"Directional") + "AirDodge");
+		MarkForDeletion("Dodge", true);
+		MarkForDeletion("NDodge", true);
 	}
 	
 	public override void SetInputs()
@@ -94,16 +73,7 @@ public class AirState : State
 	{
 		if(jump) ch.States.Change("AirJump");
 		else if(ch.walled && ch.Resources.Has("Clings")) ch.States.Change("WallLand");
-		else if(ch.grounded)
-		{
-			if(ch.onSemiSolid && ch.downHeld)
-			{
-				ch.SetCollisionMaskBit(DROP_THRU_BIT, false);
-				ch.vic.y = VCF;
-				SetupCollisionParamaters();
-			}
-			else ch.States.Change("Land");
-		}
+		else if(ch.grounded) ch.States.Change("Land");
 		else return false;
 		
 		return true;
@@ -132,6 +102,6 @@ public class AirState : State
 		ch.TurnConditional();
 		if(ch.crouching) ch.Uncrouch();
 		
-		ch.SetCollisionMaskBit(DROP_THRU_BIT, !ch.downHeld);
+		//ch.SetCollisionMaskBit(DROP_THRU_BIT, !ch.downHeld);
 	}
 }

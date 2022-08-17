@@ -14,7 +14,7 @@ public class WalkWallState: GroundedState
 	protected override void DoMovement()
 	{
 		if(ch.InputtingHorizontalDirection)
-			ch.vec.x = ch.Direction * ch.groundAcceleration;
+			ch.vec.x = ch.Direction * ch.AppropriateAcceleration;
 		else
 			ch.vec.x = 0;
 	}
@@ -23,7 +23,7 @@ public class WalkWallState: GroundedState
 	{
 		if(base.CalcStateChange()) return true;
 		if(ch.TurnConditional()) ch.States.Change("WalkTurn");
-		else if(!ch.walled) ch.States.Change("Idle");
+		else if(!ch.walled) ch.States.Change("Walk");
 		else return false;
 		
 		return false;

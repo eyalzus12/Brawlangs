@@ -12,14 +12,6 @@ public class CrouchState : BaseCrouchState
 		ch.PlayAnimation("Crouch");
 	}
 	
-	protected override void DoMovement()
-	{
-		ch.TurnConditional();
-		
-		if(ch.InputtingHorizontalDirection)
-			ch.vec.x = ch.InputDirection * ch.groundAcceleration;
-	}
-	
 	protected override bool CalcStateChange()
 	{
 		if(base.CalcStateChange()) return true;

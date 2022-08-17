@@ -14,14 +14,19 @@ public class SpotAirDodgeState : GenericInvincibleState
 	public override string ActionName => "Dodge";
 	public override string StateAnimation => "SpotAirDodge";
 	
-	protected override void OnIFramesStart()
+	protected override void DoGravity()
 	{
-		ch.vec = Vector2.Zero;
+		ch.vec.y.Towards(0, ch.AppropriateGravity);
+	}
+	
+	protected override void DoMovement()
+	{
+		ch.vec.x *= (1f-ch.AppropriateFriction);
 	}
 	
 	protected override void DecideNextState()
 	{
-		bool turn = ch.TurnConditional();
+		ch.TurnConditional();
 		ch.States.Change("Air");
 	}
 }
