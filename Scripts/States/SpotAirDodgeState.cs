@@ -17,11 +17,13 @@ public class SpotAirDodgeState : GenericInvincibleState
 	protected override void DoGravity()
 	{
 		ch.vec.y.Towards(0, ch.AppropriateGravity);
+		ch.vuc.y.Towards(0, ch.AppropriateGravity);
 	}
 	
 	protected override void DoMovement()
 	{
 		ch.vec.x *= (1f-ch.AppropriateFriction);
+		ch.vuc.x *= (1f-ch.AppropriateFriction);
 	}
 	
 	protected override void DecideNextState()

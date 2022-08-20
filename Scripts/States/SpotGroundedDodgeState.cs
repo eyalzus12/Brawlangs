@@ -17,6 +17,8 @@ public class SpotGroundedDodgeState : GenericInvincibleState
 	protected override void DoMovement()
 	{
 		ch.vec.x *= (1f-ch.AppropriateFriction);
+		ch.vuc.x *= (1f-ch.AppropriateFriction);
+		ch.vuc.y *= (1f-ch.airFriction);
 	}
 	
 	protected override void DecideNextState()
