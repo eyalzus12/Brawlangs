@@ -19,35 +19,37 @@ public class AttackPart : Node2D, IHitter
 	public int TeamNumber {get => ch.TeamNumber; set => ch.TeamNumber = value;}
 	
 	public bool active = false;
-	public int startup = 0;
-	public int endlag = 0;
-	public int length = 0;
-	public Vector2 movement = default;
-	public bool overwriteXMovement = false;
-	public bool overwriteYMovement = false;
-	public int missEndlag = 0;
-	public int cooldown = 0;
-	public int missCooldown = 0;
-	public float gravityMultiplier = 1f;
-	public float damageMult = 1f;
-	public float knockbackMult = 1f;
-	public float stunMult = 1f;
-	public string startupAnimation;
-	public string attackAnimation;
-	public string endlagAnimation;
-	public string attackSound;
-	public float driftForwardAcceleration = 0f;
-	public float driftForwardSpeed = 0f;
-	public float driftBackwardsAcceleration = 0f;
-	public float driftBackwardsSpeed = 0f;
+	public int Startup = 0;
+	public int Endlag = 0;
+	public int Length = 0;
+	public Vector2 Movement{get; set;}
+	public bool OverwriteXMovement{get; set;}
+	public bool OverwriteYMovement{get; set;}
+	public int MissEndlag{get; set;}
+	public int Cooldown{get; set;}
+	public int MissCooldown{get; set;}
+	public float GravityMultiplier{get; set;}
+	public float DamageMult{get; set;}
+	public float KnockbackMult{get; set;}
+	public float StunMult{get; set;}
+	public string StartupAnimation{get; set;}
+	public string AttackAnimation{get; set;}
+	public string EndlagAnimation{get; set;}
+	public string AttackSound{get; set;}
+	public float DriftForwardAcceleration{get; set;}
+	public float DriftForwardSpeed{get; set;}
+	public float DriftBackwardsAcceleration{get; set;}
+	public float DriftBackwardsSpeed{get; set;}
+	public bool SlowOnWalls{get; set;}
 	
-	public List<string> emittedProjectiles;
+	public List<string> EmittedProjectiles{get; set;}
 	
 	public bool HasHit{get; set;}
 	
 	public AnimationPlayer hitboxPlayer;
 	public Attack att;
 	
+	//needed for: states, animations
 	protected Character ch;
 	public IAttacker OwnerObject{get => ch; set
 		{
@@ -58,7 +60,7 @@ public class AttackPart : Node2D, IHitter
 	public override void _Ready()
 	{
 		frameCount = 0;
-		if(startup == 0) OnStartupFinish();
+		if(Startup == 0) OnStartupFinish();
 		
 		Hitboxes = GetChildren().FilterType<Hitbox>().ToList();
 		ConnectSignals();
@@ -95,16 +97,16 @@ public class AttackPart : Node2D, IHitter
 	{
 		HasHit = false;
 		
-		ch.PlayAnimation(startupAnimation);
-		ch.PlaySound(attackSound);
+		ch.PlayAnimation(StartupAnimation);
+		ch.PlaySound(AttackSound);
 		active = true;
 		frameCount = 0;
 		
-		if(overwriteXMovement) ch.vec.x = 0;
-		if(overwriteYMovement) ch.vec.y = 0;
+		if(OverwriteXMovement) ch.vec.x = 0;
+		if(OverwriteYMovement) ch.vec.y = 0;
 		
-		if(movement != Vector2.Zero)
-			ch.vec = movement * new Vector2(ch.Direction, 1);
+		if(Movement != Vector2.Zero)
+			ch.vec = Movement * new Vector2(ch.Direction, 1);
 		
 		OnStart();
 		hitboxPlayer.Play("HitboxActivation");
@@ -117,15 +119,15 @@ public class AttackPart : Node2D, IHitter
 	{
 		if(!active) return;
 		++frameCount;
-		if(frameCount == startup) OnStartupFinish();
-		else if(frameCount > startup) ch.PlayAnimation(attackAnimation);
+		if(frameCount == Startup) OnStartupFinish();
+		else if(frameCount > Startup) ch.PlayAnimation(AttackAnimation);
 		Loop();
 		HandleHits();
 	}
 	
 	public virtual void OnStartupFinish()
 	{
-		emittedProjectiles?.ForEach(s=>ch.EmitProjectile(s));
+		EmittedProjectiles?.ForEach(s=>ch.EmitProjectile(s));
 	}
 	
 	const float FPS = 60f;
@@ -136,7 +138,7 @@ public class AttackPart : Node2D, IHitter
 		hitboxPlayer.Name = "AttackPlayer";
 		AddChild(hitboxPlayer);
 		var anm = new Animation();
-		anm.Length = (startup+length/*+endlag*/)/FPS;
+		anm.Length = (Startup+Length/*+endlag*/)/FPS;
 		hitboxPlayer.AddAnimation("HitboxActivation", anm);
 		foreach(var h in Hitboxes)
 		{
@@ -144,10 +146,10 @@ public class AttackPart : Node2D, IHitter
 			var path = h.GetPath() + ":Active";
 			anm.TrackSetPath(trc, path);
 			
-			foreach(var v in h.activeFrames)
+			foreach(var v in h.ActiveFrames)
 			{
-				anm.TrackInsertKey(trc, (startup+v.x)/FPS, true);
-				anm.TrackInsertKey(trc, (startup+v.y)/FPS, false);
+				anm.TrackInsertKey(trc, (Startup+v.x)/FPS, true);
+				anm.TrackInsertKey(trc, (Startup+v.y)/FPS, false);
 			}
 		}
 		
@@ -251,7 +253,7 @@ public class AttackPart : Node2D, IHitter
 		var current = new Hitbox();
 		if(HitList.TryGetValue(hurtbox, out current))
 		{
-			if(hitbox.hitPriority > current.hitPriority)
+			if(hitbox.HitPriority > current.HitPriority)
 				HitList[hurtbox] = hitbox;
 		}
 		else
@@ -276,17 +278,17 @@ public class AttackPart : Node2D, IHitter
 			//GD.Print($"{OwnerObject} attack part runs Hit Event");
 			HitEvent(hitbox, hurtbox);
 			
-			var kmult = ch.KnockbackDoneMult*knockbackMult*att.knockbackMult*hitbox.GetKnockbackMultiplier(hitChar);
-			var dmult = ch.DamageDoneMult*damageMult*att.damageMult*hitbox.GetDamageMultiplier(hitChar);
-			var smult = ch.StunDoneMult*stunMult*att.stunMult*hitbox.GetStunMultiplier(hitChar);
+			var kmult = ch.KnockbackDoneMult*KnockbackMult*att.KnockbackMult*hitbox.GetKnockbackMultiplier(hitChar);
+			var dmult = ch.DamageDoneMult*DamageMult*att.DamageMult*hitbox.GetDamageMultiplier(hitChar);
+			var smult = ch.StunDoneMult*StunMult*att.StunMult*hitbox.GetStunMultiplier(hitChar);
 			
 			var dirvec = hitbox.KnockbackDir(hitChar)*kmult;
-			var skb = dirvec*hitbox.setKnockback + hitbox.momentumCarry*velocity;
-			var vkb = dirvec*hitbox.varKnockback;
-			var damage = hitbox.damage*dmult;
-			var stun = hitbox.stun*smult;
+			var skb = dirvec*hitbox.SetKnockback + hitbox.MomentumCarry*velocity;
+			var vkb = dirvec*hitbox.VarKnockback;
+			var damage = hitbox.Damage*dmult;
+			var stun = hitbox.Stun*smult;
  			
-			var data = new HitData(skb, vkb, damage, stun, hitbox.hitpause, hitbox, hurtbox);
+			var data = new HitData(skb, vkb, damage, stun, hitbox.Hitpause, hitbox, hurtbox);
 			
 			//GD.Print($"{OwnerObject} attack part adds {hitChar} to Hit Ignore List");
 			HitIgnoreList.Add(hitChar);
@@ -302,6 +304,6 @@ public class AttackPart : Node2D, IHitter
 		HitList.Clear();
 	}
 	
-	public virtual int GetEndlag() => endlag + (HasHit?0:missEndlag);
-	public virtual int GetCooldown() => cooldown + (HasHit?0:missCooldown);
+	public virtual int GetEndlag() => Endlag + (HasHit?0:MissEndlag);
+	public virtual int GetCooldown() => Cooldown + (HasHit?0:MissCooldown);
 }

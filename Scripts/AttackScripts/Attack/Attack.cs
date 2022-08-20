@@ -4,8 +4,10 @@ using System.Collections.Generic;
 
 public class Attack : Node2D
 {
-	public AttackPart start;
-	public AttackPart currentPart;
+	public AttackPart StartPart{get; set;}
+	public AttackPart CurrentPart{get; set;}
+	public AttackPart LastUsedPart{get; set;}
+	public Dictionary<string, AttackPart> Parts{get; set;} = new Dictionary<string, AttackPart>();
 	
 	protected Character ch;
 	public IAttacker OwnerObject{get => ch; set
@@ -14,18 +16,16 @@ public class Attack : Node2D
 		}
 	}
 	
-	public AttackPart lastUsedPart;
-	
 	public int frameCount = 0;
 	public bool active = false;
 	
-	public float damageMult = 1f;
-	public float knockbackMult = 1f;
-	public int stunMult = 1;
+	public float DamageMult{get; set;}
+	public float KnockbackMult{get; set;}
+	public int StunMult{get; set;}
 	
 	public State connected = null;
 	
-	public List<string> sharesCooldownWith = new List<string>();
+	public List<string> SharesCooldownWith{get; set;} = new List<string>();
 	
 	public Dictionary<string, ParamRequest> LoadExtraProperties = new Dictionary<string, ParamRequest>();
 	
@@ -34,14 +34,14 @@ public class Attack : Node2D
 	[Signal]
 	public delegate void AttackEnds(Attack a);
 	
-	public float attackFriction = 0.5f;
+	public float AttackFriction{get; set;}
 	
 	public Attack() {}
 	
 	public Attack(AttackPart ap)
 	{
-		start = ap;
-		currentPart = start;
+		StartPart = ap;
+		CurrentPart = StartPart;
 	}
 	
 	public override void _Ready()
@@ -52,40 +52,40 @@ public class Attack : Node2D
 	
 	public virtual void Start()
 	{
-		damageMult = 1f;
-		knockbackMult = 1f;
-		stunMult = 1;
+		DamageMult = 1f;
+		KnockbackMult = 1f;
+		StunMult = 1;
 		frameCount = 0;
 		active = true;
 		EmitSignal(nameof(AttackStarts), this);
 		if(connected != null) Disconnect("AttackEnds", connected, "SetEnd");
 		Connect("AttackEnds", ch.States.Current, "SetEnd");
 		connected = ch.States.Current;
-		currentPart = start;
+		CurrentPart = StartPart;
 		OnStart();
-		currentPart.Activate();
+		CurrentPart.Activate();
 	}
 	
 	public void SetPart(AttackPart newPart)
 	{
 		if(newPart is null) Stop();
-		else if(currentPart != newPart)
+		else if(CurrentPart != newPart)
 		{
-			lastUsedPart = currentPart;
-			if(currentPart != null) currentPart.Stop();
-			currentPart = newPart;
-			currentPart.Activate();
+			LastUsedPart = CurrentPart;
+			CurrentPart?.Stop();
+			CurrentPart = newPart;
+			CurrentPart.Activate();
 		}
 	}
 	
 	public virtual void Stop()
 	{
-		lastUsedPart = currentPart;
+		LastUsedPart = CurrentPart;
 		active = false;
 		OnEnd();
-		if(currentPart != null) currentPart.Stop();
+		CurrentPart?.Stop();
 		EmitSignal(nameof(AttackEnds), this);
-		currentPart = null;
+		CurrentPart = null;
 	}
 	
 	public override void _PhysicsProcess(float delta)
@@ -108,7 +108,7 @@ public class Attack : Node2D
 		LoadExtraProperties.Add(s, toAdd);
 	}
 	
-	public virtual int GetCooldown() => (currentPart??lastUsedPart).GetCooldown();
-	public virtual string GetEndlagAnimation() => (currentPart??lastUsedPart).endlagAnimation;
-	public virtual int GetEndlag() => (currentPart??lastUsedPart).GetEndlag();
+	public virtual int GetCooldown() => (CurrentPart??LastUsedPart).GetCooldown();
+	public virtual string GetEndlagAnimation() => (CurrentPart??LastUsedPart).EndlagAnimation;
+	public virtual int GetEndlag() => (CurrentPart??LastUsedPart).GetEndlag();
 }

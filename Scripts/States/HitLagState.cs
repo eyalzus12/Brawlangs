@@ -16,7 +16,7 @@ public class HitLagState : State
 		ch.ResetVelocity();
 		//pause animation
 		ch.fastfalling = false;
-		ch.CurrentAttack?.currentPart?.Pause();
+		ch.CurrentAttack?.CurrentPart?.Pause();
 	}
 	
 	protected override void DoGravity()
@@ -36,7 +36,7 @@ public class HitLagState : State
 		if(frameCount >= hitLagLength)
 		{
 			ch.States.Change("Attack");
-			ch.CurrentAttack.currentPart.Resume();
+			ch.CurrentAttack.CurrentPart.Resume();
 			hitLagLength = 0;
 		}
 		else return false;
@@ -54,9 +54,9 @@ public class HitLagState : State
 			att.connected = null;
 			att.active = false;
 			att.OnEnd();
-			if(att.currentPart != null) att.currentPart.Stop();
+			att.CurrentPart?.Stop();
 			ch.ResetCurrentAttack(att);
-			att.currentPart = null;
+			att.CurrentPart = null;
 		}
 	}
 }

@@ -3,11 +3,11 @@ using System;
 
 public class ChargePart : AttackPart
 {
-	public string ChargeInput = "heavy";
-	public float FullChargeDamageMult = 1f;
-	public float FullChargeKnockbackMult = 1f;
-	public int MinimumChargeForBoost = 1;
-	public string ChargeSound = "";
+	public string ChargeInput{get; set;}
+	public float FullChargeDamageMult{get; set;}
+	public float FullChargeKnockbackMult{get; set;}
+	public int MinimumChargeForBoost{get; set;}
+	public string ChargeSound{get; set;}
 	
 	public override void LoadProperties()
 	{
@@ -30,14 +30,14 @@ public class ChargePart : AttackPart
 	public override void OnEnd()
 	{
 		if(frameCount < MinimumChargeForBoost) return;
-		att.damageMult *= CalculateDamageMult();
-		att.knockbackMult *= CalculateKnockbackMult();
+		att.DamageMult *= CalculateDamageMult();
+		att.KnockbackMult *= CalculateKnockbackMult();
 	}
 	
 	public virtual float ChargeFraction()
 	{
-		var timeHeld = Math.Max(0, frameCount-startup);
-		return (float)timeHeld/(float)length;
+		var timeHeld = Math.Max(0, frameCount-Startup);
+		return (float)timeHeld/(float)Length;
 	}
 	
 	public virtual float CalculateDamageMult() => ChargeFraction()*(FullChargeDamageMult-1f) + 1f;

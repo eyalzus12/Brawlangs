@@ -10,6 +10,8 @@ public class StunState : State
 	public int framesSinceLastBounce = 0;
 	public const int BOUNCE_PERIOD = 2;
 	
+	private Color originalModulate;
+	
 	public StunState() : base() {}
 	public StunState(Character link) : base(link) {}
 	
@@ -32,6 +34,8 @@ public class StunState : State
 			ch.voc = ch.voc.Bounce(ch.fnorm);
 			framesSinceLastBounce = 0;
 		}
+		originalModulate = ch.CharacterSprite.Modulate;
+		ch.CharacterSprite.Modulate = new Color(0,0,0,1);
 	}
 	
 	public Vector2 Force
@@ -85,5 +89,6 @@ public class StunState : State
 	{
 		ch.vuc = ch.voc;
 		Force = Vector2.Zero;
+		ch.CharacterSprite.Modulate = originalModulate;
 	}
 }

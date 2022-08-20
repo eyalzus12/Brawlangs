@@ -6,9 +6,11 @@ using System.Linq;
 
 public class AudioManager : Node
 {
-	public Dictionary<string, AudioStream> sounds = new Dictionary<string, AudioStream>();
-	public List<AudioPlayer> players = new List<AudioPlayer>();
-	public Queue<AudioPlayer> available = new Queue<AudioPlayer>();
+	public Dictionary<string, AudioStream> Sounds{get; set;} = new Dictionary<string, AudioStream>();
+	public AudioStream this[string s] {get => Sounds[s]; set => Sounds[s] = value;}
+	public bool ContainsSound(string s) => Sounds.ContainsKey(s);
+	public List<AudioPlayer> Players{get; set;} = new List<AudioPlayer>();
+	public Queue<AudioPlayer> Available{get; set;} = new Queue<AudioPlayer>();
 	
 	public AudioManager() {}
 	
@@ -17,43 +19,42 @@ public class AudioManager : Node
 		for(int i = 0; i < capacity; ++i)
 		{
 			var player = new AudioPlayer();
-			players.Add(player);
-			available.Enqueue(player);
+			Players.Add(player);
+			Available.Enqueue(player);
 		}
 	}
 	
 	public override void _Ready()
 	{
-		players.ForEach(a => AddChild(a));
-		//foreach(var player in players) AddChild(player);
+		Players.ForEach(a => AddChild(a));
 	}
 	
 	public void Play(AudioStream stream)
 	{
-		if(stream is null || available.Count <= 0) return;//TODO: add a waiting queue for sounds, that plays them at the fitting time
-		var use = available.Dequeue();
+		if(stream is null || Available.Count <= 0) return;//TODO: add a waiting queue for sounds, that plays them at the fitting time
+		var use = Available.Dequeue();
 		use.Play(stream);
 		use.Connect("FinishedPlaying", this, nameof(StreamFinished));
 	}
 	
 	public void Play(string sound)
 	{
-		if(sounds.ContainsKey(sound)) Play(sounds[sound]);
+		if(Sounds.ContainsKey(sound)) Play(Sounds[sound]);
 		else if(sound != "") GD.Print($"Could not play sound {sound} as it does not exist");
 	}
 	
-	public void AddSound(string name, AudioStream audio) => sounds.Add(name, audio);
+	public void AddSound(string name, AudioStream audio) => Sounds.Add(name, audio);
 	
 	public void StreamFinished(AudioPlayer who, AudioStream what)
 	{
-		available.Enqueue(who);
+		Available.Enqueue(who);
 		who.Disconnect("FinishedPlaying", this, nameof(StreamFinished));
 	}
 	
 	public override string ToString()
 	{
 		var result = new StringBuilder();
-		foreach(var player in players)
+		foreach(var player in Players)
 		{
 			if(player.Playing)
 			{
@@ -66,14 +67,14 @@ public class AudioManager : Node
 	
 	public void Cleanup()
 	{
-		players.Where(p=>p.Playing).ForEach(CleanAfter);
+		Players.Where(p=>p.Playing).ForEach(CleanAfter);
 	}
 	
 	public void CleanAfter(AudioPlayer player)
 	{
 		player.Stop();
 		player.Disconnect("FinishedPlaying", this, nameof(StreamFinished));
-		available.Enqueue(player);
+		Available.Enqueue(player);
 	}
 	
 	public override void _ExitTree()

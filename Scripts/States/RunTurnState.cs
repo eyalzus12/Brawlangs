@@ -5,6 +5,8 @@ public class RunTurnState : GroundedState
 {
 	public const int TURNING_MULT = 5;
 	
+	public override bool Actionable => false;
+	
 	public RunTurnState(): base() {}
 	public RunTurnState(Character link): base(link) {}
 	
@@ -39,6 +41,7 @@ public class RunTurnState : GroundedState
 	
 	public override void OnChange(State newState)
 	{
-		ch.vuc.x *= -1;
+		ch.Turn();
+		if(!ch.InputtingAnyAttack) ch.vuc.x *= -1;
 	}
 }

@@ -45,16 +45,16 @@ public class ProjectileCreator
 		var characterAudioManager = proj.OwnerObject.Audio;
 		var am = new AudioManager(2);
 		am.Name = "AudioManager";
-		am.sounds = characterAudioManager.sounds;
+		am.Sounds = characterAudioManager.Sounds;
 		proj.AddChild(am);
-		proj.audioManager = am;
+		proj.Audio = am;
 		
 		proj.Name = section;
-		proj.identifier = section;
+		proj.Identifier = section;
 		var sp = inif[section, "Position", Vector2.Zero].v2();
-		proj.spawningPosition = sp;
+		proj.SpawningPosition = sp;
 		var lt = inif[section, "LifeTime", 0].i();
-		proj.maxLifetime = lt;
+		proj.MaxLifetime = lt;
 		var smf = inif[section, "MovementFunction", ""].s();
 		var movf = BuildMovementFunction(smf);
 		proj.Movement = movf;
@@ -128,56 +128,56 @@ public class ProjectileCreator
 		h.Name = section;
 		
 		var sk = inif[section, "SetKnockback", Vector2.Zero].v2();
-		h.setKnockback = sk;
+		h.SetKnockback = sk;
 		var vk = inif[section, "VarKnockback", Vector2.Zero].v2();
-		h.varKnockback = vk;
+		h.VarKnockback = vk;
 		var st = inif[section, "Stun", 0].i();
-		h.stun = st;
+		h.Stun = st;
 		var hp = inif[section, "HitPause", 0].i();
-		h.hitpause = hp;
+		h.Hitpause = hp;
 		var dm = inif[section, "Damage", 0f].f();
-		h.damage = dm;
+		h.Damage = dm;
 		var pr = inif[section, "Priority", 0].i();
-		h.hitPriority = pr;
+		h.HitPriority = pr;
 		//var cm = inif[section, "MomentumCarry", Vector2.Zero].v2();
 		//h.momentumCarry = cm;
 		
 		var hs = inif[section, "HitSound", "DefaultHit"].s();
-		if(p.audioManager.sounds.ContainsKey(hs)) h.hitSound = p.audioManager.sounds[hs];
+		if(p.Audio.ContainsSound(hs)) h.HitSound = p.Audio[hs];
 		else GD.Print($"Hit sound {hs} for hitbox {section} in file at path {inif.filePath} could not be found.");
 		
 		var hafs = inif[section, "HorizontalAngleFlipper", "Directional"].s();
 		Hitbox.AngleFlipper haf;
 		Enum.TryParse<Hitbox.AngleFlipper>(hafs, out haf);
-		h.horizontalAngleFlipper = haf;
+		h.HorizontalAngleFlipper = haf;
 		var vafs = inif[section, "VerticalAngleFlipper", "None"].s();
 		Hitbox.AngleFlipper vaf;
 		Enum.TryParse<Hitbox.AngleFlipper>(vafs, out vaf);
-		h.verticalAngleFlipper = vaf;
+		h.VerticalAngleFlipper = vaf;
 		
 		var tkm = inif[section, "TeamKnockbackMultiplier", 1f].f();
-		h.teamKnockbackMult = tkm;
+		h.TeamKnockbackMult = tkm;
 		var tdm = inif[section, "TeamDamageMultiplier", 1f].f();
-		h.teamDamageMult = tdm;
+		h.TeamDamageMult = tdm;
 		var tsm = inif[section, "TeamStunMultiplier", 1].i();
-		h.teamStunMult = tsm;
+		h.TeamStunMult = tsm;
 		
 		var oWhitelistedStates = inif[section, "WhitelistedStates", null];
 		if(oWhitelistedStates is string)
-			h.whitelistedStates.Add(oWhitelistedStates.s());
+			h.WhitelistedStates.Add(oWhitelistedStates.s());
 		else if(oWhitelistedStates is object)//not null
 		{
 			var whitelistedStates = oWhitelistedStates.ls();
-			foreach(var s in whitelistedStates) h.whitelistedStates.Add(s);
+			foreach(var s in whitelistedStates) h.WhitelistedStates.Add(s);
 		}
 		
 		var oBlacklistedStates = inif[section, "BlacklistedStates", null];
 		if(oBlacklistedStates is string)
-			h.blacklistedStates.Add(oBlacklistedStates.s());
+			h.BlacklistedStates.Add(oBlacklistedStates.s());
 		else if(oBlacklistedStates is object)//not null
 		{
 			var blacklistedStates = oBlacklistedStates.ls();
-			foreach(var s in blacklistedStates) h.blacklistedStates.Add(s);
+			foreach(var s in blacklistedStates) h.BlacklistedStates.Add(s);
 		}
 		
 		h.LoadProperties();
@@ -188,11 +188,11 @@ public class ProjectileCreator
 		
 		var pos = inif[section, "Position", Vector2.Zero].v2();
 		cs.Position = pos;
-		h.originalPosition = pos;
+		h.OriginalPosition = pos;
 		var rot = inif[section, "Rotation", 0f].f();
 		var rotrad = (float)(rot*Math.PI/180f);
 		cs.Rotation = rotrad;//turn to rads
-		h.originalRotation = rotrad;
+		h.OriginalRotation = rotrad;
 		
 		var ps = new CapsuleShape2D();
 		
@@ -204,7 +204,7 @@ public class ProjectileCreator
 		cs.Shape = ps;
 		cs.Disabled = true;
 		cs.Name = section + "Collision";
-		h.shape = cs;
+		h.HitboxShape = cs;
 		h.AddChild(cs);
 		p.AddChild(h);
 		p.Hitboxes.Add(h);

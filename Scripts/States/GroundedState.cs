@@ -67,18 +67,21 @@ public class GroundedState : State
 	protected override void LightAttack()
 	{
 		if(jump) return;
+		ch.TurnConditional();
 		base.LightAttack();
 	}
 	
 	protected override void SpecialAttack()
 	{
 		if(jump) return;
+		ch.TurnConditional();
 		base.SpecialAttack();
 	}
 	
 	protected override void Taunt()
 	{
 		if(jump) return;
+		ch.TurnConditional();
 		base.Taunt();
 	}
 	

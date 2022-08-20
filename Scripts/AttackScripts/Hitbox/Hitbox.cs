@@ -8,37 +8,37 @@ public class Hitbox : Area2D
 	[Signal]
 	public delegate void HitboxHit(Hitbox hitbox, Hurtbox hurtbox);
 	
-	public Vector2 setKnockback = Vector2.Zero;
-	public Vector2 varKnockback = Vector2.Zero;
-	public float stun = 0;
-	public int hitpause = 0;
-	public int hitlag = 0;
-	public float damage = 0f;
-	public int hitPriority = 0;
-	public float teamKnockbackMult = 1f;
-	public float teamDamageMult = 1f;
-	public float teamStunMult = 1;
-	public Vector2 momentumCarry = Vector2.Zero;
+	public Vector2 SetKnockback{get; set;}
+	public Vector2 VarKnockback{get; set;}
+	public float Stun{get; set;}
+	public int Hitpause{get; set;}
+	public int Hitlag{get; set;}
+	public float Damage{get; set;}
+	public int HitPriority{get; set;}
+	public float TeamKnockbackMult{get; set;}
+	public float TeamDamageMult{get; set;}
+	public float TeamStunMult{get; set;}
+	public Vector2 MomentumCarry{get; set;}
 	
-	public AudioStream hitSound;
+	public AudioStream HitSound{get; set;}
 	
 	public int frameCount = 0;
 	
-	public AngleFlipper horizontalAngleFlipper;
-	public AngleFlipper verticalAngleFlipper;
+	public AngleFlipper HorizontalAngleFlipper{get; set;}
+	public AngleFlipper VerticalAngleFlipper{get; set;}
 	
 	public Dictionary<string, ParamRequest> LoadExtraProperties = new Dictionary<string, ParamRequest>();
 	
-	public List<Vector2> activeFrames = new List<Vector2>();
+	public List<Vector2> ActiveFrames{get; set;}
 	public IHitter OwnerObject{get; set;}
 	
-	public HashSet<string> whitelistedStates = new HashSet<string>();
-	public HashSet<string> blacklistedStates = new HashSet<string>();
+	public HashSet<string> WhitelistedStates{get; set;} = new HashSet<string>();
+	public HashSet<string> BlacklistedStates{get; set;} = new HashSet<string>();
 	
 	private bool active = false;
 	
-	public Vector2 originalPosition = Vector2.Zero;
-	public float originalRotation = 0f;
+	public Vector2 OriginalPosition{get; set;} = Vector2.Zero;
+	public float OriginalRotation{get; set;} = 0f;
 	
 	public bool Active
 	{
@@ -48,31 +48,31 @@ public class Hitbox : Area2D
 			active = value;
 			if(value) UpdateHitboxPosition();
 			Visible = value;
-			shape?.SetDeferred("disabled", !active);
+			HitboxShape?.SetDeferred("disabled", !active);
 		}
 	}
 	
-	public CollisionShape2D shape = new CollisionShape2D();
+	public CollisionShape2D HitboxShape{get; set;}
 	
 	public Vector2 CollisionPosition
 	{
-		get => shape.Position;
+		get => HitboxShape.Position;
 		set
 		{
 			var val = value*new Vector2(OwnerObject.Direction, 1);
-			shape?.SetDeferred("position", val);
-			originalPosition = value;
+			HitboxShape?.SetDeferred("position", val);
+			OriginalPosition = value;
 		}
 	}
 	
 	public float CollisionRotation
 	{
-		get => shape.Rotation;
+		get => HitboxShape.Rotation;
 		set
 		{
 			var val = value*OwnerObject.Direction;
-			shape?.SetDeferred("rotation", val);
-			originalRotation = value;
+			HitboxShape?.SetDeferred("rotation", val);
+			OriginalRotation = value;
 		}
 	}
 	
@@ -86,6 +86,7 @@ public class Hitbox : Area2D
 		
 		Connect("area_entered", this, nameof(OnAreaEnter));
 		
+		//TODO: figure how this shit works
 		CollisionLayer ^= 0b11111;//reset five rightmost bits
 		CollisionLayer |= 0b100000;//rightmost bits set to 10000
 		CollisionMask ^= 0b11111;///reset five rightmost bits
@@ -96,8 +97,8 @@ public class Hitbox : Area2D
 	
 	public virtual void UpdateHitboxPosition()
 	{
-		CollisionPosition = originalPosition;
-		CollisionRotation = originalRotation;
+		CollisionPosition = OriginalPosition;
+		CollisionRotation = OriginalRotation;
 	}
 	
 	public virtual void Init() {}
@@ -118,9 +119,9 @@ public class Hitbox : Area2D
 			{
 				for(var t = c.States.Current.GetType(); t.Name != "State"; t = t.BaseType)
 				{
-					var whitelisted = (whitelistedStates.Count == 0 || whitelistedStates.Contains(t.Name));
-					var blacklisted = blacklistedStates.Contains(t.Name);
-					if(!whitelisted || blacklisted) return;
+					var Whitelisted = (WhitelistedStates.Count == 0 || WhitelistedStates.Contains(t.Name));
+					var Blacklisted = BlacklistedStates.Contains(t.Name);
+					if(!Whitelisted || Blacklisted) return;
 				}
 			}
 			
@@ -134,10 +135,7 @@ public class Hitbox : Area2D
 		}
 	}
 	
-	public virtual void OnHit(Hurtbox hurt)
-	{
-		
-	}
+	public virtual void OnHit(Hurtbox hurt) {}
 	
 	public override void _PhysicsProcess(float delta)
 	{
@@ -153,7 +151,7 @@ public class Hitbox : Area2D
 		//if(!(UpdateScript)n.GetRootNode("UpdateScript").debugCollision) return;
 		ZIndex = 4;
 		GeometryUtils.DrawCapsuleShape(this,
-			shape.Shape as CapsuleShape2D, //shape
+			HitboxShape.Shape as CapsuleShape2D, //shape
 			CollisionPosition, //position
 			CollisionRotation, //rotation
 			GetDrawColor()); //color
@@ -171,16 +169,15 @@ public class Hitbox : Area2D
 		
 		for(var t = c.States.Current.GetType(); t.Name != "State"; t = t.BaseType)
 		{
-			if(chooseFrom.TryGetValue(t.Name.Replace("State", ""), out f))
-				return f;
+			if(chooseFrom.TryGetValue(t.Name.Replace("State", ""), out f)) return f;
 		}
 		
 		return 1f;
 	}
 	
-	public virtual float GetKnockbackMultiplier(IHittable n) => TeamMult(n, teamKnockbackMult);
-	public virtual float GetDamageMultiplier(IHittable n) => TeamMult(n, teamDamageMult);
-	public virtual float GetStunMultiplier(IHittable n) => TeamMult(n, teamStunMult);
+	public virtual float GetKnockbackMultiplier(IHittable n) => TeamMult(n, TeamKnockbackMult);
+	public virtual float GetDamageMultiplier(IHittable n) => TeamMult(n, TeamDamageMult);
+	public virtual float GetStunMultiplier(IHittable n) => TeamMult(n, TeamStunMult);
 	
 	public virtual Vector2 KnockbackDir(IHittable hitChar) => new Vector2(
 		KnockbackDirX(hitChar),
@@ -189,7 +186,7 @@ public class Hitbox : Area2D
 	
 	public virtual float KnockbackDirX(IHittable hitChar)
 	{
-		switch(horizontalAngleFlipper)
+		switch(HorizontalAngleFlipper)
 		{
 			case AngleFlipper.Away:
 			case AngleFlipper.AwayCharacter:
@@ -206,7 +203,7 @@ public class Hitbox : Area2D
 	
 	public virtual float KnockbackDirY(IHittable hitChar)
 	{
-		switch(verticalAngleFlipper)
+		switch(VerticalAngleFlipper)
 		{
 			case AngleFlipper.Away:
 			case AngleFlipper.AwayCharacter:
@@ -222,15 +219,15 @@ public class Hitbox : Area2D
 	
 	public virtual Color GetDrawColor()
 	{
-		if(stun == 0 && hitpause == 0 && hitlag == 0) return new Color(0.9f,0.9f,0.9f,1);
-		switch(horizontalAngleFlipper)
+		if(Stun == 0 && Hitpause == 0 && Hitlag == 0) return new Color(0.9f,0.9f,0.9f,1);
+		switch(HorizontalAngleFlipper)
 		{
 			case AngleFlipper.AwayHitbox:
 			case AngleFlipper.AwayCharacter:
 			case AngleFlipper.Away:
 				return new Color(1, 0.3f, 0.1f, 1);
 			case AngleFlipper.None:
-				switch(verticalAngleFlipper)
+				switch(VerticalAngleFlipper)
 				{
 					case AngleFlipper.AwayHitbox:
 					case AngleFlipper.AwayCharacter:
@@ -248,5 +245,5 @@ public class Hitbox : Area2D
 		}
 	}
 	
-	public enum AngleFlipper {Direction, Away, AwayHitbox, AwayCharacter, None}
+	public enum AngleFlipper{Direction, Away, AwayHitbox, AwayCharacter, None}
 }

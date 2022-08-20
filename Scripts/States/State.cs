@@ -56,16 +56,19 @@ public class State : Node
 		DoGravity();
 		
 		if(ch.InputtingJump) DoJump();
+		if(this != ch.States.Current) return;
 		if(ch.InputtingDodge) DoDodge();
+		if(this != ch.States.Current) return;
 		
 		if(this == ch.States.Current && Actionable && ch.CurrentAttack is null)
 		{
 			if(ch.InputtingAttack("Light")) LightAttack();
+			if(this != ch.States.Current) return;
 			if(ch.InputtingAttack("Special")) SpecialAttack();
+			if(this != ch.States.Current) return;
 			if(ch.InputtingAttack("Taunt")) Taunt();
+			if(this != ch.States.Current) return;
 		}
-		
-		if(this != ch.States.Current) return;
 		
 		var norm = ch.grounded?ch.fnorm:Vector2.Zero;
 		var v = ch.Velocity.TiltToNormal(norm);
@@ -120,6 +123,7 @@ public class State : Node
 	protected void HandleAttack(string baseInput, string attackType)
 	{
 		if(attackType == "") return;
+		ch.TurnConditional();
 		ch.ExecuteAttack(ch.AttackInputDir(baseInput) + attackType);
 		Character.INPUT_DIRS.ForEach(s => MarkForDeletion(s + baseInput, true));
 	}

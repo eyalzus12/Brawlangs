@@ -60,7 +60,7 @@ public class ProjectilePool : Node
 	
 	public bool InsertProjectile(Projectile p)
 	{
-		var identifier = p.identifier;
+		var identifier = p.Identifier;
 		
 		if(identifier == "")
 		{

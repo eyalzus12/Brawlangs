@@ -145,17 +145,17 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public int framesSinceLastHit = 0;
 	public int comboCount = 0;
 	
-	public Vector2[] vs = new Vector2[8]{Vector2.Zero,Vector2.Zero,Vector2.Zero,Vector2.Zero,Vector2.Zero,Vector2.Zero,Vector2.Zero,Vector2.Zero};
-	public Vector2 vec = new Vector2();//normal velocity from movement
-	public Vector2 vac = new Vector2();//speed transferred from moving platforms
-	public Vector2 vic = new Vector2();//momentary force
-	public Vector2 voc = new Vector2();//knockback
-	public Vector2 vuc = new Vector2();//burst movements that should only have friction applied
-	public Vector2 vyc = new Vector2();
-	public Vector2 vwc = new Vector2();
-	public Vector2 vvc = new Vector2();
+	public Vector2[] Velocities{get;set;} = new Vector2[8]{Vector2.Zero,Vector2.Zero,Vector2.Zero,Vector2.Zero,Vector2.Zero,Vector2.Zero,Vector2.Zero,Vector2.Zero};
+	public Vector2 vec;//normal velocity from movement
+	public Vector2 vac;//speed transferred from moving platforms
+	public Vector2 vic;//momentary force
+	public Vector2 voc;//knockback
+	public Vector2 vuc;//burst movements that should only have friction applied
+	public Vector2 vyc;
+	public Vector2 vwc;
+	public Vector2 vvc;
 	
-	public Vector2 Velocity => vs.Aggregate(Vector2.Zero, (a,v)=>a+v);
+	public Vector2 Velocity => Velocities.Aggregate(Vector2.Zero, (a,v)=>a+v);
 	public Vector2 RoundedVelocity => Velocity.Round();
 	public Vector2 RoundedPosition => Position.Round();
 	
@@ -184,8 +184,8 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public float AppropriateBounce => PlatBounce * (grounded?floorBounce:walled?wallBounce:ceilinged?ceilingBounce:0f);
 	public float AppropriateAcceleration => (grounded?groundAcceleration*ffric:airAcceleration);
 	public float AppropriateSpeed => (crouching?crawlSpeed:grounded?(groundSpeed*(2-ffric)):airSpeed);
-	public float AppropriateGravity => (CurrentAttack?.currentPart?.gravityMultiplier ?? 1f)*((States.Current is StunState)?stunGravity:fastfalling?walled?wallFastFallGravity:fastFallGravity:walled?wallGravity*(2-wfric):gravity);
-	public float AppropriateFallingSpeed => (CurrentAttack?.currentPart?.gravityMultiplier ?? 1f)*((States.Current is StunState)?stunFallSpeed:fastfalling?walled?wallFastFallSpeed:fastFallSpeed:walled?wallFallSpeed*(2-wfric):fallSpeed);
+	public float AppropriateGravity => (CurrentAttack?.CurrentPart?.GravityMultiplier ?? 1f)*((States.Current is StunState)?stunGravity:fastfalling?walled?wallFastFallGravity:fastFallGravity:walled?wallGravity*(2-wfric):gravity);
+	public float AppropriateFallingSpeed => (CurrentAttack?.CurrentPart?.GravityMultiplier ?? 1f)*((States.Current is StunState)?stunFallSpeed:fastfalling?walled?wallFastFallSpeed:fastFallSpeed:walled?wallFallSpeed*(2-wfric):fallSpeed);
 	
 	public int InputDirection => rightHeld?(leftHeld?0:1):(leftHeld?-1:0);
 	public int FutureDirection => rightHeld?(leftHeld?0:1):(leftHeld?-1:Direction);
@@ -213,7 +213,12 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public bool ShouldInitiateRun => (HoldingRun&&NowInputtingHorizontalDirection) || (InputtingHorizontalDirection&&InputtingRun);
 	
 	public static readonly string[] INPUT_DIRS = {"U", "D", "S", "N", ""};
+	public static readonly string[] ATTACK_TYPES = {"Light", "Special", "Taunt"};
 	public bool InputtingAttack(string type) => INPUT_DIRS.Any(s => Inputs.IsActionJustPressed($"{s}{type}"));
+	public bool InputtingLight => INPUT_DIRS.Any(s => Inputs.IsActionJustPressed($"{s}Light"));
+	public bool InputtingSpecial => INPUT_DIRS.Any(s => Inputs.IsActionJustPressed($"{s}Heavy"));
+	public bool InputtingTaunt => INPUT_DIRS.Any(s => Inputs.IsActionJustPressed($"{s}Taunt"));
+	public bool InputtingAnyAttack => ATTACK_TYPES.Any(InputtingAttack);
 	
 	public string AttackInputDir(string type)
 	{
@@ -229,7 +234,6 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public bool walled = false;//is on wall
 	public bool ceilinged = false;//is touching ceiling
 	public bool aerial = false;//is in air
-	public bool crouching = false;//is currently crouching
 	public bool onSemiSolid = false;//is currently on a semi solid platform
 	public bool onSlope = false;//is currently on a slope
 	
@@ -237,6 +241,9 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public bool rightHeld = false;//is right currently held
 	public bool downHeld = false;//is down currently held
 	public bool upHeld = false;//is up currently held
+	
+	public bool crouching = false;//is currently crouching
+	
 	
 	public StateMachine States{get; set;}
 	
@@ -406,9 +413,8 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	
 	public virtual void DisableAllProjectiles()
 	{
-		var activeProjectilesCopy = new Dictionary<string, HashSet<Projectile>>(activeProjectiles);
-		foreach(var entry in activeProjectilesCopy)
-			entry.Value.ToList().ForEach(p => p.Destruct());
+		foreach(var activeProjectileSet in activeProjectiles.Values)
+			activeProjectileSet.ToList().ForEach(p => p.Destruct());
 	}
 	
 	public virtual void RestoreOptionsOnGroundTouch()
@@ -451,25 +457,25 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	
 	public virtual void StoreVelocities()
 	{
-		vs[0] = vec; vs[1] = vac; vs[2] = vic; vs[3] = voc;
-		vs[4] = vuc; vs[5] = vyc; vs[6] = vwc; vs[7] = vvc;
+		Velocities[0] = vec; Velocities[1] = vac; Velocities[2] = vic; Velocities[3] = voc;
+		Velocities[4] = vuc; Velocities[5] = vyc; Velocities[6] = vwc; Velocities[7] = vvc;
 	}
 	
 	public virtual void LoadVelocities()
 	{
-		vec = vs[0]; vac = vs[1]; vic = vs[2]; voc = vs[3];
-		vuc = vs[4]; vyc = vs[5]; vwc = vs[6]; vvc = vs[7];
+		vec = Velocities[0]; vac = Velocities[1]; vic = Velocities[2]; voc = Velocities[3];
+		vuc = Velocities[4]; vyc = Velocities[5]; vwc = Velocities[6]; vvc = Velocities[7];
 	}
 	
 	public virtual void ResetVelocity()
 	{
-		for(int i = 0; i < vs.Length; ++i) vs[i] = Vector2.Zero;
+		for(int i = 0; i < Velocities.Length; ++i) Velocities[i] = Vector2.Zero;
 		LoadVelocities();
 	}
 	
 	public virtual void TruncateVelocityIfInsignificant()
 	{
-		for(int i = 0; i < vs.Length; ++i) vs[i].TruncateIfInsignificant();
+		for(int i = 0; i < Velocities.Length; ++i) Velocities[i].TruncateIfInsignificant();
 		LoadVelocities();
 	}
 	
@@ -571,7 +577,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		var hp = data.Hitpause;
 		Hitbox hitbox = data.Hitter;
 		Hurtbox hurtbox = data.Hitee;
-		var hitSound = hitbox.hitSound;
+		var hitSound = hitbox.HitSound;
 		
 		damage += d * DamageTakenMult;
 		RestoreOptionsOnGettingHit();
@@ -637,10 +643,10 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		}
 		
 		//GD.Print($"{this} is really not clashing so is entering Hit Lag State");
-		if(hitbox.hitlag > 0)
+		if(hitbox.Hitlag > 0)
 		{
 			var s = States.Change<HitLagState>();
-			s.hitLagLength = hitbox.hitlag;
+			s.hitLagLength = hitbox.Hitlag;
 		}
 	}
 	
@@ -648,7 +654,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	{
 		//GD.Print($"{this} gets Handle Clashing called and calls self's attack part's Handle Hits");
 		GD.Print("CLASH");
-		CurrentAttack?.currentPart?.HandleHits();
+		CurrentAttack?.CurrentPart?.HandleHits();
 		var skb = data.Skb;
 		var vkb = data.Vkb;
 		
@@ -668,7 +674,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		//PlaySound("Clash");
 	}
 	
-	public virtual bool AttackInCooldown(Attack a) => a.sharesCooldownWith.Append(a.Name).Any(Cooldowns.InCooldown);
+	public virtual bool AttackInCooldown(Attack a) => a.SharesCooldownWith.Append(a.Name).Any(Cooldowns.InCooldown);
 	
 	public virtual bool ExecuteAttack(Attack a)
 	{
@@ -735,7 +741,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	
 	public virtual void HandleProjectileDestruction(Projectile who)
 	{
-		var identifier = who.identifier;
+		var identifier = who.Identifier;
 		
 		if(!activeProjectiles.ContainsKey(identifier))
 			throw new Exception($"Projectile {identifier} died but was never reported as active");

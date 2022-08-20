@@ -80,11 +80,11 @@ public class IniFile
 	
 	public void Parse(Strl l)
 	{
-		var ll = Clean(l);
 		var section = "";
-		for(int i = 0; i < ll.Count; ++i)
+		for(int i = 0; i < l.Count; ++i)
 		{
-			var s = ll[i];
+			var s = Clean(l[i]);
+			if(s == "") continue;
 			if(s[0] == '[')
 			{
 				if(s[s.Length - 1] != ']') throw new Exception($"File {filePath}: Opening [ without closing ] found in line {i}");
@@ -256,8 +256,6 @@ public class IniFile
 			return true;
 		}
 	}
-	
-	private Strl Clean(Strl l) => l.Select(Clean).Where(s => s != "").ToList<string>();
 	
 	private string Clean(string s) => s.Split(';')[0].Trim();
 }

@@ -32,18 +32,17 @@ public class DebugLabel : InfoLabel
 		Newline();
 		Add("CollisionSetting", ch.currentCollisionSetting);
 		Newline();
-		var currentState = ch.States.Current;
-		Add("State", currentState?.ToString()??"None");
+		Add("State", ch.States.Current?.ToString()??"None");
 		Add("PrevState", ch.States.Prev?.ToString()??"None");
-		Add("StateFrame", currentState?.frameCount??0);
-		Add("Actionable", currentState?.Actionable);
+		Add("StateFrame", ch.States.Current?.frameCount??0);
+		Add("Actionable", ch.States.Current?.Actionable);
+		Add("ShouldDrop", ch.States.Current?.ShouldDrop);
 		Newline();
-		var attack = ch.CurrentAttack;
-		Add("Attack", attack?.Name??"None");
-		Add("AttackFrame", attack?.frameCount??0);
-		Add("AttackScript", attack?.GetType()?.Name??"None");
+		Add("Attack", ch.CurrentAttack?.Name??"None");
+		Add("AttackFrame", ch.CurrentAttack?.frameCount??0);
+		Add("AttackScript", ch.CurrentAttack?.GetType()?.Name??"None");
 		Newline();
-		var part = attack?.currentPart??null;
+		var part = ch.CurrentAttack?.CurrentPart??null;
 		Add("AttackPart", part?.Name??"None");
 		Add("AttackPartFrame", part?.frameCount??0);
 		Add("NextPart", part?.GetNextPart()??"None");
@@ -58,17 +57,13 @@ public class DebugLabel : InfoLabel
 		Add("AnimationLooping", ch.CharacterSprite.currentSheet.loop);
 		Add("AnimationFrame", ch.CharacterSprite.Frame);
 		Newline();
-		Add("PlayedSounds", ch.Audio.ToString());
-		Newline();
 		Add("Velocity", ch.RoundedVelocity);
 		Add("Position", ch.RoundedPosition);
 		Newline();
 		Add("PlatformNormal", ch.Norm.Round(2));
 		Add("PlatformFriction", ch.PlatFric);
 		Add("PlatformBounce", ch.PlatBounce);
-		Add("Fvel", ch.fvel.Round(2));
-		Add("Wvel", ch.wvel.Round(2));
-		Add("Cvel", ch.cvel.Round(2));
+		Add("PlatformVelocity", ch.PlatVel.Round(2));
 		Newline();
 		Add("Friction", ch.AppropriateFriction);
 		Add("Bounce", ch.AppropriateBounce);
@@ -89,22 +84,21 @@ public class DebugLabel : InfoLabel
 		Add("Light", GetInputString("Light"));
 		Add("Special", GetInputString("Special"));
 		Add("Taunt", GetInputString("Taunt"));
-		Newline();
 		
 		if(ch.Inputs is BufferInputManager buff)
 		{
 			Newline();
 			
 			var buffstring = new StringBuilder();
-			foreach(var entry in buff.buffer)
-				if(entry.Value.bufferTimeLeft >= 0)
-					buffstring.Append($"{entry.Key} : {entry.Value.bufferTimeLeft}\n");
-		
+			foreach(var entry in buff.buffer) if(entry.Value.bufferTimeLeft >= 0)
+				buffstring.Append($"{entry.Key} : {entry.Value.bufferTimeLeft}\n");
+			
 			Add("Buffer", "\n"+buffstring.ToString());
 		}
 		
 		Newline();
-		
+		Add("PlayedSounds", "\n"+ch.Audio);
+		Newline();
 		Add("Cooldowns", "\n"+ch.Cooldowns);
 		Newline();
 		Add("InvincibilityTimers", "\n"+ch.IFrames);

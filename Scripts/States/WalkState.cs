@@ -14,7 +14,7 @@ public class WalkState : GroundedState
 	protected override bool CalcStateChange()
 	{
 		if(base.CalcStateChange()) return true;
-		else if(ch.TurnConditional()) ch.States.Change("WalkTurn");
+		else if(ch.InputtingTurn) ch.States.Change("WalkTurn");
 		else if(ch.walled) ch.States.Change("WalkWall");
 		else if(!ch.InputtingHorizontalDirection) ch.States.Change("WalkStop");
 		else return false;

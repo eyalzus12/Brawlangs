@@ -29,7 +29,7 @@ public class AttackState : State
 	
 	protected override void DoMovement()
 	{
-		if(att?.currentPart is null) return;
+		if(att?.CurrentPart is null) return;
 		if(ch.InputtingHorizontalDirection) DoInputMovement();
 		DoFriction();
 	}
@@ -37,9 +37,9 @@ public class AttackState : State
 	protected virtual void DoInputMovement()
 	{
 		if(ch.InputDirection == ch.Direction)
-			ch.vec.x.Towards(ch.Direction * att.currentPart.driftForwardSpeed, att.currentPart.driftForwardAcceleration);
+			ch.vec.x.Towards(ch.Direction * att.CurrentPart.DriftForwardSpeed, att.CurrentPart.DriftForwardAcceleration);
 		else
-			ch.vec.x.Towards(-ch.Direction * att.currentPart.driftBackwardsSpeed, att.currentPart.driftBackwardsAcceleration);
+			ch.vec.x.Towards(-ch.Direction * att.CurrentPart.DriftBackwardsSpeed, att.CurrentPart.DriftBackwardsAcceleration);
 	}
 	
 	protected virtual void DoFriction()
@@ -57,7 +57,7 @@ public class AttackState : State
 			ch.vuc.y.Towards(0, ch.AppropriateGravity);
 		}
 		//grounded and moves up
-		else if((att?.currentPart?.movement.y ?? 0) < 0) Unsnap();
+		else if((att?.CurrentPart?.Movement.y ?? 0) < 0) Unsnap();
 		//grounded and moves down
 		else
 		{
@@ -73,7 +73,7 @@ public class AttackState : State
 		if(ch.walled && ch.Resources.Has("Clings") && !touchedWall)
 		{
 			ch.RestoreOptionsOnWallTouch();
-			ch.vec.y *= (1-ch.wallFriction*ch.wfric);
+			if(att?.CurrentPart?.SlowOnWalls ?? true) ch.vec.y *= (1-ch.wallFriction*ch.wfric);
 			touchedWall = true;
 		}
 		
@@ -83,11 +83,6 @@ public class AttackState : State
 			touchedGround = true;
 		}
 	}
-	
-	/*protected override void RepeatActions()
-	{
-		ch.SetCollisionMaskBit(DROP_THRU_BIT, !ch.downHeld);
-	}*/
 	
 	public void SetEnd(Attack a)
 	{
@@ -102,11 +97,11 @@ public class AttackState : State
 			//call ending function
 			a.OnEnd();
 			//stop attack part
-			if(a.currentPart != null) a.currentPart.Stop();
+			a.CurrentPart?.Stop();
 			//reset character attack
 			ch.ResetCurrentAttack(a);
 			//revert attack state
-			a.currentPart = null;
+			a.CurrentPart = null;
 		}
 		
 		//apply enflag
@@ -164,9 +159,9 @@ public class AttackState : State
 			att.connected = null;
 			att.active = false;
 			att.OnEnd();
-			if(att.currentPart != null) att.currentPart.Stop();
+			att.CurrentPart?.Stop();
 			ch.ResetCurrentAttack(att);
-			att.currentPart = null;
+			att.CurrentPart = null;
 		}
 	}
 }

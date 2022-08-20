@@ -8,16 +8,13 @@ public class Projectile : Node2D, IHitter, IHittable
 	[Signal]
 	public delegate void ProjectileDied(Projectile who);
 	
-	[Export]
-	public string identifier;
-	[Export]
-	public Vector2 spawningPosition = default;
-	[Export]
-	public int maxLifetime = 0;
+	public string Identifier{get; set;}
+	public Vector2 SpawningPosition{get; set;}
+	public int MaxLifetime{get; set;}
 	
 	public int Direction{get; set;}
 	
-	public ProjectileMovementFunction Movement;
+	public ProjectileMovementFunction Movement{get; set;}
 	public int frameCount = 0;
 	
 	public List<Hitbox> Hitboxes{get; set;} = new List<Hitbox>();
@@ -48,9 +45,9 @@ public class Projectile : Node2D, IHitter, IHittable
 	public float KnockbackDoneMult{get => OwnerObject.KnockbackDoneMult; set => OwnerObject.KnockbackDoneMult = value;}
 	public float StunDoneMult{get => OwnerObject.StunDoneMult; set => OwnerObject.StunDoneMult = value;}
 	
-	public AudioManager audioManager;
-	public void PlaySound(string sound) => audioManager.Play(sound);
-	public void PlaySound(AudioStream sound) => audioManager.Play(sound);
+	public AudioManager Audio{get; set;} = new AudioManager();
+	public void PlaySound(string sound) => Audio.Play(sound);
+	public void PlaySound(AudioStream sound) => Audio.Play(sound);
 	
 	public Dictionary<string, ParamRequest> LoadExtraProperties = new Dictionary<string, ParamRequest>();
 	public virtual void LoadProperties() {}
@@ -77,7 +74,7 @@ public class Projectile : Node2D, IHitter, IHittable
 	public override void _Ready()
 	{
 		frameCount = 0;
-		Position = spawningPosition + OwnerObject.Position;
+		Position = SpawningPosition + OwnerObject.Position;
 		ConnectSignals();
 		HasHit = false;
 		GettingHit = false;
@@ -103,7 +100,7 @@ public class Projectile : Node2D, IHitter, IHittable
 		Loop();
 		Position = Movement.GetNext(this);
 		
-		if(frameCount >= maxLifetime)
+		if(frameCount >= MaxLifetime)
 			Destruct();
 	}
 	
@@ -155,7 +152,7 @@ public class Projectile : Node2D, IHitter, IHittable
 		Hitbox current;
 		if(HitList.TryGetValue(hurtbox, out current))
 		{
-			if(hitbox.hitPriority > current.hitPriority)
+			if(hitbox.HitPriority > current.HitPriority)
 				HitList[hurtbox] = hitbox;
 		}
 		else
@@ -180,12 +177,12 @@ public class Projectile : Node2D, IHitter, IHittable
 			
 			var dirvec = hitbox.KnockbackDir(hitChar)*kmult;
 			
-			var skb = dirvec*hitbox.setKnockback;
-			var vkb = dirvec*hitbox.varKnockback;
-			var damage = hitbox.damage*dmult;
-			var stun = hitbox.stun*smult;
+			var skb = dirvec*hitbox.SetKnockback;
+			var vkb = dirvec*hitbox.VarKnockback;
+			var damage = hitbox.Damage*dmult;
+			var stun = hitbox.Stun*smult;
 			
-			var data = new HitData(skb, vkb, damage, stun, hitbox.hitpause, hitbox, hurtbox);
+			var data = new HitData(skb, vkb, damage, stun, hitbox.Hitpause, hitbox, hurtbox);
 			
 			hitChar.HandleGettingHit(data);
 			OwnerObject.HandleHitting(data);

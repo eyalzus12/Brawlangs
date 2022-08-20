@@ -26,15 +26,17 @@ public class WalkTurnState : GroundedSlowdownState
 	
 	protected override bool CalcStateChange()
 	{
-		if(Actionable && ch.ShouldInitiateRun)
-		{
-			ch.TurnConditional();
-			ch.States.Change("RunStartup");
-		}
+		if(Actionable && ch.ShouldInitiateRun) ch.States.Change("RunStartup");
 		else if(!ch.grounded) ch.States.Change("Air");
 		else if(frameCount >= ch.walkTurn + Math.Round(TURNING_MULT*(1-ch.ffric))) ch.States.Change("Walk");
 		else return false;
 		
 		return true;
+	}
+	
+	public override void OnChange(State newState)
+	{
+		ch.Turn();
+		ch.vuc.x *= -1;
 	}
 }

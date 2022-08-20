@@ -15,7 +15,7 @@ public class WalkStopState : GroundedSlowdownState
 	{
 		if(base.CalcStateChange()) return true;
 		else if(ch.Idle) ch.States.Change("Idle");
-		else if(ch.TurnConditional()) ch.States.Change("WalkTurn");
+		else if(ch.InputtingTurn) ch.States.Change("WalkTurn");
 		else if(ch.InputtingHorizontalDirection) ch.States.Change("Walk");
 		else return false;
 		

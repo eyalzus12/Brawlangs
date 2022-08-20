@@ -8,6 +8,7 @@ public class AirState : State
 	public override bool ShouldDrop => ch.downHeld && ch.HoldingRun;
 	
 	public bool jump = false;
+	public bool wallTouch = false;
 	
 	public AirState() : base() {}
 	public AirState(Character link): base(link) {}
@@ -19,6 +20,7 @@ public class AirState : State
 		ch.onSemiSolid = false;
 		ch.onSlope = false;
 		jump = false;
+		wallTouch = false;
 		if(ch.CharacterSprite.currentSheet.name.StartsWith("Jump"))
 			ch.QueueAnimation("Drift");
 		else
@@ -87,13 +89,24 @@ public class AirState : State
 			ch.QueueAnimation("Drift");
 			
 			if(ch.cnorm == Vector2.Down)
+			{
 				ch.vec.y *= ch.ceilingBonkBounce;
+				ch.vuc.y = 0;
+			}
 			else if(ch.vec.y < 0)
 			{
 				ch.vec.x = 0;
 				if(ch.cvel.y != 0f)
 					ch.vec.y *= ch.ceilingBonkBounce;
 			}
+		}
+		
+		if(!ch.walled) wallTouch = false;
+		else if(ch.walled && !wallTouch && !ch.Resources.Has("Clings"))
+		{
+			wallTouch = true;
+			ch.vec.y *= (1-ch.wallFriction*ch.wfric);
+			ch.vuc.y *= (1-ch.wallFriction*ch.wfric);
 		}
 	}
 	

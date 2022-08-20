@@ -3,10 +3,6 @@ using System;
 
 public class WavedashState : GroundedState
 {
-	public override string LightAttackType => "Light";
-	public override string SpecialAttackType => "Special";
-	public override string TauntType => "Taunt";
-	
 	public WavedashState() : base() {}
 	public WavedashState(Character link) : base(link) {}
 	
@@ -41,24 +37,6 @@ public class WavedashState : GroundedState
 		ch.TurnConditional();
 		ch.States.Change("Jump");
 		MarkForDeletion("Jump", true);
-	}
-	
-	protected override void LightAttack()
-	{
-		ch.TurnConditional();
-		base.LightAttack();
-	}
-	
-	protected override void SpecialAttack()
-	{
-		ch.TurnConditional();
-		base.SpecialAttack();
-	}
-	
-	protected override void Taunt()
-	{
-		ch.TurnConditional();
-		base.Taunt();
 	}
 	
 	protected override bool CalcStateChange()

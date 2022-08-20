@@ -3,9 +3,9 @@ using System;
 
 public class ArtemisPart : AttackPart
 {
-	public float ForwardSpeed = 0f;
-	public float BackSpeed = 0f;
-	public int MoveLength = 0;
+	public float ForwardSpeed{get; set;}
+	public float BackSpeed{get; set;}
+	public int MoveLength{get; set;}
 	
 	public override void LoadProperties()
 	{
@@ -16,10 +16,10 @@ public class ArtemisPart : AttackPart
 	
 	public override void Loop()
 	{
-		if(frameCount < startup) {}
-		else if(frameCount < startup + MoveLength)
+		if(frameCount < Startup) {}
+		else if(frameCount < Startup + MoveLength)
 			ch.vuc.x = ForwardSpeed * ch.Direction;
-		else if(frameCount < startup + MoveLength + Math.Round(MoveLength*ForwardSpeed/BackSpeed))
+		else if(frameCount < Startup + MoveLength + Math.Round(MoveLength*ForwardSpeed/BackSpeed))
 			ch.vuc.x = -BackSpeed * ch.Direction;
 		else ch.vuc = Vector2.Zero;
 	}
