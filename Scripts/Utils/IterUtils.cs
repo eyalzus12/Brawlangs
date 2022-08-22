@@ -93,4 +93,14 @@ public static class IterUtils
 		foreach(var h in e) if(predicate(h)) return h;
 		return @default;
 	}
+	
+	public static IEnumerable<int> IndicesWhere<T>(this IEnumerable<T> e, Func<T, bool> predicate)
+	{
+		int i = 0;
+		foreach(var h in e)
+		{
+			if(predicate(h)) yield return i;
+			i++;
+		}
+	}
 }

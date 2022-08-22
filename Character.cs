@@ -274,6 +274,8 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	
 	public ResourceManager Resources{get; set;} = new ResourceManager();
 	
+	public TimedActionsManager TimedActions{get; set;} = new TimedActionsManager();
+	
 	public Dictionary<string, PackedScene> projectiles = new Dictionary<string, PackedScene>();
 	public Dictionary<string, HashSet<Projectile>> activeProjectiles = new Dictionary<string, HashSet<Projectile>>();
 	public ProjectilePool projPool;
@@ -306,6 +308,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		TruncateVelocityIfInsignificant();
 		Cooldowns.Update();
 		IFrames.Update();
+		TimedActions.Update();
 		States.Update(delta);
 		if(Input.IsActionJustPressed("reset")) Respawn();
 		
@@ -378,6 +381,12 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	///////////////Misc////////////////////////
 	///////////////////////////////////////////
 	
+	public void GiveTemporaryResource(string resource, int amount, int forFrames)
+	{
+		Resources.Give(resource, amount);
+		TimedActions.Add($"Resource{resource}Expire", forFrames, () => {Resources[resource] = 0;});
+	}
+	
 	public void Die()
 	{
 		GD.Print($"Character {this} died with {stocks} stocks");
@@ -404,7 +413,6 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		crouching = false;
 		ResetVelocity();
 		Direction = 1;
-		SetCollisionMaskBit(DROP_THRU_BIT, true);
 		damage = 0f;
 		framesSinceLastHit = 0;
 		comboCount = 0;

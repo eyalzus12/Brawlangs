@@ -8,11 +8,10 @@ public class DebugLabel : InfoLabel
 	
 	public override void UpdateLabel()
 	{
-		if(ch is null || !Godot.Object.IsInstanceValid(ch) || !Visible) return;
+		if(!Valid(ch) || !Visible) return;
 		Add("Name", ch.Name);
 		Add("Script", ch.GetType().Name);
 		Add("TeamNumber", ch.TeamNumber);
-		Newline();
 		Add("Damage", Math.Round(ch.damage,2));
 		Add("Stocks", ch.stocks);
 		Newline();
@@ -49,8 +48,8 @@ public class DebugLabel : InfoLabel
 		Add("AttackPartScript", part?.GetType()?.Name??"None");
 		Add("AttackPartHit", part?.HasHit ?? false);
 		Newline();
-		Add("LastHitee", ch.LastHitee?.ToString() ?? "None");
-		Add("LastHitter", ch.LastHitter?.ToString() ?? "None");
+		Add("LastHitee", Valid(ch.LastHitee)?ch.LastHitee.ToString():"None");
+		Add("LastHitter", Valid(ch.LastHitter)?ch.LastHitter.ToString():"None");
 		Newline();
 		Add("PlayedAnimation", ch.CharacterSprite.currentSheet.name);
 		Add("QueuedAnimation", ch.CharacterSprite.queuedSheet?.name??"None");
@@ -80,10 +79,11 @@ public class DebugLabel : InfoLabel
 		Add("Jump", GetInputString("Jump"));
 		Add("Dodge", GetInputString("Dodge"));
 		Add("Run", GetInputString("Run"));
-		Newline();
 		Add("Light", GetInputString("Light"));
 		Add("Special", GetInputString("Special"));
 		Add("Taunt", GetInputString("Taunt"));
+		Newline();
+		Add("PlayedSounds", "\n"+ch.Audio);
 		
 		if(ch.Inputs is BufferInputManager buff)
 		{
@@ -97,13 +97,13 @@ public class DebugLabel : InfoLabel
 		}
 		
 		Newline();
-		Add("PlayedSounds", "\n"+ch.Audio);
-		Newline();
 		Add("Cooldowns", "\n"+ch.Cooldowns);
 		Newline();
 		Add("InvincibilityTimers", "\n"+ch.IFrames);
 		Newline();
 		Add("Resources", "\n"+ch.Resources);
+		Newline();
+		Add("TimedActions", "\n"+ch.TimedActions);
 		Newline();
 		
 		Add("FPS", Engine.GetFramesPerSecond());
@@ -130,4 +130,6 @@ public class DebugLabel : InfoLabel
 			default: return "ERROR";
 		}
 	}
+	
+	private bool Valid(object o) => o is Godot.Object god && Godot.Object.IsInstanceValid(god);
 }

@@ -18,7 +18,7 @@ public class InfoLabel : Label
 	
 	public virtual void Connect() {}
 	
-	public override void _Process(float delta)
+	public override void _PhysicsProcess(float delta)
 	{
 		if(Input.IsActionJustPressed("debug_toggle"))
 			debugMode = !debugMode;
