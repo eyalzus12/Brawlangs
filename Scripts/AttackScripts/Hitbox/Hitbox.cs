@@ -140,10 +140,10 @@ public class Hitbox : Area2D
 	public override void _PhysicsProcess(float delta)
 	{
 		if(!Active) return;
-		++frameCount;
 		Loop();
 		UpdateHitboxPosition();
 		Update();
+		++frameCount;
 	}
 	
 	public override void _Draw()
@@ -161,6 +161,7 @@ public class Hitbox : Area2D
 	
 	public float TeamMult(IHittable n, float chooseFrom) => (n == OwnerObject || n.TeamNumber == OwnerObject.TeamNumber)?chooseFrom:1f;
 	
+	//IStateHandled
 	private float StateMult(IHittable n, Dictionary<string, float> chooseFrom)
 	{
 		if(chooseFrom is null || !(n is Character c)) return 1f;//only works on characters obv

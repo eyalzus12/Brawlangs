@@ -4,11 +4,23 @@ using System.Text;
 
 public class DebugLabel : InfoLabel
 {
+	private const int LABEL_COUNT = 2;
 	public Character ch = null;
+	
+	private int whichlabel = 0;
 	
 	public override void UpdateLabel()
 	{
 		if(!Valid(ch) || !Visible) return;
+		
+		if(Input.IsActionJustPressed("debug_label_switch"))
+			{whichlabel++; whichlabel %= LABEL_COUNT;}
+		
+		new Action[]{UpdateLabel_1,UpdateLabel_2}[whichlabel]();
+	}
+	
+	public void UpdateLabel_1()
+	{
 		Add("Name", ch.Name);
 		Add("Script", ch.GetType().Name);
 		Add("TeamNumber", ch.TeamNumber);
@@ -44,7 +56,7 @@ public class DebugLabel : InfoLabel
 		var part = ch.CurrentAttack?.CurrentPart??null;
 		Add("AttackPart", part?.Name??"None");
 		Add("AttackPartFrame", part?.frameCount??0);
-		Add("NextPart", part?.GetNextPart()??"None");
+		Add("NextPart", part?.NextPart()??"None");
 		Add("AttackPartScript", part?.GetType()?.Name??"None");
 		Add("AttackPartHit", part?.HasHit ?? false);
 		Newline();
@@ -83,8 +95,17 @@ public class DebugLabel : InfoLabel
 		Add("Special", GetInputString("Special"));
 		Add("Taunt", GetInputString("Taunt"));
 		Newline();
+		Add("FPS", Engine.GetFramesPerSecond());
+		Add("PhysicsFrame", Engine.GetPhysicsFrames());
+		Add("DebugBuild", OS.IsDebugBuild());
+		Add("OS", OS.GetName());
+	}
+	
+	public void UpdateLabel_2()
+	{
+		Add("Name", ch.Name);
+		Newline();
 		Add("PlayedSounds", "\n"+ch.Audio);
-		
 		if(ch.Inputs is BufferInputManager buff)
 		{
 			Newline();
@@ -105,11 +126,7 @@ public class DebugLabel : InfoLabel
 		Newline();
 		Add("TimedActions", "\n"+ch.TimedActions);
 		Newline();
-		
-		Add("FPS", Engine.GetFramesPerSecond());
-		Add("PhysicsFrame", Engine.GetPhysicsFrames());
-		Add("DebugBuild", OS.IsDebugBuild());
-		Add("OS", OS.GetName());
+		Add("Tags", "\n"+ch.Tags);
 	}
 	
 	protected override bool EnsureCorrectAppearence() => (this.GetDataOrDefault("CurrentInfoLabelCharacter",0).i() == ch.TeamNumber);

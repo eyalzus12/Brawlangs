@@ -15,6 +15,7 @@ public class LandState : GroundedState
 		
 		ch.vac = Vector2.Zero;
 		ch.RestoreOptionsOnGroundTouch();
+		ch.Tags["Grounded"] = StateTag.Starting;
 		
 		AdjustVelocity();
 		ch.PlayAnimation("Land");

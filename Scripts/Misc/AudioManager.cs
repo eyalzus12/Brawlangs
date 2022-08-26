@@ -59,7 +59,7 @@ public class AudioManager : Node
 			if(player.Playing)
 			{
 				var filename = StringUtils.RemoveExtension(player.Stream.ResourcePath.SplitByLast('/')[1]);//TODO: Trim loop
-				result.Append(filename + " ");
+				result.Append($"{filename}\n");
 			}
 		}
 		return result.ToString();

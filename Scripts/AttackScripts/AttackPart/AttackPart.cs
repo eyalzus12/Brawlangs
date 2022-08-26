@@ -2,11 +2,9 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using PartDir = System.Collections.Generic.Dictionary<string, AttackPart>;
 
 public class AttackPart : Node2D, IHitter
 {
-	public PartDir dir = new PartDir();
 	public int frameCount = 0;
 	
 	public List<Hitbox> Hitboxes{get; set;}
@@ -15,8 +13,8 @@ public class AttackPart : Node2D, IHitter
 	
 	public Dictionary<string, ParamRequest> LoadExtraProperties = new Dictionary<string, ParamRequest>();
 	
-	public int Direction {get => ch.Direction; set => ch.Direction = value;}
-	public int TeamNumber {get => ch.TeamNumber; set => ch.TeamNumber = value;}
+	public int Direction {get => OwnerObject.Direction; set => OwnerObject.Direction = value;}
+	public int TeamNumber {get => OwnerObject.TeamNumber; set => OwnerObject.TeamNumber = value;}
 	
 	public bool active = false;
 	public int Startup = 0;
@@ -49,7 +47,9 @@ public class AttackPart : Node2D, IHitter
 	public AnimationPlayer hitboxPlayer;
 	public Attack att;
 	
-	//needed for: states, animations
+	public AttackPartTransitionManager TransitionManager{get; set;} = new AttackPartTransitionManager();
+	
+	//needed for: animations, sound, velocity, projectiles, tags
 	protected Character ch;
 	public IAttacker OwnerObject{get => ch; set
 		{
@@ -80,7 +80,7 @@ public class AttackPart : Node2D, IHitter
 	}
 	
 	public virtual void LoadProperties() {}
-	
+	/*
 	public void Connect(AttackPart ap)
 	{
 		dir.Add(ap.Name, ap);
@@ -90,6 +90,7 @@ public class AttackPart : Node2D, IHitter
 	{
 		dir.Add(name, ap);
 	}
+	*/
 	
 	public virtual void Init() {}
 	
@@ -99,14 +100,13 @@ public class AttackPart : Node2D, IHitter
 		
 		ch.PlayAnimation(StartupAnimation);
 		ch.PlaySound(AttackSound);
+		
 		active = true;
 		frameCount = 0;
 		
 		if(OverwriteXMovement) ch.vec.x = 0;
 		if(OverwriteYMovement) ch.vec.y = 0;
-		
-		if(Movement != Vector2.Zero)
-			ch.vec = Movement * new Vector2(ch.Direction, 1);
+		if(Movement != Vector2.Zero) ch.vec = Movement * new Vector2(ch.Direction, 1);
 		
 		OnStart();
 		hitboxPlayer.Play("HitboxActivation");
@@ -118,11 +118,12 @@ public class AttackPart : Node2D, IHitter
 	public override void _PhysicsProcess(float delta)
 	{
 		if(!active) return;
-		++frameCount;
 		if(frameCount == Startup) OnStartupFinish();
 		else if(frameCount > Startup) ch.PlayAnimation(AttackAnimation);
 		Loop();
 		HandleHits();
+		var next = NextPart(); if(next != "") ChangePart(next);
+		++frameCount;
 	}
 	
 	public virtual void OnStartupFinish()
@@ -168,15 +169,16 @@ public class AttackPart : Node2D, IHitter
 		GD.Print("-------------------------------------------");
 		#endif
 		
-		hitboxPlayer.Connect("animation_finished", this, "ChangeToNext");
+		hitboxPlayer.Connect("animation_finished", this, "ChangeToNextOnEnd");
 	}
 	
 	public virtual void Stop()
 	{
 		HandleHits();
+		OnEnd();
 		hitboxPlayer.Stop(true);
 		Hitboxes.ForEach(h => h.Active = false);
-		OnEnd();
+		ch.Tags["Hit"] = StateTag.Ending;
 		HitList.Clear();
 		HitIgnoreList.Clear();
 		active = false;
@@ -189,46 +191,23 @@ public class AttackPart : Node2D, IHitter
 	public virtual void OnEnd() {}
 	public virtual void HitEvent(Hitbox hitbox, Hurtbox hurtbox) {}
 	
-	public virtual void ChangeToNext(string dummy="")
+	public void ChangeToNextOnEnd(string dummy="") => ChangeToNext(true);
+	
+	public virtual void ChangeToNext(bool end = false)
 	{
 		if(!active) return;
-		ChangePart(GetNextPart());
+		ChangePart(NextPart(end));
 	}
 	
-	private IEnumerable<string> Describe(Character c)
-	{
-		if(c.ceilinged) yield return "Ceiling";
-		if(c.walled) yield return "Wall";
-		yield return c.grounded?"Grounded":"Aerial";
-		yield return "";
-	}
-	
-	public virtual string GetNextPart()
-	{
-		foreach(var property in Describe(ch))
-		{
-			if(HasHit && dir.ContainsKey($"{property}Hit")) return $"{property}Hit";
-			if(dir.ContainsKey($"{property}Miss")) return $"{property}Miss";
-			if(dir.ContainsKey(property)) return property;
-		}
-		
-		return "Next";
-	}
+	public virtual string NextPart(bool end = false) => TransitionManager.NextAttackPart(ch.Tags, end?-1:frameCount);
 	
 	public virtual void ChangePart(string part)
 	{
-		if(!active || part == "") return;
-		var changeTo = GetConnectedPart(part);
-		att.SetPart(changeTo);
+		//if(!active) return;
+		att.SetPart(part);
 	}
 	
-	public AttackPart GetConnectedPart(string name)
-	{
-		if(dir.ContainsKey(name)) return dir[name];
-		else return null;
-	}
-	
-	public bool CanHit(IHittable h) => ch.CanHit(h) && !HitIgnoreList.Contains(h);
+	public bool CanHit(IHittable h) => OwnerObject.CanHit(h) && !HitIgnoreList.Contains(h);
 	
 	public virtual void HandleInitialHit(Hitbox hitbox, Hurtbox hurtbox)
 	{
@@ -239,9 +218,10 @@ public class AttackPart : Node2D, IHitter
 		HasHit = true;
 		
 		//GD.Print($"{OwnerObject} Hitting = true");
-		ch.Hitting = true;
+		OwnerObject.Hitting = true;
+		ch.Tags["Hit"] = StateTag.Starting;
 		//GD.Print($"{OwnerObject} Last Hitee = {hurtbox.OwnerObject}");
-		ch.LastHitee = hurtbox.OwnerObject;
+		OwnerObject.LastHitee = hurtbox.OwnerObject;
 		
 		//GD.Print($"{hurtbox.OwnerObject} Getting Hit = true");
 		hurtbox.OwnerObject.GettingHit = true;
@@ -278,9 +258,9 @@ public class AttackPart : Node2D, IHitter
 			//GD.Print($"{OwnerObject} attack part runs Hit Event");
 			HitEvent(hitbox, hurtbox);
 			
-			var kmult = ch.KnockbackDoneMult*KnockbackMult*att.KnockbackMult*hitbox.GetKnockbackMultiplier(hitChar);
-			var dmult = ch.DamageDoneMult*DamageMult*att.DamageMult*hitbox.GetDamageMultiplier(hitChar);
-			var smult = ch.StunDoneMult*StunMult*att.StunMult*hitbox.GetStunMultiplier(hitChar);
+			var kmult = OwnerObject.KnockbackDoneMult*KnockbackMult*att.KnockbackMult*hitbox.GetKnockbackMultiplier(hitChar);
+			var dmult = OwnerObject.DamageDoneMult*DamageMult*att.DamageMult*hitbox.GetDamageMultiplier(hitChar);
+			var smult = OwnerObject.StunDoneMult*StunMult*att.StunMult*hitbox.GetStunMultiplier(hitChar);
 			
 			var dirvec = hitbox.KnockbackDir(hitChar)*kmult;
 			var skb = dirvec*hitbox.SetKnockback + hitbox.MomentumCarry*velocity;
@@ -295,7 +275,7 @@ public class AttackPart : Node2D, IHitter
 			//GD.Print($"{OwnerObject} attack parts calls attack's On Hit");
 			att.OnHit(hitbox, hurtbox);
 			//GD.Print($"{OwnerObject} attack part calls {OwnerObject} Handle Hitting");
-			ch.HandleHitting(data);
+			OwnerObject.HandleHitting(data);
 			//GD.Print($"{OwnerObject} attack part calls {hitChar} Handle Getting Hit");
 			hitChar.HandleGettingHit(data);
 		}

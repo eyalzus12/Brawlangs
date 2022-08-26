@@ -276,6 +276,8 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	
 	public TimedActionsManager TimedActions{get; set;} = new TimedActionsManager();
 	
+	public StateTagsManager Tags{get; set;} = new StateTagsManager();
+	
 	public Dictionary<string, PackedScene> projectiles = new Dictionary<string, PackedScene>();
 	public Dictionary<string, HashSet<Projectile>> activeProjectiles = new Dictionary<string, HashSet<Projectile>>();
 	public ProjectilePool projPool;
@@ -309,6 +311,8 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		Cooldowns.Update();
 		IFrames.Update();
 		TimedActions.Update();
+		Tags.Update();
+		UpdateInputTags();
 		States.Update(delta);
 		if(Input.IsActionJustPressed("reset")) Respawn();
 		
@@ -381,6 +385,16 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	///////////////Misc////////////////////////
 	///////////////////////////////////////////
 	
+	private readonly static string[] INPUT_TAGS = new string[]{"Light", "Special", "Taunt", "Jump", "Dodge", "Run"};
+	public void UpdateInputTags()
+	{
+		foreach(var inputTag in INPUT_TAGS)
+		{
+			if(Inputs.IsActionJustPressed(inputTag)) Tags[inputTag] = StateTag.Starting;
+			if(Inputs.IsActionJustReleased(inputTag)) Tags[inputTag] = StateTag.Ending;
+		}
+	}
+	
 	public void GiveTemporaryResource(string resource, int amount, int forFrames)
 	{
 		Resources.Give(resource, amount);
@@ -407,7 +421,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		CurrentAttack?.Stop();
 		ApplySettings("Default");
 		States.Change("Air");
-		Position = Vector2.Zero;
+		Position = 10f * Vector2.Left * TeamNumber;
 		IFrames.Clear();//todo: respawn i-frames
 		fastfalling = false;
 		crouching = false;

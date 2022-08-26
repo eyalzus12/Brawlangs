@@ -53,8 +53,12 @@ public static class TypeUtils
 	public static List<Vector3> lv3(this object o) => o.lt<Vector3>(v3);
 	public static List<Quat> lq(this object o) => o.lt<Quat>(q);
 		
-	public static List<T> lt<T>(this object o, Func<object, T> caster) =>
-		(o as IEnumerable<object>).Select(caster).ToList<T>();
+	public static List<T> lt<T>(this object o, Func<object, T> caster)
+	{
+		if(o is IEnumerable<T> et) return et.ToList();
+		else if(o is IEnumerable<object> eo) return eo.Select(caster).ToList<T>();
+		else return null;
+	}
 	
 	public static object cast(this object o, Type t, string debug = "")
 	{

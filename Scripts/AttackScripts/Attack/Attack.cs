@@ -9,6 +9,7 @@ public class Attack : Node2D
 	public AttackPart LastUsedPart{get; set;}
 	public Dictionary<string, AttackPart> Parts{get; set;} = new Dictionary<string, AttackPart>();
 	
+	//states
 	protected Character ch;
 	public IAttacker OwnerObject{get => ch; set
 		{
@@ -66,16 +67,16 @@ public class Attack : Node2D
 		CurrentPart.Activate();
 	}
 	
-	public void SetPart(AttackPart newPart)
+	public virtual void SetPart(string s)
 	{
-		if(newPart is null) Stop();
-		else if(CurrentPart != newPart)
+		if(Parts.ContainsKey(s) && Parts[s] != null)
 		{
 			LastUsedPart = CurrentPart;
 			CurrentPart?.Stop();
-			CurrentPart = newPart;
+			CurrentPart = Parts[s];
 			CurrentPart.Activate();
 		}
+		else Stop();
 	}
 	
 	public virtual void Stop()
@@ -90,8 +91,8 @@ public class Attack : Node2D
 	
 	public override void _PhysicsProcess(float delta)
 	{
-		++frameCount;
 		Loop();
+		++frameCount;
 	}
 	
 	public virtual void Init() {}

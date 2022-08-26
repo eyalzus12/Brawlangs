@@ -1,32 +1,25 @@
 using Godot;
 using System;
 using System.Collections.Generic;
-using Conn = System.Collections.Generic.Dictionary<string, (string, Attack)>;
+using System.Linq;
+//using Conn = System.Collections.Generic.Dictionary<string, (string, Attack)>;
 
 public class AttackCreator
 {
 	public string path;
 	public IniFile inif = new IniFile();
 	
-	private Conn cn = new Conn();
-	//part name - connection section name
-	
-	public AttackCreator()
-	{
-		cn = new Conn();
-	}
+	public AttackCreator() {}
 	
 	public AttackCreator(string path)
 	{
 		this.path = path;
 		inif.Load(path);
-		cn = new Conn();
 	}
 	
 	public void Build(Node2D n)
 	{
-		cn = new Conn();
-		var oAttacks = inif["", "AttackSections", new List<string>()];
+		var oAttacks = inif["", "AttackSections", Enumerable.Empty<string>()];
 		if(oAttacks is string)
 			BuildAttack(n, oAttacks.s());
 		else
@@ -35,8 +28,6 @@ public class AttackCreator
 			foreach(var s in Attacks)
 				BuildAttack(n, s);
 		}
-		
-		BuildConnections();
 	}
 	
 	public void BuildAttack(Node n, string section)
@@ -51,12 +42,12 @@ public class AttackCreator
 		var fric = inif[section, "Friction", 1f].f();
 		a.AttackFriction = fric;
 		
-		object oSharesCooldownWith = inif[section, "SharesCooldownWith", new List<string>()];
+		object oSharesCooldownWith = inif[section, "SharesCooldownWith", Enumerable.Empty<string>()];
 		if(oSharesCooldownWith is string CooldownShareStr) a.SharesCooldownWith.Add(CooldownShareStr);
 		else a.SharesCooldownWith.AddRange(oSharesCooldownWith.ls());
 		
 		var StartPartSection = inif[section, "StartPart", ""].s();
-		object oPartSections = inif[section, "Parts", new List<string>()];
+		object oPartSections = inif[section, "Parts", Enumerable.Empty<string>()];
 		if(oPartSections is string PartSection)
 			BuildPart(a, PartSection, StartPartSection);
 		else
@@ -71,9 +62,7 @@ public class AttackCreator
 		
 		n.AddChild(a);
 		a.Owner = n;//for scene packing
-		//ch.attacks.Add(a);
 		ch.Attacks.Add(a.Name, a);
-		//ch.cooldowns.Add(a.Name, 0);
 	}
 	
 	public AttackPart BuildPart(Attack a, string section, string start)
@@ -129,7 +118,7 @@ public class AttackCreator
 		ap.EndlagAnimation = ea;
 		var ps = inif[section, "Sound", ""].s();
 		ap.AttackSound = ps;
-		var ep = inif[section, "EmittedProjectiles", new List<string>()];
+		var ep = inif[section, "EmittedProjectiles", Enumerable.Empty<string>()];
 		if(ep is string sep) ap.EmittedProjectiles = new List<string>{sep};
 		else ap.EmittedProjectiles = ep.ls();
 		
@@ -142,10 +131,14 @@ public class AttackCreator
 			foreach(var s in HitboxSections) BuildHitbox(ap, s);
 		}
 		
-		var ConnectionSection = inif[section, "Connections", ""].s();
-		//get connection section
-		if(ConnectionSection != "") cn.Add(section, (ConnectionSection, a));
-		//request connection for later
+		var oTransitionSections = inif[section, "Transitions", null];
+		if(oTransitionSections is string)
+			BuildTransition(ap, oTransitionSections.s());
+		else if(oTransitionSections is object)
+		{
+			var TransitionSections = oTransitionSections.ls();
+			foreach(var s in TransitionSections) BuildTransition(ap, s);
+		}
 		
 		ap.LoadProperties();
 		LoadExtraProperties(ap, section);
@@ -184,7 +177,7 @@ public class AttackCreator
 		if(ap.OwnerObject.Audio.ContainsSound(hs)) h.HitSound = ap.OwnerObject.Audio[hs];
 		else GD.Print($"Hit sound {hs} for hitbox {section} in file at path {inif.filePath} could not be found.");
 		
-		var af = inif[section, "ActiveFrames", new List<Vector2>()];
+		var af = inif[section, "ActiveFrames", Enumerable.Empty<Vector2>()];
 		if(af is Vector2) h.ActiveFrames = new List<Vector2>{af.v2()};
 		else h.ActiveFrames = af.lv2();
 		
@@ -253,20 +246,35 @@ public class AttackCreator
 		h.Owner = ap;//for scene packing
 	}
 	
-	public void BuildConnections()
+	public void BuildTransition(AttackPart ap, string section)
 	{
-		foreach(var entry in cn)//go over requests
+		var oFrames = inif[section, "Frames", Enumerable.Empty<Vector2>()];
+		List<Vector2> frames = null;
+		if(oFrames is Vector2 v) frames = new List<Vector2>{v};
+		else if(oFrames is object) frames = oFrames.lv2();
+		
+		var tags = inif[section, "Tag", ""].s();
+		var tagList = ParseTagList(tags).ToList();
+		
+		var nextPart = inif[section, "Next", ""].s();
+		
+		var addedTransition = new AttackPartTransition(frames, tagList, nextPart);
+		ap.TransitionManager.Add(addedTransition);
+	}
+	
+	public IEnumerable<(string,StateTag)> ParseTagList(string s)
+	{
+		if(s == "") yield break;
+		string[] subtags = s.Split('|');
+		foreach(var subtag in subtags)
 		{
-			Attack a = entry.Value.Item2;
-			AttackPart ap = a.Parts[entry.Key];//get requester
-			var conndict = inif.dict[entry.Value.Item1];//get dictionary of connection
-			foreach(var connection in conndict)//go over it
-			{
-				//get requested to connect to
-				AttackPart toConnect = a.Parts[connection.Value.s()];
-				//connect
-				ap.Connect(connection.Key, toConnect);
-			}
+			string[] parts = subtag.Split('.');
+			if(parts.Length != 2) throw new FormatException($"{path}: Bad format for tag {subtag}");
+			string tag = parts[0];
+			string stateName = parts[1];
+			StateTag st;
+			if(!Enum.TryParse<StateTag>(stateName, out st)) throw new FormatException($"{path}: Unrecognizable state tag {stateName}");
+			yield return (tag,st);
 		}
 	}
 	

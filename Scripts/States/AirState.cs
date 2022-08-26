@@ -25,6 +25,12 @@ public class AirState : State
 			ch.QueueAnimation("Drift");
 		else
 			ch.PlayAnimation("Drift");
+		
+		if(ch.Tags["Grounded"] == StateTag.Starting || ch.Tags["Grounded"] == StateTag.Active)
+			ch.Tags["Grounded"] = StateTag.Ending;
+		
+		if(ch.Tags["Walled"] == StateTag.Starting || ch.Tags["Walled"] == StateTag.Active)
+			ch.Tags["Walled"] = StateTag.Ending;
 	}
 	
 	protected override void DoMovement()

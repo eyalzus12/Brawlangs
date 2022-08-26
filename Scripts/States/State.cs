@@ -49,7 +49,6 @@ public class State : Node
 		
 		if(frameCount == 0) FirstFrameAfterInit();
 		
-		frameCount++;
 		RepeatActions();
 		SetPlatformDropping();
 		DoMovement();
@@ -85,6 +84,8 @@ public class State : Node
 		CalcStateChange();
 		
 		ch.vic = Vector2.Zero;
+		
+		++frameCount;
 	}
 	
 	public virtual void Init() => SetupCollisionParamaters();

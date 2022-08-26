@@ -24,7 +24,7 @@ public class ChargePart : AttackPart
 	
 	public override void Loop()
 	{
-		if(!ch.Inputs.IsActionPressed(ChargeInput)) ChangePart(GetNextPart());
+		if(!ch.Inputs.IsActionPressed(ChargeInput)) ChangeToNext();
 	}
 	
 	public override void OnEnd()

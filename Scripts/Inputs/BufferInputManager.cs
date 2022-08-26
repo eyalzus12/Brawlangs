@@ -90,8 +90,9 @@ public class BufferInputManager : InputManager
 		str = $"{playerDeviceNumber}_{str}";
 		
 		if(buffer.ContainsKey(str)) return
-			!base.IsActionPressed(str) && //ensure input not existent
-			buffer[str].bufferTimeLeft == 0;//ensure just released
+			buffer[str].markedForDeletion || //ignored for input
+			(!base.IsActionPressed(str) && //ensure input not existent
+			buffer[str].bufferTimeLeft == 0);//ensure just released
 		else return base.IsActionJustReleased(str);
 	}
 	

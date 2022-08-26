@@ -10,15 +10,7 @@ public class ResourceManager
 	public int this[string resource]
 	{
 		get => Resources.ContainsKey(resource)?Resources[resource]:0;
-		set
-		{
-			if(Resources.ContainsKey(resource))
-			{
-				if(value <= 0) Resources.Remove(resource);
-				else if(Resources.ContainsKey(resource)) Resources[resource] = value;
-			}
-			else Resources.Add(resource, value);
-		}
+		set => Resources[resource] = value;
 	}
 	
 	public void Give(string resource, int amount, int min, int max)

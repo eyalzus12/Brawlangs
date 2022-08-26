@@ -9,17 +9,8 @@ public class CooldownManager
 	
 	public int this[string s]
 	{
-		get
-		{
-			if(Cooldowns.ContainsKey(s)) return Cooldowns[s];
-			else return 0;
-		}
-		
-		set
-		{
-			if(Cooldowns.ContainsKey(s)) Cooldowns[s] = value;
-			else Cooldowns.Add(s, value);
-		}
+		get => Cooldowns.ContainsKey(s)?Cooldowns[s]:0;
+		set => Cooldowns[s] = value;
 	}
 	
 	public bool InCooldown(string s) => this[s] > 0;
