@@ -9,7 +9,7 @@ public class CooldownManager
 	
 	public int this[string s]
 	{
-		get => Cooldowns.ContainsKey(s)?Cooldowns[s]:0;
+		get => Cooldowns.GetValueOrDefault(s,0);
 		set => Cooldowns[s] = value;
 	}
 	

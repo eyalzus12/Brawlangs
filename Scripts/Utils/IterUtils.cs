@@ -103,4 +103,9 @@ public static class IterUtils
 			i++;
 		}
 	}
+	
+	public static TValue GetValueOrDefault<TKey,TValue>(this Dictionary<TKey,TValue> d, TKey k, TValue @default = default)
+	{
+		TValue res; return d.TryGetValue(k, out res)?res:@default;
+	}
 }

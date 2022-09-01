@@ -50,6 +50,7 @@ public class DirectionalAirDodgeState : GenericInvincibleState
 		if(ch.grounded && !IsInEndlag && movement.y >= 0)
 		{
 			if(!IFramesStarted) OnIFramesStart();
+			ch.IFrames.Remove(ActionName);
 			ch.vuc.y = 0;
 			ch.vec.y = VCF;
 			ch.States.Change("Wavedash");

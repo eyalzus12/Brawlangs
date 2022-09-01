@@ -41,7 +41,7 @@ public class KeybindsParser
 		.Cast<Match>()
 		.Select(m => (int.Parse(m.Groups["section"].Value), m.Groups["data"].Value));
 	
-	private const string DATA_PARSER = @"^(?<action>\w+)\s*=\s*(?:@(?<deadzone>[+-]?[0-9]*.[0-9]+))?(?:\s+(?<device>[0-9]+)_(?<type>[a-zA-Z]*)(?<data>[0-9]+))*\s*(?:;.*)?$";
+	private const string DATA_PARSER = @"^(?<action>\w+)\s*=\s*(?:@(?<deadzone>[+-]?[0-9]*\.?[0-9]*))?(?:\s+(?<device>[0-9]+)_(?<type>[a-zA-Z]*)(?<data>[0-9]+))*\s*(?:;.*)?$";
 	private static readonly Regex DATA_REGEX = new Regex(DATA_PARSER, RegexOptions.Compiled | RegexOptions.Multiline);
 	private static void ParseData(int section, string s)
 	{

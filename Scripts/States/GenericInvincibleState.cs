@@ -23,6 +23,7 @@ public class GenericInvincibleState : State
 		IsInEndlag = false;
 		ch.Resources.Give(ActionName, -1);
 		ch.PlayAnimation(StateAnimation);
+		ch.Uncrouch();
 	}
 	
 	protected override void LoopActions()

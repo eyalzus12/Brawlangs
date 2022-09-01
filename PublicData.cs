@@ -60,11 +60,7 @@ public class PublicData : Node
 		return res;
 	}
 	
-	public object GetOrDefault(string str, object @default)
-	{
-		if(dict.ContainsKey(str)) return dict[str];
-		else return @default;
-	}
+	public object GetOrDefault(string str, object @default) => dict.GetValueOrDefault(str, @default);
 	
 	//public T GetOrDefault<T>(string str, T @default) => (T)GetOrDefault(str, @default);
 	public void Clear() => dict.Clear();

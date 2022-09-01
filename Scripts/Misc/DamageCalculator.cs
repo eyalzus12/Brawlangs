@@ -34,9 +34,9 @@ public class DamageCalculator
 		var weight = (damage-prevDamage)/(nextDamage-prevDamage);
 		return prevColor.LinearInterpolate(nextColor, weight);
 	}
-	
-	private class FirstItemComparar : IComparer<(float, Color)>
-	{
-		public int Compare((float, Color) fc1, (float, Color) fc2) => fc1.Item1.CompareTo(fc2.Item1);
-	}
+}
+
+public class FirstItemComparar : IComparer<(float, Color)>
+{
+	public int Compare((float, Color) fc1, (float, Color) fc2) => fc1.Item1.CompareTo(fc2.Item1);
 }

@@ -33,6 +33,7 @@ public class GetupState : GroundedState
 		if(base.CalcStateChange()) return true;
 		else if(frameCount >= ch.getupLength)
 		{
+			ch.Uncrouch();
 			if(ch.Idle) ch.States.Change("Idle");
 			else if(ch.InputtingHorizontalDirection) ch.States.Change("Walk");
 			else ch.States.Change("WalkStop");

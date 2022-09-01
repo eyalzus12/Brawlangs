@@ -17,6 +17,7 @@ public class AttackState : State
 	public override void Init()
 	{
 		Unsnap();
+		ch.Uncrouch();
 		touchedWall = false;
 		touchedGround = false;
 	}

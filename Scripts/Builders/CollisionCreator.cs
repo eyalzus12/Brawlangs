@@ -19,8 +19,8 @@ public class CollisionCreator
 	
 	public void Build(Character ch)
 	{
-		var oStates = inif["", "States", "Default"];
-		var oHurtboxes = inif["", "Hurtboxes", "Hurtbox"];
+		var states = inif["", "States", "Default"].ls();
+		var hurtboxes = inif["", "Hurtboxes", "Hurtbox"].ls();
 		
 		var collision = inif["", "Collision", "Collision"].s();
 		var cs = new CharacterCollision();
@@ -29,67 +29,23 @@ public class CollisionCreator
 		ch.collision = cs;
 		ch.AddChild(cs);
 		
-		if(oStates is string state)
-		{
-			if(oHurtboxes is string hurtbox)
-			{
-				var hr = new Hurtbox();
-				hr.Name = hurtbox;
-				hr.OwnerObject = ch;
-				ch.AddChild(hr);
-				ch.Hurtboxes.Add(hr);
-				BuildHurtbox(hr, state+hurtbox, state);
-			}
-			else
-			{
-				foreach(var hurtboox in oHurtboxes.ls())//name needs to be different than hurtbox. aaa
-				{
-					var hr = new Hurtbox();
-					hr.Name = hurtboox;
-					hr.OwnerObject = ch;
-					ch.AddChild(hr);
-					ch.Hurtboxes.Add(hr);
-					BuildHurtbox(hr, state+hurtboox, state);
-				}
-			}
+		foreach(var state in states) BuildCollision(cs, state+collision, state);
 			
-			BuildCollision(cs, state+collision, state);
-		}
-		else
+		foreach(var hurtbox in hurtboxes)
 		{
-			foreach(var staate in oStates.ls())
-				BuildCollision(cs, staate+collision, staate);
-			
-			if(oHurtboxes is string hurtbox)
-			{
-				var hr = new Hurtbox();
-				hr.Name = hurtbox;
-				hr.OwnerObject = ch;
-				ch.AddChild(hr);
-				ch.Hurtboxes.Add(hr);
-				foreach(var staate in oStates.ls())
-					BuildHurtbox(hr, staate+hurtbox, staate);
-			}
-			else
-			{
-				foreach(var hurtboox in oHurtboxes.ls())
-				{
-					var hr = new Hurtbox();
-					hr.Name = hurtboox;
-					hr.OwnerObject = ch;
-					ch.AddChild(hr);
-					ch.Hurtboxes.Add(hr);
-					foreach(var staate in oStates.ls())
-						BuildHurtbox(hr, staate+hurtboox, staate);
-				}
-			}
+			var hr = new Hurtbox();
+			hr.Name = hurtbox;
+			hr.OwnerObject = ch;
+			ch.AddChild(hr);
+			ch.Hurtboxes.Add(hr);
+			foreach(var state in states) BuildHurtbox(hr, state+hurtbox, state);
 		}
 		
-		var platDrop = new PlatformDropDetector();
+		/*var platDrop = new PlatformDropDetector();
 		platDrop.Name = "DropDetector";
 		platDrop.owner = ch;
 		ch.DropDetector = platDrop;
-		ch.AddChild(platDrop);
+		ch.AddChild(platDrop);*/
 	}
 	
 	public void BuildHurtbox(Hurtbox hr, string section, string state)

@@ -6,7 +6,6 @@ public static class DataUtils
 	public static object GetData(this Node n, string str) => n.GetPublicData()[str];
 	public static object GetData<T>(this Node n, string str) => n.GetPublicData().Get<T>(str);
 	public static object GetDataOrDefault(this Node n, string str, object @default) => n.GetPublicData().GetOrDefault(str,@default);
-	//public static object GetDataOrDefault<T>(this Node n, string str, T @default) => n.GetPublicData().GetOrDefault<T>(str,@default);
 	public static void AddData(this Node n, string str, object val) => n.GetPublicData().Add(str, val);
 	public static void SetData(this Node n, string str, object obj) => n.GetPublicData()[str] = obj;
 	public static void OverrideData(this Node n, string str, object obj) => n.GetPublicData().AddOverride(str,obj);

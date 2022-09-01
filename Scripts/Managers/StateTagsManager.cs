@@ -10,13 +10,13 @@ public class StateTagsManager
 	
 	public StateTag this[string s]
 	{
-		get => Tags.ContainsKey(s)?Tags[s]:StateTag.NotDefined;
+		get => Tags.GetValueOrDefault(s,StateTag.NotDefined);
 		set => Tags[s] = value;
 	}
 	
 	public void Update()
 	{
-		Tags.Keys.ToList().ForEach(s=>Tags[s] = NextTag(Tags[s]));
+		Tags.Keys.ToList().ForEach(s => this[s] = NextTag(this[s]));
 	}
 	
 	private StateTag NextTag(StateTag t)

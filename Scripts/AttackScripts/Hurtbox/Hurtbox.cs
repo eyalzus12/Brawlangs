@@ -12,7 +12,7 @@ public class Hurtbox : Area2D
 	public float Height {get => Shape.Height; set => Shape.Height = value;}
 	
 	public Dictionary<string, HurtboxCollisionState> states = new Dictionary<string, HurtboxCollisionState>();
-	public string CurrentCollisionState = "Default";
+	public string CurrentCollisionState{get; set;} = "Default";
 	public HurtboxCollisionState CurrentCollisionStateData;
 	
 	public Vector2 CollisionPosition

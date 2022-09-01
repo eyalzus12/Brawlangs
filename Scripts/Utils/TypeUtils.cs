@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 public static class TypeUtils
 {
@@ -11,37 +12,26 @@ public static class TypeUtils
 	public static string s(this object o) => (string)o;
 	public static object ob(this object o) => o;
 	
+	
 	public static Vector2 v2(this object o)//aslkfjhakusdfghausjkfhsakuh
 	{
-		var str = o.ToString();
-		str = str.Substring(1, str.Length-2);//turns to string and cuts ()
-		var split = str.Split(',');//split by the space
-		var x = float.Parse(split[0].Trim());//parse x
-		var y = float.Parse(split[1].Trim());//parse y
-		return new Vector2(x, y);//uses the parts
+		Vector2 res;
+		if(StringUtils.TryParseVector2(o.ToString(), out res)) return res;
+		else throw new FormatException($"Bad Vector2 format {o}");
 	}
 	
 	public static Vector3 v3(this object o)
 	{
-		var str = o.ToString();
-		str = str.Substring(1, str.Length-2);//turns to string and cuts ()
-		var split = str.Split(',');//split by the space
-		var x = float.Parse(split[0].Trim());//parse x
-		var y = float.Parse(split[1].Trim());//parse y
-		var z = float.Parse(split[2].Trim());//parse z
-		return new Vector3(x, y, z);//uses the parts
+		Vector3 res;
+		if(StringUtils.TryParseVector3(o.ToString(), out res)) return res;
+		else throw new FormatException($"Bad Vector3 format {o}");
 	}
 	
 	public static Quat q(this object o)
 	{
-		var str = o.ToString();
-		str = str.Substring(1, str.Length-2);//turns to string and cuts ()
-		var split = str.Split(',');//split by the space
-		var x = float.Parse(split[0].Trim());//parse x
-		var y = float.Parse(split[1].Trim());//parse y
-		var z = float.Parse(split[2].Trim());//parse z
-		var w = float.Parse(split[3].Trim());//parse w
-		return new Quat(x, y, z, w);//uses the parts
+		Quat res;
+		if(StringUtils.TryParseQuat(o.ToString(), out res)) return res;
+		else throw new FormatException($"Bad Quat format {o}");
 	}
 	
 	public static List<object> lo(this object o) => o.lt<object>(ob);//(o as IEnumerable<object>).ToList<object>();
@@ -57,6 +47,7 @@ public static class TypeUtils
 	{
 		if(o is IEnumerable<T> et) return et.ToList();
 		else if(o is IEnumerable<object> eo) return eo.Select(caster).ToList<T>();
+		else if(o is T t) return new List<T>{t};
 		else return null;
 	}
 	

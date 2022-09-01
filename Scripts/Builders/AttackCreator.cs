@@ -19,15 +19,8 @@ public class AttackCreator
 	
 	public void Build(Node2D n)
 	{
-		var oAttacks = inif["", "AttackSections", Enumerable.Empty<string>()];
-		if(oAttacks is string)
-			BuildAttack(n, oAttacks.s());
-		else
-		{
-			var Attacks = oAttacks.ls();
-			foreach(var s in Attacks)
-				BuildAttack(n, s);
-		}
+		var attacks = inif["", "AttackSections", Enumerable.Empty<string>()].ls();
+		foreach(var s in attacks) BuildAttack(n, s);
 	}
 	
 	public void BuildAttack(Node n, string section)
@@ -42,20 +35,12 @@ public class AttackCreator
 		var fric = inif[section, "Friction", 1f].f();
 		a.AttackFriction = fric;
 		
-		object oSharesCooldownWith = inif[section, "SharesCooldownWith", Enumerable.Empty<string>()];
-		if(oSharesCooldownWith is string CooldownShareStr) a.SharesCooldownWith.Add(CooldownShareStr);
-		else a.SharesCooldownWith.AddRange(oSharesCooldownWith.ls());
+		var sharesCooldownWith = inif[section, "SharesCooldownWith", Enumerable.Empty<string>()].ls();
+		a.SharesCooldownWith.AddRange(sharesCooldownWith);
 		
-		var StartPartSection = inif[section, "StartPart", ""].s();
-		object oPartSections = inif[section, "Parts", Enumerable.Empty<string>()];
-		if(oPartSections is string PartSection)
-			BuildPart(a, PartSection, StartPartSection);
-		else
-		{
-			var PartSections = oPartSections.ls();
-			foreach(var s in PartSections)
-				BuildPart(a, s, StartPartSection);
-		}
+		var startPartSection = inif[section, "StartPart", ""].s();
+		var partSections = inif[section, "Parts", Enumerable.Empty<string>()].ls();
+		foreach(var s in partSections) BuildPart(a, s, startPartSection);
 		
 		a.LoadProperties();
 		LoadExtraProperties(a, section);
@@ -118,27 +103,16 @@ public class AttackCreator
 		ap.EndlagAnimation = ea;
 		var ps = inif[section, "Sound", ""].s();
 		ap.AttackSound = ps;
-		var ep = inif[section, "EmittedProjectiles", Enumerable.Empty<string>()];
-		if(ep is string sep) ap.EmittedProjectiles = new List<string>{sep};
-		else ap.EmittedProjectiles = ep.ls();
 		
-		var oHitboxSections = inif[section, "Hitboxes", null];
-		if(oHitboxSections is string)
-			BuildHitbox(ap, oHitboxSections.s());
-		else if(oHitboxSections is object)//not null
-		{
-			var HitboxSections = oHitboxSections.ls();
-			foreach(var s in HitboxSections) BuildHitbox(ap, s);
-		}
+		var ep = inif[section, "EmittedProjectiles", Enumerable.Empty<string>()].ls();
+		ap.EmittedProjectiles = ep;
 		
-		var oTransitionSections = inif[section, "Transitions", null];
-		if(oTransitionSections is string)
-			BuildTransition(ap, oTransitionSections.s());
-		else if(oTransitionSections is object)
-		{
-			var TransitionSections = oTransitionSections.ls();
-			foreach(var s in TransitionSections) BuildTransition(ap, s);
-		}
+		var hitboxSections = inif[section, "Hitboxes", Enumerable.Empty<string>()].ls();
+		foreach(var s in hitboxSections) BuildHitbox(ap, s);
+		
+		
+		var transitionSections = inif[section, "Transitions", Enumerable.Empty<string>()].ls();
+		foreach(var s in transitionSections) BuildTransition(ap, s);
 		
 		ap.LoadProperties();
 		LoadExtraProperties(ap, section);
@@ -177,9 +151,8 @@ public class AttackCreator
 		if(ap.OwnerObject.Audio.ContainsSound(hs)) h.HitSound = ap.OwnerObject.Audio[hs];
 		else GD.Print($"Hit sound {hs} for hitbox {section} in file at path {inif.filePath} could not be found.");
 		
-		var af = inif[section, "ActiveFrames", Enumerable.Empty<Vector2>()];
-		if(af is Vector2) h.ActiveFrames = new List<Vector2>{af.v2()};
-		else h.ActiveFrames = af.lv2();
+		var af = inif[section, "ActiveFrames", Enumerable.Empty<Vector2>()].lv2();
+		h.ActiveFrames = af;
 		
 		var hafs = inif[section, "HorizontalAngleFlipper", "Directional"].s();
 		Hitbox.AngleFlipper haf;
@@ -197,23 +170,11 @@ public class AttackCreator
 		var tsm = inif[section, "TeamStunMultiplier", 1f].f();
 		h.TeamStunMult = tsm;
 		
-		var oWhitelistedStates = inif[section, "WhitelistedStates", null];
-		if(oWhitelistedStates is string)
-			h.WhitelistedStates.Add(oWhitelistedStates.s());
-		else if(oWhitelistedStates is object)//not null
-		{
-			var whitelistedStates = oWhitelistedStates.ls();
-			foreach(var s in whitelistedStates) h.WhitelistedStates.Add(s);
-		}
+		var whitelistedStates = inif[section, "WhitelistedStates", Enumerable.Empty<string>()].ls();
+		h.WhitelistedStates = new HashSet<string>(whitelistedStates);
 		
-		var oBlacklistedStates = inif[section, "BlacklistedStates", null];
-		if(oBlacklistedStates is string)
-			h.BlacklistedStates.Add(oBlacklistedStates.s());
-		else if(oBlacklistedStates is object)//not null
-		{
-			var blacklistedStates = oBlacklistedStates.ls();
-			foreach(var s in blacklistedStates) h.BlacklistedStates.Add(s);
-		}
+		var blacklistedStates = inif[section, "BlacklistedStates", Enumerable.Empty<string>()].ls();
+		h.BlacklistedStates = new HashSet<string>(blacklistedStates);
 		
 		h.LoadProperties();
 		LoadExtraProperties(h, section);
@@ -248,10 +209,7 @@ public class AttackCreator
 	
 	public void BuildTransition(AttackPart ap, string section)
 	{
-		var oFrames = inif[section, "Frames", Enumerable.Empty<Vector2>()];
-		List<Vector2> frames = null;
-		if(oFrames is Vector2 v) frames = new List<Vector2>{v};
-		else if(oFrames is object) frames = oFrames.lv2();
+		var frames = inif[section, "Frames", Enumerable.Empty<Vector2>()].lv2();
 		
 		var tags = inif[section, "Tag", ""].s();
 		var tagList = ParseTagList(tags).ToList();

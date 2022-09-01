@@ -180,13 +180,13 @@ public class IniFile
 		else if(string.Equals(s, "false",  StringComparison.OrdinalIgnoreCase)) return false;//represents false
 		else if(int.TryParse(s, out i)) return i;//represents a number
 		else if(float.TryParse(s, out f)) return f;//represents a float
-		else if(s2v2(s, out v2)) return v2;//represents a Vector2
-		else if(s2v3(s, out v3)) return v3;//represents a Vector3
-		else if(s2q(s, out q)) return q;//represents a Quat
+		else if(StringUtils.TryParseVector2(s, out v2)) return v2;//represents a Vector2
+		else if(StringUtils.TryParseVector3(s, out v3)) return v3;//represents a Vector3
+		else if(StringUtils.TryParseQuat(s, out q)) return q;//represents a Quat
 		else return s.Trim('\"');//represents a string
 	}
 	
-	private bool s2v2(string s, out Vector2 v)
+	/*private bool s2v2(string s, out Vector2 v)
 	{
 		var st = s.Trim();
 		if(st[0] != '(' || st[st.Length-1] != ')')
@@ -255,7 +255,7 @@ public class IniFile
 			q = new Quat(x, y, z, w);
 			return true;
 		}
-	}
+	}*/
 	
 	private string Clean(string s) => s.Split(';')[0].Trim();
 }

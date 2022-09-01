@@ -131,9 +131,10 @@ public class CharacterCreator
 		}
 	}
 	
+	const int AUDIO_PLAYERS = 4;
 	public void BuildAudio(Character ch, string audioFolder)
 	{
-		var am = new AudioManager(4);
+		var am = new AudioManager(AUDIO_PLAYERS);
 		am.Name = "AudioManager";
 		
 		var files = ListPostImportDirectoryFiles(audioFolder, ".wav", ".ogg", ".mp3").Distinct().ToList();
@@ -175,7 +176,7 @@ public class CharacterCreator
 			}
 			else if(audio is AudioStreamSample wav)
 			{
-				GD.Print("Warning: WAV does not support dynamic looping yet. Turn looping on in the import file or use ogg instead.");
+				GD.Print("Warning: WAV does not support dynamic looping. Use ogg instead.");
 				//wav.LoopMode = AudioStreamSample.LoopModeEnum.Forward;
 				return wav;
 			}

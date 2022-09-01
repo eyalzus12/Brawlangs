@@ -251,7 +251,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	
 	public string currentCollisionSetting;
 	public CharacterCollision collision;
-	public PlatformDropDetector DropDetector;
+	//public PlatformDropDetector DropDetector;
 	
 	private Attack currentAttack;
 	public Attack CurrentAttack{get => currentAttack; set => currentAttack = value;}
@@ -288,6 +288,8 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public InputManager Inputs;
 	
 	public AnimationSprite CharacterSprite{get; set;}
+	public Color SpriteModulate{get; set;}
+	
 	public AudioManager Audio{get; set;}
 	
 	public Character() {}
@@ -317,6 +319,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		if(Input.IsActionJustPressed("reset")) Respawn();
 		
 		CharacterSprite.FlipH = (Direction == -1);
+		CharacterSprite.SelfModulate = Invincible?new Color(1,1,1,1):SpriteModulate;
 		Update();
 	}
 	
@@ -519,7 +522,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	{
 		currentCollisionSetting = setting;
 		collision.ChangeState(setting);
-		DropDetector.UpdateBasedOnCollisionShape();
+		//DropDetector.UpdateBasedOnCollisionShape();
 		Hurtboxes.ForEach(h=>h.ChangeState(setting));
 	}
 	

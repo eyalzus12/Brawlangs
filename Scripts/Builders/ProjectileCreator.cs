@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 public class ProjectileCreator
 {
@@ -59,18 +60,12 @@ public class ProjectileCreator
 		var movf = BuildMovementFunction(smf);
 		proj.Movement = movf;
 		
-		var oHitboxSections = inif[section, "Hitboxes", $"{section}Hitbox"];
-		if(oHitboxSections is string hitboxSection)
-			BuildHitbox(proj, hitboxSection);
-		else if(oHitboxSections is object)//not null
-		{
-			var HitboxSections = oHitboxSections.ls();
-			foreach(var s in HitboxSections) BuildHitbox(proj, s);
-		}
+		var hitboxSections = inif[section, "Hitboxes", $"{section}Hitbox"].ls();
+		foreach(var s in hitboxSections) BuildHitbox(proj, s);
 		
-		var oHurtboxes = inif[section, "Hurtboxes", $"{section}Hurtbox"];
+		var hurtboxes = inif[section, "Hurtboxes", $"{section}Hurtbox"].ls();
 		
-		if(oHurtboxes is string hurtbox)
+		foreach(var hurtbox in hurtboxes)
 		{
 			var hr = new Hurtbox();
 			hr.Name = hurtbox;
@@ -79,16 +74,6 @@ public class ProjectileCreator
 			hr.Owner = proj;
 			proj.Hurtboxes.Add(hr);
 			BuildHurtbox(hr, hurtbox, "Default");
-		}
-		else foreach(var hurtboox in oHurtboxes.ls())
-		{
-			var hr = new Hurtbox();
-			hr.Name = hurtboox;
-			hr.OwnerObject = proj;
-			proj.AddChild(hr);
-			hr.Owner = proj;
-			proj.Hurtboxes.Add(hr);
-			BuildHurtbox(hr, hurtboox, "Default");
 		}
 		
 		proj.LoadProperties();
@@ -162,23 +147,11 @@ public class ProjectileCreator
 		var tsm = inif[section, "TeamStunMultiplier", 1].i();
 		h.TeamStunMult = tsm;
 		
-		var oWhitelistedStates = inif[section, "WhitelistedStates", null];
-		if(oWhitelistedStates is string)
-			h.WhitelistedStates.Add(oWhitelistedStates.s());
-		else if(oWhitelistedStates is object)//not null
-		{
-			var whitelistedStates = oWhitelistedStates.ls();
-			foreach(var s in whitelistedStates) h.WhitelistedStates.Add(s);
-		}
+		var whitelistedStates = inif[section, "WhitelistedStates", Enumerable.Empty<string>()].ls();
+		h.WhitelistedStates = new HashSet<string>(whitelistedStates);
 		
-		var oBlacklistedStates = inif[section, "BlacklistedStates", null];
-		if(oBlacklistedStates is string)
-			h.BlacklistedStates.Add(oBlacklistedStates.s());
-		else if(oBlacklistedStates is object)//not null
-		{
-			var blacklistedStates = oBlacklistedStates.ls();
-			foreach(var s in blacklistedStates) h.BlacklistedStates.Add(s);
-		}
+		var blacklistedStates = inif[section, "BlacklistedStates", Enumerable.Empty<string>()].ls();
+		h.BlacklistedStates = new HashSet<string>(blacklistedStates);
 		
 		h.LoadProperties();
 		LoadExtraProperties(h, section);

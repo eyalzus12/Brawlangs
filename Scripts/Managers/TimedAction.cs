@@ -17,7 +17,7 @@ public class TimedAction
 	public void Update()
 	{
 		FramesLeft--;
-		if(FramesLeft == 0) {Execute(); GD.Print($"Doing your mom {FramesLeft}");}
+		if(FramesLeft == 0) Execute();
 	}
 	
 	public void Execute() => DesignatedAction();

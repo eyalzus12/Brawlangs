@@ -9,19 +9,15 @@ public class ResourceManager
 	
 	public int this[string resource]
 	{
-		get => Resources.ContainsKey(resource)?Resources[resource]:0;
+		get => Resources.GetValueOrDefault(resource,0);
 		set => Resources[resource] = value;
 	}
 	
 	public void Give(string resource, int amount, int min, int max)
 	{
-		if(Resources.ContainsKey(resource))
-		{
-			int desired = Math.Max(Math.Min(Resources[resource] + amount, max), Math.Max(min,0));
-			if(desired == 0) Resources.Remove(resource);
-			else Resources[resource] = desired;
-		}
-		else if(amount > 0) Resources.Add(resource, amount);
+		int desired = Math.Max(Math.Min(this[resource] + amount, max), Math.Max(min,0));
+		if(desired == 0) Remove(resource);
+		else this[resource] = desired;
 	}
 	
 	public void Remove(string resource)
@@ -31,8 +27,6 @@ public class ResourceManager
 	
 	public void Give(string resource, int amount, int max) => Give(resource, amount, 0, max);
 	public void Give(string resource, int amount) => Give(resource, amount, int.MaxValue);
-	
-	public int Count(string resource) => Resources.ContainsKey(resource)?Resources[resource]:0;
 	
 	public bool Has(string resource) => HasBeyondThreshold(resource, 0);
 	public bool HasBeyondThreshold(string resource, int threshold) => this[resource] > threshold;
