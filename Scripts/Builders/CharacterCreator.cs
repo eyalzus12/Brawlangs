@@ -99,7 +99,7 @@ public class CharacterCreator
 			var texture = GenerateTextureFromPath(resourcePath);
 			if(texture is null)
 			{
-				GD.Print($"failed to load animation {animationName} from path {resourcePath}");
+				GD.PushError($"failed to load animation {animationName} from path {resourcePath}");
 				continue;
 			}
 			spr.Add(texture, animationName, frames, loop);
@@ -121,7 +121,7 @@ public class CharacterCreator
 			var err = image.Load(path);
 			if(err != Error.Ok)
 			{
-				GD.Print($"failed to load animation sheet {path}. error is {err}");
+				GD.PushError($"failed to load animation sheet {path}. error is {err}");
 				return null;
 			}
 		
@@ -158,7 +158,7 @@ public class CharacterCreator
 		var audio = ResourceLoader.Load<AudioStream>(path);
 		if(audio is null)
 		{
-			GD.Print($"failed to load sound file from path {path}");
+			GD.PushError($"failed to load sound file from path {path}");
 			return null;
 		}
 		
@@ -176,13 +176,13 @@ public class CharacterCreator
 			}
 			else if(audio is AudioStreamSample wav)
 			{
-				GD.Print("Warning: WAV does not support dynamic looping. Use ogg instead.");
+				GD.PushWarning("Warning: WAV does not support dynamic looping. Use ogg instead.");
 				//wav.LoopMode = AudioStreamSample.LoopModeEnum.Forward;
 				return wav;
 			}
 			else
 			{
-				GD.Print($"Cannot loop audio file {path} since it isn't MP3, OGG, or WAV.");
+				GD.PushError($"Cannot loop audio file {path} since it isn't MP3, OGG, or WAV.");
 				return audio;
 			}
 		}
@@ -236,7 +236,7 @@ public class CharacterCreator
 		}
 		else
 		{
-			GD.Print($"Error opening folder {path}. error is {er}");
+			GD.PushError($"Error opening folder {path}. error is {er}");
 		}
 		
 		return files;

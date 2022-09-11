@@ -41,7 +41,7 @@ public class PropertyMap
 		
 		if(cfg.Load(path) != Error.Ok)
 		{
-			GD.Print($"failed to read property file \"{path}\"");
+			GD.PushError($"failed to read property file \"{path}\"");
 			return false;
 		}
 		

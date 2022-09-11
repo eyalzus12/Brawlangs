@@ -72,7 +72,7 @@ public static class TypeUtils
 		else if(t == typeof(List<Quat>)) return o.lq();
 		
 		var ToPrint = (debug!="")?$"\nDebug message: {debug}":"";
-		GD.Print($"ERROR: Type {t.Name} isn't available in the cast method" + ToPrint);
+		GD.PushError($"Type {t.Name} isn't available in the cast method" + ToPrint);
 		return null;
 		
 		/*var t = typeof(T);
@@ -136,13 +136,13 @@ public static class TypeUtils
 					{
 						return t;
 					}
-					else GD.Print($"Attempt to load script {path} failed because the object in that path is not {typeName.AAN()} script");
+					else GD.PushError($"Attempt to load script {path} failed because the object in that path is not {typeName.AAN()} script");
 				}
-				else GD.Print($"Attempt to construct script {path} failed because the constructor returned null for some reason");
+				else GD.PushError($"Attempt to construct script {path} failed because the constructor returned null for some reason");
 			}
-			else GD.Print($"Attempt to load script {path} failed because the object in that path is not a C# script");
+			else GD.PushError($"Attempt to load script {path} failed because the object in that path is not a C# script");
 		}
-		else GD.Print($"Attempt to load script {path} failed because that file does not exist");
+		else GD.PushError($"Attempt to load script {path} failed because that file does not exist");
 		
 		return @default;
 	}

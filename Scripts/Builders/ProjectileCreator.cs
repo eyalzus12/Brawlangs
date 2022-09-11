@@ -133,7 +133,7 @@ public class ProjectileCreator
 		
 		var hs = inif[section, "HitSound", "DefaultHit"].s();
 		if(p.Audio.ContainsSound(hs)) h.HitSound = p.Audio[hs];
-		else GD.Print($"Hit sound {hs} for hitbox {section} in file at path {inif.filePath} could not be found.");
+		else GD.PushError($"Hit sound {hs} for hitbox {section} in file at path {inif.filePath} could not be found.");
 		
 		var hafs = inif[section, "HorizontalAngleFlipper", "Directional"].s();
 		Hitbox.AngleFlipper haf;

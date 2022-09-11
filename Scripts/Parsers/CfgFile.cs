@@ -46,7 +46,7 @@ public class CfgFile
 		var f = new File();//create new file
 		if(!f.FileExists(path))
 		{
-			GD.Print($"failed to load cfg file {path}, as it does not exist");
+			GD.PushError($"failed to load cfg file {path}, as it does not exist");
 			return Error.FileNotFound;
 		}
 		var er = f.Open(path, File.ModeFlags.Read);//open file

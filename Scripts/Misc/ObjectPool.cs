@@ -38,7 +38,7 @@ public class ObjectPool : Node
 		{
 			if(source is null)//cant instance 
 			{
-				GD.Print($"Cannot pool object with identifier {identifier} because given packed scene is null");
+				GD.PushError($"Cannot pool object with identifier {identifier} because given packed scene is null");
 				return null;
 			}
 			
@@ -62,7 +62,7 @@ public class ObjectPool : Node
 		
 		if(identifier == "")
 		{
-			GD.Print($"Cannot pool object {n} because it does not have a given identifier (or wasnt generated from one)");
+			GD.PushError($"Cannot pool object {n} because it does not have a given identifier (or wasnt generated from one)");
 			return false;
 		}
 		

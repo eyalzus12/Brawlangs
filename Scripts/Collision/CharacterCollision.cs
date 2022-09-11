@@ -60,7 +60,7 @@ public class CharacterCollision : CollisionShape2D
 		}
 		else
 		{
-			GD.Print($"Collision State {newState} is not defined for collision {this}");
+			GD.PushError($"Collision State {newState} is not defined for collision {this}");
 		}
 	}
 	

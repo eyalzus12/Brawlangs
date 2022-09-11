@@ -64,13 +64,13 @@ public class ProjectilePool : Node
 		
 		if(identifier == "")
 		{
-			GD.Print($"Cannot pool projectile {p} because it does not have an identifier");
+			GD.PushError($"Cannot pool projectile {p} because it does not have an identifier");
 			return false;
 		}
 		
 		if(ReturnQueueSet.Contains(p))
 		{
-			GD.Print($"Cannot pool projectile {p} because it already got pooled");
+			GD.PushError($"Cannot pool projectile {p} because it already got pooled");
 			return false;
 		}
 		
@@ -89,7 +89,7 @@ public class ProjectilePool : Node
 			var obj = h.Item2;
 			if(obj is null || !Godot.Object.IsInstanceValid(obj))
 			{
-				GD.Print($"Invalid instance of object {obj} was found while cealning return queue. Cheese fucked up somewhere.");
+				GD.PushError($"Invalid instance of object {obj} was found while cealning return queue. Cheese fucked up somewhere.");
 				continue;
 			}
 			

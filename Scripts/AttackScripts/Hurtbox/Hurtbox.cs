@@ -82,7 +82,7 @@ public class Hurtbox : Area2D
 		}
 		catch(KeyNotFoundException)
 		{
-			GD.Print($"Collision State {newState} is not defined for hurtbox {this}");
+			GD.PushError($"Collision State {newState} is not defined for hurtbox {this}");
 		}
 	}
 	

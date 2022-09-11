@@ -162,7 +162,7 @@ public class AttackCreator
 		h.MomentumCarry = cm;
 		var hs = inif[section, "HitSound", "DefaultHit"].s();
 		if(ap.OwnerObject.Audio.ContainsSound(hs)) h.HitSound = ap.OwnerObject.Audio[hs];
-		else GD.Print($"Hit sound {hs} for hitbox {section} in file at path {inif.filePath} could not be found.");
+		else GD.PushError($"Hit sound {hs} for hitbox {section} in file at path {inif.filePath} could not be found.");
 		
 		var af = inif[section, "ActiveFrames", Enumerable.Empty<Vector2>()].lv2();
 		h.ActiveFrames = af;

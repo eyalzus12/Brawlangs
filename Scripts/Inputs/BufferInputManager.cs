@@ -32,7 +32,7 @@ public class BufferInputManager : InputManager
 		//reads from buffer.ini
 		if(config.Load(CONFIG_PATH) != Error.Ok)
 		{
-			GD.Print($"failed to parse buffer config at path {CONFIG_PATH}");
+			GD.PushError($"failed to parse buffer config at path {CONFIG_PATH}");
 			return;
 		}
 		

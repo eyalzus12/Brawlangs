@@ -40,7 +40,7 @@ public class AudioManager : Node
 	public void Play(string sound)
 	{
 		if(Sounds.ContainsKey(sound)) Play(Sounds[sound]);
-		else if(sound != "") GD.Print($"Could not play sound {sound} as it does not exist");
+		else if(sound != "") GD.PushError($"Could not play sound {sound} as it does not exist");
 	}
 	
 	public void AddSound(string name, AudioStream audio) => Sounds.Add(name, audio);
