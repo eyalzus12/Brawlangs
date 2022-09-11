@@ -15,12 +15,14 @@ public class DamageCalculator
 		(300, new Color(0.3f, 0, 0))// 74/255
 	};
 	
+	private static readonly FirstTupleItemComparer<float, Color> COMPARER = new FirstTupleItemComparer<float, Color>();
+	
 	public static Color DamageToColor(float damage)
 	{
 		if(damage <= VALUES[0].Item1) return VALUES[0].Item2;
 		if(damage >= VALUES[VALUES.Length-1].Item1) return VALUES[VALUES.Length-1].Item2;
 		
-		int idx = Array.BinarySearch<(float,Color)>(VALUES, (damage, new Color()), new FirstItemComparar());
+		int idx = Array.BinarySearch<(float,Color)>(VALUES, (damage, new Color()), COMPARER);
 		
 		if(idx < 0) idx = ~idx;
 		
@@ -34,9 +36,4 @@ public class DamageCalculator
 		var weight = (damage-prevDamage)/(nextDamage-prevDamage);
 		return prevColor.LinearInterpolate(nextColor, weight);
 	}
-}
-
-public class FirstItemComparar : IComparer<(float, Color)>
-{
-	public int Compare((float, Color) fc1, (float, Color) fc2) => fc1.Item1.CompareTo(fc2.Item1);
 }

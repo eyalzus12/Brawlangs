@@ -11,7 +11,7 @@ public class DuckState : BaseCrouchState
 	public override void Init()
 	{
 		ch.Crouch();
-		ch.PlayAnimation("Duck");
+		ch.PlayAnimation("Duck", true);
 	}
 	
 	protected override void DoJump()

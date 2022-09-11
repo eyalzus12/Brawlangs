@@ -8,13 +8,13 @@ public class RunWallState: GroundedState
 	
 	public override void Init()
 	{
-		ch.PlayAnimation("Run");
+		ch.PlayAnimation("Run", true);
 	}
 	
 	protected override void DoMovement()
 	{
 		if(ch.InputtingHorizontalDirection)
-			ch.vuc.x = ch.Direction * ch.runInitialSpeed * (2-ch.ffric);
+			ch.vuc.x = ch.MovementDirection * ch.runInitialSpeed * (2-ch.ffric);
 		else
 			ch.vuc.x = 0;
 	}
@@ -22,7 +22,7 @@ public class RunWallState: GroundedState
 	protected override bool CalcStateChange()
 	{
 		if(base.CalcStateChange()) return true;
-		if(ch.TurnConditional()) ch.States.Change("RunTurn");
+		if(ch.InputtingTurn) ch.States.Change("RunTurn");
 		else if(!ch.walled) ch.States.Change("Run");
 		else return false;
 		

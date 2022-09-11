@@ -110,6 +110,5 @@ public class Attack : Node2D
 	}
 	
 	public virtual int GetCooldown() => (CurrentPart??LastUsedPart).GetCooldown();
-	public virtual string GetEndlagAnimation() => (CurrentPart??LastUsedPart).EndlagAnimation;
 	public virtual int GetEndlag() => (CurrentPart??LastUsedPart).GetEndlag();
 }

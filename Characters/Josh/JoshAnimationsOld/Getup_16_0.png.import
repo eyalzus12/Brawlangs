@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/Jump_21_0.png-c40ab39ba6bc7fe8fe89cc259931fa48.stex"
+path="res://.import/Getup_16_0.png-cdc37cce08daa4faf9b95df014d3a5f1.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Characters/Josh/JoshAnimations/Jump_21_0.png"
-dest_files=[ "res://.import/Jump_21_0.png-c40ab39ba6bc7fe8fe89cc259931fa48.stex" ]
+source_file="res://Characters/Josh/JoshAnimationsOld/Getup_16_0.png"
+dest_files=[ "res://.import/Getup_16_0.png-cdc37cce08daa4faf9b95df014d3a5f1.stex" ]
 
 [params]
 
@@ -28,6 +28,7 @@ process/fix_alpha_border=true
 process/premult_alpha=false
 process/HDR_as_SRGB=false
 process/invert_color=false
+process/normal_map_invert_y=false
 stream=false
 size_limit=0
 detect_3d=true

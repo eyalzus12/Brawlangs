@@ -18,7 +18,7 @@ public class LandState : GroundedState
 		ch.Tags["Grounded"] = StateTag.Starting;
 		
 		AdjustVelocity();
-		ch.PlayAnimation("Land");
+		ch.PlayAnimation("Land", true);
 	}
 	
 	protected override void DoJump() {}

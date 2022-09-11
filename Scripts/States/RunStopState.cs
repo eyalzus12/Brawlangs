@@ -8,6 +8,12 @@ public class RunStopState : WalkStopState
 	
 	public override void Init()
 	{
-		ch.PlayAnimation("RunStop");
+		ch.PlayAnimation("RunStop", true);
+	}
+	
+	protected override void DoMovement()
+	{
+		base.DoMovement();
+		ch.TurnConditional();
 	}
 }

@@ -81,6 +81,8 @@ public static class GeometryUtils
 		return new Rect2(pos, size);
 	}
 	
+	public static Rect2 Zoomed(this Rect2 r, Vector2 zoom) => RectFrom(r.Center(), r.Size*zoom/2f);
+	
 	public static float Clamp(this float f, float m, float M) => Math.Min(M, Math.Max(m, f));
 		
 	public static Vector2 Clamp(this Vector2 v, float mx, float Mx,
@@ -111,14 +113,9 @@ public static class GeometryUtils
 	
 	public static IEnumerable<Vector2> GetLabelLocations(this int[] playercounts, Vector2 left, Vector2 right, float margin)
 	{
-		var teamparts = SplitToParts(left, right, playercounts.Length, margin).ToArray();
-		for(int i = 0; i < teamparts.Length; ++i)
-		{
-			var teampart = teamparts[i];
-			var playercount = playercounts[i];
-			var locationsforteam = SplitToParts(teampart.Item1, teampart.Item2, playercount, margin).PartCenters();
-			foreach(var l in locationsforteam) yield return l;
-		}
+		foreach(((Vector2, Vector2) teampart, int playercount) in SplitToParts(left, right, playercounts.Length, margin).Zip(playercounts))
+			foreach(var l in SplitToParts(teampart.Item1, teampart.Item2, playercount, margin).PartCenters())
+				yield return l;
 	}
 	
 	public static void DrawCapsuleShape(this CanvasItem ci, CapsuleShape2D shape, Vector2 position, float rotation, Color color)
@@ -126,9 +123,18 @@ public static class GeometryUtils
 		var height = shape.Height;
 		var radius = shape.Radius;
 		ci.DrawSetTransform(position, rotation, Vector2.One);
-		var middleRect = BlastZone.CalcRect(Vector2.Zero, new Vector2(radius, height/2));
+		var middleRect = GeometryUtils.RectFrom(Vector2.Zero, new Vector2(radius, height/2));
 		ci.DrawRect(middleRect, color);
 		ci.DrawCircle(new Vector2(0, height/2), radius, color);
 		ci.DrawCircle(new Vector2(0, -height/2), radius, color);
+	}
+	
+	public static Vector2 SmoothLinearInterpolate(this Vector2 @from, Vector2 to, float weight, float curve) => @from.LinearInterpolate(to, weight*Mathf.Tanh(curve*@from.DistanceSquaredTo(to)));
+	
+	public static Rect2 RectFrom(Vector2 Center, Vector2 Size)
+	{
+		var TopLeft = Center-Size;
+		var BottomRight = Center+Size;
+		return new Rect2(TopLeft, 2*Size);
 	}
 }

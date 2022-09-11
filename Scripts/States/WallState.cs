@@ -11,14 +11,15 @@ public class WallState : State
 	public override void Init()
 	{
 		jump = false;
-		ch.PlayAnimation("WallIdle");
-		ch.vuc.x = 0;
 	}
 	
 	protected override void DoMovement()
 	{
-		if(ch.TurnConditional())
-			ch.vec.x = ch.Direction * ch.airAcceleration;
+		if(ch.InputtingTurn)
+		{
+			ch.vec.x = -ch.Direction * ch.airAcceleration;
+			ch.walled = false;
+		}
 	}
 	
 	protected override void DoGravity()
@@ -42,7 +43,7 @@ public class WallState : State
 	protected override bool CalcStateChange()
 	{
 		if(ch.grounded) ch.States.Change("Land");
-		else if(!ch.walled) ch.States.Change("Air");
+		else if(ch.TurnConditional() || !ch.walled) ch.States.Change("Air");
 		else 
 		{
 			if(jump) ch.States.Change("WallJump");
@@ -69,11 +70,13 @@ public class WallState : State
 	
 	protected override void AdjustVelocity()
 	{
-		if(ch.Direction * ch.wvel.x > 0)
+		if(ch.InputtingTurn) return;
+		
+		if(ch.MovementDirection * ch.wvel.x > 0)
 			ch.vec.x = ch.wvel.x;
 		else ch.vec.x = 0;
 		
-		ch.vec.x += ch.Direction * HCF;
+		ch.vec.x += ch.MovementDirection * HCF;
 		ch.vac.y = ch.wvel.y;
 	}
 }

@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 //using Conn = System.Collections.Generic.Dictionary<string, (string, Attack)>;
 
 public class AttackCreator
@@ -83,6 +84,10 @@ public class AttackCreator
 		ap.DriftBackwardsAcceleration = dba;
 		var dbs = inif[section, "DriftBackwardsSpeed", 0f].f();
 		ap.DriftBackwardsSpeed = dbs;
+		var ws = inif[section, "SlowOnWalls", true].b();
+		ap.SlowOnWalls = ws;
+		var ffl = inif[section, "FastFallLocked", false].b();
+		ap.FastFallLocked = ffl;
 		var me = inif[section, "MissEndlag", 0].i();
 		ap.MissEndlag = me;
 		var mc = inif[section, "MissCooldown", 0].i();
@@ -95,12 +100,8 @@ public class AttackCreator
 		ap.KnockbackMult = km;
 		var sm = inif[section, "StunMult", 1f].f();
 		ap.StunMult = sm;
-		var sa = inif[section, "StartupAnimation", "Default"].s();
-		ap.StartupAnimation = sa;
-		var aa = inif[section, "AttackAnimation", "Default"].s();
+		var aa = inif[section, "Animation", ""].s();
 		ap.AttackAnimation = aa;
-		var ea = inif[section, "EndlagAnimation", "Default"].s();
-		ap.EndlagAnimation = ea;
 		var ps = inif[section, "Sound", ""].s();
 		ap.AttackSound = ps;
 		
@@ -110,9 +111,17 @@ public class AttackCreator
 		var hitboxSections = inif[section, "Hitboxes", Enumerable.Empty<string>()].ls();
 		foreach(var s in hitboxSections) BuildHitbox(ap, s);
 		
-		
 		var transitionSections = inif[section, "Transitions", Enumerable.Empty<string>()].ls();
 		foreach(var s in transitionSections) BuildTransition(ap, s);
+		
+		var hitTransitionSection = inif[section, "HitTransition", ""].s();
+		if(hitTransitionSection != "") ap.TransitionManager.Add(new AttackPartTransition(Enumerable.Empty<Vector2>(), new AttackPartTransitionTagExpression(new object[]{("Hit",StateTag.Active),("Hit",StateTag.Starting),'|'}), hitTransitionSection));
+		
+		var missTransitionSection = inif[section, "MissTransition", ""].s();
+		if(missTransitionSection != "") ap.TransitionManager.Add(new AttackPartTransition(Enumerable.Empty<Vector2>(), new AttackPartTransitionTagExpression(new object[]{("Hit",StateTag.NotActive)}), missTransitionSection));
+		
+		var nextTransitionSection = inif[section, "NextTransition", ""].s();
+		if(nextTransitionSection != "") ap.TransitionManager.Add(new AttackPartTransition(Enumerable.Empty<Vector2>(), new AttackPartTransitionTagExpression(), nextTransitionSection));
 		
 		ap.LoadProperties();
 		LoadExtraProperties(ap, section);
@@ -135,12 +144,16 @@ public class AttackCreator
 		h.SetKnockback = sk;
 		var vk = inif[section, "VarKnockback", Vector2.Zero].v2();
 		h.VarKnockback = vk;
-		var st = inif[section, "Stun", 0f].f();
-		h.Stun = st;
-		var hl = inif[section, "HitLag", 0].i();
+		var sst = inif[section, "Stun", 0f].f();
+		h.SetStun = sst;
+		var vst = inif[section, "VarStun", 0f].f();
+		h.VarStun = vst;
+		var hl = inif[section, "HitLag", 0].f();
 		h.Hitlag = hl;
-		var hp = inif[section, "ExtraOpponentHitlag", 0].i();
-		h.Hitpause = hl+hp;
+		var hp = inif[section, "ExtraOpponentHitlag", 0].f();
+		h.SetHitpause = hl+hp;
+		var ehp = inif[section, "ExtraOpponentVarHitlag", 0].f();
+		h.VarHitpause = ehp;
 		var dm = inif[section, "Damage", 0f].f();
 		h.Damage = dm;
 		var pr = inif[section, "Priority", 0].i();
@@ -212,28 +225,76 @@ public class AttackCreator
 		var frames = inif[section, "Frames", Enumerable.Empty<Vector2>()].lv2();
 		
 		var tags = inif[section, "Tag", ""].s();
-		var tagList = ParseTagList(tags).ToList();
+		var tagExpression = new AttackPartTransitionTagExpression(ParseTagList(tags));
 		
 		var nextPart = inif[section, "Next", ""].s();
 		
-		var addedTransition = new AttackPartTransition(frames, tagList, nextPart);
+		var addedTransition = new AttackPartTransition(frames, tagExpression, nextPart);
 		ap.TransitionManager.Add(addedTransition);
 	}
 	
-	public IEnumerable<(string,StateTag)> ParseTagList(string s)
+	private static readonly char[] OPERATORS = new char[]{'!', '|', '&', '(', ')'};
+	public IEnumerable<object> ParseTagList(string s)
 	{
 		if(s == "") yield break;
-		string[] subtags = s.Split('|');
-		foreach(var subtag in subtags)
+		
+		var operators = new Stack<char>();
+		
+		var stateName = new StringBuilder();
+		var tagValue = new StringBuilder();
+		bool doingTagValue = false;
+		
+		foreach(var c in s)
 		{
-			string[] parts = subtag.Split('.');
-			if(parts.Length != 2) throw new FormatException($"{path}: Bad format for tag {subtag}");
-			string tag = parts[0];
-			string stateName = parts[1];
-			StateTag st;
-			if(!Enum.TryParse<StateTag>(stateName, out st)) throw new FormatException($"{path}: Unrecognizable state tag {stateName}");
-			yield return (tag,st);
+			if(OPERATORS.Contains(c))
+			{
+				if(!doingTagValue) throw new FormatException($"Too few periods in attack part transition expression {s}");
+				
+				var _stateName = stateName.ToString();
+				var _tagValue = tagValue.ToString();
+				StateTag tag;
+				if(!Enum.TryParse<StateTag>(_tagValue, out tag)) throw new FormatException($"Unknown tag value {_tagValue} in attack part transition expression {s}");
+				yield return (_stateName, tag);
+				stateName.Clear(); tagValue.Clear(); doingTagValue = false;
+				
+				if(c == '(') operators.Push(c);
+				else if(c == ')')
+				{
+					while(operators.Count > 0 && operators.Peek() != '(') yield return operators.Pop();
+					if(operators.Count == 0) throw new FormatException($"Attack part transition expression {s} has imbalanced brackets");
+					operators.Pop(); //remove the (
+				}
+				else
+				{
+					int pre = OPERATORS.FindIndex(c);
+					while(operators.Count > 0 && OPERATORS.FindIndex(operators.Peek()) <= pre) yield return operators.Pop();
+					operators.Push(c);
+				}
+			}
+			else if(c == '.')
+			{
+				if(doingTagValue) throw new FormatException($"Too many periods in attack part transition expression {s}");
+				doingTagValue = true;
+			}
+			else
+			{
+				if(doingTagValue) tagValue.Append(c);
+				else stateName.Append(c);
+			}
 		}
+		
+		if(doingTagValue)
+		{
+			var _stateName = stateName.ToString();
+			var _tagValue = tagValue.ToString();
+			StateTag tag;
+			if(!Enum.TryParse<StateTag>(_tagValue, out tag)) throw new FormatException($"Unknown tag value {_tagValue} in attack part transition expression {s}");
+			yield return (_stateName, tag);
+			stateName.Clear(); tagValue.Clear(); doingTagValue = false;
+		}
+		else if(stateName.Length != 0) throw new FormatException($"Too few periods in attack part transition expression {s}");
+		
+		while(operators.Count > 0) yield return operators.Pop();
 	}
 	
 	/*

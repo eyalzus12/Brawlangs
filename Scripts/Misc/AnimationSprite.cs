@@ -1,42 +1,43 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 public class AnimationSprite : Sprite
 {
-	public Dictionary<string, AnimationSheet> animations = new Dictionary<string, AnimationSheet>();
-	
-	public AnimationSheet currentSheet;
-	public AnimationSheet? queuedSheet;
-	public AnimationPlayer framePlayer;
-	
-	public AnimationSprite()
-	{
-		currentSheet = new AnimationSheet(null, "", 0, false);
-	}
+	public Dictionary<string, AnimationSheet> Animations{get; set;} = new Dictionary<string, AnimationSheet>();
+	public AnimationPlayer FramePlayer{get; private set;} = new AnimationPlayer();
+	public AnimationSheet? Current{get; private set;} = null;
+	public Queue<AnimationSheet> Queued{get; private set;} = new Queue<AnimationSheet>();
+	public bool Playing => FramePlayer.IsPlaying();
+	public bool Looping => Current?.Loop ?? false;
 	
 	public override void _Ready()
 	{
 		InitFramePlayer();
 	}
 	
+	public void Add(Texture texture, string name, int length, bool loop)
+	{
+		Animations.Add(name, new AnimationSheet(texture, name, length, loop));
+	}
+	
 	public void InitFramePlayer()
 	{
-		framePlayer = new AnimationPlayer();
-		framePlayer.PlaybackProcessMode = AnimationPlayer.AnimationProcessMode.Physics;
-		framePlayer.Name = "FramePlayer";
-		AddChild(framePlayer);
-		foreach(var a in animations)
+		FramePlayer.PlaybackProcessMode = AnimationPlayer.AnimationProcessMode.Physics;
+		FramePlayer.Name = "FramePlayer";
+		AddChild(FramePlayer);
+		foreach(var a in Animations)
 		{
 			var animationName = a.Key;
 			var animationSheet = a.Value;
 			
 			var anm = new Animation();
 			anm.Step = 1/24f;
-			var frameCount = animationSheet.frames;
+			var frameCount = animationSheet.Length;
 			anm.Length = frameCount * anm.Step;
-			anm.Loop = animationSheet.loop;
-			framePlayer.AddAnimation(animationName, anm);
+			anm.Loop = animationSheet.Loop;
+			FramePlayer.AddAnimation(animationName, anm);
 			int trc = anm.AddTrack(Animation.TrackType.Value);
 			var path = GetPath() + ":frame";
 			anm.TrackSetPath(trc, path);
@@ -45,69 +46,71 @@ public class AnimationSprite : Sprite
 				anm.TrackInsertKey(trc, i*anm.Step, i);
 		}
 		
-		framePlayer.Connect("animation_finished", this, nameof(AnimationFinished));
+		FramePlayer.Connect("animation_finished", this, nameof(AnimationFinished));
 	}
 	
-	public void Play(string animation)
+	public void Play(string anm, bool overwriteQueue)
 	{
-		if(animations.ContainsKey(animation)) SetSheet(animations[animation]);
-		else if(animations.ContainsKey("Default")) SetSheet(animations["Default"]);
+		if(overwriteQueue) ClearQueue();
+		AnimationSheet sheet; if(Animations.TryGetValue(anm, out sheet)) Play(sheet, false);
 	}
 	
-	public void Queue(string animation)
+	public void Play(AnimationSheet sheet, bool overwriteQueue)
 	{
-		if(animations.ContainsKey(animation)) QueueSheet(animations[animation]);
-		else if(animations.ContainsKey("Default")) QueueSheet(animations["Default"]);
+		if(overwriteQueue) ClearQueue();
+		if(FramePlayer is null) return;
+		this.Texture = sheet.Texture;
+		this.Hframes = sheet.Length;
+		FramePlayer.Play(sheet.Name);
+		FramePlayer.Advance(0);
+		Current = sheet;
 	}
+	
+	public void Queue(string anm, bool goNext, bool overwriteQueue)
+	{
+		if(overwriteQueue) ClearQueue();
+		AnimationSheet sheet; if(Animations.TryGetValue(anm, out sheet)) Queue(sheet, false, false);
+		if(goNext) GoNext();
+	}
+	
+	public void Queue(AnimationSheet sheet, bool goNext, bool overwriteQueue)
+	{
+		if(overwriteQueue) ClearQueue();
+		Queued.Enqueue(sheet);
+		if(goNext || !Playing) GoNext();
+	}
+	
+	public void GoNext() => AnimationFinished(Current?.Name ?? "");
+	
+	public void ClearQueue() => Queued.Clear();
 	
 	public void AnimationFinished(string anm = "")
 	{
-		if(queuedSheet is null) return;
-		SetSheet((AnimationSheet)queuedSheet);
-		queuedSheet = null;
+		if(Queued.Count > 0)
+		{
+			Current = Queued.Peek();
+			Play(Queued.Dequeue(), false);
+		}
 	}
 	
-	public void AddSheet(Texture texture, string name, int frames, bool loop)
-	{
-		AddSheet(new AnimationSheet(texture, name, frames, loop));
-	}
+	public void Pause() => FramePlayer?.Stop(false);
+	public void Resume() => FramePlayer?.Play();
 	
-	public void AddSheet(AnimationSheet sheet)
-	{
-		animations.Add(sheet.name, sheet);
-	}
-	
-	public void SetSheet(AnimationSheet sheet)
-	{
-		if(framePlayer is null) return;
-		currentSheet = sheet;
-		this.Texture = currentSheet.texture;
-		this.Hframes = currentSheet.frames;
-		framePlayer.Play(currentSheet.name);
-		framePlayer.Advance(0);
-	}
-	
-	public void QueueSheet(AnimationSheet sheet)
-	{
-		queuedSheet = sheet;
-	}
-	
-	public void Pause() => framePlayer?.Stop(false);
-	public void Continue() => framePlayer?.Play();
+	public string QueueToString => string.Join(" ", Queued.Select(a=>a.Name).ToArray());
 }
 
 public readonly struct AnimationSheet
 {
-	public readonly Texture texture;
-	public readonly string name;
-	public readonly int frames;
-	public readonly bool loop;
+	public Texture @Texture {get;}
+	public string Name {get;}
+	public int Length {get;}
+	public bool Loop {get;}
 	
-	public AnimationSheet(Texture texture, string name, int frames, bool loop)
+	public AnimationSheet(Texture texture, string name, int length, bool loop)
 	{
-		this.texture = texture;
-		this.name = name;
-		this.frames = frames;
-		this.loop = loop;
+		@Texture = texture;
+		Name = name;
+		Length = length;
+		Loop = loop;
 	}
 }

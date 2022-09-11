@@ -6,33 +6,39 @@ public class RunStartupState : GroundedState
 	public RunStartupState() : base() {}
 	public RunStartupState(Character link) : base(link) {}
 	
-	public override bool Actionable => false;
+	public override bool Actionable => true;
 	
 	public override void Init()
 	{
 		ch.TurnConditional();
 		ch.ApplySettings("Default");
 		ch.Uncrouch();
-		ch.PlayAnimation("RunStart");
-		ch.QueueAnimation("Run");
+		ch.PlayAnimation("RunStart", true);
+		ch.QueueAnimation("Run", false, false);
+		ch.vuc.x = ch.MovementDirection * ch.runInitialSpeed * (2-ch.ffric);
 	}
 	
 	protected override void DoMovement()
 	{
 		ch.vec.x *= (1-ch.AppropriateFriction);
-		ch.vuc.x.Towards(ch.Direction * ch.runInitialSpeed * (2-ch.ffric), ch.runAcceleration * ch.ffric);
 	}
 	
 	protected override bool CalcStateChange()
 	{
-		if(frameCount >= ch.runStartup)
+		if(jump) ch.States.Change("RunJump");
+		else if(!ch.grounded) ch.States.Change("Air");
+		else if(ch.grounded && ch.HoldingRun && ch.TurnConditional()) ch.States.Change("RunStartup");
+		else if(frameCount >= ch.runStartup)
 		{
-			ch.vec.x = 0;
-			ch.vuc.x = ch.Direction * ch.runInitialSpeed * (2-ch.ffric);
-			if(ch.HoldingRun) ch.States.Change("Run");
+			if(ch.HoldingRun)
+			{
+				ch.vec.x = 0;
+				ch.States.Change("Run");
+			}
 			else ch.States.Change("RunStop");
-			return true;
 		}
-		return false;
+		else return false;
+		
+		return true;
 	}
 }

@@ -10,19 +10,10 @@ public class WalkTurnState : GroundedSlowdownState
 	
 	public override void Init()
 	{
-		ch.PlayAnimation("Turn");
+		ch.QueueAnimation("WalkTurn", ch.AnimationLooping, true);
 	}
 	
-	protected override void DoDodge()
-	{
-		if(!Actionable || jump) return;
-		
-		if(!ch.InputtingTurn)
-		{
-			ch.Turn();
-			base.DoDodge();
-		}
-	}
+	protected override void DoDodge() {}
 	
 	protected override bool CalcStateChange()
 	{

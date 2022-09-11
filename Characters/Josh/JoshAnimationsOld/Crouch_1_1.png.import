@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/SAirStartup_2_0.png-1d6ff230c2defaf6bb5e7fa9d8110a85.stex"
+path="res://.import/Crouch_1_1.png-3c134d008647ffc0b34a9e5e493d8e17.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Characters/Josh/JoshAnimations/SAirStartup_2_0.png"
-dest_files=[ "res://.import/SAirStartup_2_0.png-1d6ff230c2defaf6bb5e7fa9d8110a85.stex" ]
+source_file="res://Characters/Josh/JoshAnimationsOld/Crouch_1_1.png"
+dest_files=[ "res://.import/Crouch_1_1.png-3c134d008647ffc0b34a9e5e493d8e17.stex" ]
 
 [params]
 
@@ -28,6 +28,7 @@ process/fix_alpha_border=true
 process/premult_alpha=false
 process/HDR_as_SRGB=false
 process/invert_color=false
+process/normal_map_invert_y=false
 stream=false
 size_limit=0
 detect_3d=true

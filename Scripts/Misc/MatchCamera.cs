@@ -18,13 +18,15 @@ public class MatchCamera : Camera2D
 	[Export]
 	public Vector2 middle = Vector2.Zero;//center of screen
 	[Export]
-	public float interpolationWeight = 0.01f;//how interpolated the zoom and offset is
+	public float interpolationWeight = 0.05f;//how interpolated the zoom and offset is
+	[Export]
+	public float curveMultiplier = 0.8f;
 	[Export]
 	public float baseZoom = 1.7f;//multiplier for CalculateZoom
 	[Export]
 	public float startZoomMult = 1.3f;
 	[Export]
-	public Vector2 startOffsetOffset = new Vector2(0, -500);
+	public Vector2 startPositionOffset = new Vector2(0, -500);
 	
 	public Vector2 center;
 	
@@ -42,7 +44,7 @@ public class MatchCamera : Camera2D
 	
 	public void Reset()
 	{
-		Offset = middle+startOffsetOffset;
+		Position = middle+startPositionOffset;
 		Zoom = startZoomMult*baseZoom*Vector2.One;
 		
 		foreach(var n in GetParent().GetChildren()) if(n is Character c)
@@ -74,7 +76,7 @@ public class MatchCamera : Camera2D
 		//get average position, including map center. this will be used for following
 		center = positions.Append(middle).Avg();
 		
-		//create a rect, starting at the center, that includes all positions
+		//create a rect, starting at the center, that includes all positions, and is a bit zoomed out
 		var initialRect = new Rect2(center, Vector2.Zero);
 		cameraRect = positions.Aggregate(initialRect, (a,v)=>a.Expand(v));
 		
@@ -83,36 +85,33 @@ public class MatchCamera : Camera2D
 		cameraRect = cameraRect.Limit(limits.x, limits.y);//limit the rectangle to the limits
 		cameraRect.Position += middle;//get non relative position
 		
-		//now cameraRect is in the desired place and size for the camera
-		//so we need to set the camera's position and zoom to match
-		
 		//interpolate between the desired position and the current one, to smoothen it out
-		var desiredOffset = cameraRect.Center();
-		Offset = Offset.LinearInterpolate(desiredOffset, interpolationWeight);
+		var desiredPosition = cameraRect.Center();//get center (desired position)
+		Position = Position.SmoothLinearInterpolate(desiredPosition, interpolationWeight, curveMultiplier);
 		
 		//interpolate between the desired zoom and the current one, to smoothen it out
 		var desiredZoom = CalculateZoom(cameraRect);
-		Zoom = Zoom.LinearInterpolate(desiredZoom, interpolationWeight);
+		Zoom = Zoom.SmoothLinearInterpolate(desiredZoom, interpolationWeight, curveMultiplier);
 		
 		//draw debug things
 		Update();
 	}
 	
-	public Vector2 CalculateZoom(Rect2 cameraRect)
+	public Vector2 CalculateZoom(Rect2 cameraRect, bool addOffset = true)
 	{
 		//don't change zoom if the viewport rect has 0 size
-		if(viewportRect.Size.x == 0 || viewportRect.Size.y == 0) return Zoom; 
+		if(viewportRect.Size.x == 0 || viewportRect.Size.y == 0) return Vector2.One; 
 		
 		//get the zoom that'll match on the xy
-		var cameraZoomXY = cameraRect.Size/viewportRect.Size;
+		var cameraZoomXY = 2f*cameraRect.Size/viewportRect.Size;
 		//get desired matching zoom
-		var cameraZoom = Math.Max(Math.Max(cameraZoomXY.x, cameraZoomXY.y), 1)+zoomOffset;
+		var cameraZoom = Math.Max(Math.Max(cameraZoomXY.x, cameraZoomXY.y), 1)+(addOffset?zoomOffset:0);
 		//get max zoom possible on the xy
 		var maxZoomXY = limits/viewportRect.Size;
 		//get desired max zoom possible
 		var maxZoom = Math.Min(maxZoomXY.x, maxZoomXY.y);
 		//get resulting zoom that fits the max
-		var zoomResult = baseZoom*Math.Min(cameraZoom, maxZoom);
+		var zoomResult = Math.Min(cameraZoom, maxZoom)*(addOffset?baseZoom:1);
 		return zoomResult*Vector2.One;
 	}
 	
@@ -121,18 +120,25 @@ public class MatchCamera : Camera2D
 		//debug draw of camera rect
 		if(!debugMode) return;
 		
+		DrawSetTransform(-Position,0f,Vector2.One);
+		
 		var White = new Color(1, 1, 1);
 		var Red = new Color(1, 0, 0);
 		var Blue = new Color(0, 0, 1);
+		var Yellow = new Color(1, 1, 0);
+		var Orange = new Color(1, 0.5f, 0);
 		
-		DrawRect(cameraRect, Red, false);
-		var limitRect = BlastZone.CalcRect(middle, limits);
+		DrawRect(cameraRect, Yellow, false);
+		DrawRect(cameraRect.Zoomed(Zoom), Orange, false);
+		var limitRect = GeometryUtils.RectFrom(middle, limits);
 		DrawRect(limitRect, Red, false);
-		var vrect = BlastZone.CalcRect(middle, viewportRect.Size);
-		DrawRect(vrect, White, false);
+		DrawRect(viewportRect, White, false);
+		DrawRect(viewportRect.Zoomed(Zoom), Blue, false);
 		DrawCircle(cameraRect.Center(), 5, Red);
+		DrawCircle(Position, 5, Yellow);
 		DrawCircle(middle, 5, White);
 		DrawCircle(center, 5, Blue);
+		//.Zoomed(CalculateZoom(GeometryUtils.RectFrom(middle, viewportRect.Size))
 	}
 	
 	public void CharacterGone(Node2D who) => followed.Remove(who);

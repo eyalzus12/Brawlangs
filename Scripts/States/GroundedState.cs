@@ -29,7 +29,7 @@ public class GroundedState : State
 	
 	protected virtual void DoInputMovement()
 	{
-		ch.vec.x.Towards(ch.Direction * ch.AppropriateSpeed, ch.AppropriateAcceleration);
+		ch.vec.x.Towards(ch.MovementDirection * ch.AppropriateSpeed, ch.AppropriateAcceleration);
 	}
 	
 	protected virtual void DoFriction()
@@ -56,8 +56,8 @@ public class GroundedState : State
 		}
 		else
 		{
-			ch.TurnConditional();
-			ch.States.Change("RunStartup");
+			/*ch.TurnConditional();
+			ch.States.Change("RunStartup");*/
 		}
 		
 		MarkForDeletion("Dodge", true);
@@ -67,21 +67,18 @@ public class GroundedState : State
 	protected override void LightAttack()
 	{
 		if(jump) return;
-		ch.TurnConditional();
 		base.LightAttack();
 	}
 	
 	protected override void SpecialAttack()
 	{
 		if(jump) return;
-		ch.TurnConditional();
 		base.SpecialAttack();
 	}
 	
 	protected override void Taunt()
 	{
 		if(jump) return;
-		ch.TurnConditional();
 		base.Taunt();
 	}
 	

@@ -11,9 +11,15 @@ public class UpdateScript : Node
 	
 	public override void _Ready()
 	{
-		KeybindsParser.Load(FIRST_KEYBINDS_PATH);
-		KeybindsParser.Load(SECOND_KEYBINDS_PATH);
-		//foreach(var h in InputMap.GetActions()) GD.Print(h);
+		var kbd = new KeybindsParser();
+		//check if file exists
+		//kbd.Load(FIRST_KEYBINDS_PATH);
+		kbd.Load(SECOND_KEYBINDS_PATH);
+		kbd.ApplyParsedData();
+		
+		#if DEBUG_INPUT_MAP
+		foreach(var h in InputMap.GetActions()) GD.Print(h);
+		#endif
 	}
 	
 	public override void _Process(float delta)

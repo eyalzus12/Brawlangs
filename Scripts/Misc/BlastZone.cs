@@ -13,12 +13,12 @@ public class BlastZone : Node2D
 	
 	public BlastZone()
 	{
-		Bounds = CalcRect(Vector2.Zero, DEFAULT_SIZE);
+		Bounds = GeometryUtils.RectFrom(Vector2.Zero, DEFAULT_SIZE);
 	}
 	
 	public BlastZone(Vector2 Center, Vector2 Limits)
 	{
-		Bounds = CalcRect(Center, Limits);
+		Bounds = GeometryUtils.RectFrom(Center, Limits);
 	}
 	
 	public BlastZone(Rect2 rect)
@@ -56,14 +56,6 @@ public class BlastZone : Node2D
 				c.Die();
 			}
 		}
-	}
-	
-	public static Rect2 CalcRect(Vector2 Center, Vector2 Lengths)
-	{
-		var TopLeft = Center-Lengths;
-		var BottomRight = Center+Lengths;
-		var Size = BottomRight-TopLeft;
-		return new Rect2(TopLeft, Size);
 	}
 	
 	public void CharacterGone(Node2D who)

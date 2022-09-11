@@ -30,15 +30,14 @@ public class AttackPart : Node2D, IHitter
 	public float DamageMult{get; set;}
 	public float KnockbackMult{get; set;}
 	public float StunMult{get; set;}
-	public string StartupAnimation{get; set;}
 	public string AttackAnimation{get; set;}
-	public string EndlagAnimation{get; set;}
 	public string AttackSound{get; set;}
 	public float DriftForwardAcceleration{get; set;}
 	public float DriftForwardSpeed{get; set;}
 	public float DriftBackwardsAcceleration{get; set;}
 	public float DriftBackwardsSpeed{get; set;}
 	public bool SlowOnWalls{get; set;}
+	public bool FastFallLocked{get; set;}
 	
 	public List<string> EmittedProjectiles{get; set;}
 	
@@ -98,7 +97,7 @@ public class AttackPart : Node2D, IHitter
 	{
 		HasHit = false;
 		
-		ch.PlayAnimation(StartupAnimation);
+		ch.PlayAnimation(AttackAnimation, true);//overwrite animation
 		ch.PlaySound(AttackSound);
 		
 		active = true;
@@ -119,7 +118,6 @@ public class AttackPart : Node2D, IHitter
 	{
 		if(!active) return;
 		if(frameCount == Startup) OnStartupFinish();
-		else if(frameCount > Startup) ch.PlayAnimation(AttackAnimation);
 		Loop();
 		HandleHits();
 		var next = NextPart(); if(next != "") ChangePart(next);
@@ -184,8 +182,8 @@ public class AttackPart : Node2D, IHitter
 		active = false;
 	}
 	
-	public virtual void Pause() {hitboxPlayer.Stop();}
-	public virtual void Resume() {hitboxPlayer.Play();}
+	public virtual void Pause() {hitboxPlayer.Stop(); ch.PauseAnimation();}
+	public virtual void Resume() {hitboxPlayer.Play(); ch.ResumeAnimation();}
 	public virtual void Loop() {}
 	public virtual void OnStart() {}
 	public virtual void OnEnd() {}
@@ -266,9 +264,10 @@ public class AttackPart : Node2D, IHitter
 			var skb = dirvec*hitbox.SetKnockback + hitbox.MomentumCarry*velocity;
 			var vkb = dirvec*hitbox.VarKnockback;
 			var damage = hitbox.Damage*dmult;
-			var stun = hitbox.Stun*smult;
+			var sstun = hitbox.SetStun*smult;
+			var vstun = hitbox.VarStun*smult;
  			
-			var data = new HitData(skb, vkb, damage, stun, hitbox.Hitpause, hitbox, hurtbox);
+			var data = new HitData(skb, vkb, damage, sstun, vstun, hitbox.SetHitpause, hitbox.VarHitpause, hitbox, hurtbox);
 			
 			//GD.Print($"{OwnerObject} attack part adds {hitChar} to Hit Ignore List");
 			HitIgnoreList.Add(hitChar);

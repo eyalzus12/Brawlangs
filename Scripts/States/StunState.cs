@@ -27,7 +27,7 @@ public class StunState : State
 		ch.voc = force;//retrieve
 		
 		framesSinceLastBounce = 0;
-		ch.PlayAnimation("Stun");
+		ch.PlayAnimation("Stun", true);
 		
 		if(ch.grounded && !ch.onSemiSolid)
 		{

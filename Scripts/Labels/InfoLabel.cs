@@ -45,7 +45,7 @@ public class InfoLabel : Label
 		commit.Append($"{obj.ToString()}    ");
 	}
 	
-	public void Newline() => commit.Append('\n');
+	public void Newline() => commit.AppendLine();
 	
 	protected virtual bool EnsureCorrectAppearence() => true;
 }

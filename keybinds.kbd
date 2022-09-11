@@ -22,6 +22,7 @@ NTaunt =
 Dodge = 0_K76
 NDodge = 
 Run = 0_K16777237
+Strafe = 0_K59
 
 1:
 Left = 0_K16777231
@@ -56,6 +57,7 @@ Dodge = 0_K86
 NDodge = 
 NDodge = 
 Run = 0_K66
+Strafe = 
 
 2:
 Left = 
@@ -81,6 +83,7 @@ NTaunt =
 Dodge = 
 NDodge = 
 Run = 
+Strafe = 
 
 3:
 Left = 
@@ -110,6 +113,7 @@ NTaunt =
 Dodge = 
 NDodge = 
 Run = 
+Strafe = 
 
 4:
 Left = 
@@ -135,6 +139,7 @@ NTaunt =
 Dodge = 
 NDodge = 
 Run = 
+Strafe = 
 
 5:
 Left = 
@@ -160,6 +165,7 @@ NTaunt =
 Dodge = 
 NDodge = 
 Run = 
+Strafe = 
 
 6:
 Left = 
@@ -185,6 +191,7 @@ NTaunt =
 Dodge = 
 NDodge = 
 Run = 
+Strafe = 
 
 7:
 Left = 
@@ -210,3 +217,4 @@ NTaunt =
 Dodge = 
 NDodge = 
 Run = 
+Strafe = 

@@ -80,12 +80,25 @@ public static class IterUtils
 		foreach(var h in e) a(h);
 	}
 	
+	public static IEnumerable<(T1,T2)> Zip<T1,T2>(this IEnumerable<T1> e1, IEnumerable<T2> e2)
+	{
+		var en1 = e1.GetEnumerator();
+		var en2 = e2.GetEnumerator();
+		while(en1.MoveNext() && en2.MoveNext()) yield return (en1.Current, en2.Current);
+	}
+	
 	public static IEnumerable<(T1,T2,T3)> TriZip<T1,T2,T3>(IEnumerable<T1> e1, IEnumerable<T2> e2, IEnumerable<T3> e3)
 	{
 		var en1 = e1.GetEnumerator();
 		var en2 = e2.GetEnumerator();
 		var en3 = e3.GetEnumerator();
 		while(en1.MoveNext() && en2.MoveNext() && en3.MoveNext()) yield return (en1.Current, en2.Current, en3.Current);
+	}
+	
+	public static IEnumerable<IEnumerable<T>> MultiZip<T>(params IEnumerable<T>[] es)
+	{
+		var ens = es.Select(e => e.GetEnumerator());
+		while(ens.All(en => en.MoveNext())) yield return ens.Select(en => en.Current);
 	}
 	
 	public static T FirstOrDefault<T>(this IEnumerable<T> e, Func<T, bool> predicate, T @default = default)
@@ -107,5 +120,11 @@ public static class IterUtils
 	public static TValue GetValueOrDefault<TKey,TValue>(this Dictionary<TKey,TValue> d, TKey k, TValue @default = default)
 	{
 		TValue res; return d.TryGetValue(k, out res)?res:@default;
+	}
+	
+	public static int FindIndex<T>(this IEnumerable<T> e, T v) where T : IEquatable<T>
+	{
+		int i = 0; foreach(var o in e) {++i; if(o.Equals(v)) return i;}
+		return i;
 	}
 }

@@ -11,7 +11,7 @@ public class GetupState : GroundedState
 	public override void Init()
 	{
 		ch.Uncrouch();
-		ch.PlayAnimation("Getup");
+		ch.PlayAnimation("Getup", true);
 	}
 	
 	protected override void DoJump()
@@ -24,7 +24,7 @@ public class GetupState : GroundedState
 		ch.TurnConditional();
 		
 		if(ch.InputtingHorizontalDirection)
-			ch.vec.x = ch.Direction * ch.crawlSpeed;
+			ch.vec.x = ch.MovementDirection * ch.crawlSpeed;
 		else ch.vec.x = 0;
 	}
 	

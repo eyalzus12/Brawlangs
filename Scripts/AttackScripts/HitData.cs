@@ -4,13 +4,21 @@ using System.Collections.Generic;
 
 public struct HitData
 {
-	public Vector2 Skb {get; set;}
-	public Vector2 Vkb {get; set;}
+	public Vector2 SKB {get; set;}
+	public Vector2 VKB {get; set;}
+	
 	public float Damage {get; set;}
-	public float Stun {get; set;}
-	public int Hitpause {get; set;}
+	
+	public float SStun {get; set;}
+	public float VStun{get; set;}
+	
+	public float SHitpause {get; set;}
+	public float VHitpause {get; set;}
+	
 	public Hitbox Hitter {get; set;}
 	public Hurtbox Hitee {get; set;}
+	
+	
 	public Dictionary<string, object> ExtraData {get; set;}
 	public object this[string s]
 	{
@@ -22,15 +30,27 @@ public struct HitData
 		}
 	}
 	
-	public HitData(Vector2 skb, Vector2 vkb, float damage, float stun, int hitpause, Hitbox hitter, Hurtbox hitee)
+	public HitData(
+		Vector2 skb, Vector2 vkb,
+		float damage,
+		float sstun, float vstun,
+		float shitpause, float vhitpause,
+		Hitbox hitter, Hurtbox hitee)
 	{
-		Skb = skb;
-		Vkb = vkb;
+		SKB = skb;
+		VKB = vkb;
+		
 		Damage = damage;
-		Stun = stun;
-		Hitpause = hitpause;
+		
+		SStun = sstun;
+		VStun = vstun;
+		
+		SHitpause = shitpause;
+		VHitpause = vhitpause;
+		
 		Hitter = hitter;
 		Hitee = hitee;
+		
 		ExtraData = new Dictionary<string, object>();
 	}
 }

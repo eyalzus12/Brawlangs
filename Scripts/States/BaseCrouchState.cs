@@ -17,7 +17,7 @@ public class BaseCrouchState : GroundedState
 		ch.TurnConditional();
 		
 		if(ch.InputtingHorizontalDirection)
-			ch.vec.x.Towards(ch.Direction * ch.crawlSpeed, ch.AppropriateAcceleration);
+			ch.vec.x.Towards(ch.MovementDirection * ch.crawlSpeed, ch.AppropriateAcceleration);
 		else
 			ch.vec.x *= (1-ch.AppropriateFriction);
 		

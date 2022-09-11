@@ -102,7 +102,7 @@ public class CharacterCreator
 				GD.Print($"failed to load animation {animationName} from path {resourcePath}");
 				continue;
 			}
-			spr.AddSheet(texture, animationName, frames, loop);
+			spr.Add(texture, animationName, frames, loop);
 		}
 		
 		ch.CharacterSprite = spr;

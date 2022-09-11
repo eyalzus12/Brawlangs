@@ -8,7 +8,7 @@ public class WalkState : GroundedState
 	
 	public override void Init()
 	{
-		ch.PlayAnimation("Walk");
+		ch.QueueAnimation("Walk", ch.AnimationLooping, true);
 	}
 	
 	protected override bool CalcStateChange()

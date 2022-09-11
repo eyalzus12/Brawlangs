@@ -8,7 +8,7 @@ public class RunState : GroundedState
 	
 	protected override void DoMovement()
 	{
-		ch.vuc.x.Towards(ch.Direction * ch.runSpeed * (2-ch.ffric), ch.runAcceleration * ch.ffric);
+		ch.vuc.x = ch.MovementDirection * ch.runSpeed * (2-ch.ffric);
 	}
 	
 	protected override bool CalcStateChange()

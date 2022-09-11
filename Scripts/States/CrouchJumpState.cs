@@ -22,8 +22,9 @@ public class CrouchJumpState : BaseCrouchState
 			SetupCollisionParamaters();
 			AdjustVelocity();
 		}
-		ch.PlayAnimation("CrouchJumpReady");
-		ch.QueueAnimation("CrouchJump");
+		
+		ch.PlayAnimation("CrouchJumpReady", true);
+		ch.QueueAnimation("CrouchJump", false, false);
 	}
 	
 	protected override void LoopActions()

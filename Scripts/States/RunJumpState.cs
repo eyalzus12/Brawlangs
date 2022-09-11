@@ -22,8 +22,9 @@ public class RunJumpState : RunState
 			SetupCollisionParamaters();
 			AdjustVelocity();
 		}
-		ch.PlayAnimation("JumpRunReady");
-		ch.QueueAnimation("JumpRun");
+		
+		ch.PlayAnimation("JumpRunReady", true);
+		ch.QueueAnimation("JumpRun", false, false);
 	}
 	
 	protected override void LoopActions()
@@ -34,7 +35,7 @@ public class RunJumpState : RunState
 		{
 			jumpActive = true;
 			ch.fnorm = new Vector2(0,-1);
-			ch.vuc.x = ch.Direction * ch.runJumpSpeed * (2-ch.ffric);
+			ch.vuc.x = Math.Sign(ch.vuc.x) * ch.runJumpSpeed * (2-ch.ffric);
 			ch.vuc.y = -ch.runJumpHeight;
 			Unsnap();
 		}

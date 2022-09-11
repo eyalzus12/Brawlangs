@@ -17,8 +17,9 @@ public class AirJumpState : AirState
 		ch.vac = Vector2.Zero;
 		jump = false;
 		jumpActive = false;
-		ch.PlayAnimation("AirJumpReady");
-		ch.QueueAnimation("AirJump");
+		
+		ch.PlayAnimation("AirJumpReady", true);
+		ch.QueueAnimation("AirJump", false, false);
 	}
 	
 	protected override void LoopActions()
@@ -42,7 +43,13 @@ public class AirJumpState : AirState
 	
 	protected override bool CalcStateChange()
 	{
-		if(jumpActive) ch.States.Change("Air");
+		if(jumpActive)
+		{
+			if(ch.walled && ch.Resources.Has("Clings")) ch.States.Change("WallLand");
+			else ch.States.Change("Air");
+		}
+		else return false;
+		
 		return true;
 	}
 }

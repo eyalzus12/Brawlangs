@@ -21,10 +21,8 @@ public class AirState : State
 		ch.onSlope = false;
 		jump = false;
 		wallTouch = false;
-		if(ch.CharacterSprite.currentSheet.name.StartsWith("Jump"))
-			ch.QueueAnimation("Drift");
-		else
-			ch.PlayAnimation("Drift");
+		
+		ch.QueueAnimation("Drift", ch.AnimationLooping, false);
 		
 		if(ch.Tags["Grounded"] == StateTag.Starting || ch.Tags["Grounded"] == StateTag.Active)
 			ch.Tags["Grounded"] = StateTag.Ending;
@@ -42,7 +40,7 @@ public class AirState : State
 	
 	protected virtual void DoInputMovement()
 	{
-		ch.vec.x.Towards(ch.Direction * ch.AppropriateSpeed, ch.AppropriateAcceleration);
+		ch.vec.x.Towards(ch.MovementDirection * ch.AppropriateSpeed, ch.AppropriateAcceleration);
 	}
 	
 	protected virtual void DoFriction()
@@ -91,8 +89,8 @@ public class AirState : State
 	{
 		if(ch.ceilinged)
 		{
-			ch.PlayAnimation("Bonk");
-			ch.QueueAnimation("Drift");
+			ch.PlayAnimation("Bonk", true);
+			ch.QueueAnimation("Drift", false, false);
 			
 			if(ch.cnorm == Vector2.Down)
 			{
@@ -111,8 +109,8 @@ public class AirState : State
 		else if(ch.walled && !wallTouch && !ch.Resources.Has("Clings"))
 		{
 			wallTouch = true;
-			ch.vec.y *= (1-ch.wallFriction*ch.wfric);
-			ch.vuc.y *= (1-ch.wallFriction*ch.wfric);
+			//ch.vec.y *= (1-ch.wallFriction*ch.wfric);
+			//ch.vuc.y *= (1-ch.wallFriction*ch.wfric);
 		}
 	}
 	
@@ -120,6 +118,7 @@ public class AirState : State
 	{
 		ch.TurnConditional();
 		if(ch.crouching) ch.Uncrouch();
+		if(!ch.Resources.Has("Clings")) ch.walled = false;
 		
 		//ch.SetCollisionMaskBit(DROP_THRU_BIT, !ch.downHeld);
 	}

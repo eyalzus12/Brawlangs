@@ -12,28 +12,22 @@ public class RunTurnState : GroundedState
 	
 	public override void Init()
 	{
-		ch.PlayAnimation("Turn");
+		ch.PlayAnimation("RunTurn", true);
 	}
 	
-	protected override void DoMovement() {}
-	
-	protected override void DoDodge()
+	protected override void DoMovement()
 	{
-		if(!Actionable || jump) return;
-		
-		if(!ch.InputtingTurn)
-		{
-			ch.Turn();
-			base.DoDodge();
-		}
+		ch.vuc.x.Towards(ch.MovementDirection * ch.runSpeed * (2-ch.ffric), ch.runAcceleration * ch.ffric);
 	}
+	
+	protected override void DoDodge() {}
 	
 	protected override bool CalcStateChange()
 	{
 		if(!ch.grounded)
 			ch.States.Change("Air");
 		else if(frameCount >= ch.runTurn + Math.Round(TURNING_MULT*(1-ch.ffric)))
-			ch.States.Change("Run");
+			ch.States.Change(/*"Run"*/"RunStartup");
 		else return false;
 		
 		return true;
@@ -42,6 +36,5 @@ public class RunTurnState : GroundedState
 	public override void OnChange(State newState)
 	{
 		ch.Turn();
-		if(!ch.InputtingAnyAttack) ch.vuc.x *= -1;
 	}
 }

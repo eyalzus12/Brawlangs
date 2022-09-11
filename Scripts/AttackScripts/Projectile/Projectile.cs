@@ -176,13 +176,13 @@ public class Projectile : Node2D, IHitter, IHittable
 			var smult = OwnerObject.StunDoneMult*StunDoneMult*hitbox.GetStunMultiplier(hitChar);
 			
 			var dirvec = hitbox.KnockbackDir(hitChar)*kmult;
-			
 			var skb = dirvec*hitbox.SetKnockback;
 			var vkb = dirvec*hitbox.VarKnockback;
 			var damage = hitbox.Damage*dmult;
-			var stun = hitbox.Stun*smult;
-			
-			var data = new HitData(skb, vkb, damage, stun, hitbox.Hitpause, hitbox, hurtbox);
+			var sstun = hitbox.SetStun*smult;
+			var vstun = hitbox.VarStun*smult;
+ 			
+			var data = new HitData(skb, vkb, damage, sstun, vstun, hitbox.SetHitpause, hitbox.VarHitpause, hitbox, hurtbox);
 			
 			hitChar.HandleGettingHit(data);
 			OwnerObject.HandleHitting(data);

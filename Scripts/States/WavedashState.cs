@@ -12,8 +12,10 @@ public class WavedashState : GroundedState
 		ch.SetCollisionMaskBit(DROP_THRU_BIT, true);
 		ch.RestoreOptionsOnGroundTouch();
 		AdjustVelocity();
-		ch.PlayAnimation("WavedashStart");
-		ch.QueueAnimation("Wavewdash");
+		ch.PlayAnimation("WavedashStart", true);
+		ch.QueueAnimation("Wavewdash", false, false);
+		
+		ch.vec.x *= 1.5f;
 	}
 	
 	protected override void LoopActions()
@@ -25,19 +27,12 @@ public class WavedashState : GroundedState
 		}
 		else
 		{
-			ch.vuc.x *= (1f-ch.AppropriateFriction);
+			ch.vuc.x *= (1f-0.5f*ch.AppropriateFriction);
 		}
 	}
 	
 	protected override void DoMovement() {}
 	protected override void DoFriction() {}
-	
-	protected override void DoJump()
-	{
-		ch.TurnConditional();
-		ch.States.Change("Jump");
-		MarkForDeletion("Jump", true);
-	}
 	
 	protected override bool CalcStateChange()
 	{

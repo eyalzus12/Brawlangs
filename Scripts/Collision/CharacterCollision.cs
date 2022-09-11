@@ -75,7 +75,7 @@ public class CharacterCollision : CollisionShape2D
 	public override void _Draw()
 	{
 		if(!this.GetRootNode<UpdateScript>("UpdateScript").debugCollision) return;
-		var rect = BlastZone.CalcRect(Vector2.Zero, Extents);
+		var rect = GeometryUtils.RectFrom(Vector2.Zero, Extents);
 		DrawRect(rect, GetDrawColor(), true);
 	}
 	

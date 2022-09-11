@@ -25,7 +25,7 @@ public class AttackState : State
 	public override void SetInputs()
 	{
 		base.SetInputs();
-		SetFastFallInput();
+		if(att?.CurrentPart?.FastFallLocked ?? true) SetFastFallInput();
 	}
 	
 	protected override void DoMovement()
@@ -118,7 +118,7 @@ public class AttackState : State
 		}
 		else//no endlag. state transition immedietly
 		{
-			//turnaroujnd
+			//turnaround
 			ch.TurnConditional();
 			
 			//transition to appropriate state

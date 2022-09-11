@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Text;
+using System.Linq;
 
 public class DebugLabel : InfoLabel
 {
@@ -63,10 +64,11 @@ public class DebugLabel : InfoLabel
 		Add("LastHitee", Valid(ch.LastHitee)?ch.LastHitee.ToString():"None");
 		Add("LastHitter", Valid(ch.LastHitter)?ch.LastHitter.ToString():"None");
 		Newline();
-		Add("PlayedAnimation", ch.CharacterSprite.currentSheet.name);
-		Add("QueuedAnimation", ch.CharacterSprite.queuedSheet?.name??"None");
-		Add("AnimationLooping", ch.CharacterSprite.currentSheet.loop);
+		Add("CurrentAnimation", ch.CharacterSprite.Current?.Name ?? "");
+		Add("AnimationPlaying", ch.CharacterSprite.Playing);
 		Add("AnimationFrame", ch.CharacterSprite.Frame);
+		Add("AnimationLooping", ch.CharacterSprite.Looping);
+		Add("AnimationQueue", ch.CharacterSprite.QueueToString);
 		Newline();
 		Add("Velocity", ch.RoundedVelocity);
 		Add("Position", ch.RoundedPosition);

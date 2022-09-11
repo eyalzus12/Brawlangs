@@ -40,7 +40,7 @@ public class StateTagsManager
 	public override string ToString()
 	{
 		var result = new StringBuilder();
-		foreach(var entry in Tags) result.Append($"{entry.Key.ToString()} : {entry.Value.ToString()}\n");
+		foreach(var entry in Tags) if(entry.Value != StateTag.NotActive) result.Append($"{entry.Key.ToString()} : {entry.Value.ToString()}\n");
 		return result.ToString();
 	}
 }

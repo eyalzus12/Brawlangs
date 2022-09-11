@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/Idle_21_0.png-13a4354c2d8670350c4dffed0a15f2ea.stex"
+path="res://.import/WallJumpReady_1_1.png-03db9638a25df8a65262a2306e3231e8.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Characters/Josh/JoshAnimations/Idle_21_0.png"
-dest_files=[ "res://.import/Idle_21_0.png-13a4354c2d8670350c4dffed0a15f2ea.stex" ]
+source_file="res://Characters/Josh/JoshAnimationsOld/WallJumpReady_1_1.png"
+dest_files=[ "res://.import/WallJumpReady_1_1.png-03db9638a25df8a65262a2306e3231e8.stex" ]
 
 [params]
 
@@ -28,6 +28,7 @@ process/fix_alpha_border=true
 process/premult_alpha=false
 process/HDR_as_SRGB=false
 process/invert_color=false
+process/normal_map_invert_y=false
 stream=false
 size_limit=0
 detect_3d=true

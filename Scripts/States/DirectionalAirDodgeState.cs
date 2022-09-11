@@ -17,7 +17,7 @@ public class DirectionalAirDodgeState : GenericInvincibleState
 	public override int IFrames => ch.directionalAirDodgeLength;
 	public override int Endlag => ch.directionalAirDodgeEndlag;
 	public override string ActionName => "Dodge";
-	public override string StateAnimation => "DirectionAirDodge";
+	public override string StateAnimation => "DirectionalAirDodge";
 	
 	public override void Init()
 	{

@@ -8,13 +8,13 @@ public class WalkWallState: GroundedState
 	
 	public override void Init()
 	{
-		ch.PlayAnimation("Walk");
+		ch.QueueAnimation("Walk", ch.AnimationLooping, true);
 	}
 	
 	protected override void DoMovement()
 	{
 		if(ch.InputtingHorizontalDirection)
-			ch.vec.x = ch.Direction * ch.AppropriateAcceleration;
+			ch.vec.x = ch.MovementDirection * ch.AppropriateAcceleration;
 		else
 			ch.vec.x = 0;
 	}

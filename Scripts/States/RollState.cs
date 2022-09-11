@@ -10,7 +10,7 @@ public class RollState : GenericInvincibleState
 	
 	protected override void OnIFramesStart()
 	{
-		ch.vec = new Vector2(ch.Direction*Speed, VCF);
+		ch.vec = new Vector2(ch.MovementDirection*Speed, VCF);
 	}
 	
 	protected override void OnEndlagStart()

@@ -8,7 +8,7 @@ public class WalkStopState : GroundedSlowdownState
 	
 	public override void Init()
 	{
-		ch.PlayAnimation("WalkStop");
+		ch.QueueAnimation("WalkStop", ch.AnimationLooping, true);
 	}
 	
 	protected override bool CalcStateChange()

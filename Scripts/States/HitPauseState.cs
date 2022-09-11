@@ -16,6 +16,7 @@ public class HitPauseState : State
 	{
 		ch.Uncrouch();
 		ch.ResetVelocity();
+		ch.CharacterSprite.Pause();
 	}
 	
 	protected override bool CalcStateChange()
@@ -32,5 +33,10 @@ public class HitPauseState : State
 		else return false;
 		
 		return true;
+	}
+	
+	public override void OnChange(State newState)
+	{
+		ch.CharacterSprite.Resume();
 	}
 }

@@ -188,10 +188,11 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public float AppropriateFallingSpeed => (CurrentAttack?.CurrentPart?.GravityMultiplier ?? 1f)*((States.Current is StunState)?stunFallSpeed:fastfalling?walled?wallFastFallSpeed:fastFallSpeed:walled?wallFallSpeed*(2-wfric):fallSpeed);
 	
 	public int InputDirection => rightHeld?(leftHeld?0:1):(leftHeld?-1:0);
-	public int FutureDirection => rightHeld?(leftHeld?0:1):(leftHeld?-1:Direction);
+	public int MovementDirection => (HoldingStrafe && InputDirection != 0)?InputDirection:Direction;
+	public int FutureDirection => (InputDirection == 0)?Direction:InputDirection;
 	public Vector2 InputVector => new Vector2((rightHeld?1:leftHeld?-1:0),(downHeld?1:upHeld?-1:0)).Normalized();
 	
-	public bool InputtingTurn => (FutureDirection != Direction);
+	public bool InputtingTurn => !HoldingStrafe && (FutureDirection != Direction);
 	public bool InputtingHorizontalDirection => leftHeld||rightHeld;
 	public bool NowInputtingHorizontalDirection => Inputs.IsActionJustPressed("Left")||Inputs.IsActionJustPressed("Right");
 	public bool InputtingVerticalDirection => upHeld||downHeld;
@@ -209,6 +210,9 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public bool InputtingRun => Inputs.IsActionJustPressed("Run");
 	public bool HoldingRun => Inputs.IsActionPressed("Run");
 	public bool ReleasingRun => Inputs.IsActionJustReleased("Run");
+	public bool InputtingStrafe => Inputs.IsActionJustPressed("Strafe");
+	public bool HoldingStrafe => Inputs.IsActionPressed("Strafe");
+	public bool ReleasingStrafe => Inputs.IsActionJustReleased("Strafe");
 	
 	public bool ShouldInitiateRun => (HoldingRun&&NowInputtingHorizontalDirection) || (InputtingHorizontalDirection&&InputtingRun);
 	
@@ -329,8 +333,11 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		DrawCircle(Vector2.Zero, 5, new Color(0,0,0,1));
 	}
 	
-	public void PlayAnimation(string anm) => CharacterSprite.Play(anm);
-	public void QueueAnimation(string anm) => CharacterSprite.Queue(anm);
+	public void PlayAnimation(string anm, bool overwriteQueue) => CharacterSprite.Play(anm, overwriteQueue);
+	public void QueueAnimation(string anm, bool goNext, bool overwriteQueue) => CharacterSprite.Queue(anm, goNext, overwriteQueue);
+	public bool AnimationLooping => CharacterSprite.Looping;
+	public void PauseAnimation() => CharacterSprite.Pause();
+	public void ResumeAnimation() => CharacterSprite.Resume();
 	public void PlaySound(string sound) => Audio.Play(sound);
 	public void PlaySound(AudioStream sound) => Audio.Play(sound);
 	
@@ -388,10 +395,9 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	///////////////Misc////////////////////////
 	///////////////////////////////////////////
 	
-	private readonly static string[] INPUT_TAGS = new string[]{"Light", "Special", "Taunt", "Jump", "Dodge", "Run"};
 	public void UpdateInputTags()
 	{
-		foreach(var inputTag in INPUT_TAGS)
+		foreach(var inputTag in InputMap.GetActions().Enumerable<string>().Where(s=>s.StartsWith($"{TeamNumber}_")).Select(s=>s.Substring($"{TeamNumber}_".Length)))
 		{
 			if(Inputs.IsActionJustPressed(inputTag)) Tags[inputTag] = StateTag.Starting;
 			if(Inputs.IsActionJustReleased(inputTag)) Tags[inputTag] = StateTag.Ending;
@@ -444,40 +450,48 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	
 	public virtual void RestoreOptionsOnGroundTouch()
 	{
+		EmitSignal(nameof(OptionsRestoredFromGroundTouch));
+		
 		Resources["Clings"] = maxClingsAllowed;
 		Resources["AirJumps"] = maxAirJumpsAllowed;
 		Resources["OnHittingOptionRestoration"] = 1;
 		Resources["OnGettingHitOptionRestoration"] = 1;
 		if(restoreDodgeOnGroundTouch) Resources["Dodge"] = maxDodgesAllowed;
-		EmitSignal(nameof(OptionsRestoredFromGroundTouch));
 	}
 	
 	public virtual void RestoreOptionsOnWallTouch()
 	{
+		EmitSignal(nameof(OptionsRestoredFromWallTouch));
+		
 		Resources.Give("Clings", -1);
 		Resources["AirJumps"] = maxAirJumpsAllowed;
 		if(restoreDodgeOnWallTouch) Resources["Dodge"] = maxDodgesAllowed;
-		EmitSignal(nameof(OptionsRestoredFromWallTouch));
 	}
 	
 	public virtual void RestoreOptionsOnHitting()
 	{
-		if(!Resources.Has("OnHittingOptionRestoration")) return;
-		Resources.Give("Clings", givenClingsOnHitting, maxClingsAllowed);
-		Resources.Give("AirJumps", givenAirJumpsOnHitting, maxAirJumpsAllowed);
-		if(restoreDodgeOnHitting) Resources.Give("Dodge", givenDodgesOnHitting, maxDodgesAllowed);
 		EmitSignal(nameof(OptionsRestoredFromHitting));
-		Resources.Give("OnHittingOptionRestoration", -1);
+		
+		if(Resources.Has("OnHittingOptionRestoration"))
+		{
+			Resources.Give("Clings", givenClingsOnHitting, maxClingsAllowed);
+			Resources.Give("AirJumps", givenAirJumpsOnHitting, maxAirJumpsAllowed);
+			if(restoreDodgeOnHitting) Resources.Give("Dodge", givenDodgesOnHitting, maxDodgesAllowed);
+			Resources.Give("OnHittingOptionRestoration", -1);
+		}
 	}
 	
 	public virtual void RestoreOptionsOnGettingHit()
 	{
-		if(!Resources.Has("OnGettingHitOptionRestoration")) return;
-		Resources.Give("Clings", givenClingsOnGettingHit, maxClingsAllowed);
-		Resources.Give("AirJumps", givenAirJumpsOnGettingHit, maxAirJumpsAllowed);
-		if(restoreDodgeOnGettingHit) Resources.Give("Dodge", givenDodgesOnGettingHit, maxDodgesAllowed);
 		EmitSignal(nameof(OptionsRestoredFromGettingHit));
-		Resources.Give("OnGettingHitOptionRestoration", -1);
+		
+		if(Resources.Has("OnGettingHitOptionRestoration"))
+		{
+			Resources.Give("Clings", givenClingsOnGettingHit, maxClingsAllowed);
+			Resources.Give("AirJumps", givenAirJumpsOnGettingHit, maxAirJumpsAllowed);
+			if(restoreDodgeOnGettingHit) Resources.Give("Dodge", givenDodgesOnGettingHit, maxDodgesAllowed);
+			Resources.Give("OnGettingHitOptionRestoration", -1);
+		}
 	}
 	
 	public virtual void StoreVelocities()
@@ -595,11 +609,13 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public virtual void HandleGettingHit(HitData data)
 	{
 		//GD.Print($"{this} runs Handle Getting Hit");
-		var skb = data.Skb;
-		var vkb = data.Vkb;
+		var skb = data.SKB;
+		var vkb = data.VKB;
 		var d = data.Damage;
-		var stun = data.Stun;
-		var hp = data.Hitpause;
+		var sstun = data.SStun;
+		var vstun = data.VStun;
+		var shp = data.SHitpause;
+		var vhp = data.VHitpause;
 		Hitbox hitbox = data.Hitter;
 		Hurtbox hurtbox = data.Hitee;
 		var hitSound = hitbox.HitSound;
@@ -617,14 +633,15 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		
 		//GD.Print($"{this} is not clashing. doing hit stuff");
 		var force = (skb + damage*vkb/100f) * KnockbackTakenMult * (100f/weight);
-		var stunlen = stun * StunTakenMult;
+		var stunlen = (sstun + damage*vstun/100f) * StunTakenMult;
+		var hp = (shp + damage*vhp/100f);
 		
 		if(hp > 0)
 		{
 			var s = States.Change<HitPauseState>();
 			s.force = force;
 			s.stunLength = (int)stunlen;
-			s.hitPauseLength = hp;
+			s.hitPauseLength = (int)hp;
 		}
 		else if(stunlen > 0)
 		{
@@ -671,7 +688,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		if(hitbox.Hitlag > 0)
 		{
 			var s = States.Change<HitLagState>();
-			s.hitLagLength = hitbox.Hitlag;
+			s.hitLagLength = (int)hitbox.Hitlag;
 		}
 	}
 	
@@ -680,10 +697,10 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		//GD.Print($"{this} gets Handle Clashing called and calls self's attack part's Handle Hits");
 		GD.Print("CLASH");
 		CurrentAttack?.CurrentPart?.HandleHits();
-		var skb = data.Skb;
-		var vkb = data.Vkb;
+		var skb = data.SKB;
+		var vkb = data.VKB;
 		
-		var force = (skb + damage*vkb/100f) * KnockbackTakenMult * (100f/weight);
+		var force = (skb + damage*vkb/100f);
 		if(force != Vector2.Zero) force = force.Normalized() * clashForce;
 		var stun = clashStun;
 		
@@ -724,7 +741,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		if(Attacks.ContainsKey(s)) return Attacks[s];
 		else
 		{
-			GD.Print($"No attack {s} found on character {Name}");
+			GD.PushError($"No attack {s} found on character {Name}");
 			return null;
 		}
 	}
@@ -743,7 +760,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		var generatedProjectile = projPool.GetProjectile(proj);
 		if(generatedProjectile is null)
 		{
-			GD.Print($"Failed to emit projectile {proj} because the object pool returned a null");
+			GD.PushError($"Failed to emit projectile {proj} because the object pool returned a null");
 		}
 		else
 		{

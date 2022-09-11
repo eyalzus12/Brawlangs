@@ -41,7 +41,7 @@ public class EndlagState : State
 	
 	protected override void FirstFrameAfterInit()
 	{
-		ch.PlayAnimation(att.GetEndlagAnimation());
+		//ch.PlayAnimation(att.GetEndlagAnimation());
 	}
 	
 	protected override void DoGravity()

@@ -22,7 +22,7 @@ public class GenericInvincibleState : State
 		IFramesStarted = false;
 		IsInEndlag = false;
 		ch.Resources.Give(ActionName, -1);
-		ch.PlayAnimation(StateAnimation);
+		ch.PlayAnimation(StateAnimation, true);
 		ch.Uncrouch();
 	}
 	

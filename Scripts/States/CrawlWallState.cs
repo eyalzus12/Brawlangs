@@ -8,7 +8,7 @@ public class CrawlWallState: BaseCrouchState
 	
 	public override void Init()
 	{
-		ch.PlayAnimation("Crawl");
+		ch.QueueAnimation("Crawl", ch.AnimationLooping, true);
 	}
 	
 	protected override bool CalcStateChange()
