@@ -86,6 +86,7 @@ public class AnimationSprite : Sprite
 	
 	public void AnimationFinished(string anm = "")
 	{
+		FramePlayer?.Stop(true);
 		if(Queued.Count > 0)
 		{
 			Current = Queued.Peek();
@@ -95,6 +96,7 @@ public class AnimationSprite : Sprite
 	
 	public void Pause() => FramePlayer?.Stop(false);
 	public void Resume() => FramePlayer?.Play();
+	public void Stop() {ClearQueue(); AnimationFinished();}
 	
 	public string QueueToString => string.Join(" ", Queued.Select(a=>a.Name).ToArray());
 }

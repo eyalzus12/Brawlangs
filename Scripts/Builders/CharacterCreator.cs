@@ -158,7 +158,7 @@ public class CharacterCreator
 		var audio = ResourceLoader.Load<AudioStream>(path);
 		if(audio is null)
 		{
-			GD.PushError($"failed to load sound file from path {path}");
+			GD.PushError($"Failed to load sound file from path {path}");
 			return null;
 		}
 		
@@ -176,7 +176,7 @@ public class CharacterCreator
 			}
 			else if(audio is AudioStreamSample wav)
 			{
-				GD.PushWarning("Warning: WAV does not support dynamic looping. Use ogg instead.");
+				GD.PushWarning("WAV does not support dynamic looping. Use ogg instead.");
 				//wav.LoopMode = AudioStreamSample.LoopModeEnum.Forward;
 				return wav;
 			}

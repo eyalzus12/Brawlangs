@@ -38,4 +38,6 @@ public class WallJumpState : WallState
 		ch.ApplySettings("Default");
 		return true;
 	}
+	
+	public override void OnChange(State newState) {}
 }

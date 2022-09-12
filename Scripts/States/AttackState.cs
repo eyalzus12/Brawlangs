@@ -25,7 +25,7 @@ public class AttackState : State
 	public override void SetInputs()
 	{
 		base.SetInputs();
-		if(att?.CurrentPart?.FastFallLocked ?? true) SetFastFallInput();
+		if(!att?.CurrentPart?.FastFallLocked ?? true) SetFastFallInput();
 	}
 	
 	protected override void DoMovement()

@@ -10,6 +10,7 @@ public class WallState : State
 	
 	public override void Init()
 	{
+		ch.QueueAnimation("Wall", ch.AnimationLooping, true);
 		jump = false;
 	}
 	
@@ -78,5 +79,10 @@ public class WallState : State
 		
 		ch.vec.x += ch.MovementDirection * HCF;
 		ch.vac.y = ch.wvel.y;
+	}
+	
+	public override void OnChange(State newState)
+	{
+		if(!(newState is WallState)) ch.CharacterSprite.Stop();
 	}
 }

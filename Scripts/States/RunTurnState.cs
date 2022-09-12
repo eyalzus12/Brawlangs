@@ -5,7 +5,7 @@ public class RunTurnState : GroundedState
 {
 	public const int TURNING_MULT = 5;
 	
-	public override bool Actionable => false;
+	public override bool Actionable => true;
 	
 	public RunTurnState(): base() {}
 	public RunTurnState(Character link): base(link) {}
@@ -35,6 +35,6 @@ public class RunTurnState : GroundedState
 	
 	public override void OnChange(State newState)
 	{
-		ch.Turn();
+		ch.TurnConditional();
 	}
 }
