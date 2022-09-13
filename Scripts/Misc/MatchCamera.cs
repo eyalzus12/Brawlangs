@@ -32,6 +32,7 @@ public class MatchCamera : Camera2D
 	
 	public Rect2 cameraRect = new Rect2();
 	public Rect2 viewportRect = new Rect2();
+	public bool limit = true;
 	
 	public override void _Ready()
 	{
@@ -44,6 +45,7 @@ public class MatchCamera : Camera2D
 	
 	public void Reset()
 	{
+		limit = true;
 		Position = middle+startPositionOffset;
 		Zoom = startZoomMult*baseZoom*Vector2.One;
 		
@@ -59,6 +61,8 @@ public class MatchCamera : Camera2D
 		//toggle debug display
 		if(Input.IsActionJustPressed("toggle_camera_debug"))
 			debugMode = !debugMode;
+		if(Input.IsActionJustPressed("toggle_camera_limits"))
+			limit = !limit;
 		
 		//get viewport rect
 		viewportRect = GetViewportRect();
@@ -79,9 +83,12 @@ public class MatchCamera : Camera2D
 		cameraRect = positions.Aggregate(initialRect, (a,v)=>a.Expand(v));
 		
 		//limit rect
-		cameraRect.Position -= middle;//make rect relative to map center
-		cameraRect = cameraRect.Limit(limits.x, limits.y);//limit the rectangle to the limits
-		cameraRect.Position += middle;//get non relative position
+		if(limit)
+		{
+			cameraRect.Position -= middle;//make rect relative to map center
+			cameraRect = cameraRect.Limit(limits.x, limits.y);//limit the rectangle to the limits
+			cameraRect.Position += middle;//get non relative position
+		}
 		
 		//interpolate between the desired position and the current one, to smoothen it out
 		var desiredPosition = cameraRect.Center();//get center (desired position)
@@ -107,11 +114,10 @@ public class MatchCamera : Camera2D
 		var cameraZoom = Math.Max(Math.Max(cameraZoomXY.x, cameraZoomXY.y), 1);
 		//get max zoom possible on the xy
 		var maxZoomXY = limits/viewportRect.Size;
-		//get desired max zoom possible
-		var maxZoom = Math.Min(maxZoomXY.x, maxZoomXY.y);
+		//get max total zoom possible (conditionally)
+		var maxZoom = limit?Math.Max(maxZoomXY.x, maxZoomXY.y):float.PositiveInfinity;
 		//get resulting zoom that fits the max
-		var zoomResult = Math.Min(cameraZoom*baseZoom+zoomOffset, maxZoom);
-		return zoomResult*Vector2.One;
+		return Math.Min(cameraZoom*baseZoom+zoomOffset, maxZoom)*Vector2.One;
 	}
 	
 	public override void _Draw()

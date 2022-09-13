@@ -87,6 +87,9 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public int spotGroundedDodgeEndlag;
 	public int spotGroundedDodgeCooldown;
 	////////////////////////////////////////////
+	public float wavedashVelocityMutliplier = 1.5f;
+	public float wavedashFrictionMultiplier = 0.5f;
+	////////////////////////////////////////////
 	public int runStartup = 2;
 	public float runInitialSpeed = 600f;
 	public float runAcceleration = 60f;

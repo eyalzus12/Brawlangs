@@ -4,8 +4,8 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Linq;
 
-using ActionInput = System.ValueTuple<int, char, int>;
-using ActionDict = System.Collections.Generic.Dictionary<string, (float, System.Collections.Generic.List<System.ValueTuple<int, char, int>>)>;
+using Action = System.ValueTuple<int, char, int, float>;
+using ActionDict = System.Collections.Generic.Dictionary<string, (float, System.Collections.Generic.List<System.ValueTuple<int, char, int, float>>)>;
 
 public class KeybindsParser
 {
@@ -30,7 +30,7 @@ public class KeybindsParser
 	{
 		var actionName = $"{de.Key}_{ae.Key}";
 		if(!InputMap.HasAction(actionName)) InputMap.AddAction(actionName, ae.Value.Item1);
-		ae.Value.Item2.ForEach(t => InputMap.ActionAddEvent(actionName, CreateInput(t.Item1, t.Item2, t.Item3)));
+		ae.Value.Item2.ForEach(t => InputMap.ActionAddEvent(actionName, CreateInput(t.Item1, t.Item2, t.Item3, t.Item4)));
 	}));
 	
 	public void Parse(string s) => SplitToSections(EnsureNoPreData(RemoveRedundantLines(s))).ForEach(dat => ParseData(dat.Item1, dat.Item2));
@@ -54,7 +54,7 @@ public class KeybindsParser
 		.Cast<Match>()
 		.Select(m => (int.Parse(m.Groups["section"].Value), m.Groups["data"].Value));
 	
-	private const string DATA_PARSER = @"^(?<action>\w+)\s*=\s*(?:@(?<deadzone>[+-]?[0-9]*\.?[0-9]*))?(?:\s+(?<device>[0-9]+)_(?<type>[a-zA-Z]*)(?<data>[0-9]+))*\s*(?:;.*)?$";
+	private const string DATA_PARSER = @"^(?<action>\w+)\s*=\s*(?:@(?<deadzone>[+-]?[0-9]*\.?[0-9]*))?(?:\s+(?<device>[0-9]+)_(?<type>[a-zA-Z]*)(?<data>[0-9]+)_?(?<extra>[+-]?[0-9]*\.?[0-9]*)?)*\s*(?:;.*)?$";
 	private static readonly Regex DATA_REGEX = new Regex(DATA_PARSER, RegexOptions.Compiled | RegexOptions.Multiline);
 	private void ParseData(int section, string s)
 	{
@@ -69,23 +69,32 @@ public class KeybindsParser
 			var string_deadzone = groups["deadzone"].Value;
 			var deadzone = (string_deadzone == "")?0.5f:float.Parse(string_deadzone);
 			
-			if(!Data[section].ContainsKey(action)) Data[section].Add(action, (deadzone, new List<ActionInput>()));
+			if(!Data[section].ContainsKey(action)) Data[section].Add(action, (deadzone, new List<Action>()));
 			
 			var devices = groups["device"].Captures.Cast<Capture>().Select(c=>int.Parse(c.Value));
 			var types = groups["type"].Captures.Cast<Capture>().Select(c=>c.Value[0]);
 			var datas = groups["data"].Captures.Cast<Capture>().Select(c=>int.Parse(c.Value));
+			var extras = groups["extra"].Captures.Cast<Capture>().Select(c=>(c.Value=="")?0f:float.Parse(c.Value));
 			
-			Data[section][action].Item2.AddRange(IterUtils.TriZip(devices, types, datas));
+			var inputs = IterUtils.Zip(devices, types, datas, extras);
+			Data[section][action].Item2.AddRange(inputs);
 		}
 	}
 	
-	private InputEvent CreateInput(int device, char type, int data)
+	private InputEvent CreateInput(int device, char type, int data, float extra)
 	{
 		InputEvent input = InputEventForType(type);
+		
+		input.Device = device;
+		
 		input.Set("button_index", data);
 		input.Set("scancode", data);
 		input.Set("axis", data);
-		input.Device = device;
+		
+		input.Set("factor", extra);
+		input.Set("pressure", extra);
+		input.Set("axis_value", extra);
+		
 		return input;
 	}
 	

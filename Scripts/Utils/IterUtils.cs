@@ -87,12 +87,83 @@ public static class IterUtils
 		while(en1.MoveNext() && en2.MoveNext()) yield return (en1.Current, en2.Current);
 	}
 	
-	public static IEnumerable<(T1,T2,T3)> TriZip<T1,T2,T3>(IEnumerable<T1> e1, IEnumerable<T2> e2, IEnumerable<T3> e3)
+	public static IEnumerable<(T1,T2,T3)> Zip<T1,T2,T3>(IEnumerable<T1> e1, IEnumerable<T2> e2, IEnumerable<T3> e3)
 	{
 		var en1 = e1.GetEnumerator();
 		var en2 = e2.GetEnumerator();
 		var en3 = e3.GetEnumerator();
 		while(en1.MoveNext() && en2.MoveNext() && en3.MoveNext()) yield return (en1.Current, en2.Current, en3.Current);
+	}
+	
+	public static IEnumerable<(T1,T2,T3,T4)> Zip<T1,T2,T3,T4>(IEnumerable<T1> e1, IEnumerable<T2> e2, IEnumerable<T3> e3, IEnumerable<T4> e4)
+	{
+		var en1 = e1.GetEnumerator();
+		var en2 = e2.GetEnumerator();
+		var en3 = e3.GetEnumerator();
+		var en4 = e4.GetEnumerator();
+		while(en1.MoveNext() && en2.MoveNext() && en3.MoveNext() && en4.MoveNext()) yield return (en1.Current, en2.Current, en3.Current, en4.Current);
+	}
+	
+	public static IEnumerable<(T1,T2,T3,T4,T5)> Zip<T1,T2,T3,T4,T5>(
+		IEnumerable<T1> e1, IEnumerable<T2> e2, IEnumerable<T3> e3, IEnumerable<T4> e4,
+		IEnumerable<T5> e5)
+	{
+		var en1 = e1.GetEnumerator();
+		var en2 = e2.GetEnumerator();
+		var en3 = e3.GetEnumerator();
+		var en4 = e4.GetEnumerator();
+		var en5 = e5.GetEnumerator();
+		while(en1.MoveNext() && en2.MoveNext() && en3.MoveNext() && en4.MoveNext()
+			&& en5.MoveNext())
+			yield return (en1.Current, en2.Current, en3.Current, en4.Current, en5.Current);
+	}
+	
+	public static IEnumerable<(T1,T2,T3,T4,T5,T6)> Zip<T1,T2,T3,T4,T5,T6>(
+		IEnumerable<T1> e1, IEnumerable<T2> e2, IEnumerable<T3> e3, IEnumerable<T4> e4,
+		IEnumerable<T5> e5, IEnumerable<T6> e6)
+	{
+		var en1 = e1.GetEnumerator();
+		var en2 = e2.GetEnumerator();
+		var en3 = e3.GetEnumerator();
+		var en4 = e4.GetEnumerator();
+		var en5 = e5.GetEnumerator();
+		var en6 = e6.GetEnumerator();
+		while(en1.MoveNext() && en2.MoveNext() && en3.MoveNext() && en4.MoveNext()
+			&& en5.MoveNext() && en6.MoveNext())
+			yield return (en1.Current, en2.Current, en3.Current, en4.Current, en5.Current, en6.Current);
+	}
+	
+	public static IEnumerable<(T1,T2,T3,T4,T5,T6,T7)> Zip<T1,T2,T3,T4,T5,T6,T7>(
+		IEnumerable<T1> e1, IEnumerable<T2> e2, IEnumerable<T3> e3, IEnumerable<T4> e4,
+		IEnumerable<T5> e5, IEnumerable<T6> e6, IEnumerable<T7> e7)
+	{
+		var en1 = e1.GetEnumerator();
+		var en2 = e2.GetEnumerator();
+		var en3 = e3.GetEnumerator();
+		var en4 = e4.GetEnumerator();
+		var en5 = e5.GetEnumerator();
+		var en6 = e6.GetEnumerator();
+		var en7 = e7.GetEnumerator();
+		while(en1.MoveNext() && en2.MoveNext() && en3.MoveNext() && en4.MoveNext()
+			&& en5.MoveNext() && en6.MoveNext() && en7.MoveNext())
+			yield return (en1.Current, en2.Current, en3.Current, en4.Current, en5.Current, en6.Current, en7.Current);
+	}
+	
+	public static IEnumerable<(T1,T2,T3,T4,T5,T6,T7,T8)> Zip<T1,T2,T3,T4,T5,T6,T7,T8>(
+		IEnumerable<T1> e1, IEnumerable<T2> e2, IEnumerable<T3> e3, IEnumerable<T4> e4,
+		IEnumerable<T5> e5, IEnumerable<T6> e6, IEnumerable<T7> e7, IEnumerable<T8> e8)
+	{
+		var en1 = e1.GetEnumerator();
+		var en2 = e2.GetEnumerator();
+		var en3 = e3.GetEnumerator();
+		var en4 = e4.GetEnumerator();
+		var en5 = e5.GetEnumerator();
+		var en6 = e6.GetEnumerator();
+		var en7 = e7.GetEnumerator();
+		var en8 = e8.GetEnumerator();
+		while(en1.MoveNext() && en2.MoveNext() && en3.MoveNext() && en4.MoveNext()
+			&& en5.MoveNext() && en6.MoveNext() && en7.MoveNext() && en8.MoveNext())
+			yield return (en1.Current, en2.Current, en3.Current, en4.Current, en5.Current, en6.Current, en7.Current, en8.Current);
 	}
 	
 	public static IEnumerable<IEnumerable<T>> MultiZip<T>(params IEnumerable<T>[] es)

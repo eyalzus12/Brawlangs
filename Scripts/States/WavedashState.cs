@@ -15,7 +15,7 @@ public class WavedashState : GroundedState
 		ch.PlayAnimation("WavedashStart", true);
 		ch.QueueAnimation("Wavewdash", false, false);
 		
-		ch.vec.x *= 1.5f;
+		ch.vuc.x *= ch.wavedashVelocityMutliplier;
 	}
 	
 	protected override void LoopActions()
@@ -23,11 +23,11 @@ public class WavedashState : GroundedState
 		//koopabackdashwaveslidehoverwalkmoonlanding
 		if(Math.Sign(ch.vuc.x) != ch.Direction && ch.InputDirection == ch.Direction)
 		{
-			ch.vuc.x.Towards(0, ch.groundAcceleration);
+			ch.vuc.x.Towards(0, ch.wavedashFrictionMultiplier*ch.groundAcceleration);
 		}
 		else
 		{
-			ch.vuc.x *= (1f-0.5f*ch.AppropriateFriction);
+			ch.vuc.x *= (1f-ch.wavedashFrictionMultiplier*ch.AppropriateFriction);
 		}
 	}
 	

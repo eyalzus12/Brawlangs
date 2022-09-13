@@ -12,9 +12,7 @@ public class UpdateScript : Node
 	public override void _Ready()
 	{
 		var kbd = new KeybindsParser();
-		//check if file exists
-		//kbd.Load(FIRST_KEYBINDS_PATH);
-		kbd.Load(SECOND_KEYBINDS_PATH);
+		kbd.Load((new File()).FileExists(FIRST_KEYBINDS_PATH)?FIRST_KEYBINDS_PATH:SECOND_KEYBINDS_PATH);
 		kbd.ApplyParsedData();
 		
 		#if DEBUG_INPUT_MAP

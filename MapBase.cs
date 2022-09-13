@@ -141,7 +141,7 @@ public class MapBase : Node2D
 	
 	public override void _Draw()
 	{
-		if(!this.GetRootNode<UpdateScript>("UpdateScript").debugCollision) return;
+		//if(!this.GetRootNode<UpdateScript>("UpdateScript").debugCollision) return;
 		DrawRect(GeometryUtils.RectFrom(Vector2.Zero, BlastZones), new Color(1,0,1), false);
 	}
 	
