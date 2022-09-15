@@ -120,7 +120,13 @@ public class AttackPart : Node2D, IHitter
 		if(frameCount == Startup) OnStartupFinish();
 		Loop();
 		HandleHits();
-		var next = NextPart(); if(next != "") ChangePart(next);
+		
+		if(!(ch.States.Current is HitLagState))
+		{
+			var next = NextPart();
+			if(next != "") ChangePart(next);
+		}
+		
 		++frameCount;
 	}
 	

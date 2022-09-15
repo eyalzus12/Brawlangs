@@ -50,6 +50,7 @@ public class CollisionCreator
 	
 	public void BuildHurtbox(Hurtbox hr, string section, string state)
 	{
+		if(!inif.HasSection(section)) {GD.PushError($"Can't generate hurtbox {section} as it is not a real section"); return;}
 		var rd = inif[section, "Radius", 0f].f();
 		var he = inif[section, "Height", 0f].f();
 		var pos = inif[section, "Position", Vector2.Zero].v2();
@@ -61,6 +62,7 @@ public class CollisionCreator
 	
 	public void BuildCollision(CharacterCollision cs, string section, string state)
 	{
+		if(!inif.HasSection(section)) {GD.PushError($"Can't generate character collision {section} as it is not a real section"); return;}
 		var ext = inif[section, "Extents", Vector2.Zero].v2();
 		var pos = inif[section, "Position", Vector2.Zero].v2();
 		var collisionState = new CollisionShapeState(state, ext, pos);

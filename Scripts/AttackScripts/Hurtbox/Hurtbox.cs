@@ -8,8 +8,8 @@ public class Hurtbox : Area2D
 	
 	public CapsuleShape2D Shape{get => (CapsuleShape2D)col.Shape; set => col.Shape = value;}
 	
-	public float Radius {get => Shape.Radius; set => Shape.Radius = value;}
-	public float Height {get => Shape.Height; set => Shape.Height = value;}
+	public float Radius {get => Shape.Radius; set => Shape.SetDeferred("radius", value);}
+	public float Height {get => Shape.Height; set => Shape.SetDeferred("height", value);}
 	
 	public Dictionary<string, HurtboxCollisionState> states = new Dictionary<string, HurtboxCollisionState>();
 	public string CurrentCollisionState{get; set;} = "Default";
@@ -94,6 +94,7 @@ public class Hurtbox : Area2D
 		Height = newState.Height;
 		CollisionPosition = newState.Position;
 		CollisionRotation = newState.Rotation;
+		Update();
 	}
 	
 	public override void _Draw()

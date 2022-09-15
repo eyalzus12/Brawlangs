@@ -38,11 +38,12 @@ public class ProjectileCreator
 		return packs;
 	}*/
 	
-	public Projectile BuildProjectile(Node2D n, string section)
+	public Projectile BuildProjectile(IAttacker n, string section)
 	{
+		if(!inif.HasSection(section)) {GD.PushError($"Can't generate projectile {section} as it is not a real section"); return null;}
 		var proj = new Projectile();
 		
-		proj.OwnerObject = (IAttacker)n;
+		proj.OwnerObject = n;
 		var characterAudioManager = proj.OwnerObject.Audio;
 		var am = new AudioManager(2);
 		am.Name = "AudioManager";
@@ -84,6 +85,7 @@ public class ProjectileCreator
 	
 	public ProjectileMovementFunction BuildMovementFunction(string section)
 	{
+		if(!inif.HasSection(section)) {GD.PushError($"Can't generate movement function {section} as it is not a real section"); return null;}
 		var movementScript = inif[section, "Script", ""].s();
 		var baseFolder = path.SplitByLast('/')[0];
 		var movf = TypeUtils.LoadScript<ProjectileMovementFunction>(movementScript, new ProjectileMovementFunction(), baseFolder);
@@ -95,6 +97,7 @@ public class ProjectileCreator
 	
 	public void BuildHurtbox(Hurtbox hr, string section, string state)
 	{
+		if(!inif.HasSection(section)) {GD.PushError($"Can't generate hurtbox {section} as it is not a real section"); return;}
 		var rd = inif[section, "Radius", 0f].f();
 		var he = inif[section, "Height", 0f].f();
 		var pos = inif[section, "Position", Vector2.Zero].v2();
@@ -106,6 +109,7 @@ public class ProjectileCreator
 	
 	public void BuildHitbox(Projectile p, string section)
 	{
+		if(!inif.HasSection(section)) {GD.PushError($"Can't generate hitbox {section} as it is not a real section"); return;}
 		var HitboxScript = inif[section, "Script", ""].s();
 		var baseFolder = path.SplitByLast('/')[0];
 		var h = TypeUtils.LoadScript<Hitbox>(HitboxScript, new Hitbox(), baseFolder);

@@ -60,6 +60,7 @@ public class DebugLabel : InfoLabel
 		Add("NextPart", part?.NextPart()??"None");
 		Add("AttackPartScript", part?.GetType()?.Name??"None");
 		Add("AttackPartHit", part?.HasHit ?? false);
+		Add("LastAttackPart", ch.CurrentAttack?.LastUsedPart?.Name??"None");
 		Newline();
 		Add("LastHitee", Valid(ch.LastHitee)?ch.LastHitee.ToString():"None");
 		Add("LastHitter", Valid(ch.LastHitter)?ch.LastHitter.ToString():"None");

@@ -26,6 +26,7 @@ public class AttackCreator
 	
 	public void BuildAttack(Node n, string section)
 	{
+		if(!inif.HasSection(section)) {GD.PushError($"Can't generate attack {section} as it is not a real section"); return;}
 		var AttackScript = inif[section, "Script", ""].s();
 		var baseFolder = path.SplitByLast('/')[0];
 		var a = TypeUtils.LoadScript<Attack>(AttackScript, new Attack(), baseFolder);
@@ -53,6 +54,7 @@ public class AttackCreator
 	
 	public AttackPart BuildPart(Attack a, string section, string start)
 	{
+		if(!inif.HasSection(section)) {GD.PushError($"Can't generate attack part {section} as it is not a real section"); return null;}
 		var PartScript = inif[section, "Script", ""].s();
 		var baseFolder = path.SplitByLast('/')[0];
 		var ap = TypeUtils.LoadScript<AttackPart>(PartScript, new AttackPart(), baseFolder);
@@ -134,6 +136,7 @@ public class AttackCreator
 	
 	public void BuildHitbox(AttackPart ap, string section)
 	{
+		if(!inif.HasSection(section)) {GD.PushError($"Can't generate hitbox {section} as it is not a real section"); return;}
 		var HitboxScript = inif[section, "Script", ""].s();
 		var baseFolder = path.SplitByLast('/')[0];
 		var h = TypeUtils.LoadScript<Hitbox>(HitboxScript, new Hitbox(), baseFolder);
@@ -222,6 +225,7 @@ public class AttackCreator
 	
 	public void BuildTransition(AttackPart ap, string section)
 	{
+		if(!inif.HasSection(section)) {GD.PushError($"Can't generate transition {section} as it is not a real section"); return;}
 		var frames = inif[section, "Frames", Enumerable.Empty<Vector2>()].lv2();
 		
 		var tags = inif[section, "Tag", ""].s();

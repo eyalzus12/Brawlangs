@@ -63,6 +63,7 @@ public class Attack : Node2D
 		Connect("AttackEnds", ch.States.Current, "SetEnd");
 		connected = ch.States.Current;
 		CurrentPart = StartPart;
+		LastUsedPart = null;
 		OnStart();
 		CurrentPart.Activate();
 	}

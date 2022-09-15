@@ -4,6 +4,7 @@ using System;
 public class CrouchJumpState : BaseCrouchState
 {
 	bool jumpActive = false;
+	public bool forceShortHop = false;
 	
 	public CrouchJumpState() : base() {}
 	public CrouchJumpState(Character link) : base(link) {}
@@ -17,6 +18,7 @@ public class CrouchJumpState : BaseCrouchState
 		ch.vac = Vector2.Zero;
 		jump = false;
 		jumpActive = false;
+		forceShortHop = false;
 		if(ch.CurrentAttack is null)
 		{
 			SetupCollisionParamaters();
@@ -29,12 +31,13 @@ public class CrouchJumpState : BaseCrouchState
 	
 	protected override void LoopActions()
 	{
+		if(Inputs.IsActionPressed("Run")) forceShortHop = true;
 		AdjustVelocity();
 		
 		if(frameCount >= ch.crouchJumpSquat)
 		{
 			jumpActive = true;
-			var height = Inputs.IsActionReallyPressed("Jump")?ch.crouchJumpHeight:ch.crouchShorthopHeight;
+			var height =(!forceShortHop && Inputs.IsActionReallyPressed("Jump"))?ch.crouchJumpHeight:ch.crouchShorthopHeight;
 			ch.fnorm = new Vector2(0,-1);
 			ch.vec.y = -height;
 			Unsnap();

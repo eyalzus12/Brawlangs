@@ -303,7 +303,6 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	
 	public override void _Ready()
 	{
-		ZIndex = 4;
 		States = new StateMachine(CreateStates());
 	}
 
@@ -327,13 +326,6 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		
 		CharacterSprite.FlipH = (Direction == -1);
 		CharacterSprite.SelfModulate = Invincible?new Color(1,1,1,1):SpriteModulate;
-		Update();
-	}
-	
-	public override void _Draw()
-	{
-		if(!this.GetRootNode<UpdateScript>("UpdateScript").debugCollision) return;
-		DrawCircle(Vector2.Zero, 5, new Color(0,0,0,1));
 	}
 	
 	public void PlayAnimation(string anm, bool overwriteQueue) => CharacterSprite.Play(anm, overwriteQueue);
