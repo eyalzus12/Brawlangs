@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Text;
 
-public class InfoLabel : Label
+public partial class InfoLabel : Label
 {
 	public InfoLabel() {}
 	
@@ -11,14 +11,14 @@ public class InfoLabel : Label
 	
 	public override void _Ready()
 	{
-		PauseMode = Node.PauseModeEnum.Process;
+		ProcessMode = Node.ProcessModeEnum.Always;
 		debugMode = false;
 		Connect();
 	}
 	
 	public virtual void Connect() {}
 	
-	public override void _PhysicsProcess(float delta)
+	public override void _PhysicsProcess(double delta)
 	{
 		if(Input.IsActionJustPressed("debug_toggle"))
 			debugMode = !debugMode;

@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class MapCreator
+public partial class MapCreator
 {
 	public const string BASE_SECTION = "Base";
 	
@@ -23,7 +23,7 @@ public class MapCreator
 		else foreach(var str in plats.ls()) BuildPlatform(str, n);
 		
 		var camera = new MatchCamera();
-		camera.Name = "Camera";
+		camera.Name = "Camera3D";
 		var cbounds = inif[BASE_SECTION, "CameraBounds", MatchCamera.DEFAULT_LIMITS].v2();
 		camera.limits = cbounds;
 		var center = inif[BASE_SECTION, "Center", Vector2.Zero].v2();
@@ -69,7 +69,7 @@ public class MapCreator
 		if(cp is string) BuildCollision(cp.s(), sp);
 		else foreach(var s in cp.ls()) BuildCollision(s, sp);
 		
-		var sr = inif[section, "Sprite", section+"sprite"];
+		var sr = inif[section, "Sprite2D", section+"sprite"];
 		if(sr is string) BuildSprite(sr.s(), sp);
 		else foreach(var ss in sr.ls()) BuildSprite(ss, sp);
 		
@@ -98,7 +98,7 @@ public class MapCreator
 	public void BuildSprite(string section, Node n)
 	{
 		section = section.Trim();
-		var sp = new Sprite();
+		var sp = new Sprite2D();
 		
 		var pos = inif[section, "Position", Vector2.Zero].v2();
 		sp.Position = pos;
@@ -106,8 +106,8 @@ public class MapCreator
 		sp.Rotation = rot;
 		var scl = inif[section, "Scale", new Vector2(1f,1f)].v2();
 		sp.Scale = scl;
-		var te = inif[section, "Texture", "res://icon.png"].s();
-		sp.Texture = ResourceLoader.Load<Texture>(te);
+		var te = inif[section, "Texture2D", "res://icon.png"].s();
+		sp.Texture = ResourceLoader.Load<Texture2D>(te);
 		var zz = inif[section, "Z", 1].i();
 		sp.ZIndex = zz;
 		
@@ -144,7 +144,7 @@ public class MapCreator
 		var rs = new RectangleShape2D();
 		
 		var ex = inif[section, "Extents", new Vector2(16f,16f)].v2();
-		rs.Extents = ex;
+		rs.Size = ex;
 		
 		return rs;
 	}
@@ -171,14 +171,14 @@ public class MapCreator
 		return ps;
 	}
 	
-	private LineShape2D s2l(string section)
+	private WorldBoundaryShape2D s2l(string section)
 	{
-		var ls = new LineShape2D();
+		var ls = new WorldBoundaryShape2D();
 		
 		var nr = inif[section, "Normal", new Vector2(0, -1)].v2();
 		ls.Normal = nr;
 		var ds = inif[section, "Distance", 0f].f();
-		ls.D = ds;
+		ls.Distance = ds;
 		
 		return ls;
 	}

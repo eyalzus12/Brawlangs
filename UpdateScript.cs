@@ -1,8 +1,10 @@
+#define DEBUG_INPUT_MAP
+
 using Godot;
 using System;
 using System.Linq;
 
-public class UpdateScript : Node
+public partial class UpdateScript : Node
 {
 	public bool debugCollision = false;
 	
@@ -12,18 +14,20 @@ public class UpdateScript : Node
 	public override void _Ready()
 	{
 		var kbd = new KeybindsParser();
-		kbd.Load((new File()).FileExists(FIRST_KEYBINDS_PATH)?FIRST_KEYBINDS_PATH:SECOND_KEYBINDS_PATH);
+		kbd.Load(File.FileExists(FIRST_KEYBINDS_PATH)?FIRST_KEYBINDS_PATH:SECOND_KEYBINDS_PATH);
 		kbd.ApplyParsedData();
 		
 		#if DEBUG_INPUT_MAP
-		foreach(var h in InputMap.GetActions()) GD.Print(h);
+		foreach(var h in InputMap.GetActions())
+			foreach(var i in InputMap.ActionGetEvents(h))
+				GD.Print($"{h} : {i.AsText()}");
 		#endif
 	}
 	
-	public override void _Process(float delta)
+	public override void _Process(double delta)
 	{
 		if(Input.IsActionJustPressed("toggle_fullscreen"))
-			OS.WindowFullscreen = !OS.WindowFullscreen;
+			Utils.ToggleFullscreen();
 		if(Input.IsActionJustPressed("debug_collision"))
 			debugCollision = !debugCollision;
 	}

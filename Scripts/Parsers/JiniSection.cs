@@ -12,7 +12,7 @@ using PropertyDictionary =
 using Strl = 
 	System.Collections.Generic.List<string>;
 
-public class JiniSection
+public partial class JiniSection
 {
 	public string name = "";
 	public SectionDictionary sectionDict = new SectionDictionary();
@@ -244,7 +244,7 @@ public class JiniSection
 		else return s;
 	}
 	
-	public class ReturnType
+	public partial class ReturnType
 	{
 		protected JiniSection js = new JiniSection();
 		protected object oj = new object();

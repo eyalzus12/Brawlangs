@@ -3,11 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-public class MatchCamera : Camera2D
+public partial class MatchCamera : Camera2D
 {
 	public readonly static Vector2 DEFAULT_LIMITS = new Vector2(1300, 900);
 	
-	public List<Node2D> followed = new List<Node2D>();
+	public List<Node2D> followed = new();
 	
 	[Export(PropertyHint.Range, "0.1,0.5,or_greater")]
 	public float zoomOffset = 0.5f;//no idea what this does
@@ -30,8 +30,8 @@ public class MatchCamera : Camera2D
 	
 	public Vector2 center;
 	
-	public Rect2 cameraRect = new Rect2();
-	public Rect2 viewportRect = new Rect2();
+	public Rect2 cameraRect = new();
+	public Rect2 viewportRect = new();
 	public bool limit = true;
 	
 	public override void _Ready()
@@ -52,11 +52,11 @@ public class MatchCamera : Camera2D
 		foreach(var n in GetParent().GetChildren()) if(n is Character c)
 		{
 			followed.Add(c);
-			c.Connect("Dead", this, nameof(CharacterGone));
+			c.Connect("Dead",new Callable(this,nameof(CharacterGone)));
 		}
 	}
 	
-	public override void _Process(float delta)
+	public override void _Process(double delta)
 	{
 		//toggle debug display
 		if(Input.IsActionJustPressed("toggle_camera_debug"))
@@ -100,7 +100,7 @@ public class MatchCamera : Camera2D
 		if(float.IsNaN(Zoom.x) || float.IsNaN(Zoom.y)) Zoom = Vector2.One;
 		
 		//draw debug things
-		Update();
+		QueueRedraw();
 	}
 	
 	public Vector2 CalculateZoom(Rect2 cameraRect, bool addOffset = true)

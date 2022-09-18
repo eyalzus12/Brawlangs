@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class RunStartupState : GroundedState
+public partial class RunStartupState : GroundedState
 {
 	public RunStartupState() : base() {}
 	public RunStartupState(Character link) : base(link) {}

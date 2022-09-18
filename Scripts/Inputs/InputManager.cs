@@ -1,13 +1,13 @@
 using Godot;
 using System;
 
-public class InputManager : Node
+public partial class InputManager : Node
 {
 	public InputManager(): base() {}
 	
 	public override void _Ready()
 	{
-		PauseMode = Node.PauseModeEnum.Process;
+		ProcessMode = Node.ProcessModeEnum.Always;
 	}
 	
 	public virtual bool IsActionJustPressed(string str) => Input.IsActionJustPressed(str);

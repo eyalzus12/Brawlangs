@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class MomEffect : Effect
+public partial class MomEffect : Effect
 {
 	public MomEffect():base() {}
 	public MomEffect(int length):base(length) {}

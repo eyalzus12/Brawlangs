@@ -1,6 +1,9 @@
 using Godot;
 using System;
 
+public record HurtboxCollisionState(string Name, float Radius, float Height, Vector2 Position, float Rotation);
+
+/*
 public readonly struct HurtboxCollisionState
 {
 	public readonly string Name;
@@ -18,3 +21,4 @@ public readonly struct HurtboxCollisionState
 		Rotation = rot;
 	}
 }
+*/

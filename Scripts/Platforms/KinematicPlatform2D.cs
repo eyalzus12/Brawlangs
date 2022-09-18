@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-public class KinematicPlatform2D : KinematicBody2D
+public partial class KinematicPlatform2D : CharacterBody2D
 {
 	public KinematicPlatform2D() {}
 	
@@ -11,8 +11,8 @@ public class KinematicPlatform2D : KinematicBody2D
 	
 	public override void _Ready()
 	{
-		SetCollisionLayerBit(0, !FallThrough);
-		SetCollisionLayerBit(1, FallThrough);
+		SetCollisionLayerValue(1, !FallThrough);
+		SetCollisionLayerValue(2, FallThrough);
 		
 		CollisionMask = 0;
 	}
@@ -36,12 +36,12 @@ public class KinematicPlatform2D : KinematicBody2D
 		set
 		{
 			FallThrough = value;
-			SetCollisionLayerBit(0, !value);
-			SetCollisionLayerBit(1, value);
+			SetCollisionLayerValue(0, !value);
+			SetCollisionLayerValue(1, value);
 		}
 	}
 	
 	//public void LoadExtraProperty<T>(string s) => LoadExtraProperties.Add(s, typeof(T));
 	
-	private List<CollisionShape2D> getshape() => GetChildren().FilterType<CollisionShape2D>().ToList();
+	private List<CollisionShape2D> getshape() => GetChildren().FilterType<CollisionShape2D, Node>().ToList();
 }

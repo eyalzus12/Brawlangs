@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class StateMachine
 {
-	public Dictionary<string, State> States{get; set;} = new Dictionary<string, State>();
+	public Dictionary<string, State> States{get; set;} = new();
 	public State Current{get; private set;}
 	public State Prev{get; private set;}
 	
@@ -52,7 +52,7 @@ public class StateMachine
 		throw new Exception("This should never fucking happen. If anyone finds this, fuck you.");
 	}
 	
-	public void Update(float delta)
+	public void Update(double delta)
 	{
 		Current?.SetInputs();
 		Current?.DoPhysics(delta);

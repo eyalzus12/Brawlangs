@@ -2,21 +2,21 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class ObjectPool : Node
+public partial class ObjectPool : Node
 {
 	public const int LoadAmount = 3;
 	public Dictionary<string, Queue<Node2D>> ObjectDict;
 	public Dictionary<string, PackedScene> LoadDict;
-	public Queue<Tuple<string, Node2D>> ReturnQueue;
+	public Queue<ValueTuple<string, Node2D>> ReturnQueue;
 	public HashSet<Node2D> ReturnQueueSet;
 	
 	public ObjectPool()
 	{
-		ObjectDict = new Dictionary<string, Queue<Node2D>>();
-		LoadDict = new Dictionary<string, PackedScene>();
+		ObjectDict = new();
+		LoadDict = new();
 	}
 	
-	public override void _PhysicsProcess(float delta)
+	public override void _PhysicsProcess(double delta)
 	{
 		CleanReturnQueue();
 	}
@@ -42,14 +42,14 @@ public class ObjectPool : Node
 				return null;
 			}
 			
-			ObjectDict.Add(identifier, new Queue<Node2D>());//make a queue
+			ObjectDict.Add(identifier, new());//make a queue
 			LoadDict.Add(identifier, source);
 		}
 		
 		for(int i = 0; i < LoadAmount; ++i)
 		{
 			var loader = source??LoadDict[identifier];
-			var obj = source.Instance<Node2D>();//instance new object
+			var obj = source.Instantiate<Node2D>();//instance new object
 			ObjectDict[identifier].Enqueue(obj);//put in the pool
 		}
 		
@@ -58,7 +58,7 @@ public class ObjectPool : Node
 	
 	public bool InsertObject(Node2D n, string identifier = "")
 	{
-		if(identifier == "") identifier = n.Filename;
+		if(identifier == "") identifier = n.SceneFilePath;
 		
 		if(identifier == "")
 		{
@@ -67,7 +67,7 @@ public class ObjectPool : Node
 		}
 		
 		if(ReturnQueueSet.Contains(n)) return false;
-		ReturnQueue.Enqueue(new Tuple<string,Node2D>(identifier,n));
+		ReturnQueue.Enqueue((identifier,n));
 		ReturnQueueSet.Add(n);
 		return true;
 	}
@@ -84,7 +84,7 @@ public class ObjectPool : Node
 			parent.RemoveChild(obj);
 			
 			if(!ObjectDict.ContainsKey(identifier))
-				ObjectDict.Add(identifier, new Queue<Node2D>());//make a queue
+				ObjectDict.Add(identifier, new());//make a queue
 			ObjectDict[identifier].Enqueue(obj);
 			
 			ReturnQueueSet.Remove(obj);

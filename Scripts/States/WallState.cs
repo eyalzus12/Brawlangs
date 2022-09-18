@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class WallState : State
+public partial class WallState : State
 {
 	protected bool jump = false;
 	

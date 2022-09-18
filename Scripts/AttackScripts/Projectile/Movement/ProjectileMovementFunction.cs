@@ -2,9 +2,9 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class ProjectileMovementFunction : Node2D
+public partial class ProjectileMovementFunction : Node2D
 {
-	public Dictionary<string, ParamRequest> LoadExtraProperties = new Dictionary<string, ParamRequest>();
+	public Dictionary<string, ParamRequest> LoadExtraProperties = new();
 	
 	public virtual Vector2 GetNext(Projectile proj) => proj.Position;
 	

@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class ReplenishedLimitedAttack : LimitedAttack
+public partial class ReplenishedLimitedAttack : LimitedAttack
 {
 	public bool RestoreOnGround;
 	public bool RestoreOnWall;
@@ -15,10 +15,10 @@ public class ReplenishedLimitedAttack : LimitedAttack
 		LoadExtraProperty<bool>("RestoreOnWall", false);
 		LoadExtraProperty<bool>("RestoreOnHitting", false);
 		LoadExtraProperty<bool>("RestoreOnGettingHit", false);
-		ch.Connect("OptionsRestoredFromGroundTouch", this, nameof(GroundTouch));
-		ch.Connect("OptionsRestoredFromWallTouch", this, nameof(WallTouch));
-		ch.Connect("OptionsRestoredFromHitting", this, nameof(Hitting));
-		ch.Connect("OptionsRestoredFromGettingHit", this, nameof(GettingHit));
+		ch.Connect("OptionsRestoredFromGroundTouch",new Callable(this,nameof(GroundTouch)));
+		ch.Connect("OptionsRestoredFromWallTouch",new Callable(this,nameof(WallTouch)));
+		ch.Connect("OptionsRestoredFromHitting",new Callable(this,nameof(Hitting)));
+		ch.Connect("OptionsRestoredFromGettingHit",new Callable(this,nameof(GettingHit)));
 	}
 	
 	public virtual void GroundTouch() {if(RestoreOnGround) ch.Resources[ResourceName] = AmountCanUse;}

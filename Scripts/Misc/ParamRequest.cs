@@ -1,6 +1,8 @@
 using Godot;
 using System;
 
+public record ParamRequest(Type ParamType, string ParamName, object ParamDefault);
+/*
 public struct ParamRequest
 {
 	public Type ParamType;
@@ -14,3 +16,4 @@ public struct ParamRequest
 		ParamDefault = @default;
 	}
 }
+*/

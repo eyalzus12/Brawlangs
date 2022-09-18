@@ -1,9 +1,9 @@
 using Godot;
 using System;
 
-public class GroundedState : State
+public partial class GroundedState : State
 {
-	public override string LightAttackType => "Light";
+	public override string LightAttackType => "Light3D";
 	public override string SpecialAttackType => "Special";
 	public override string TauntType => "Taunt";
 	public override bool ShouldDrop => ch.downHeld && ch.HoldingRun;

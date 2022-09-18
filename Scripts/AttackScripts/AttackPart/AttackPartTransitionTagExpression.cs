@@ -2,19 +2,12 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class AttackPartTransitionTagExpression
+public partial class AttackPartTransitionTagExpression
 {
-	public List<object> ExpressionParts{get; set;} = new List<object>();
+	public List<object> ExpressionParts{get; set;} = new();
 	
-	public AttackPartTransitionTagExpression()
-	{
-		ExpressionParts = new List<object>();
-	}
-	
-	public AttackPartTransitionTagExpression(IEnumerable<object> parts)
-	{
-		ExpressionParts = new List<object>(parts);
-	}
+	public AttackPartTransitionTagExpression() {ExpressionParts = new();}
+	public AttackPartTransitionTagExpression(IEnumerable<object> parts) {ExpressionParts = new(parts);}
 	
 	public bool Get(StateTagsManager tagsManager)
 	{

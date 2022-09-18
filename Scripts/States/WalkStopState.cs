@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class WalkStopState : GroundedSlowdownState
+public partial class WalkStopState : GroundedSlowdownState
 {
 	public WalkStopState(): base() {}
 	public WalkStopState(Character link): base(link) {}

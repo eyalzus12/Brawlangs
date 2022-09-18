@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class MapSelectorButton : OnPressButton
+public partial class MapSelectorButton : OnPressButton
 {
 	[Export]
 	public string dest = "FallBackMap";
@@ -18,10 +18,11 @@ public class MapSelectorButton : OnPressButton
 
 	public override void OnPress()
 	{
+		//TOFIX: unsafe
 		var te = GetParent().GetParent().GetNode<TextEdit>("TextEdit");
 		var str = te.Text;
 		if(str != "") this.AddData("ini_path", str);
 		
-		GetTree().CallDeferred("change_scene", path + dest);
+		this.ChangeSceneToFile(path + dest);
 	}
 }

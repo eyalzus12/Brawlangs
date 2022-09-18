@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-public class CharacterCreator
+public partial class CharacterCreator
 {
 	public string path;
 	
@@ -109,11 +109,11 @@ public class CharacterCreator
 		ch.AddChild(spr);
 	}
 	
-	public Texture GenerateTextureFromPath(string path)
+	public Texture2D GenerateTextureFromPath(string path)
 	{
 		if(path.StartsWith("res://"))//local
 		{
-			return ResourceLoader.Load<Texture>(path);
+			return ResourceLoader.Load<Texture2D>(path);
 		}
 		else//remote
 		{
@@ -125,9 +125,7 @@ public class CharacterCreator
 				return null;
 			}
 		
-			var texture = new ImageTexture();
-			texture.CreateFromImage(image, 0b11);
-			return texture;
+			return ImageTexture.CreateFromImage(image);
 		}
 	}
 	
@@ -164,7 +162,7 @@ public class CharacterCreator
 		
 		if(loop)
 		{
-			if(audio is AudioStreamOGGVorbis ogg)
+			if(audio is AudioStreamOggVorbis ogg)
 			{
 				ogg.Loop = true;
 				return ogg;
@@ -174,10 +172,10 @@ public class CharacterCreator
 				mp3.Loop = true;
 				return mp3;
 			}
-			else if(audio is AudioStreamSample wav)
+			else if(audio is AudioStreamWAV wav)
 			{
 				GD.PushWarning("WAV does not support dynamic looping. Use ogg instead.");
-				//wav.LoopMode = AudioStreamSample.LoopModeEnum.Forward;
+				//wav.LoopMode = AudioStreamWAV.LoopModeEnum.Forward;
 				return wav;
 			}
 			else

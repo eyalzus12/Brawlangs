@@ -6,15 +6,17 @@ using System.Text.RegularExpressions;
 
 public static class TypeUtils
 {
-	public static float f(this object o) => Convert.ToSingle(o);
-	public static bool b(this object o) => Convert.ToBoolean(o);
-	public static int i(this object o) => Convert.ToInt32(o);
-	public static string s(this object o) => (string)o;
-	public static object ob(this object o) => o;
+	public static float f(this object o) => (o is Variant v)?v.AsSingle():Convert.ToSingle(o);
+	public static bool b(this object o) => (o is Variant v)?v.AsBool():Convert.ToBoolean(o);
+	public static int i(this object o) => (o is Variant v)?v.AsInt32():Convert.ToInt32(o);
+	public static string s(this object o) => (o is Variant v)?v.AsString():(o is StringName sn)?sn.ToString():((string)o);
+	public static object ob(this object o) => (o is Variant v)?v.Obj:o;
 	
 	
 	public static Vector2 v2(this object o)//aslkfjhakusdfghausjkfhsakuh
 	{
+		if(o is Variant v) return v.AsVector2();
+		
 		Vector2 res;
 		if(StringUtils.TryParseVector2(o.ToString(), out res)) return res;
 		else throw new FormatException($"Bad Vector2 format {o}");
@@ -22,16 +24,20 @@ public static class TypeUtils
 	
 	public static Vector3 v3(this object o)
 	{
+		if(o is Variant v) return v.AsVector3();
+		
 		Vector3 res;
 		if(StringUtils.TryParseVector3(o.ToString(), out res)) return res;
 		else throw new FormatException($"Bad Vector3 format {o}");
 	}
 	
-	public static Quat q(this object o)
+	public static Vector4 v4(this object o)
 	{
-		Quat res;
-		if(StringUtils.TryParseQuat(o.ToString(), out res)) return res;
-		else throw new FormatException($"Bad Quat format {o}");
+		if(o is Variant v) return v.AsVector4();
+		
+		Vector4 res;
+		if(StringUtils.TryParseVector4(o.ToString(), out res)) return res;
+		else throw new FormatException($"Bad Quaternion format {o}");
 	}
 	
 	public static List<object> lo(this object o) => o.lt<object>(ob);//(o as IEnumerable<object>).ToList<object>();
@@ -41,10 +47,12 @@ public static class TypeUtils
 	public static List<bool> lb(this object o) => o.lt<bool>(b);
 	public static List<Vector2> lv2(this object o) => o.lt<Vector2>(v2);
 	public static List<Vector3> lv3(this object o) => o.lt<Vector3>(v3);
-	public static List<Quat> lq(this object o) => o.lt<Quat>(q);
+	public static List<Vector4> lv4(this object o) => o.lt<Vector4>(v4);
 		
 	public static List<T> lt<T>(this object o, Func<object, T> caster)
 	{
+		//if(o is Variant v) return v.AsArray<T>().ToList<T>();
+		
 		if(o is IEnumerable<T> et) return et.ToList();
 		else if(o is IEnumerable<object> eo) return eo.Select(caster).ToList<T>();
 		else if(o is T t) return new List<T>{t};
@@ -53,14 +61,14 @@ public static class TypeUtils
 	
 	public static object cast(this object o, Type t, string debug = "")
 	{
-		if(t == typeof(object)) return o;
+		if(t == typeof(object)) return o.ob();
 		else if(t == typeof(string)) return o.s();
 		else if(t == typeof(float)) return o.f();
 		else if(t == typeof(int)) return o.i();
 		else if(t == typeof(bool)) return o.b();
 		else if(t == typeof(Vector2)) return o.v2();
 		else if(t == typeof(Vector3)) return o.v3();
-		else if(t == typeof(Quat)) return o.q();
+		else if(t == typeof(Vector4)) return o.v4();
 		
 		else if(t == typeof(List<object>)) return o.lo();
 		else if(t == typeof(List<string>)) return o.ls();
@@ -69,7 +77,7 @@ public static class TypeUtils
 		else if(t == typeof(List<bool>)) return o.lb();
 		else if(t == typeof(List<Vector2>)) return o.lv2();
 		else if(t == typeof(List<Vector3>)) return o.lv3();
-		else if(t == typeof(List<Quat>)) return o.lq();
+		else if(t == typeof(List<Vector4>)) return o.lv4();
 		
 		var ToPrint = (debug!="")?$"\nDebug message: {debug}":"";
 		GD.PushError($"Type {t.Name} isn't available in the cast method" + ToPrint);
@@ -129,8 +137,8 @@ public static class TypeUtils
 				/*var h = new T();
 				return h.SafelySetScript<T>(script);*/
 				
-				var o = script.New();
-				if(o is object)
+				var o = script.New().Obj;
+				if(o is not null)
 				{
 					if(o is T t)
 					{

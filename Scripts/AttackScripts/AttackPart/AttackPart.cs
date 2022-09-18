@@ -3,15 +3,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-public class AttackPart : Node2D, IHitter
+public partial class AttackPart : Node2D, IHitter
 {
 	public int frameCount = 0;
 	
 	public List<Hitbox> Hitboxes{get; set;}
-	public HashSet<IHittable> HitIgnoreList{get; set;} = new HashSet<IHittable>();
-	public Dictionary<Hurtbox, Hitbox> HitList{get; set;} = new Dictionary<Hurtbox, Hitbox>();
+	public HashSet<IHittable> HitIgnoreList{get; set;} = new();
+	public Dictionary<Hurtbox, Hitbox> HitList{get; set;} = new();
 	
-	public Dictionary<string, ParamRequest> LoadExtraProperties = new Dictionary<string, ParamRequest>();
+	public Dictionary<string, ParamRequest> LoadExtraProperties = new();
 	
 	public int Direction {get => OwnerObject.Direction; set => OwnerObject.Direction = value;}
 	public int TeamNumber {get => OwnerObject.TeamNumber; set => OwnerObject.TeamNumber = value;}
@@ -46,7 +46,7 @@ public class AttackPart : Node2D, IHitter
 	public AnimationPlayer hitboxPlayer;
 	public Attack att;
 	
-	public AttackPartTransitionManager TransitionManager{get; set;} = new AttackPartTransitionManager();
+	public AttackPartTransitionManager TransitionManager{get; set;} = new();
 	
 	//needed for: animations, sound, velocity, projectiles, tags
 	protected Character ch;
@@ -61,7 +61,9 @@ public class AttackPart : Node2D, IHitter
 		frameCount = 0;
 		if(Startup == 0) OnStartupFinish();
 		
-		Hitboxes = GetChildren().FilterType<Hitbox>().ToList();
+		//TOFIX: this is unsafe
+		Hitboxes = GetChildren().FilterType<Hitbox, Node>().ToList();
+		
 		ConnectSignals();
 		BuildHitboxAnimator();
 		Init();
@@ -69,7 +71,7 @@ public class AttackPart : Node2D, IHitter
 	
 	public void ConnectSignals()
 	{
-		Hitboxes.ForEach(h => h.Connect("HitboxHit", this, nameof(HandleInitialHit)));
+		Hitboxes.ForEach(h => h.Connect("HitboxHit",new Callable(this,nameof(HandleInitialHit))));
 	}
 	
 	public void LoadExtraProperty<T>(string s, T @default = default(T))
@@ -79,17 +81,6 @@ public class AttackPart : Node2D, IHitter
 	}
 	
 	public virtual void LoadProperties() {}
-	/*
-	public void Connect(AttackPart ap)
-	{
-		dir.Add(ap.Name, ap);
-	}
-	
-	public void Connect(string name, AttackPart ap)
-	{
-		dir.Add(name, ap);
-	}
-	*/
 	
 	public virtual void Init() {}
 	
@@ -114,7 +105,7 @@ public class AttackPart : Node2D, IHitter
 		HitIgnoreList.Clear();
 	}
 	
-	public override void _PhysicsProcess(float delta)
+	public override void _PhysicsProcess(double delta)
 	{
 		if(!active) return;
 		if(frameCount == Startup) OnStartupFinish();
@@ -139,12 +130,11 @@ public class AttackPart : Node2D, IHitter
 	public void BuildHitboxAnimator()
 	{
 		hitboxPlayer = new AnimationPlayer();
-		hitboxPlayer.PlaybackProcessMode = AnimationPlayer.AnimationProcessMode.Physics;
+		hitboxPlayer.PlaybackProcessMode = AnimationPlayer.AnimationProcessCallback.Physics;
 		hitboxPlayer.Name = "AttackPlayer";
 		AddChild(hitboxPlayer);
 		var anm = new Animation();
 		anm.Length = (Startup+Length/*+endlag*/)/FPS;
-		hitboxPlayer.AddAnimation("HitboxActivation", anm);
 		foreach(var h in Hitboxes)
 		{
 			int trc = anm.AddTrack(Animation.TrackType.Value);
@@ -158,7 +148,12 @@ public class AttackPart : Node2D, IHitter
 			}
 		}
 		
+		var anmlib = new AnimationLibrary();
+		anmlib.AddAnimation("HitboxActivation", anm);
+		hitboxPlayer.AddAnimationLibrary("HitboxActivation", anmlib);
+		
 		#if DEBUG_HITBOX_PLAYER
+		GD.Print("-------------------------------------------");
 		GD.Print("Animation hitbox player debug ahead");
 		GD.Print(anm.GetTrackCount());
 		for(int i = 0; i < anm.GetTrackCount(); ++i)
@@ -173,7 +168,7 @@ public class AttackPart : Node2D, IHitter
 		GD.Print("-------------------------------------------");
 		#endif
 		
-		hitboxPlayer.Connect("animation_finished", this, "ChangeToNextOnEnd");
+		hitboxPlayer.Connect("animation_finished",new Callable(this,"ChangeToNextOnEnd"));
 	}
 	
 	public virtual void Stop()

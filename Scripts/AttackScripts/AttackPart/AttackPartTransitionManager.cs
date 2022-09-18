@@ -3,9 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-public class AttackPartTransitionManager
+public partial class AttackPartTransitionManager
 {
-	List<AttackPartTransition> Transitions{get; set;} = new List<AttackPartTransition>();
+	List<AttackPartTransition> Transitions{get; set;} = new();
 	public void Add(AttackPartTransition apt) => Transitions.Add(apt);
 	public void Clear() => Transitions.Clear();
 	

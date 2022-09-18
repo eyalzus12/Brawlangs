@@ -3,9 +3,9 @@
 [ext_resource path="res://MapBase.cs" type="Script" id=1]
 [ext_resource path="res://Scripts/Platforms/StaticPlatform2D.cs" type="Script" id=2]
 [ext_resource path="res://maps/SelfDestructingPlatform2D.cs" type="Script" id=3]
-[ext_resource path="res://MapArt/TestMap/AllSides.png" type="Texture" id=4]
-[ext_resource path="res://MapArt/TestMap/Connection.png" type="Texture" id=5]
-[ext_resource path="res://MapArt/TestMap/ThreeSides.png" type="Texture" id=6]
+[ext_resource path="res://MapArt/TestMap/AllSides.png" type="Texture2D" id=4]
+[ext_resource path="res://MapArt/TestMap/Connection.png" type="Texture2D" id=5]
+[ext_resource path="res://MapArt/TestMap/ThreeSides.png" type="Texture2D" id=6]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 128, 1028 )
@@ -28,7 +28,7 @@ script = ExtResource( 2 )
 [node name="LeftCollision" type="CollisionShape2D" parent="WallLeft"]
 shape = SubResource( 1 )
 
-[node name="Sprite" type="Sprite" parent="WallLeft"]
+[node name="Sprite2D" type="Sprite2D" parent="WallLeft"]
 position = Vector2( 0, -32 )
 scale = Vector2( 4, 33.125 )
 texture = ExtResource( 5 )
@@ -40,7 +40,7 @@ script = ExtResource( 2 )
 [node name="RightCollision" type="CollisionShape2D" parent="WallRight"]
 shape = SubResource( 1 )
 
-[node name="Sprite" type="Sprite" parent="WallRight"]
+[node name="Sprite2D" type="Sprite2D" parent="WallRight"]
 position = Vector2( 0, -32 )
 scale = Vector2( 4, 33.125 )
 texture = ExtResource( 5 )
@@ -54,7 +54,7 @@ rotation = 3.14159
 shape = SubResource( 2 )
 one_way_collision = true
 
-[node name="Sprite" type="Sprite" parent="Top"]
+[node name="Sprite2D" type="Sprite2D" parent="Top"]
 position = Vector2( 0.793762, 0.238091 )
 rotation = 3.14159
 scale = Vector2( 20, 2 )
@@ -67,7 +67,7 @@ script = ExtResource( 3 )
 [node name="StartCollision" type="CollisionShape2D" parent="Start"]
 shape = SubResource( 3 )
 
-[node name="Sprite" type="Sprite" parent="Start"]
+[node name="Sprite2D" type="Sprite2D" parent="Start"]
 position = Vector2( 7.62939e-06, 0 )
 scale = Vector2( 4, 1 )
 texture = ExtResource( 4 )

@@ -9,10 +9,12 @@ using ActionDict = System.Collections.Generic.Dictionary<string, (float, System.
 
 public class KeybindsParser
 {
-	public Dictionary<int, ActionDict> Data{get; set;} = new Dictionary<int, ActionDict>();
+	public Dictionary<int, ActionDict> Data{get; set;} = new();
 	
 	public Error Load(string path)
 	{
+		GD.Print($"Loading keybinds from {path}");
+		
 		File f = new File();//create new file
 		var er = f.Open(path, File.ModeFlags.Read);//open file
 		if(er != Error.Ok) return er;//if error, return
@@ -20,6 +22,9 @@ public class KeybindsParser
 		f.Close();//flush buffer
 		Data.Clear();
 		Parse(content);//parse
+		
+		GD.Print($"Finished loading keybinds from {path}");
+		
 		return Error.Ok;
 		//everything went well
 		//unless there was a parse error
@@ -88,25 +93,20 @@ public class KeybindsParser
 		input.Device = device;
 		
 		input.Set("button_index", data);
-		input.Set("scancode", data);
+		input.Set("keycode", data);
 		input.Set("axis", data);
 		
-		input.Set("factor", extra);
-		input.Set("pressure", extra);
 		input.Set("axis_value", extra);
 		
 		return input;
 	}
 	
-	private InputEvent InputEventForType(char type)
+	private InputEvent InputEventForType(char type) => type switch
 	{
-		switch(type)
-		{
-			case 'B': return new InputEventJoypadButton();
-			case 'J': return new InputEventJoypadMotion();
-			case 'K': return new InputEventKey();
-			case 'M': return new InputEventMouseButton();
-			default: throw new FormatException($"Keybinds config: invalid input type {type}");
-		}
-	}
+		'B' => new InputEventJoypadButton(),
+		'J' => new InputEventJoypadMotion(),
+		'K' => new InputEventKey(),
+		'M' => new InputEventMouseButton(),
+		_ => throw new FormatException($"Keybinds config: invalid input type {type}"),
+	};
 }

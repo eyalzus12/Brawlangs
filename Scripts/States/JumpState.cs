@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class JumpState : GroundedState
+public partial class JumpState : GroundedState
 {
 	public bool jumpActive = false;
 	public bool forceShortHop = false;

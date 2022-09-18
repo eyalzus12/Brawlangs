@@ -2,12 +2,12 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class Attack : Node2D
+public partial class Attack : Node2D
 {
 	public AttackPart StartPart{get; set;}
 	public AttackPart CurrentPart{get; set;}
 	public AttackPart LastUsedPart{get; set;}
-	public Dictionary<string, AttackPart> Parts{get; set;} = new Dictionary<string, AttackPart>();
+	public Dictionary<string, AttackPart> Parts{get; set;} = new();
 	
 	//states
 	protected Character ch;
@@ -26,14 +26,14 @@ public class Attack : Node2D
 	
 	public State connected = null;
 	
-	public List<string> SharesCooldownWith{get; set;} = new List<string>();
+	public List<string> SharesCooldownWith{get; set;} = new();
 	
-	public Dictionary<string, ParamRequest> LoadExtraProperties = new Dictionary<string, ParamRequest>();
+	public Dictionary<string, ParamRequest> LoadExtraProperties = new();
 	
 	[Signal]
-	public delegate void AttackStarts(Attack a);
+	public delegate void AttackStartsEventHandler(Attack a);
 	[Signal]
-	public delegate void AttackEnds(Attack a);
+	public delegate void AttackEndsEventHandler(Attack a);
 	
 	public float AttackFriction{get; set;}
 	
@@ -59,8 +59,8 @@ public class Attack : Node2D
 		frameCount = 0;
 		active = true;
 		EmitSignal(nameof(AttackStarts), this);
-		if(connected != null) Disconnect("AttackEnds", connected, "SetEnd");
-		Connect("AttackEnds", ch.States.Current, "SetEnd");
+		if(connected is not null) Disconnect("AttackEnds",new Callable(connected,"SetEnd"));
+		Connect("AttackEnds",new Callable(ch.States.Current,"SetEnd"));
 		connected = ch.States.Current;
 		CurrentPart = StartPart;
 		LastUsedPart = null;
@@ -70,7 +70,7 @@ public class Attack : Node2D
 	
 	public virtual void SetPart(string s)
 	{
-		if(Parts.ContainsKey(s) && Parts[s] != null)
+		if(Parts.ContainsKey(s) && Parts[s] is not null)
 		{
 			LastUsedPart = CurrentPart;
 			CurrentPart?.Stop();
@@ -90,7 +90,7 @@ public class Attack : Node2D
 		CurrentPart = null;
 	}
 	
-	public override void _PhysicsProcess(float delta)
+	public override void _PhysicsProcess(double delta)
 	{
 		Loop();
 		++frameCount;

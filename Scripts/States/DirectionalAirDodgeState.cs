@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class DirectionalAirDodgeState : GenericInvincibleState
+public partial class DirectionalAirDodgeState : GenericInvincibleState
 {
 	public DirectionalAirDodgeState() : base() {}
 	public DirectionalAirDodgeState(Character link) : base(link) {}

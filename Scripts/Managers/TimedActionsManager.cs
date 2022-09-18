@@ -6,12 +6,12 @@ using System.Linq;
 
 public class TimedActionsManager
 {
-	public Dictionary<string, List<TimedAction>> Actions{get; set;} = new Dictionary<string, List<TimedAction>>();
+	public Dictionary<string, List<TimedAction>> Actions{get; set;} = new();
 	
 	public void Add(string s, int time, Action action)
 	{
-		if(!Actions.ContainsKey(s)) Actions.Add(s, new List<TimedAction>());
-		Actions[s].Add(new TimedAction(s,time,action));
+		if(!Actions.ContainsKey(s)) Actions.Add(s, new());
+		Actions[s].Add(new(s,time,action));
 	}
 	
 	public void Remove(string s)
@@ -22,7 +22,7 @@ public class TimedActionsManager
 	public void Update()
 	{
 		Actions.Values.ForEach(l => l.ForEach(a => a.Update()));
-		var actionsCopy = new Dictionary<string, List<TimedAction>>(Actions);
+		Dictionary<string, List<TimedAction>> actionsCopy = new(Actions);
 		actionsCopy.ForEach(t => 
 		{
 			var after = t.Value.Where(h => h.FramesLeft > 0).ToList();

@@ -2,7 +2,7 @@
 
 [ext_resource path="res://MapBase.cs" type="Script" id=1]
 [ext_resource path="res://Scripts/Platforms/StaticPlatform2D.cs" type="Script" id=2]
-[ext_resource path="res://grass.jpg" type="Texture" id=3]
+[ext_resource path="res://grass.jpg" type="Texture2D" id=3]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 128, 4 )
@@ -22,7 +22,7 @@ PlatformFriction = 0.5
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Soft1"]
 shape = SubResource( 1 )
 
-[node name="Sprite" type="Sprite" parent="Soft1"]
+[node name="Sprite2D" type="Sprite2D" parent="Soft1"]
 position = Vector2( 0, 3.8147e-06 )
 scale = Vector2( 0.503937, 0.0237389 )
 texture = ExtResource( 3 )
@@ -35,7 +35,7 @@ PlatformFriction = 0.5
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Soft2"]
 shape = SubResource( 1 )
 
-[node name="Sprite" type="Sprite" parent="Soft2"]
+[node name="Sprite2D" type="Sprite2D" parent="Soft2"]
 position = Vector2( 0, 3.8147e-06 )
 scale = Vector2( 0.503937, 0.0237389 )
 texture = ExtResource( 3 )
@@ -48,7 +48,7 @@ PlatformFriction = 0.5
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Soft3"]
 shape = SubResource( 1 )
 
-[node name="Sprite" type="Sprite" parent="Soft3"]
+[node name="Sprite2D" type="Sprite2D" parent="Soft3"]
 position = Vector2( 0, 3.8147e-06 )
 scale = Vector2( 0.503937, 0.0237389 )
 texture = ExtResource( 3 )
@@ -61,7 +61,7 @@ PlatformFriction = 0.5
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Soft4"]
 shape = SubResource( 1 )
 
-[node name="Sprite" type="Sprite" parent="Soft4"]
+[node name="Sprite2D" type="Sprite2D" parent="Soft4"]
 position = Vector2( 0, 3.8147e-06 )
 scale = Vector2( 0.503937, 0.0237389 )
 texture = ExtResource( 3 )
@@ -75,7 +75,7 @@ PlatformFriction = 0.5
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Soft5"]
 shape = SubResource( 1 )
 
-[node name="Sprite" type="Sprite" parent="Soft5"]
+[node name="Sprite2D" type="Sprite2D" parent="Soft5"]
 position = Vector2( 0, 3.8147e-06 )
 scale = Vector2( 0.503937, 0.0237389 )
 texture = ExtResource( 3 )
@@ -88,7 +88,7 @@ PlatformFriction = 0.5
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Soft6"]
 shape = SubResource( 2 )
 
-[node name="Sprite" type="Sprite" parent="Soft6"]
+[node name="Sprite2D" type="Sprite2D" parent="Soft6"]
 position = Vector2( 0, 3.8147e-06 )
 scale = Vector2( 5.04, 0.024 )
 texture = ExtResource( 3 )

@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class SelectScreenLineEdit : LineEdit
+public partial class SelectScreenLineEdit : LineEdit
 {
 	public CheckBox check;
 	
@@ -12,7 +12,7 @@ public class SelectScreenLineEdit : LineEdit
 	
 	public override void _Ready()
 	{
-		number = int.Parse(GetParent().Name.Substring("Load".Length));
+		number = int.Parse(GetParent().Name.ToString().Substring("Load".Length));
 		//take parent name
 		//remove "Load"
 		//parse
@@ -22,7 +22,7 @@ public class SelectScreenLineEdit : LineEdit
 		if(data.TryGet($"{PREFIX}{number}", out o)) Text = o.s();
 		
 		//bruh wtf is this
-		GetParent().GetParent().GetParent().GetNode<Button>("ExitButton").Connect("pressed", this, nameof(OnExit));
+		GetParent().GetParent().GetParent().GetNode<Button>("ExitButton").Connect("pressed",new Callable(this,nameof(OnExit)));
 		
 	}
 	

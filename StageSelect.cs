@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class StageSelect : Control
+public partial class StageSelect : Control
 {
 	protected const string LOCAL_PATH = "res://maps/";
 	protected const string REMOTE_PATH = "user://maps/";
@@ -14,7 +14,7 @@ public class StageSelect : Control
 		cont = GetNode<GridContainer>(CONT_NAME);
 		var path_object = this.GetData("ini_path") as string;
 		
-		if(path_object != null)
+		if(path_object is not null)
 		{
 			var te = GetNode<TextEdit>("TextEdit");
 			te.Text = path_object ?? "";
@@ -32,7 +32,7 @@ public class StageSelect : Control
 		
 		if(dir.Open(path) == Error.Ok)
 		{
-			dir.ListDirBegin(true);
+			dir.ListDirBegin();
 			
 			for(string file = dir.GetNext(); file != ""; file = dir.GetNext())
 			if(!dir.CurrentIsDir() && StringUtils.GetExtension(file) == MAP_EXT)
@@ -49,7 +49,7 @@ public class StageSelect : Control
 		cont?.AddChild(sel);
 	}
 	
-	public override void _Process(float delta)
+	public override void _Process(double delta)
 	{
 		if(Input.IsActionJustPressed("exit_game")) GetTree().Quit();
 	}

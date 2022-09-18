@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class SpotGroundedDodgeState : GenericInvincibleState
+public partial class SpotGroundedDodgeState : GenericInvincibleState
 {
 	public SpotGroundedDodgeState() : base() {}
 	public SpotGroundedDodgeState(Character link) : base(link) {}

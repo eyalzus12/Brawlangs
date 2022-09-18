@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class LimitedAttack : Attack
+public partial class LimitedAttack : Attack
 {
 	public string ResourceName;
 	public int AmountCanUse;

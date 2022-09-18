@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class HitPauseState : State
+public partial class HitPauseState : State
 {
 	public int hitPauseLength = 0;
 	public int stunLength = 0;

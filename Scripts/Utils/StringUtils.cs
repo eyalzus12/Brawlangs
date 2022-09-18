@@ -61,7 +61,7 @@ public static class StringUtils
 	
 	public const string FLOAT_PATTERN = @"[+-]?[0-9]*\.?[0-9]*";
 	
-	public static readonly string V2_PATTERN = $@"^\s*\(\s*(?<x>{FLOAT_PATTERN})\s*,\s*(?<y>{FLOAT_PATTERN})\s*\)\s*$";
+	public const string V2_PATTERN = $@"^\s*\(\s*(?<x>{FLOAT_PATTERN})\s*,\s*(?<y>{FLOAT_PATTERN})\s*\)\s*$";
 	public static readonly Regex V2_REGEX = new Regex(V2_PATTERN, RegexOptions.Compiled);
 	public static bool TryParseVector2(string s, out Vector2 v)
 	{
@@ -81,7 +81,7 @@ public static class StringUtils
 		}
 	}
 	
-	public static readonly string V3_PATTERN = $@"^\s*\(\s*(?<x>{FLOAT_PATTERN})\s*,\s*(?<y>{FLOAT_PATTERN})\s*,\s*(?<z>{FLOAT_PATTERN})\s*\)\s*$";
+	public const string V3_PATTERN = $@"^\s*\(\s*(?<x>{FLOAT_PATTERN})\s*,\s*(?<y>{FLOAT_PATTERN})\s*,\s*(?<z>{FLOAT_PATTERN})\s*\)\s*$";
 	public static readonly Regex V3_REGEX = new Regex(V3_PATTERN, RegexOptions.Compiled);
 	public static bool TryParseVector3(string s, out Vector3 v)
 	{
@@ -102,11 +102,11 @@ public static class StringUtils
 		}
 	}
 	
-	public static readonly string Q_PATTERN = $@"^\s*\(\s*(?<x>{FLOAT_PATTERN})\s*,\s*(?<y>{FLOAT_PATTERN})\s*,\s*(?<z>{FLOAT_PATTERN})\s*,\s*(?<w>{FLOAT_PATTERN})\s*\)\s*$";
-	public static readonly Regex Q_REGEX = new Regex(Q_PATTERN, RegexOptions.Compiled);
-	public static bool TryParseQuat(string s, out Quat v)
+	public const string V4_PATTERN = $@"^\s*\(\s*(?<x>{FLOAT_PATTERN})\s*,\s*(?<y>{FLOAT_PATTERN})\s*,\s*(?<z>{FLOAT_PATTERN})\s*,\s*(?<w>{FLOAT_PATTERN})\s*\)\s*$";
+	public static readonly Regex V4_REGEX = new Regex(V4_PATTERN, RegexOptions.Compiled);
+	public static bool TryParseVector4(string s, out Vector4 v)
 	{
-		var match = Q_REGEX.Match(s);
+		var match = V4_REGEX.Match(s);
 		float x,y,z,w;
 		if(match.Success
 			&& float.TryParse(match.Groups["x"].Value, out x)
@@ -114,7 +114,7 @@ public static class StringUtils
 			&& float.TryParse(match.Groups["z"].Value, out z)
 			&& float.TryParse(match.Groups["w"].Value, out w))
 		{
-			v = new Quat(x,y,z,w);
+			v = new Vector4(x,y,z,w);
 			return true;
 		}
 		else

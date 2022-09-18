@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class RunJumpState : RunState
+public partial class RunJumpState : RunState
 {
 	public RunJumpState() : base() {}
 	public RunJumpState(Character link) : base(link) {}

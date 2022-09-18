@@ -1,7 +1,7 @@
 using System;
 using Godot;
 
-public class CrawlWallState: BaseCrouchState
+public partial class CrawlWallState: BaseCrouchState
 {
 	public CrawlWallState(): base() {}
 	public CrawlWallState(Character link): base(link) {}

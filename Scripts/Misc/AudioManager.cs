@@ -4,13 +4,13 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 
-public class AudioManager : Node
+public partial class AudioManager : Node
 {
-	public Dictionary<string, AudioStream> Sounds{get; set;} = new Dictionary<string, AudioStream>();
+	public Dictionary<string, AudioStream> Sounds{get; set;} = new();
 	public AudioStream this[string s] {get => Sounds[s]; set => Sounds[s] = value;}
 	public bool ContainsSound(string s) => Sounds.ContainsKey(s);
-	public List<AudioPlayer> Players{get; set;} = new List<AudioPlayer>();
-	public Queue<AudioPlayer> Available{get; set;} = new Queue<AudioPlayer>();
+	public List<AudioPlayer> Players{get; set;} = new();
+	public Queue<AudioPlayer> Available{get; set;} = new();
 	
 	public AudioManager() {}
 	
@@ -34,7 +34,7 @@ public class AudioManager : Node
 		if(stream is null || Available.Count <= 0) return;//TODO: add a waiting queue for sounds, that plays them at the fitting time
 		var use = Available.Dequeue();
 		use.Play(stream);
-		use.Connect("FinishedPlaying", this, nameof(StreamFinished));
+		use.Connect("FinishedPlaying",new Callable(this,nameof(StreamFinished)));
 	}
 	
 	public void Play(string sound)
@@ -48,7 +48,7 @@ public class AudioManager : Node
 	public void StreamFinished(AudioPlayer who, AudioStream what)
 	{
 		Available.Enqueue(who);
-		who.Disconnect("FinishedPlaying", this, nameof(StreamFinished));
+		who.Disconnect("FinishedPlaying",new Callable(this,nameof(StreamFinished)));
 	}
 	
 	public override string ToString()
@@ -73,7 +73,7 @@ public class AudioManager : Node
 	public void CleanAfter(AudioPlayer player)
 	{
 		player.Stop();
-		player.Disconnect("FinishedPlaying", this, nameof(StreamFinished));
+		player.Disconnect("FinishedPlaying",new Callable(this,nameof(StreamFinished)));
 		Available.Enqueue(player);
 	}
 	

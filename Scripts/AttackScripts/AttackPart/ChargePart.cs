@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class ChargePart : AttackPart
+public partial class ChargePart : AttackPart
 {
 	public string ChargeInput{get; set;}
 	public float FullChargeDamageMult{get; set;}

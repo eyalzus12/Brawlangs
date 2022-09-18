@@ -3,10 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-public class Hitbox : Area2D
+public partial class Hitbox : Area2D
 {
 	[Signal]
-	public delegate void HitboxHit(Hitbox hitbox, Hurtbox hurtbox);
+	public delegate void HitboxHitEventHandler(Hitbox hitbox, Hurtbox hurtbox);
 	
 	public Vector2 SetKnockback{get; set;}
 	public Vector2 VarKnockback{get; set;}
@@ -29,13 +29,13 @@ public class Hitbox : Area2D
 	public AngleFlipper HorizontalAngleFlipper{get; set;}
 	public AngleFlipper VerticalAngleFlipper{get; set;}
 	
-	public Dictionary<string, ParamRequest> LoadExtraProperties = new Dictionary<string, ParamRequest>();
+	public Dictionary<string, ParamRequest> LoadExtraProperties = new();
 	
 	public List<Vector2> ActiveFrames{get; set;}
 	public IHitter OwnerObject{get; set;}
 	
-	public HashSet<string> WhitelistedStates{get; set;} = new HashSet<string>();
-	public HashSet<string> BlacklistedStates{get; set;} = new HashSet<string>();
+	public HashSet<string> WhitelistedStates{get; set;} = new();
+	public HashSet<string> BlacklistedStates{get; set;} = new();
 	
 	private bool active = false;
 	
@@ -86,7 +86,7 @@ public class Hitbox : Area2D
 		
 		Active = false;
 		
-		Connect("area_entered", this, nameof(OnAreaEnter));
+		Connect("area_entered",new Callable(this,nameof(OnAreaEnter)));
 		
 		//TODO: figure how this shit works
 		CollisionLayer ^= 0b11111;//reset five rightmost bits
@@ -139,12 +139,12 @@ public class Hitbox : Area2D
 	
 	public virtual void OnHit(Hurtbox hurt) {}
 	
-	public override void _PhysicsProcess(float delta)
+	public override void _PhysicsProcess(double delta)
 	{
 		if(!Active) return;
 		Loop();
 		UpdateHitboxPosition();
-		Update();
+		QueueRedraw();
 		++frameCount;
 	}
 	
@@ -157,6 +157,7 @@ public class Hitbox : Area2D
 			CollisionPosition, //position
 			CollisionRotation, //rotation
 			GetDrawColor()); //color
+		//((CapsuleShape2D)HitboxShape.Shape).Draw(new RID(this), GetDrawColor());
 	}
 	
 	public virtual void Loop() {}
@@ -187,65 +188,34 @@ public class Hitbox : Area2D
 		KnockbackDirY(hitChar)
 	);
 	
-	public virtual float KnockbackDirX(IHittable hitChar)
+	public virtual float KnockbackDirX(IHittable hitChar) => HorizontalAngleFlipper switch
 	{
-		switch(HorizontalAngleFlipper)
-		{
-			case AngleFlipper.Away:
-			case AngleFlipper.AwayCharacter:
-				return Math.Sign((hitChar.Position-OwnerObject.OwnerObject.Position).x);
-			case AngleFlipper.AwayHitbox:
-				return Math.Sign((hitChar.Position-Position).x);
-			case AngleFlipper.None:
-				return 1;
-			case AngleFlipper.Direction:
-			default:
-				return OwnerObject.Direction;
-		}
-	}
+		AngleFlipper.Away or AngleFlipper.AwayCharacter => Math.Sign((hitChar.Position-OwnerObject.OwnerObject.Position).x),
+		AngleFlipper.AwayHitbox => Math.Sign((hitChar.Position-Position).x),
+		AngleFlipper.None => 1f,
+		_ => OwnerObject.Direction,
+	};
 	
-	public virtual float KnockbackDirY(IHittable hitChar)
+	public virtual float KnockbackDirY(IHittable hitChar) => VerticalAngleFlipper switch
 	{
-		switch(VerticalAngleFlipper)
-		{
-			case AngleFlipper.Away:
-			case AngleFlipper.AwayCharacter:
-				return Math.Sign((hitChar.Position-OwnerObject.OwnerObject.Position).y);
-			case AngleFlipper.AwayHitbox:
-				return Math.Sign((hitChar.Position-Position).y);
-			case AngleFlipper.None:
-			case AngleFlipper.Direction:
-			default:
-				return 1;
-		}
-	}
+		AngleFlipper.Away or AngleFlipper.AwayCharacter => Math.Sign((hitChar.Position-OwnerObject.OwnerObject.Position).y),
+		AngleFlipper.AwayHitbox => Math.Sign((hitChar.Position-Position).y),
+		_ => 1f,
+	};
 	
 	public virtual Color GetDrawColor()
 	{
 		if((SetStun == 0) && (VarStun == 0) && (SetHitpause == 0) && (VarHitpause == 0) && (Hitlag == 0)) return new Color(0.9f,0.9f,0.9f,1);
-		switch(HorizontalAngleFlipper)
+		else return HorizontalAngleFlipper switch
 		{
-			case AngleFlipper.AwayHitbox:
-			case AngleFlipper.AwayCharacter:
-			case AngleFlipper.Away:
-				return new Color(1, 0.3f, 0.1f, 1);
-			case AngleFlipper.None:
-				switch(VerticalAngleFlipper)
-				{
-					case AngleFlipper.AwayHitbox:
-					case AngleFlipper.AwayCharacter:
-					case AngleFlipper.Away:
-						return new Color(0.7f, 0.7f, 0.1f, 1);
-					case AngleFlipper.None:
-					case AngleFlipper.Direction:
-					default:
-						return new Color(0.5f, 0.5f, 0, 1);
-				}
-				
-			case AngleFlipper.Direction:
-			default:
-				return new Color(1, 0.1f, 0.1f, 1);
-		}
+			AngleFlipper.AwayHitbox or AngleFlipper.AwayCharacter or AngleFlipper.Away => new Color(1, 0.3f, 0.1f, 1),
+			AngleFlipper.None => VerticalAngleFlipper switch
+			{
+				AngleFlipper.AwayHitbox or AngleFlipper.AwayCharacter or AngleFlipper.Away => new Color(0.7f, 0.7f, 0.1f, 1),
+				_ => new Color(0.5f, 0.5f, 0, 1),
+			},
+			_ => new Color(1, 0.1f, 0.1f, 1),
+		};
 	}
 	
 	public enum AngleFlipper{Direction, Away, AwayHitbox, AwayCharacter, None}

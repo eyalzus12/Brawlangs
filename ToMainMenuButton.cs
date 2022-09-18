@@ -1,15 +1,15 @@
 using Godot;
 using System;
 
-public class ToMainMenuButton : OnPressButton
+public partial class ToMainMenuButton : OnPressButton
 {
-	public override void _Process(float delta)
+	public override void _Process(double delta)
 	{
 		if(Input.IsActionJustPressed("exit_game")) OnPress();
 	}
 	
 	public override void OnPress()
 	{
-		this.ChangeScene(ProjectSettings.GetSetting("application/run/main_scene").s());
+		this.ChangeSceneToFile(ProjectSettings.GetSetting("application/run/main_scene").AsString());
 	}
 }

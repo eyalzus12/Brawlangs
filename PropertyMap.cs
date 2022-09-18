@@ -5,12 +5,12 @@ using System.Text;
 using System.Linq;
 using Godict = Godot.Collections.Dictionary;
 
-public class PropertyMap
+public partial class PropertyMap
 {
 	public Dictionary<string, object> dict;
 	
 	public PropertyMap() => Reset();
-	public void Reset() => dict = new Dictionary<string, object>();
+	public void Reset() => dict = new();
 	
 	public int Count => dict.Count;
 	public Dictionary<string, object>.KeyCollection Keys => dict.Keys;
@@ -23,7 +23,7 @@ public class PropertyMap
 	public void LoadProperties(Godot.Object obj)
 	{
 		foreach(var entry in dict)
-			obj.Set(entry.Key, entry.Value);
+			obj.Set(entry.Key, Variant.CreateFrom((dynamic)entry.Value));
 	}
 	
 	public void StoreProperties(Godot.Object obj, List<string> propertyList)

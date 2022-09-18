@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class LandState : GroundedState
+public partial class LandState : GroundedState
 {
 	public LandState() : base() {}
 	public LandState(Character link) : base(link) {}

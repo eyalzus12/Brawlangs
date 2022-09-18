@@ -2,14 +2,14 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class AudioPlayer : AudioStreamPlayer2D
+public partial class AudioPlayer : AudioStreamPlayer2D
 {
 	[Signal]
-	public delegate void FinishedPlaying(AudioPlayer who, AudioStream what);
+	public delegate void FinishedPlayingEventHandler(AudioPlayer who, AudioStream what);
 	
 	public override void _Ready()
 	{
-		Connect("finished", this, nameof(OnFinish));
+		Connect("finished",new Callable(this,nameof(OnFinish)));
 	}
 	
 	public void Play(AudioStream stream)

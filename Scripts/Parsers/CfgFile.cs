@@ -44,7 +44,7 @@ public class CfgFile
 	public Error Load(string path)
 	{
 		var f = new File();//create new file
-		if(!f.FileExists(path))
+		if(!File.FileExists(path))
 		{
 			GD.PushError($"failed to load cfg file {path}, as it does not exist");
 			return Error.FileNotFound;
@@ -101,7 +101,7 @@ public class CfgFile
 								store.Add(element + ',' + trim1 + ',' + trim2 + ',' + trim3);//add
 								i += 3;
 							}
-						}//end of Quat else
+						}//end of Quaternion else
 					}//end of Vector3 else
 				}//end of Vector check
 				else store.Add(element);
@@ -134,7 +134,7 @@ public class CfgFile
 		float f;
 		Vector2 v2;
 		Vector3 v3;
-		Quat q;
+		Quaternion q;
 			
 		if(string.Equals(s, "true",  StringComparison.OrdinalIgnoreCase)) return true;//represents true
 		else if(string.Equals(s, "false",  StringComparison.OrdinalIgnoreCase)) return false;//represents false
@@ -142,7 +142,7 @@ public class CfgFile
 		else if(float.TryParse(s, out f)) return f;//represents a float
 		else if(s2v2(s, out v2)) return v2;//represents a Vector2
 		else if(s2v3(s, out v3)) return v3;//represents a Vector3
-		else if(s2q(s, out q)) return q;//represents a Quat
+		else if(s2q(s, out q)) return q;//represents a Quaternion
 		else return s.Trim('\"');//represents a string
 	}
 	
@@ -193,7 +193,7 @@ public class CfgFile
 		}
 	}
 	
-	private bool s2q(string s, out Quat q)
+	private bool s2q(string s, out Quaternion q)
 	{
 		if(s[0] != '(' || s[s.Length-1] != ')')
 		{
@@ -212,7 +212,7 @@ public class CfgFile
 			float y = float.Parse(ss[1].Trim());
 			float z = float.Parse(ss[2].Trim());
 			float w = float.Parse(ss[3].Trim());
-			q = new Quat(x, y, z, w);
+			q = new Quaternion(x, y, z, w);
 			return true;
 		}
 	}

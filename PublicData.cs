@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-public class PublicData : Node
+public partial class PublicData : Node
 {
 	public Dictionary<string, object> dict;
 	
@@ -16,7 +16,7 @@ public class PublicData : Node
 	
 	public override void _Ready()
 	{
-		PauseMode = Node.PauseModeEnum.Process;
+		ProcessMode = Node.ProcessModeEnum.Always;
 	}
 	
 	public object this[string index]
@@ -33,7 +33,7 @@ public class PublicData : Node
 		}
 	}
 	
-	public new object Get(string s) => this[s];
+	public object Get(string s) => this[s];
 	public T Get<T>(string s) => (T)Get(s);
 	
 	public void Add(string str, object obj)

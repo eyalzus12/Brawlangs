@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class EndlagState : State
+public partial class EndlagState : State
 {
 	public EndlagState() : base() {}
 	public EndlagState(Character link) : base(link) {}

@@ -5,7 +5,7 @@ using System.Text;
 
 public class InvincibilityManager
 {
-	public Dictionary<string, int> Timers{get; set;} = new Dictionary<string, int>();
+	public Dictionary<string, int> Timers{get; set;} = new();
 	
 	public int Count => Timers.Count;
 	public void Add(string source, int length) => Timers.Add(source, length);

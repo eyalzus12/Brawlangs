@@ -2,4 +2,6 @@
 *.translation
 export_presets.cfg
 .mono/
+.godot/
 todo.txt
+*.import

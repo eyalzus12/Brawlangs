@@ -5,7 +5,7 @@ using static System.IO.File;
 using Strl = 
 	System.Collections.Generic.List<string>;
 
-public class JiniFile : JiniSection
+public partial class JiniFile : JiniSection
 {
 	public JiniFile() : base() {}
 	public JiniFile(string name) : base(name) {}

@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class ArtemisPart : AttackPart
+public partial class ArtemisPart : AttackPart
 {
 	public float ForwardSpeed{get; set;}
 	public float BackSpeed{get; set;}

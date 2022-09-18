@@ -2,7 +2,7 @@ using Godot;
 using System;
 using Godot.Collections;
 
-public class WaypointMovingPlatform2D : MovingPlatform2D
+public partial class WaypointMovingPlatform2D : MovingPlatform2D
 {
 	[Export]
 	public Array<Vector3> WayPoints;

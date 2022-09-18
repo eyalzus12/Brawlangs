@@ -9,21 +9,21 @@ __meta__ = {
 }
 
 [node name="ResultsLabel" type="Label" parent="."]
-margin_left = 56.0
-margin_top = 48.0
-margin_right = 66.0
-margin_bottom = 62.0
-rect_min_size = Vector2( 10, 10 )
+offset_left = 56.0
+offset_top = 48.0
+offset_right = 66.0
+offset_bottom = 62.0
+minimum_size = Vector2( 10, 10 )
 script = ExtResource( 1 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="Button" type="Button" parent="."]
-margin_left = 440.0
-margin_top = 500.0
-margin_right = 598.0
-margin_bottom = 520.0
+offset_left = 440.0
+offset_top = 500.0
+offset_right = 598.0
+offset_bottom = 520.0
 grow_horizontal = 2
 grow_vertical = 2
 text = "Go Back To Main Menu"

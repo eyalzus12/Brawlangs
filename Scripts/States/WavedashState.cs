@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class WavedashState : GroundedState
+public partial class WavedashState : GroundedState
 {
 	public WavedashState() : base() {}
 	public WavedashState(Character link) : base(link) {}
@@ -9,7 +9,7 @@ public class WavedashState : GroundedState
 	public override void Init()
 	{
 		ch.vec.y = VCF;
-		ch.SetCollisionMaskBit(DROP_THRU_BIT, true);
+		ch.SetCollisionMaskValue(DROP_THRU_BIT, true);
 		ch.RestoreOptionsOnGroundTouch();
 		AdjustVelocity();
 		ch.PlayAnimation("WavedashStart", true);

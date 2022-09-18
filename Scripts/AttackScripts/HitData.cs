@@ -2,6 +2,9 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+public record HitData(Vector2 SKB, Vector2 VKB, float Damage, float SStun, float VStun, float SHitpause, float VHitpause, Hitbox Hitter, Hurtbox Hitee);
+
+/*
 public struct HitData
 {
 	public Vector2 SKB {get; set;}
@@ -53,4 +56,4 @@ public struct HitData
 		
 		ExtraData = new Dictionary<string, object>();
 	}
-}
+}*/

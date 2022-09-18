@@ -3,10 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-public class State : Node
+public partial class State : Node
 {
 	[Signal]
-	public delegate void StateEnd(State s);
+	public delegate void StateEndEventHandler(State s);
 	
 	public virtual bool Actionable => true;
 	public virtual string LightAttackType => "";
@@ -14,7 +14,7 @@ public class State : Node
 	public virtual string TauntType => "";
 	public virtual bool ShouldDrop => false;
 		
-	public const int DROP_THRU_BIT = 1;
+	public const int DROP_THRU_BIT = 2;
 	public const float HCF = 20f;//check force
 	public const float VCF = 20f;//check force
 	public const float FLOOR_ANGLE = (float)(Math.PI/2f - 0.1);
@@ -40,7 +40,7 @@ public class State : Node
 	
 	public override string ToString() => GetType().Name.Replace("State", "");
 	
-	public virtual void DoPhysics(float delta)
+	public virtual void DoPhysics(double delta)
 	{
 		if(this != ch.States.Current) return;
 		
@@ -69,12 +69,40 @@ public class State : Node
 			if(this != ch.States.Current) return;
 		}
 		
-		var norm = ch.grounded?ch.fnorm:Vector2.Zero;
-		var v = ch.Velocity.TiltToNormal(norm);
+		//var norm = ch.grounded?ch.fnorm:Vector2.Zero;
+		//var v = ch.DesiredVelocity.TiltToNormal(norm);
 		
-		var moveRes = ch.
+		ch.FloorBlockOnWall = true;
+		ch.FloorConstantSpeed = false;
+		ch.FloorMaxAngle = FLOOR_ANGLE;
+		ch.FloorSnapLength = 10f;//Modify
+		ch.FloorStopOnSlope = true;
+		ch.PlatformOnLeave = CharacterBody2D.PlatformOnLeaveEnum.AddUpwardVelocity;
+		ch.SlideOnCeiling = false;
+		
+		ch.Velocity = ch.DesiredVelocity;
+		
+		ch.MoveAndSlide();
+		
+		/*
+		Floor block on wall: try true, see how behaves
+		Floor constant speed: false?
+		Floor max angle: copy from current usage
+		Floor snap length: need to manually manage. and also to change all code to use that instead of a vector
+		Floor stop on slope: true? i remember this causing issues with moving platforms
+		Motion mode: keep default
+		Platform floor layers: useful!!!!!! keep default for now.
+		Platform wall layers: useful!!!!!! keep default for now.
+		Platform on leave: add upwards velocity?
+		Slide on ceiling: false?
+		Up direction: keep default
+		
+		Need to modify velocity myself
+		*/
+		
+		/*var moveRes = ch.
 			MoveAndSlideWithSnap(v, snapVector, Vector2.Up,
-			false, 4, FLOOR_ANGLE);
+			false, 4, FLOOR_ANGLE);*/
 		
 		ch.grounded = ch.IsOnFloor();
 		ch.walled = ch.IsOnWall();
@@ -225,7 +253,7 @@ public class State : Node
 	
 	protected virtual void SetPlatformDropping()
 	{
-		ch.SetCollisionMaskBit(DROP_THRU_BIT, !ShouldDrop);
+		ch.SetCollisionMaskValue(DROP_THRU_BIT, !ShouldDrop);
 	}
 	
 	protected void SetDownHoldingInput() => ch.downHeld = Inputs.IsActionPressed("Down");
@@ -247,15 +275,15 @@ public class State : Node
 		////////////////////////////////////////////////////////////////////////////////////////////////
 		foreach(var collision in GetSlideCollisions())
 		{
-			var body = collision.Collider;//get collided body
+			var body = collision.GetCollider();//get collided body
 			if(body is null || !Godot.Object.IsInstanceValid(body)) continue;//ensure the collided body actually exists
 			
 			////////////////////////////////////////////////////////////////////////////////////////////////
 			//get paramaters of the platform, like friction, speed, etc
 			////////////////////////////////////////////////////////////////////////////////////////////////
 			
-			var vel = collision.ColliderVelocity;//get collision velocity
-			var norm = collision.Normal;//get the collision normal (angle)
+			var vel = collision.GetColliderVelocity();//get collision velocity
+			var norm = collision.GetNormal();//get the collision normal (angle)
 			var fric = body.GetProp<float>("PlatformFriction", 1f);//get friction
 			var bounce = body.GetProp<float>("PlatformBounce", 0f);//get bounce
 			
@@ -326,7 +354,7 @@ public class State : Node
 	
 	private IEnumerable<KinematicCollision2D> GetSlideCollisions()
 	{
-		for(int i = 0; i < ch.GetSlideCount(); ++i) yield return ch.GetSlideCollision(i);
+		for(int i = 0; i < ch.GetSlideCollisionCount(); ++i) yield return ch.GetSlideCollision(i);
 	}
 	
 	public string VerySecretMethod() => base.ToString();

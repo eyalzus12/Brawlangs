@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class CollisionCreator
+public partial class CollisionCreator
 {
 	public const string BrawlangsServer_JoinOrBad = "https://discord.gg/ZaGfdm3bad";
 	

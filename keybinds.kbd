@@ -21,14 +21,14 @@ STaunt =
 NTaunt = 
 Dodge = 0_K76
 NDodge = 
-Run = 0_K16777237
+Run = 0_K4194325
 Strafe = 0_K59
 
 1:
-Left = 0_K16777231
-Right = 0_K16777233
-Down = 0_K16777234
-Up = 0_K16777232
+Left = 0_K4194319
+Right = 0_K4194321
+Down = 0_K4194322
+Up = 0_K4194320
 Jump = 0_K90
 Light = 0_K88
 ULight = 

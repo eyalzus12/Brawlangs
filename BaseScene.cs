@@ -1,9 +1,9 @@
 using Godot;
 using System;
 
-public class BaseScene : Node2D
+public partial class BaseScene : Node2D
 {
-	public override void _Process(float delta)
+	public override void _Process(double delta)
 	{
 		if(Input.IsActionJustPressed("exit_game")) GetTree().Quit();
 	}

@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class WalkState : GroundedState
+public partial class WalkState : GroundedState
 {
 	public WalkState(): base() {}
 	public WalkState(Character link): base(link) {}

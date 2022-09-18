@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class WallJumpState : WallState
+public partial class WallJumpState : WallState
 {
 	public WallJumpState() : base() {}
 	public WallJumpState(Character link) : base(link) {}

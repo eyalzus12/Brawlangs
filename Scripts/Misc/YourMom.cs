@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class YourMom : Hitbox
+public partial class YourMom : Hitbox
 {	
 	public override void OnHit(Hurtbox hurtbox)
 	{

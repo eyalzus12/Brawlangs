@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class RollState : GenericInvincibleState
+public partial class RollState : GenericInvincibleState
 {
 	public RollState() : base() {}
 	public RollState(Character link) : base(link) {}

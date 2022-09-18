@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class AirJumpState : AirState
+public partial class AirJumpState : AirState
 {
 	bool jumpActive = false;
 	

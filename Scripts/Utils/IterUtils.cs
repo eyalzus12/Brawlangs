@@ -6,17 +6,15 @@ using System.Text.RegularExpressions;
 
 public static class IterUtils
 {
-	public static IEnumerable<T> Enumerable<T>(this Godot.Collections.Array<T> a)
+	
+	public static IEnumerable<T> Enumerable<[MustBeVariant] T>(this Godot.Collections.Array<T> a)
 	{
 		foreach(var h in a) yield return h;
 	}
 	
-	public static IEnumerable<T> Enumerable<T>(this Godot.Collections.Array a)
-	{
-		foreach(var h in a) yield return (T)h;
-	}
+	public static Godot.Collections.Array<T> Typed<[MustBeVariant] T>(this Godot.Collections.Array a) => new Godot.Collections.Array<T>(a);
 	
-	public static IEnumerable<object> Enumerable(this Godot.Collections.Array a) => a.Enumerable<object>();
+	public static List<T> ToList<[MustBeVariant] T>(this Godot.Collections.Array<T> a) => a.Enumerable<T>().ToList<T>();
 	
 	public static IEnumerable<(int, T)> Indexed<T>(this IEnumerable<T> e)
 	{
@@ -39,6 +37,11 @@ public static class IterUtils
 	}
 	
 	public static IEnumerable<T> FilterType<T>(this Godot.Collections.Array a)
+	{
+		foreach(var o in a) if(o is T t) yield return t;
+	}
+	
+	public static IEnumerable<T> FilterType<T, [MustBeVariant] TOG>(this Godot.Collections.Array<TOG> a) where T : TOG
 	{
 		foreach(var o in a) if(o is T t) yield return t;
 	}

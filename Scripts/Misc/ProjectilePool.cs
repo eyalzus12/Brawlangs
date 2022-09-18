@@ -2,13 +2,13 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class ProjectilePool : Node
+public partial class ProjectilePool : Node
 {
 	public const int LOAD_AMOUNT = 3;
-	public Dictionary<string, Queue<Projectile>> ProjectileDict{get; set;} = new Dictionary<string, Queue<Projectile>>();
-	public Queue<(string, Projectile)> ReturnQueue{get; set;} = new Queue<(string, Projectile)>();
-	public HashSet<Projectile> ReturnQueueSet{get; set;} = new HashSet<Projectile>();
-	public ProjectileCreator ProjCreate{get; set;} = new ProjectileCreator();
+	public Dictionary<string, Queue<Projectile>> ProjectileDict{get; set;} = new();
+	public Queue<(string, Projectile)> ReturnQueue{get; set;} = new();
+	public HashSet<Projectile> ReturnQueueSet{get; set;} = new();
+	public ProjectileCreator ProjCreate{get; set;} = new();
 	public IAttacker OwnerObject{get; set;}
 	
 	public ProjectilePool()
@@ -21,7 +21,7 @@ public class ProjectilePool : Node
 		OwnerObject = owner;
 	}
 	
-	public override void _PhysicsProcess(float delta)
+	public override void _PhysicsProcess(double delta)
 	{
 		CleanReturnQueue();
 	}
@@ -40,7 +40,7 @@ public class ProjectilePool : Node
 	public Queue<Projectile> CreateNewProjectile(string identifier)
 	{
 		if(!ProjectileDict.ContainsKey(identifier))//no queue exists
-			ProjectileDict.Add(identifier, new Queue<Projectile>());//make a queue
+			ProjectileDict.Add(identifier, new());//make a queue
 		
 		for(int i = 0; i < LOAD_AMOUNT; ++i)
 		{
@@ -100,7 +100,7 @@ public class ProjectilePool : Node
 			}
 			
 			if(!ProjectileDict.ContainsKey(identifier))
-				ProjectileDict.Add(identifier, new Queue<Projectile>());//make a queue
+				ProjectileDict.Add(identifier, new());//make a queue
 			ProjectileDict[identifier].Enqueue(obj);
 			
 			ReturnQueueSet.Remove(obj);

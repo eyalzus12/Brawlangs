@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-public class MapBase : Node2D
+public partial class MapBase : Node2D
 {
 	[Export]
 	public Vector2 BlastZones = new Vector2(2300, 1200);
@@ -22,7 +22,9 @@ public class MapBase : Node2D
 	
 	public override void _Ready()
 	{
+		GD.Print("Starting map load");
 		LoadCharacters();
+		GD.Print("Finished loading characters");
 		var camera = new MatchCamera();
 		camera.limits = CameraLimits;
 		AddChild(camera);
@@ -30,6 +32,8 @@ public class MapBase : Node2D
 		
 		var bz = new BlastZone(Vector2.Zero, BlastZones);
 		AddChild(bz);
+		
+		GD.Print("Finished base map load");
 	}
 	
 	public void LoadCharacters()
@@ -51,7 +55,7 @@ public class MapBase : Node2D
 		SetDamageLabelLocations(chars.ToArray());
 		var dh = new DeathHandeler(chars);
 		AddChild(dh);
-		dh.Connect("MatchEnds", this, nameof(MatchEnd));
+		dh.Connect("MatchEnds",new Callable(this,nameof(MatchEnd)));
 	}
 	
 	public Character PathToCharacter(string path, int i)
@@ -85,7 +89,7 @@ public class MapBase : Node2D
 			lb.ch = ch;
 			cl.AddChild(lb);
 			var dl = new DamageLabel(ch);
-			dl.RectPosition = v;
+			dl.Position = v;
 			cl.AddChild(dl);
 		}
 	}
@@ -94,8 +98,8 @@ public class MapBase : Node2D
 	public const float CENTER_OFFSET = 100f;
 	public Vector2[] GetDamageLabelLocations(int[] counts)
 	{
-		var width = ProjectSettings.GetSetting("display/window/size/width").f();
-		var height = ProjectSettings.GetSetting("display/window/size/height").f();
+		var width = ProjectSettings.GetSetting("display/window/size/viewport_width").f();
+		var height = ProjectSettings.GetSetting("display/window/size/viewport_height").f();
 		var windowsize = new Vector2(width, height);
 		var topleft = Vector2.Zero;
 		var bottomright = windowsize;
@@ -105,7 +109,7 @@ public class MapBase : Node2D
 		return counts.GetLabelLocations(leftedge,rightedge,MARGIN).ToArray();
 	}
 	
-	public override void _Process(float delta)
+	public override void _Process(double delta)
 	{
 		if(Input.IsActionJustPressed("next_label_character"))
 		{
@@ -129,15 +133,16 @@ public class MapBase : Node2D
 			ExitToMainMenu();
 	}
 	
-	public override void _Notification(int what)
+	public override void _Notification(long what)
 	{
-		if(what == MainLoop.NotificationWmQuitRequest)
+		//Node.NOTIFICATION_WM_CLOSE_REQUEST
+		/*if(what == 1006)
 		{
 			GetTree().Quit();
-		}
+		}*/
 	}
 	
-	public override void _PhysicsProcess(float delta) => Update();
+	public override void _PhysicsProcess(double delta) => QueueRedraw();
 	
 	public override void _Draw()
 	{
@@ -147,11 +152,11 @@ public class MapBase : Node2D
 	
 	public void MatchEnd()
 	{
-		this.ChangeScene("res://ResultsScreen.tscn");
+		this.ChangeSceneToFile("res://ResultsScreen.tscn");
 	}
 	
 	public void ExitToMainMenu()
 	{
-		this.ChangeScene(ProjectSettings.GetSetting("application/run/main_scene").s());
+		this.ChangeSceneToFile(ProjectSettings.GetSetting("application/run/main_scene").s());
 	}
 }

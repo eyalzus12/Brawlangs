@@ -1,57 +1,48 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=3 format=3 uid="uid://bd8utufe2i3ok"]
 
-[ext_resource path="res://StageSelect.cs" type="Script" id=1]
-[ext_resource path="res://ToLoadingScreenButton.cs" type="Script" id=2]
+[ext_resource type="Script" path="res://StageSelect.cs" id="1"]
+[ext_resource type="Script" path="res://ToLoadingScreenButton.cs" id="2"]
 
 [node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-script = ExtResource( 1 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
 
 [node name="GridContainer" type="GridContainer" parent="."]
-margin_left = 94.0
-margin_top = 72.0
-margin_right = 924.0
-margin_bottom = 480.0
-rect_pivot_offset = Vector2( 415, 204 )
+layout_mode = 0
+offset_left = 94.0
+offset_top = 72.0
+offset_right = 924.0
+offset_bottom = 480.0
+pivot_offset = Vector2(415, 204)
 size_flags_horizontal = 3
 size_flags_vertical = 3
-custom_constants/vseparation = 50
-custom_constants/hseparation = 50
 columns = 5
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [node name="TextEdit" type="TextEdit" parent="."]
-margin_left = 216.0
-margin_top = 520.0
-margin_right = 656.0
-margin_bottom = 560.0
-__meta__ = {
-"_edit_use_anchors_": false
-}
+layout_mode = 0
+offset_left = 216.0
+offset_top = 520.0
+offset_right = 656.0
+offset_bottom = 560.0
 
 [node name="Label" type="Label" parent="."]
-margin_left = 296.0
-margin_top = 496.0
-margin_right = 565.0
-margin_bottom = 510.0
+layout_mode = 0
+offset_left = 296.0
+offset_top = 496.0
+offset_right = 565.0
+offset_bottom = 510.0
 text = "Dont touch unless I told you how to use it"
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [node name="Button" type="Button" parent="."]
-margin_left = 760.0
-margin_top = 512.0
-margin_right = 968.0
-margin_bottom = 560.0
+layout_mode = 0
+offset_left = 760.0
+offset_top = 512.0
+offset_right = 968.0
+offset_bottom = 560.0
 text = "Select characters to load"
-script = ExtResource( 2 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
+script = ExtResource("2")

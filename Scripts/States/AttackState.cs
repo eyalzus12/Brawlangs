@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class AttackState : State
+public partial class AttackState : State
 {
 	public bool touchedWall = false;
 	public bool touchedGround = false;
@@ -88,7 +88,7 @@ public class AttackState : State
 	public void SetEnd(Attack a)
 	{
 		//remove signal
-		a.Disconnect("AttackEnds", this, nameof(SetEnd));
+		a.Disconnect("AttackEnds",new Callable(this,nameof(SetEnd)));
 		a.connected = null;
 		
 		//disable attack
@@ -156,7 +156,7 @@ public class AttackState : State
 		if(newState is StunState || newState is HitPauseState)
 		{
 			//GD.Print($"{ch} is changing to Stun or Hit Pause State so need to cleanup");
-			att.Disconnect("AttackEnds", this, nameof(SetEnd));
+			att.Disconnect("AttackEnds",new Callable(this,nameof(SetEnd)));
 			att.connected = null;
 			att.active = false;
 			att.OnEnd();

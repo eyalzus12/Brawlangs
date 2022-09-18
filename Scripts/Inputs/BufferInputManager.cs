@@ -6,11 +6,11 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 
-public class BufferInputManager : InputManager
+public partial class BufferInputManager : InputManager
 {
 	protected const string CONFIG_PATH = "res://buffer.cfg";
 		
-	public Dictionary<string, BufferInfo> buffer = new Dictionary<string, BufferInfo>();
+	public Dictionary<string, BufferInfo> buffer = new();
 		
 	CfgFile config = new CfgFile();
 	
@@ -41,7 +41,7 @@ public class BufferInputManager : InputManager
 		foreach(var key in config.Keys)
 		{
 			int res = config[key, 1].i();
-			buffer.Add($"{playerDeviceNumber}_{key}", new BufferInfo(res));
+			buffer.Add($"{playerDeviceNumber}_{key}", new(res));
 		}
 	}
 		
@@ -99,7 +99,7 @@ public class BufferInputManager : InputManager
 	public override bool IsActionReallyPressed(string str) => base.IsActionPressed($"{playerDeviceNumber}_{str}");
 	public override bool IsActionReallyJustReleased(string str) => base.IsActionJustReleased($"{playerDeviceNumber}_{str}");
 	
-	public override void _PhysicsProcess(float delta)
+	public override void _PhysicsProcess(double delta)
 	{
 		//if(GetTree().Paused) return;
 		foreach(var buff in buffer.Values)

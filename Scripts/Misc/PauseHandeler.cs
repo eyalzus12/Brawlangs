@@ -1,16 +1,16 @@
 using Godot;
 using System;
 
-public class PauseHandeler : Node
+public partial class PauseHandeler : Node
 {
 	public bool queueNextFrame = false;
 	
 	public override void _Ready()
 	{
-		PauseMode = Node.PauseModeEnum.Process;
+		ProcessMode = Node.ProcessModeEnum.Always;
 	}
 	
-	public override void _Process(float delta)
+	public override void _Process(double delta)
 	{
 		if(queueNextFrame)
 		{

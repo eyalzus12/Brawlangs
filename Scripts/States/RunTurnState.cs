@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class RunTurnState : GroundedState
+public partial class RunTurnState : GroundedState
 {
 	public const int TURNING_MULT = 5;
 	

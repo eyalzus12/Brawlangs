@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class DummyInputManager : InputManager
+public partial class DummyInputManager : InputManager
 {
 	public DummyInputManager(): base() {}
 	

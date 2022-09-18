@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class IdleState : GroundedSlowdownState
+public partial class IdleState : GroundedSlowdownState
 {
 	public IdleState(): base() {}
 	public IdleState(Character link): base(link) {}

@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class AirState : State
+public partial class AirState : State
 {
 	public override string LightAttackType => "Air";
 	public override string SpecialAttackType => "ASpecial";
@@ -120,6 +120,6 @@ public class AirState : State
 		if(ch.crouching) ch.Uncrouch();
 		if(!ch.Resources.Has("Clings")) ch.walled = false;
 		
-		//ch.SetCollisionMaskBit(DROP_THRU_BIT, !ch.downHeld);
+		//ch.SetCollisionMaskValue(DROP_THRU_BIT, !ch.downHeld);
 	}
 }

@@ -2,9 +2,9 @@
 
 [ext_resource path="res://MapBase.cs" type="Script" id=1]
 [ext_resource path="res://Scripts/Platforms/StaticPlatform2D.cs" type="Script" id=2]
-[ext_resource path="res://MapArt/TestMap/AllSidesSlope.png" type="Texture" id=3]
-[ext_resource path="res://MapArt/TestMap/ThreeSides.png" type="Texture" id=4]
-[ext_resource path="res://MapArt/TestMap/icon.png" type="Texture" id=5]
+[ext_resource path="res://MapArt/TestMap/AllSidesSlope.png" type="Texture2D" id=3]
+[ext_resource path="res://MapArt/TestMap/ThreeSides.png" type="Texture2D" id=4]
+[ext_resource path="res://MapArt/TestMap/icon.png" type="Texture2D" id=5]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 1024, 32 )
@@ -18,26 +18,26 @@ position = Vector2( -512, -300 )
 script = ExtResource( 2 )
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="StaticBody2D"]
-polygon = PoolVector2Array( -256, 0, -256, 304, 1176, 304, 1176, 0, 888, 0, 256, 304, -112, 0 )
+polygon = PackedVector2Array( -256, 0, -256, 304, 1176, 304, 1176, 0, 888, 0, 256, 304, -112, 0 )
 
-[node name="Sprite" type="Sprite" parent="StaticBody2D/CollisionPolygon2D"]
+[node name="Sprite2D" type="Sprite2D" parent="StaticBody2D/CollisionPolygon2D"]
 position = Vector2( 568, 152 )
 scale = Vector2( 9.7385, 4.70457 )
 texture = ExtResource( 3 )
 
-[node name="Sprite3" type="Sprite" parent="StaticBody2D/CollisionPolygon2D"]
+[node name="Sprite3" type="Sprite2D" parent="StaticBody2D/CollisionPolygon2D"]
 position = Vector2( 1028.59, 152 )
 rotation = -1.5708
 scale = Vector2( 4.7, 4.74342 )
 texture = ExtResource( 4 )
 
-[node name="Sprite4" type="Sprite" parent="StaticBody2D/CollisionPolygon2D"]
+[node name="Sprite4" type="Sprite2D" parent="StaticBody2D/CollisionPolygon2D"]
 position = Vector2( -184, 152 )
 rotation = 1.5708
 scale = Vector2( 4.73781, 2.24842 )
 texture = ExtResource( 4 )
 
-[node name="Sprite2" type="Sprite" parent="StaticBody2D/CollisionPolygon2D"]
+[node name="Sprite2" type="Sprite2D" parent="StaticBody2D/CollisionPolygon2D"]
 position = Vector2( 72.7499, 153 )
 scale = Vector2( 5.72657, 4.71875 )
 texture = ExtResource( 3 )
@@ -47,6 +47,6 @@ flip_h = true
 position = Vector2( 256, 544 )
 shape = SubResource( 1 )
 
-[node name="Sprite" type="Sprite" parent="StaticBody2D/CollisionShape2D"]
+[node name="Sprite2D" type="Sprite2D" parent="StaticBody2D/CollisionShape2D"]
 scale = Vector2( 32, 1 )
 texture = ExtResource( 5 )

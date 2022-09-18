@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class CrouchState : BaseCrouchState
+public partial class CrouchState : BaseCrouchState
 {
 	public CrouchState(): base() {}
 	public CrouchState(Character link): base(link) {}

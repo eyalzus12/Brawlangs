@@ -11,15 +11,15 @@ __meta__ = {
 }
 
 [node name="VSplitContainer" type="VBoxContainer" parent="."]
-margin_right = 1024.0
-margin_bottom = 600.0
+offset_right = 1024.0
+offset_bottom = 600.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="Load1" type="HSplitContainer" parent="VSplitContainer"]
-margin_right = 1024.0
-margin_bottom = 24.0
+offset_right = 1024.0
+offset_bottom = 24.0
 split_offset = 850
 dragger_visibility = 1
 __meta__ = {
@@ -27,31 +27,31 @@ __meta__ = {
 }
 
 [node name="LineEdit" type="LineEdit" parent="VSplitContainer/Load1"]
-margin_right = 1024.0
-margin_bottom = 24.0
+offset_right = 1024.0
+offset_bottom = 24.0
 text = "res://Characters/Josh"
 script = ExtResource( 1 )
 
 [node name="Label" type="Label" parent="VSplitContainer/Load1"]
 visible = false
-margin_left = 920.0
-margin_top = 5.0
-margin_right = 1024.0
-margin_bottom = 19.0
+offset_left = 920.0
+offset_top = 5.0
+offset_right = 1024.0
+offset_bottom = 19.0
 text = "dummy"
 
 [node name="CheckBox" type="CheckBox" parent="VSplitContainer/Load1/Label"]
-margin_left = 72.0
-margin_right = 176.0
-margin_bottom = 24.0
+offset_left = 72.0
+offset_right = 176.0
+offset_bottom = 24.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="Load2" type="HSplitContainer" parent="VSplitContainer"]
-margin_top = 28.0
-margin_right = 1024.0
-margin_bottom = 52.0
+offset_top = 28.0
+offset_right = 1024.0
+offset_bottom = 52.0
 split_offset = 850
 dragger_visibility = 1
 __meta__ = {
@@ -59,31 +59,31 @@ __meta__ = {
 }
 
 [node name="LineEdit" type="LineEdit" parent="VSplitContainer/Load2"]
-margin_right = 1024.0
-margin_bottom = 24.0
+offset_right = 1024.0
+offset_bottom = 24.0
 text = "res://Characters/Josh"
 script = ExtResource( 1 )
 
 [node name="Label" type="Label" parent="VSplitContainer/Load2"]
 visible = false
-margin_left = 920.0
-margin_top = 5.0
-margin_right = 1024.0
-margin_bottom = 19.0
+offset_left = 920.0
+offset_top = 5.0
+offset_right = 1024.0
+offset_bottom = 19.0
 text = "dummy"
 
 [node name="CheckBox" type="CheckBox" parent="VSplitContainer/Load2/Label"]
-margin_left = 72.0
-margin_right = 96.0
+offset_left = 72.0
+offset_right = 96.0
 pressed = true
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="Load3" type="HSplitContainer" parent="VSplitContainer"]
-margin_top = 56.0
-margin_right = 1024.0
-margin_bottom = 80.0
+offset_top = 56.0
+offset_right = 1024.0
+offset_bottom = 80.0
 split_offset = 850
 dragger_visibility = 1
 __meta__ = {
@@ -91,29 +91,29 @@ __meta__ = {
 }
 
 [node name="LineEdit" type="LineEdit" parent="VSplitContainer/Load3"]
-margin_right = 1024.0
-margin_bottom = 24.0
+offset_right = 1024.0
+offset_bottom = 24.0
 script = ExtResource( 1 )
 
 [node name="Label" type="Label" parent="VSplitContainer/Load3"]
 visible = false
-margin_left = 920.0
-margin_top = 5.0
-margin_right = 1024.0
-margin_bottom = 19.0
+offset_left = 920.0
+offset_top = 5.0
+offset_right = 1024.0
+offset_bottom = 19.0
 text = "dummy"
 
 [node name="CheckBox" type="CheckBox" parent="VSplitContainer/Load3/Label"]
-margin_left = 72.0
-margin_right = 96.0
+offset_left = 72.0
+offset_right = 96.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="Load4" type="HSplitContainer" parent="VSplitContainer"]
-margin_top = 84.0
-margin_right = 1024.0
-margin_bottom = 108.0
+offset_top = 84.0
+offset_right = 1024.0
+offset_bottom = 108.0
 split_offset = 850
 dragger_visibility = 1
 __meta__ = {
@@ -121,29 +121,29 @@ __meta__ = {
 }
 
 [node name="LineEdit" type="LineEdit" parent="VSplitContainer/Load4"]
-margin_right = 1024.0
-margin_bottom = 24.0
+offset_right = 1024.0
+offset_bottom = 24.0
 script = ExtResource( 1 )
 
 [node name="Label" type="Label" parent="VSplitContainer/Load4"]
 visible = false
-margin_left = 920.0
-margin_top = 5.0
-margin_right = 1024.0
-margin_bottom = 19.0
+offset_left = 920.0
+offset_top = 5.0
+offset_right = 1024.0
+offset_bottom = 19.0
 text = "dummy"
 
 [node name="CheckBox" type="CheckBox" parent="VSplitContainer/Load4/Label"]
-margin_left = 72.0
-margin_right = 96.0
+offset_left = 72.0
+offset_right = 96.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="Load5" type="HSplitContainer" parent="VSplitContainer"]
-margin_top = 112.0
-margin_right = 1024.0
-margin_bottom = 136.0
+offset_top = 112.0
+offset_right = 1024.0
+offset_bottom = 136.0
 split_offset = 850
 dragger_visibility = 1
 __meta__ = {
@@ -151,29 +151,29 @@ __meta__ = {
 }
 
 [node name="LineEdit" type="LineEdit" parent="VSplitContainer/Load5"]
-margin_right = 1024.0
-margin_bottom = 24.0
+offset_right = 1024.0
+offset_bottom = 24.0
 script = ExtResource( 1 )
 
 [node name="Label" type="Label" parent="VSplitContainer/Load5"]
 visible = false
-margin_left = 920.0
-margin_top = 5.0
-margin_right = 1024.0
-margin_bottom = 19.0
+offset_left = 920.0
+offset_top = 5.0
+offset_right = 1024.0
+offset_bottom = 19.0
 text = "dummy"
 
 [node name="CheckBox" type="CheckBox" parent="VSplitContainer/Load5/Label"]
-margin_left = 72.0
-margin_right = 96.0
+offset_left = 72.0
+offset_right = 96.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="Load6" type="HSplitContainer" parent="VSplitContainer"]
-margin_top = 140.0
-margin_right = 1024.0
-margin_bottom = 164.0
+offset_top = 140.0
+offset_right = 1024.0
+offset_bottom = 164.0
 split_offset = 850
 dragger_visibility = 1
 __meta__ = {
@@ -181,29 +181,29 @@ __meta__ = {
 }
 
 [node name="LineEdit" type="LineEdit" parent="VSplitContainer/Load6"]
-margin_right = 1024.0
-margin_bottom = 24.0
+offset_right = 1024.0
+offset_bottom = 24.0
 script = ExtResource( 1 )
 
 [node name="Label" type="Label" parent="VSplitContainer/Load6"]
 visible = false
-margin_left = 920.0
-margin_top = 5.0
-margin_right = 1024.0
-margin_bottom = 19.0
+offset_left = 920.0
+offset_top = 5.0
+offset_right = 1024.0
+offset_bottom = 19.0
 text = "dummy"
 
 [node name="CheckBox" type="CheckBox" parent="VSplitContainer/Load6/Label"]
-margin_left = 72.0
-margin_right = 96.0
+offset_left = 72.0
+offset_right = 96.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="Load7" type="HSplitContainer" parent="VSplitContainer"]
-margin_top = 168.0
-margin_right = 1024.0
-margin_bottom = 192.0
+offset_top = 168.0
+offset_right = 1024.0
+offset_bottom = 192.0
 split_offset = 850
 dragger_visibility = 1
 __meta__ = {
@@ -211,29 +211,29 @@ __meta__ = {
 }
 
 [node name="LineEdit" type="LineEdit" parent="VSplitContainer/Load7"]
-margin_right = 1024.0
-margin_bottom = 24.0
+offset_right = 1024.0
+offset_bottom = 24.0
 script = ExtResource( 1 )
 
 [node name="Label" type="Label" parent="VSplitContainer/Load7"]
 visible = false
-margin_left = 920.0
-margin_top = 5.0
-margin_right = 1024.0
-margin_bottom = 19.0
+offset_left = 920.0
+offset_top = 5.0
+offset_right = 1024.0
+offset_bottom = 19.0
 text = "dummy"
 
 [node name="CheckBox" type="CheckBox" parent="VSplitContainer/Load7/Label"]
-margin_left = 72.0
-margin_right = 96.0
+offset_left = 72.0
+offset_right = 96.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="Load8" type="HSplitContainer" parent="VSplitContainer"]
-margin_top = 196.0
-margin_right = 1024.0
-margin_bottom = 220.0
+offset_top = 196.0
+offset_right = 1024.0
+offset_bottom = 220.0
 split_offset = 850
 dragger_visibility = 1
 __meta__ = {
@@ -241,30 +241,30 @@ __meta__ = {
 }
 
 [node name="LineEdit" type="LineEdit" parent="VSplitContainer/Load8"]
-margin_right = 1024.0
-margin_bottom = 24.0
+offset_right = 1024.0
+offset_bottom = 24.0
 script = ExtResource( 1 )
 
 [node name="Label" type="Label" parent="VSplitContainer/Load8"]
 visible = false
-margin_left = 920.0
-margin_top = 5.0
-margin_right = 1024.0
-margin_bottom = 19.0
+offset_left = 920.0
+offset_top = 5.0
+offset_right = 1024.0
+offset_bottom = 19.0
 text = "dummy"
 
 [node name="CheckBox" type="CheckBox" parent="VSplitContainer/Load8/Label"]
-margin_left = 72.0
-margin_right = 96.0
+offset_left = 72.0
+offset_right = 96.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="ExitButton" type="Button" parent="."]
-margin_left = 448.0
-margin_top = 290.0
-margin_right = 608.0
-margin_bottom = 322.0
+offset_left = 448.0
+offset_top = 290.0
+offset_right = 608.0
+offset_bottom = 322.0
 text = "exit"
 script = ExtResource( 2 )
 __meta__ = {

@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class Effect : Node2D
+public partial class Effect : Node2D
 {
 	public Character ch;
 	public int length;
@@ -24,7 +24,7 @@ public class Effect : Node2D
 		Init();
 	}
 	
-	public override void _PhysicsProcess(float delta)
+	public override void _PhysicsProcess(double delta)
 	{
 		if(frameCount >= length)
 		{

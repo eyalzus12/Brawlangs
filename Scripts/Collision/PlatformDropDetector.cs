@@ -1,12 +1,12 @@
 using Godot;
 using System;
 
-public class PlatformDropDetector : Area2D
+public partial class PlatformDropDetector : Area2D
 {
 	public CollisionShape2D collision;
 	public Shape2D Shape{get => collision.Shape; set => collision.Shape = value;}
 	public RectangleShape2D RShape{get => (RectangleShape2D)Shape; set => Shape = value;}
-	public Vector2 Extents{get => RShape.Extents; set => RShape.Extents = value;}
+	public Vector2 Extents{get => RShape.Size; set => RShape.Size = value;}
 	public int Direction => owner.Direction;
 	public Character owner;
 	public Vector2 originalPosition = Vector2.Zero;
@@ -29,7 +29,7 @@ public class PlatformDropDetector : Area2D
 		collision.Name = "DropCollision";
 		AddChild(collision);
 		originalPosition = CollisionPosition;
-		//Connect("body_exited", owner, "OnSemiSolidLeave");
+		//Connect("body_exited",new Callable(owner,"OnSemiSolidLeave"));
 		CollisionLayer = 0;
 		CollisionMask = 0b10;
 	}
@@ -40,7 +40,7 @@ public class PlatformDropDetector : Area2D
 	{
 		var colShape = (RectangleShape2D)col.Shape;
 		var colPosition = col.Position;
-		var colExtents = colShape.Extents;
+		var colExtents = colShape.Size;
 		
 		var desiredPosition = colPosition;
 		var desiredExtents = colExtents;

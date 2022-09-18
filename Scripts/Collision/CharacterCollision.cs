@@ -2,13 +2,13 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class CharacterCollision : CollisionShape2D
+public partial class CharacterCollision : CollisionShape2D
 {
 	public RectangleShape2D RecShape{get => (RectangleShape2D)Shape; set => Shape = value;}
 	
-	public Vector2 Extents {get => RecShape.Extents; set => RecShape.SetDeferred("extents", value);}
+	public Vector2 Extents {get => RecShape.Size; set => RecShape.SetDeferred("extents", value);}
 	
-	public Dictionary<string, CollisionShapeState> states = new Dictionary<string, CollisionShapeState>();
+	public Dictionary<string, CollisionShapeState> states = new();
 	public string CurrentCollisionState = "Default";
 	public CollisionShapeState CurrentCollisionStateData;
 	
@@ -40,10 +40,10 @@ public class CharacterCollision : CollisionShape2D
 		originalPosition = DynamicPosition;
 	}
 	
-	public override void _PhysicsProcess(float delta)
+	public override void _PhysicsProcess(double delta)
 	{
 		DynamicPosition = originalPosition;
-		Update();
+		QueueRedraw();
 	}
 	
 	public virtual void AddState(CollisionShapeState newState)
@@ -71,7 +71,7 @@ public class CharacterCollision : CollisionShape2D
 		//Extents = newState.Extents;
 		RecShape.SetDeferred("extents", newState.Extents);
 		DynamicPosition = newState.Position;
-		Update();
+		QueueRedraw();
 	}
 	
 	public override void _Draw()

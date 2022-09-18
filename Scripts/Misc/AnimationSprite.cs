@@ -3,12 +3,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-public class AnimationSprite : Sprite
+#nullable enable
+
+public partial class AnimationSprite : Sprite2D
 {
-	public Dictionary<string, AnimationSheet> Animations{get; set;} = new Dictionary<string, AnimationSheet>();
-	public AnimationPlayer FramePlayer{get; private set;} = new AnimationPlayer();
+	public Dictionary<string, AnimationSheet> Animations{get; set;} = new();
+	public AnimationPlayer FramePlayer{get; private set;} = new();
 	public AnimationSheet? Current{get; private set;} = null;
-	public Queue<AnimationSheet> Queued{get; private set;} = new Queue<AnimationSheet>();
+	public Queue<AnimationSheet> Queued{get; private set;} = new();
 	public bool Playing => FramePlayer.IsPlaying();
 	public bool Looping => Current?.Loop ?? false;
 	
@@ -17,14 +19,14 @@ public class AnimationSprite : Sprite
 		InitFramePlayer();
 	}
 	
-	public void Add(Texture texture, string name, int length, bool loop)
+	public void Add(Texture2D texture, string name, int length, bool loop)
 	{
-		Animations.Add(name, new AnimationSheet(texture, name, length, loop));
+		Animations.Add(name, new(texture, name, length, loop));
 	}
 	
 	public void InitFramePlayer()
 	{
-		FramePlayer.PlaybackProcessMode = AnimationPlayer.AnimationProcessMode.Physics;
+		FramePlayer.PlaybackProcessMode = AnimationPlayer.AnimationProcessCallback.Physics;
 		FramePlayer.Name = "FramePlayer";
 		AddChild(FramePlayer);
 		foreach(var a in Animations)
@@ -36,8 +38,10 @@ public class AnimationSprite : Sprite
 			anm.Step = 1/24f;
 			var frameCount = animationSheet.Length;
 			anm.Length = frameCount * anm.Step;
-			anm.Loop = animationSheet.Loop;
-			FramePlayer.AddAnimation(animationName, anm);
+			anm.LoopMode = animationSheet.Loop?Animation.LoopModeEnum.Linear:Animation.LoopModeEnum.None;
+			var anmlib = new AnimationLibrary();
+			anmlib.AddAnimation(animationName, anm);
+			FramePlayer.AddAnimationLibrary(animationName, anmlib);
 			int trc = anm.AddTrack(Animation.TrackType.Value);
 			var path = GetPath() + ":frame";
 			anm.TrackSetPath(trc, path);
@@ -46,17 +50,19 @@ public class AnimationSprite : Sprite
 				anm.TrackInsertKey(trc, i*anm.Step, i);
 		}
 		
-		FramePlayer.Connect("animation_finished", this, nameof(AnimationFinished));
+		FramePlayer.Connect("animation_finished",new Callable(this,nameof(AnimationFinished)));
 	}
 	
 	public void Play(string anm, bool overwriteQueue)
 	{
 		if(overwriteQueue) ClearQueue();
-		AnimationSheet sheet; if(Animations.TryGetValue(anm, out sheet)) Play(sheet, false);
+		AnimationSheet? sheet; if(Animations.TryGetValue(anm, out sheet)) Play(sheet, false);
 	}
 	
-	public void Play(AnimationSheet sheet, bool overwriteQueue)
+	public void Play(AnimationSheet? sheet, bool overwriteQueue)
 	{
+		if(sheet is null) return;
+		
 		if(overwriteQueue) ClearQueue();
 		if(FramePlayer is null) return;
 		this.Texture = sheet.Texture;
@@ -69,12 +75,14 @@ public class AnimationSprite : Sprite
 	public void Queue(string anm, bool goNext, bool overwriteQueue)
 	{
 		if(overwriteQueue) ClearQueue();
-		AnimationSheet sheet; if(Animations.TryGetValue(anm, out sheet)) Queue(sheet, false, false);
+		AnimationSheet? sheet; if(Animations.TryGetValue(anm, out sheet)) Queue(sheet, false, false);
 		if(goNext) GoNext();
 	}
 	
-	public void Queue(AnimationSheet sheet, bool goNext, bool overwriteQueue)
+	public void Queue(AnimationSheet? sheet, bool goNext, bool overwriteQueue)
 	{
+		if(sheet is null) return;
+		
 		if(overwriteQueue) ClearQueue();
 		Queued.Enqueue(sheet);
 		if(goNext || !Playing) GoNext();
@@ -98,21 +106,23 @@ public class AnimationSprite : Sprite
 	public void Resume() => FramePlayer?.Play();
 	public void Stop() {ClearQueue(); AnimationFinished();}
 	
-	public string QueueToString => string.Join(" ", Queued.Select(a=>a.Name).ToArray());
+	public string QueueToString() => string.Join(" ", Queued.Select(a=>a.Name).ToArray());
 }
 
+public record AnimationSheet(Texture2D @Texture, string Name, int Length, bool Loop);
+/*
 public readonly struct AnimationSheet
 {
-	public Texture @Texture {get;}
+	public Texture2D @Texture {get;}
 	public string Name {get;}
 	public int Length {get;}
 	public bool Loop {get;}
 	
-	public AnimationSheet(Texture texture, string name, int length, bool loop)
+	public AnimationSheet(Texture2D texture, string name, int length, bool loop)
 	{
 		@Texture = texture;
 		Name = name;
 		Length = length;
 		Loop = loop;
 	}
-}
+}*/

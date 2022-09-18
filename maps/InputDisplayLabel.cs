@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class InputDisplayLabel : InfoLabel
+public partial class InputDisplayLabel : InfoLabel
 {
 	BufferInputManager bim;
 	

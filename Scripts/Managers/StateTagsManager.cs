@@ -6,7 +6,7 @@ using System.Text;
 
 public class StateTagsManager
 {
-	public Dictionary<string, StateTag> Tags{get; set;} = new Dictionary<string, StateTag>();
+	public Dictionary<string, StateTag> Tags{get; set;} = new();
 	
 	public StateTag this[string s]
 	{
@@ -19,23 +19,12 @@ public class StateTagsManager
 		Tags.Keys.ToList().ForEach(s => this[s] = NextTag(this[s]));
 	}
 	
-	private StateTag NextTag(StateTag t)
+	private StateTag NextTag(StateTag t) => t switch
 	{
-		switch(t)
-		{
-			case StateTag.NotDefined:
-			case StateTag.NotActive:
-			case StateTag.Active:
-				return t;
-			case StateTag.Starting:
-				return StateTag.Active;
-			case StateTag.Ending:
-			case StateTag.Instant:
-				return StateTag.NotActive;
-			default:
-				throw new Exception("If you see this someone really fucked up");
-		}
-	}
+		StateTag.Starting => StateTag.Active,
+		StateTag.Ending or StateTag.Instant => StateTag.NotActive,
+		_ => t,
+	};
 	
 	public override string ToString()
 	{

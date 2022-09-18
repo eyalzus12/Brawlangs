@@ -5,10 +5,10 @@ using System.Linq;
 using System.Text;
 //using Conn = System.Collections.Generic.Dictionary<string, (string, Attack)>;
 
-public class AttackCreator
+public partial class AttackCreator
 {
 	public string path;
-	public IniFile inif = new IniFile();
+	public IniFile inif = new();
 	
 	public AttackCreator() {}
 	
@@ -165,7 +165,7 @@ public class AttackCreator
 		h.MomentumCarry = cm;
 		var hs = inif[section, "HitSound", "DefaultHit"].s();
 		if(ap.OwnerObject.Audio.ContainsSound(hs)) h.HitSound = ap.OwnerObject.Audio[hs];
-		else GD.PushError($"Hit sound {hs} for hitbox {section} in file at path {inif.filePath} could not be found.");
+		else GD.PushError($"Hit sound {hs} for hitbox {section} in file at path {inif.FilePath} could not be found.");
 		
 		var af = inif[section, "ActiveFrames", Enumerable.Empty<Vector2>()].lv2();
 		h.ActiveFrames = af;
@@ -321,7 +321,7 @@ public class AttackCreator
 			var objname = request.ParamName;
 			var @default = request.ParamDefault;
 			var prop = inif[section, ininame, @default].cast(type, $"loading extra properties for {loadTo.GetType().Name} {section}");
-			loadTo.Set(objname, prop);
+			loadTo.Set(objname, Variant.CreateFrom((dynamic)prop));
 		}
 	}
 }

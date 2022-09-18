@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class HitLagState : State
+public partial class HitLagState : State
 {
 	public int hitLagLength = 0;
 	
@@ -50,7 +50,7 @@ public class HitLagState : State
 		{
 			var att = ch.CurrentAttack;
 			if(att is null) return;
-			att.Disconnect("AttackEnds", ch.States["Attack"], "SetEnd");
+			att.Disconnect("AttackEnds",new Callable(ch.States["Attack"],"SetEnd"));
 			att.connected = null;
 			att.active = false;
 			att.OnEnd();

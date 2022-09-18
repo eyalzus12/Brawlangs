@@ -1,7 +1,9 @@
 using Godot;
 using System;
 
-public readonly struct CollisionShapeState
+public record CollisionShapeState(string Name, Vector2 Extents, Vector2 Position);
+
+/*public readonly struct CollisionShapeState
 {
 	public readonly string Name;
 	public readonly Vector2 Extents;
@@ -13,4 +15,4 @@ public readonly struct CollisionShapeState
 		Extents = extents;
 		Position = pos;
 	}
-}
+}*/

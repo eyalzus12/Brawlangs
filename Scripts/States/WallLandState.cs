@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class WallLandState : WallState
+public partial class WallLandState : WallState
 {
 	public WallLandState() : base() {}
 	public WallLandState(Character link) : base(link) {}

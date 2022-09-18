@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class MovingPlatform2D : KinematicPlatform2D
+public partial class MovingPlatform2D : KinematicPlatform2D
 {
 	public int frameCount = 0;
 	
@@ -9,11 +9,11 @@ public class MovingPlatform2D : KinematicPlatform2D
 	{
 		frameCount = 0;
 		base._Ready();
-		Motion__syncToPhysics = true;
+		//Motion__syncToPhysics = true;
 		Init();
 	}
 	
-	public override void _PhysicsProcess(float delta)
+	public override void _PhysicsProcess(double delta)
 	{
 		++frameCount;
 		Loop();

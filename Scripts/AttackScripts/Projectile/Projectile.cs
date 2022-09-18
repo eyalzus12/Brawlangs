@@ -3,10 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-public class Projectile : Node2D, IHitter, IHittable
+public partial class Projectile : Node2D, IHitter, IHittable
 {
 	[Signal]
-	public delegate void ProjectileDied(Projectile who);
+	public delegate void ProjectileDiedEventHandler(Projectile who);
 	
 	public string Identifier{get; set;}
 	public Vector2 SpawningPosition{get; set;}
@@ -19,8 +19,8 @@ public class Projectile : Node2D, IHitter, IHittable
 	
 	public List<Hitbox> Hitboxes{get; set;} = new List<Hitbox>();
 	
-	public Dictionary<Hurtbox, Hitbox> HitList{get; set;} = new Dictionary<Hurtbox, Hitbox>();
-	public HashSet<IHittable> HitIgnoreList{get; set;} = new HashSet<IHittable>();
+	public Dictionary<Hurtbox, Hitbox> HitList{get; set;} = new();
+	public HashSet<IHittable> HitIgnoreList{get; set;} = new();
 	
 	public bool HasHit{get; set;}
 	public bool GettingHit{get; set;}
@@ -30,10 +30,10 @@ public class Projectile : Node2D, IHitter, IHittable
 	
 	public string currentCollisionSetting;
 	
-	public InvincibilityManager IFrames{get; set;} = new InvincibilityManager();
+	public InvincibilityManager IFrames{get; set;} = new();
 	public bool Invincible => IFrames.Count > 0;
 	
-	public List<Hurtbox> Hurtboxes{get; set;} = new List<Hurtbox>();
+	public List<Hurtbox> Hurtboxes{get; set;} = new();
 	
 	public int TeamNumber{get => OwnerObject.TeamNumber; set => OwnerObject.TeamNumber = value;}
 	
@@ -45,11 +45,11 @@ public class Projectile : Node2D, IHitter, IHittable
 	public float KnockbackDoneMult{get => OwnerObject.KnockbackDoneMult; set => OwnerObject.KnockbackDoneMult = value;}
 	public float StunDoneMult{get => OwnerObject.StunDoneMult; set => OwnerObject.StunDoneMult = value;}
 	
-	public AudioManager Audio{get; set;} = new AudioManager();
+	public AudioManager Audio{get; set;} = new();
 	public void PlaySound(string sound) => Audio.Play(sound);
 	public void PlaySound(AudioStream sound) => Audio.Play(sound);
 	
-	public Dictionary<string, ParamRequest> LoadExtraProperties = new Dictionary<string, ParamRequest>();
+	public Dictionary<string, ParamRequest> LoadExtraProperties = new();
 	public virtual void LoadProperties() {}
 	public void LoadExtraProperty<T>(string s, T @default = default(T))
 	{
@@ -91,7 +91,7 @@ public class Projectile : Node2D, IHitter, IHittable
 		h.Init();
 	}
 	
-	public override void _PhysicsProcess(float delta)
+	public override void _PhysicsProcess(double delta)
 	{
 		if(!Active) return;
 		GettingHit = false;
@@ -123,7 +123,8 @@ public class Projectile : Node2D, IHitter, IHittable
 	
 	public virtual void Reset()
 	{
-		Hitboxes = GetChildren().FilterType<Hitbox>().ToList();
+		//TOFIX: this is unsafe
+		Hitboxes = GetChildren().FilterType<Hitbox, Node>().ToList();
 		PostHitboxInit();
 	}
 	
@@ -131,14 +132,14 @@ public class Projectile : Node2D, IHitter, IHittable
 	
 	public virtual void ConnectSignals()
 	{
-		Hitboxes.ForEach(h => h.Connect("HitboxHit", this, nameof(HandleInitialHit)));
+		Hitboxes.ForEach(h => h.Connect("HitboxHit",new Callable(this,nameof(HandleInitialHit))));
 	}
 	
 	public virtual void DisonnectSignals()
 	{
 		foreach(var h in Hitboxes)
 		{
-			h.Disconnect("HitboxHit", this, nameof(HandleInitialHit));
+			h.Disconnect("HitboxHit",new Callable(this,nameof(HandleInitialHit)));
 			h.OwnerObject = this;
 		}
 	}

@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class StunState : State
+public partial class StunState : State
 {
 	public int stunLength = 0;
 	public Vector2 force = Vector2.Zero;
@@ -68,7 +68,7 @@ public class StunState : State
 	
 	protected override void FirstFrameAfterInit()
 	{
-		ch.SetCollisionMaskBit(DROP_THRU_BIT, Force.y <= 0);
+		ch.SetCollisionMaskValue(DROP_THRU_BIT, Force.y <= 0);
 	}
 	
 	protected override void SetPlatformDropping() {}

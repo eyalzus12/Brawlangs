@@ -3,33 +3,33 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-public class DeathHandeler : Node
+public partial class DeathHandeler : Node
 {
 	[Signal]
-	public delegate void MatchEnds();
+	public delegate void MatchEndsEventHandler();
 	
-	public List<string> diedThisFrame;
-	public List<List<string>> diedTotal;
-	public List<Character> exists;
+	public List<string> diedThisFrame = new();
+	public List<List<string>> diedTotal = new();
+	public List<Character> exists = new();
 	public int count = 0;
 	
 	public DeathHandeler()
 	{
-		diedThisFrame = new List<string>();
-		diedTotal = new List<List<string>>();
-		exists = new List<Character>();
+		diedThisFrame = new();
+		diedTotal = new();
+		exists = new();
 		count = 0;
 	}
 	
 	public DeathHandeler(IEnumerable<Character> cr)
 	{
-		diedThisFrame = new List<string>();
-		diedTotal = new List<List<string>>();
-		exists = new List<Character>(cr);
+		diedThisFrame = new();
+		diedTotal = new();
+		exists = new(cr);
 		count = 0;
 		foreach(var c in cr)
 		{
-			c.Connect("Dead", this, nameof(CharacterDead));
+			c.Connect("Dead",new Callable(this,nameof(CharacterDead)));
 			++count;
 		}
 	}
@@ -44,9 +44,9 @@ public class DeathHandeler : Node
 		}
 	}
 	
-	public override void _PhysicsProcess(float delta)
+	public override void _PhysicsProcess(double delta)
 	{
-		diedTotal.Add(new List<string>(diedThisFrame));
+		diedTotal.Add(new(diedThisFrame));
 		count -= diedThisFrame.Count;
 		diedThisFrame.Clear();
 		if(count <= 1)

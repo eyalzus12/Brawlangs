@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class Hurtbox : Area2D
+public partial class Hurtbox : Area2D
 {
 	public CollisionShape2D col;
 	
@@ -61,11 +61,11 @@ public class Hurtbox : Area2D
 		ChangeState("Default");
 	}
 	
-	public override void _PhysicsProcess(float delta)
+	public override void _PhysicsProcess(double delta)
 	{
 		CollisionPosition = originalPosition;
 		CollisionRotation = originalRotation;
-		Update();
+		QueueRedraw();
 	}
 	
 	public virtual void AddState(HurtboxCollisionState newState)
@@ -94,7 +94,7 @@ public class Hurtbox : Area2D
 		Height = newState.Height;
 		CollisionPosition = newState.Position;
 		CollisionRotation = newState.Rotation;
-		Update();
+		QueueRedraw();
 	}
 	
 	public override void _Draw()

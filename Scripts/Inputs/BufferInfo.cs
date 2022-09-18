@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class BufferInfo
+public partial class BufferInfo
 {
 	//bufferTimeLeft > 0: the input is currently buffered
 	//bufferTimeLeft = 0: the input has just stopped being buffered

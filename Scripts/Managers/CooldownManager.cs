@@ -5,7 +5,7 @@ using System.Text;
 
 public class CooldownManager
 {
-	public Dictionary<string, int> Cooldowns{get; set;} = new Dictionary<string, int>();
+	public Dictionary<string, int> Cooldowns{get; set;} = new();
 	
 	public int this[string s]
 	{

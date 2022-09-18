@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class BlastZone : Node2D
+public partial class BlastZone : Node2D
 {
 	public readonly static Vector2 DEFAULT_SIZE =  new Vector2(2300, 1100);
 	
@@ -36,11 +36,11 @@ public class BlastZone : Node2D
 		foreach(var n in GetParent().GetChildren()) if(n is Character c)
 		{
 			characters.Add(c);
-			c.Connect("Dead", this, nameof(CharacterGone));
+			c.Connect("Dead",new Callable(this,nameof(CharacterGone)));
 		}
 	}
 	
-	public override void _PhysicsProcess(float delta)
+	public override void _PhysicsProcess(double delta)
 	{
 		var crs = new List<Character>(characters);
 		

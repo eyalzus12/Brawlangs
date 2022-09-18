@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class CrouchJumpState : BaseCrouchState
+public partial class CrouchJumpState : BaseCrouchState
 {
 	bool jumpActive = false;
 	public bool forceShortHop = false;

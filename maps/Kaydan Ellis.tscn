@@ -2,8 +2,8 @@
 
 [ext_resource path="res://MapBase.cs" type="Script" id=1]
 [ext_resource path="res://Scripts/Platforms/StaticPlatform2D.cs" type="Script" id=2]
-[ext_resource path="res://toki pona mage.png" type="Texture" id=3]
-[ext_resource path="res://grass.jpg" type="Texture" id=4]
+[ext_resource path="res://toki pona mage.png" type="Texture2D" id=3]
+[ext_resource path="res://grass.jpg" type="Texture2D" id=4]
 [ext_resource path="res://Scripts/Platforms/WaypointMovingPlatform2D.cs" type="Script" id=5]
 
 [sub_resource type="RectangleShape2D" id=1]
@@ -15,7 +15,7 @@ extents = Vector2( 192, 8 )
 [sub_resource type="RectangleShape2D" id=3]
 extents = Vector2( 192, 8 )
 
-[sub_resource type="StreamTexture" id=4]
+[sub_resource type="CompressedTexture2D" id=4]
 flags = 4
 load_path = "res://.import/grass.jpg-4ca37d76c8b391a7e96ec05260cb4207.stex"
 
@@ -30,12 +30,12 @@ script = ExtResource( 2 )
 [node name="CollisionShape2D" type="CollisionShape2D" parent="MainPlatform"]
 shape = SubResource( 1 )
 
-[node name="Sprite" type="Sprite" parent="MainPlatform"]
+[node name="Sprite2D" type="Sprite2D" parent="MainPlatform"]
 position = Vector2( 0, 1.43051e-05 )
 scale = Vector2( 2.522, 1.26 )
 texture = ExtResource( 3 )
 
-[node name="LeftPlatform" type="KinematicBody2D" parent="."]
+[node name="LeftPlatform" type="CharacterBody2D" parent="."]
 position = Vector2( -704, 136 )
 script = ExtResource( 5 )
 Clingable = false
@@ -47,12 +47,12 @@ Repeat = true
 shape = SubResource( 2 )
 one_way_collision = true
 
-[node name="Sprite" type="Sprite" parent="LeftPlatform"]
+[node name="Sprite2D" type="Sprite2D" parent="LeftPlatform"]
 position = Vector2( 2.28882e-05, 1.14441e-05 )
 scale = Vector2( 0.755905, 0.047 )
 texture = ExtResource( 4 )
 
-[node name="RightPlatform" type="KinematicBody2D" parent="."]
+[node name="RightPlatform" type="CharacterBody2D" parent="."]
 position = Vector2( 704, 136 )
 script = ExtResource( 5 )
 Clingable = false
@@ -64,7 +64,7 @@ Repeat = true
 shape = SubResource( 3 )
 one_way_collision = true
 
-[node name="Sprite" type="Sprite" parent="RightPlatform"]
+[node name="Sprite2D" type="Sprite2D" parent="RightPlatform"]
 position = Vector2( 7.62939e-06, 1.14441e-05 )
 scale = Vector2( 0.755905, 0.047 )
 texture = SubResource( 4 )

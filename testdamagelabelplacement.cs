@@ -1,12 +1,12 @@
 using Godot;
 using System;
 
-public class testdamagelabelplacement : Node2D
+public partial class testdamagelabelplacement : Node2D
 {
 	public override void _Ready()
 	{
 		var margin = 50f;
-		var windowsize = OS.WindowSize;
+		var windowsize = DisplayServer.WindowGetSize();
 		var topleft = Vector2.Zero;
 		var bottomright = windowsize;
 		var bottomleft = new Vector2(topleft.x, bottomright.y);
@@ -20,7 +20,7 @@ public class testdamagelabelplacement : Node2D
 			var l = new Label();
 			l.Text = "h";
 			AddChild(l);
-			l.RectPosition = v;
+			l.Position = v;
 		}
 		
 		counts = new int[]{4,4};
@@ -32,7 +32,7 @@ public class testdamagelabelplacement : Node2D
 			var l = new Label();
 			l.Text = "g";
 			AddChild(l);
-			l.RectPosition = v;
+			l.Position = v;
 		}
 		
 		counts = new int[]{2,2,2,2};
@@ -44,7 +44,7 @@ public class testdamagelabelplacement : Node2D
 			var l = new Label();
 			l.Text = "j";
 			AddChild(l);
-			l.RectPosition = v;
+			l.Position = v;
 		}
 	}
 }

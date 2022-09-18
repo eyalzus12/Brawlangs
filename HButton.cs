@@ -1,11 +1,11 @@
 using Godot;
 using System;
 
-public class HButton : Button
+public partial class HButton : Button
 {
 	public override void _Ready()
 	{
-		Connect("pressed", this, nameof(OnPress));
+		Connect("pressed",new Callable(this,nameof(OnPress)));
 	}
 	
 	public void OnPress()

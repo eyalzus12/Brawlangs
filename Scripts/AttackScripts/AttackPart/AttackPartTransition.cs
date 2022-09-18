@@ -3,10 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-public class AttackPartTransition
+public partial class AttackPartTransition
 {
-	public List<Vector2> Frames{get; set;} = new List<Vector2>();
-	public AttackPartTransitionTagExpression TagExpression{get; set;} = new AttackPartTransitionTagExpression();
+	public List<Vector2> Frames{get; set;} = new();
+	public AttackPartTransitionTagExpression TagExpression{get; set;} = new();
 	public string NextPart{get; set;} = "";
 	
 	public AttackPartTransition() {}
@@ -15,7 +15,7 @@ public class AttackPartTransition
 	{
 		tagExpression.Get(null);//test expression
 		TagExpression = tagExpression;
-		Frames = new List<Vector2>(frames);
+		Frames = new(frames);
 		NextPart = nextPart;
 	}
 	

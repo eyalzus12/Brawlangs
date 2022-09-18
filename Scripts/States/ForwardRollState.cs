@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class ForwardRollState : RollState
+public partial class ForwardRollState : RollState
 {
 	public ForwardRollState() : base() {}
 	public ForwardRollState(Character link) : base(link) {}

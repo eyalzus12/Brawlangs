@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-public class ProjectileCreator
+public partial class ProjectileCreator
 {
 	public string path;
 	public IniFile inif = new IniFile();
@@ -137,7 +137,7 @@ public class ProjectileCreator
 		
 		var hs = inif[section, "HitSound", "DefaultHit"].s();
 		if(p.Audio.ContainsSound(hs)) h.HitSound = p.Audio[hs];
-		else GD.PushError($"Hit sound {hs} for hitbox {section} in file at path {inif.filePath} could not be found.");
+		else GD.PushError($"Hit sound {hs} for hitbox {section} in file at path {inif.FilePath} could not be found.");
 		
 		var hafs = inif[section, "HorizontalAngleFlipper", "Directional"].s();
 		Hitbox.AngleFlipper haf;
@@ -207,7 +207,7 @@ public class ProjectileCreator
 			
 			var prop_obj = inif[section, ininame, @default];
 			var prop = prop_obj.cast(type, $"loading extra properties for {loadTo.GetType().Name} {section}");
-			loadTo.Set(objname, prop);
+			loadTo.Set(objname, Variant.CreateFrom((dynamic)prop));
 		}
 	}
 }

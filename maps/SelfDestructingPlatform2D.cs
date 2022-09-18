@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class SelfDestructingPlatform2D : StaticBody2D
+public partial class SelfDestructingPlatform2D : StaticBody2D
 {
 	[Export]
 	public int LifeTime = 60;
@@ -13,7 +13,7 @@ public class SelfDestructingPlatform2D : StaticBody2D
 		frameCount = 0;
 	}
 	
-	public override void _PhysicsProcess(float delta)
+	public override void _PhysicsProcess(double delta)
 	{
 		if(frameCount >= LifeTime) QueueFree();
 		else ++frameCount;

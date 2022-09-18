@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class GetupState : GroundedState
+public partial class GetupState : GroundedState
 {
 	public GetupState() : base() {}
 	public GetupState(Character link) : base(link) {}

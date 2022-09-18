@@ -20,11 +20,11 @@ public static class GeometryUtils
 			(float)Math.Round(v.z, point)
 		);
 		
-	public static Quat Round(this Quat q, int point = 0) => new Quat(
-			(float)Math.Round(q.x, point),
-			(float)Math.Round(q.y, point),
-			(float)Math.Round(q.z, point),
-			(float)Math.Round(q.w, point)
+	public static Vector4 Round(this Vector4 v4, int point = 0) => new Vector4(
+			(float)Math.Round(v4.x, point),
+			(float)Math.Round(v4.y, point),
+			(float)Math.Round(v4.z, point),
+			(float)Math.Round(v4.w, point)
 		);
 	
 	public static Vector2 TiltToNormal(this Vector2 v, Vector2 normal)
@@ -129,7 +129,7 @@ public static class GeometryUtils
 		ci.DrawCircle(new Vector2(0, -height/2), radius, color);
 	}
 	
-	public static Vector2 SmoothLinearInterpolate(this Vector2 @from, Vector2 to, float weight, float curve) => @from.LinearInterpolate(to, weight*Mathf.Tanh(curve*@from.DistanceSquaredTo(to)));
+	public static Vector2 SmoothLinearInterpolate(this Vector2 @from, Vector2 to, float weight, float curve) => @from.Lerp(to, weight*Mathf.Tanh(curve*@from.DistanceSquaredTo(to)));
 	
 	public static Rect2 RectFrom(Vector2 Center, Vector2 Size)
 	{

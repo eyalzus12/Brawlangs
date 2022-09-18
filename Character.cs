@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-public class Character : KinematicBody2D, IHittable, IAttacker
+public partial class Character : CharacterBody2D, IHittable, IAttacker
 {
 	public const int DROP_THRU_BIT = 1;
 	protected const int CF = 30;
@@ -13,15 +13,15 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public string statSectionName = "Stats";
 	
 	[Signal]
-	public delegate void Dead(Node2D who);
+	public delegate void DeadEventHandler(Node2D who);
 	[Signal]
-	public delegate void OptionsRestoredFromGroundTouch();
+	public delegate void OptionsRestoredFromGroundTouchEventHandler();
 	[Signal]
-	public delegate void OptionsRestoredFromWallTouch();
+	public delegate void OptionsRestoredFromWallTouchEventHandler();
 	[Signal]
-	public delegate void OptionsRestoredFromHitting();
+	public delegate void OptionsRestoredFromHittingEventHandler();
 	[Signal]
-	public delegate void OptionsRestoredFromGettingHit();
+	public delegate void OptionsRestoredFromGettingHitEventHandler();
 	
 	////////////////////////////////////////////
 	public float fallSpeed = 800f;//max fall speed
@@ -158,22 +158,22 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public Vector2 vwc;
 	public Vector2 vvc;
 	
-	public Vector2 Velocity => Velocities.Aggregate(Vector2.Zero, (a,v)=>a+v);
+	public Vector2 DesiredVelocity => Velocities.Aggregate(Vector2.Zero, (a,v)=>a+v);
 	public Vector2 RoundedVelocity => Velocity.Round();
 	public Vector2 RoundedPosition => Position.Round();
 	
-	public Vector2 fnorm = new Vector2();//floor normal
-	public Vector2 fvel = new Vector2();//floor velocity
+	public Vector2 fnorm = new();//floor normal
+	public Vector2 fvel = new();//floor velocity
 	public float ffric = 1f;//floor friction
 	public float fbounce = 0f;//floor bounce
 	
-	public Vector2 wnorm = new Vector2();//wall normal
-	public Vector2 wvel = new Vector2();//wall velocity
+	public Vector2 wnorm = Vector2.Zero;//wall normal
+	public Vector2 wvel = Vector2.Zero;//wall velocity
 	public float wfric = 1f;//wall friction
 	public float wbounce = 0f;//wall bounce
 	
-	public Vector2 cnorm = new Vector2();//ceiling normal
-	public Vector2 cvel = new Vector2();//ceiling velocity
+	public Vector2 cnorm = Vector2.Zero;//ceiling normal
+	public Vector2 cvel = Vector2.Zero;//ceiling velocity
 	public float cfric = 1f;//ceiling friction
 	public float cbounce = 1f;//ceiling bounce
 	
@@ -254,14 +254,13 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	
 	public StateMachine States{get; set;}
 	
-	public List<Hurtbox> Hurtboxes{get; set;} = new List<Hurtbox>();
+	public List<Hurtbox> Hurtboxes{get; set;} = new();
 	
 	public string currentCollisionSetting;
 	public CharacterCollision collision;
 	//public PlatformDropDetector DropDetector;
 	
-	private Attack currentAttack;
-	public Attack CurrentAttack{get => currentAttack; set => currentAttack = value;}
+	public Attack CurrentAttack{get; set;}
 	
 	public bool Hitting{get; set;}
 	public IHittable LastHitee{get; set;}
@@ -271,26 +270,25 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public bool Clashing{get; set;}
 	public HitData ClashData{get; set;}
 	
-	private Dictionary<string, Attack> attackDict = new Dictionary<string, Attack>();
-	public Dictionary<string, Attack> Attacks{get => attackDict; set => attackDict = value;}
+	public Dictionary<string, Attack> Attacks{get; set;} = new();
 	
-	public CooldownManager Cooldowns{get; set;} = new CooldownManager();
+	public CooldownManager Cooldowns{get; set;} = new();
 	
-	public InvincibilityManager IFrames{get; set;} = new InvincibilityManager();
+	public InvincibilityManager IFrames{get; set;} = new();
 	public bool Invincible => IFrames.Count > 0;
 	
-	public ResourceManager Resources{get; set;} = new ResourceManager();
+	public ResourceManager Resources{get; set;} = new();
 	
-	public TimedActionsManager TimedActions{get; set;} = new TimedActionsManager();
+	public TimedActionsManager TimedActions{get; set;} = new();
 	
-	public StateTagsManager Tags{get; set;} = new StateTagsManager();
+	public StateTagsManager Tags{get; set;} = new();
 	
-	public Dictionary<string, PackedScene> projectiles = new Dictionary<string, PackedScene>();
-	public Dictionary<string, HashSet<Projectile>> activeProjectiles = new Dictionary<string, HashSet<Projectile>>();
+	public Dictionary<string, PackedScene> projectiles = new();
+	public Dictionary<string, HashSet<Projectile>> activeProjectiles = new();
 	public ProjectilePool projPool;
 	
-	public List<string> StatList = new List<string>();
-	public PropertyMap prop = new PropertyMap();
+	public List<string> StatList = new();
+	public PropertyMap prop = new();
 	
 	public InputManager Inputs;
 	
@@ -299,14 +297,12 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	
 	public AudioManager Audio{get; set;}
 	
-	public Character() {}
-	
-	public override void _Ready()
+	public Character()
 	{
-		States = new StateMachine(CreateStates());
+		States = new(GenerateStates());
 	}
 
-	public override void _PhysicsProcess(float delta)
+	public override void _PhysicsProcess(double delta)
 	{
 		if(Clashing) HandleClashing(ClashData);
 		Clashing = false;
@@ -340,51 +336,51 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	///////////////States//////////////////////
 	///////////////////////////////////////////
 	
-	private IEnumerable<State> CreateStates()
+	public virtual State[] GenerateStates() => new State[]
 	{
-		yield return new AirState(this);
-		yield return new AirJumpState(this);
+		new AirState(this),
+		new AirJumpState(this),
 		
-		yield return new WallState(this);
-		yield return new WallLandState(this);
-		yield return new WallJumpState(this);
+		new WallState(this),
+		new WallLandState(this),
+		new WallJumpState(this),
 		
-		yield return new GroundedState(this);
-		yield return new LandState(this);
-		yield return new JumpState(this);
+		new GroundedState(this),
+		new LandState(this),
+		new JumpState(this),
 		
-		yield return new IdleState(this);
-		yield return new WalkState(this);
-		yield return new WalkTurnState(this);
-		yield return new WalkStopState(this);
-		yield return new WalkWallState(this);
+		new IdleState(this),
+		new WalkState(this),
+		new WalkTurnState(this),
+		new WalkStopState(this),
+		new WalkWallState(this),
 		
-		yield return new GetupState(this);
-		yield return new DuckState(this);
-		yield return new CrouchState(this);
-		yield return new CrawlState(this);
-		yield return new CrawlWallState(this);
-		yield return new CrouchJumpState(this);
+		new GetupState(this),
+		new DuckState(this),
+		new CrouchState(this),
+		new CrawlState(this),
+		new CrawlWallState(this),
+		new CrouchJumpState(this),
 		
-		yield return new StunState(this);
-		yield return new HitPauseState(this);
-		yield return new HitLagState(this);
-		yield return new AttackState(this);
-		yield return new EndlagState(this);
+		new StunState(this),
+		new HitPauseState(this),
+		new HitLagState(this),
+		new AttackState(this),
+		new EndlagState(this),
 		
-		yield return new SpotAirDodgeState(this);
-		yield return new DirectionalAirDodgeState(this);
-		yield return new SpotGroundedDodgeState(this);
+		new SpotAirDodgeState(this),
+		new DirectionalAirDodgeState(this),
+		new SpotGroundedDodgeState(this),
 		
-		yield return new RunStartupState(this);
-		yield return new RunState(this);
-		yield return new RunStopState(this);
-		yield return new RunJumpState(this);
-		yield return new RunTurnState(this);
-		yield return new RunWallState(this);
+		new RunStartupState(this),
+		new RunState(this),
+		new RunStopState(this),
+		new RunJumpState(this),
+		new RunTurnState(this),
+		new RunWallState(this),
 		
-		yield return new WavedashState(this);
-	}
+		new WavedashState(this)
+	};
 	
 	///////////////////////////////////////////
 	///////////////Misc////////////////////////
@@ -392,7 +388,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	
 	public void UpdateInputTags()
 	{
-		foreach(var inputTag in InputMap.GetActions().Enumerable<string>().Where(s=>s.StartsWith($"{TeamNumber}_")).Select(s=>s.Substring($"{TeamNumber}_".Length)))
+		foreach(var inputTag in InputMap.GetActions().Select(s => s.ToString()).Where(s=>s.StartsWith($"{TeamNumber}_")).Select(s=>s.Substring($"{TeamNumber}_".Length)))
 		{
 			if(Inputs.IsActionJustPressed(inputTag)) Tags[inputTag] = StateTag.Starting;
 			if(Inputs.IsActionJustReleased(inputTag)) Tags[inputTag] = StateTag.Ending;
@@ -540,17 +536,17 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public bool CanChange(CollisionShape2D collShape)
 	{
 		var spaceState = GetWorld2d().DirectSpaceState;
-		var query = new Physics2DShapeQueryParameters();
-		query.SetShape(collShape.Shape);
+		var query = new PhysicsShapeQueryParameters2D();
+		query.Shape = collShape.Shape;
 		query.Transform = collShape.GlobalTransform;
 		
 		var trav = new Vector2(0, (fvel.y < 0)?fvel.y:0);
 		
 		query.Transform = query.Transform.Translated(CF*fnorm + trav);
-		var temp = GetCollisionMaskBit(DROP_THRU_BIT);
-		SetCollisionMaskBit(DROP_THRU_BIT, false);
-		query.CollisionLayer = CollisionMask;
-		SetCollisionMaskBit(DROP_THRU_BIT, temp);
+		var temp = GetCollisionMaskValue(DROP_THRU_BIT);
+		SetCollisionMaskValue(DROP_THRU_BIT, false);
+		query.CollisionMask = CollisionMask;
+		SetCollisionMaskValue(DROP_THRU_BIT, temp);
 		query.CollideWithAreas = false;
 		query.CollideWithBodies = true;
 		
@@ -559,9 +555,13 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		for(int i = 0; i < result.Count; ++i)
 		{
 			var res = result[i] as Godot.Collections.Dictionary;
-			var collider = res["collider"];
+			var collider = res["collider"].Obj;
 			
-			if(collider == this) result.RemoveAt(i);
+			if(collider is CharacterBody2D c && c == this)
+			{
+				result.RemoveAt(i);
+				i--;
+			}
 		}
 		
 		return (result?.Count == 0);
@@ -711,7 +711,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		//PlaySound("Clash");
 	}
 	
-	public virtual bool AttackInCooldown(Attack a) => a.SharesCooldownWith.Append(a.Name).Any(Cooldowns.InCooldown);
+	public virtual bool AttackInCooldown(Attack a) => a.SharesCooldownWith.Append((string)a.Name).Any(Cooldowns.InCooldown);
 	
 	public virtual bool ExecuteAttack(Attack a)
 	{
@@ -720,7 +720,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		if(CurrentAttack != null) ResetCurrentAttack(null);
 		
 		CurrentAttack = a;
-		CurrentAttack.Connect("AttackEnds", this, nameof(ResetCurrentAttack));
+		CurrentAttack.Connect("AttackEnds",new Callable(this,nameof(ResetCurrentAttack)));
 		var s = States.Get<AttackState>();
 		s.att = CurrentAttack;
 		States.Change("Attack");
@@ -744,7 +744,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public void ResetCurrentAttack(Attack a)
 	{
 		if(CurrentAttack is null) return;
-		CurrentAttack.Disconnect("AttackEnds", this, nameof(ResetCurrentAttack));
+		CurrentAttack.Disconnect("AttackEnds",new Callable(this,nameof(ResetCurrentAttack)));
 		SetAttackCooldowns();
 		CurrentAttack = null;
 	}
@@ -760,13 +760,13 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		else
 		{
 			if(!activeProjectiles.ContainsKey(proj))//projectile havent been used yet. create storage
-				activeProjectiles.Add(proj, new HashSet<Projectile>());
+				activeProjectiles.Add(proj, new());
 			//set direction
 			generatedProjectile.Direction = Direction;
 			//add owner
 			//generatedProjectile.OwnerObject = this;
 			//connect destruction signal
-			generatedProjectile.Connect("ProjectileDied", this, nameof(HandleProjectileDestruction));
+			generatedProjectile.Connect("ProjectileDied",new Callable(this,nameof(HandleProjectileDestruction)));
 			//store as active
 			activeProjectiles[proj].Add(generatedProjectile);
 			//request that _Ready will be called
@@ -785,7 +785,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		
 		activeProjectiles[identifier].Remove(who);
 		projPool.InsertProjectile(who);
-		who.Disconnect("ProjectileDied", this, nameof(HandleProjectileDestruction));
+		who.Disconnect("ProjectileDied",new Callable(this,nameof(HandleProjectileDestruction)));
 	}
 	
 	public virtual void SetAttackCooldowns()

@@ -3,7 +3,7 @@ using System;
 using System.Text;
 using System.Linq;
 
-public class DebugLabel : InfoLabel
+public partial class DebugLabel : InfoLabel
 {
 	private const int LABEL_COUNT = 2;
 	public Character ch = null;
@@ -30,7 +30,7 @@ public class DebugLabel : InfoLabel
 		Newline();
 		Add("Fastfalling", ch.fastfalling);
 		Add("Crouch", ch.crouching);
-		Add("FallThrough", !ch.GetCollisionMaskBit(1));
+		Add("FallThrough", !ch.GetCollisionMaskValue(1));
 		Add("Direction", GetStringDirection(ch.Direction));
 		Add("Idle", ch.Idle);
 		Add("Turning", ch.InputtingTurn);
@@ -69,7 +69,7 @@ public class DebugLabel : InfoLabel
 		Add("AnimationPlaying", ch.CharacterSprite.Playing);
 		Add("AnimationFrame", ch.CharacterSprite.Frame);
 		Add("AnimationLooping", ch.CharacterSprite.Looping);
-		Add("AnimationQueue", ch.CharacterSprite.QueueToString);
+		Add("AnimationQueue", ch.CharacterSprite.QueueToString());
 		Newline();
 		Add("Velocity", ch.RoundedVelocity);
 		Add("Position", ch.RoundedPosition);
