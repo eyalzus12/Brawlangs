@@ -10,14 +10,21 @@ public partial class DebugLabel : InfoLabel
 	
 	private int whichlabel = 0;
 	
+	private Action[] SubLabels;
+	
+	public override void Connect()
+	{
+		SubLabels = new Action[]{UpdateLabel_1,UpdateLabel_2};
+	}
+	
 	public override void UpdateLabel()
 	{
-		if(!Valid(ch) || !Visible) return;
+		if(!Valid(ch)) return;
 		
 		if(Input.IsActionJustPressed("debug_label_switch"))
 			{whichlabel++; whichlabel %= LABEL_COUNT;}
 		
-		new Action[]{UpdateLabel_1,UpdateLabel_2}[whichlabel]();
+		SubLabels[whichlabel]();
 	}
 	
 	public void UpdateLabel_1()

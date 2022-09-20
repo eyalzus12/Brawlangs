@@ -88,7 +88,8 @@ public partial class AttackState : State
 	public void SetEnd(Attack a)
 	{
 		//remove signal
-		a.Disconnect("AttackEnds",new Callable(this,nameof(SetEnd)));
+		//a.Disconnect("AttackEnds",new Callable(this,nameof(SetEnd)));
+		a.AttackEnds -= SetEnd;
 		a.connected = null;
 		
 		//disable attack
@@ -156,7 +157,8 @@ public partial class AttackState : State
 		if(newState is StunState || newState is HitPauseState)
 		{
 			//GD.Print($"{ch} is changing to Stun or Hit Pause State so need to cleanup");
-			att.Disconnect("AttackEnds",new Callable(this,nameof(SetEnd)));
+			//att.Disconnect("AttackEnds",new Callable(this,nameof(SetEnd)));
+			att.AttackEnds -= SetEnd;
 			att.connected = null;
 			att.active = false;
 			att.OnEnd();

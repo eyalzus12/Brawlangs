@@ -17,7 +17,7 @@ public class CooldownManager
 	
 	public void Update()
 	{
-		var keys = new List<string>(Cooldowns.Keys);
+		List<string> keys = new(Cooldowns.Keys);
 		foreach(var k in keys)
 		{
 			Cooldowns[k]--;
@@ -27,7 +27,7 @@ public class CooldownManager
 	
 	public override string ToString()
 	{
-		var result = new StringBuilder();
+		StringBuilder result = new();
 		foreach(var entry in Cooldowns) result.Append($"{entry.Key.ToString()} : {entry.Value.ToString()}\n");
 		return result.ToString();
 	}

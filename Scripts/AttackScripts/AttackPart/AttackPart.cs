@@ -71,7 +71,8 @@ public partial class AttackPart : Node2D, IHitter
 	
 	public void ConnectSignals()
 	{
-		Hitboxes.ForEach(h => h.Connect("HitboxHit",new Callable(this,nameof(HandleInitialHit))));
+		Hitboxes.ForEach(h => h.HitboxHit += HandleInitialHit);
+		//Hitboxes.ForEach(h => h.Connect("HitboxHit",new Callable(this,nameof(HandleInitialHit))));
 	}
 	
 	public void LoadExtraProperty<T>(string s, T @default = default(T))
@@ -133,6 +134,7 @@ public partial class AttackPart : Node2D, IHitter
 		hitboxPlayer.PlaybackProcessMode = AnimationPlayer.AnimationProcessCallback.Physics;
 		hitboxPlayer.Name = "AttackPlayer";
 		AddChild(hitboxPlayer);
+		
 		var anm = new Animation();
 		anm.Length = (Startup+Length/*+endlag*/)/FPS;
 		foreach(var h in Hitboxes)
@@ -150,7 +152,7 @@ public partial class AttackPart : Node2D, IHitter
 		
 		var anmlib = new AnimationLibrary();
 		anmlib.AddAnimation("HitboxActivation", anm);
-		hitboxPlayer.AddAnimationLibrary("HitboxActivation", anmlib);
+		hitboxPlayer.AddAnimationLibrary("", anmlib);
 		
 		#if DEBUG_HITBOX_PLAYER
 		GD.Print("-------------------------------------------");
@@ -168,7 +170,8 @@ public partial class AttackPart : Node2D, IHitter
 		GD.Print("-------------------------------------------");
 		#endif
 		
-		hitboxPlayer.Connect("animation_finished",new Callable(this,"ChangeToNextOnEnd"));
+		//hitboxPlayer.Connect("animation_finished",new Callable(this,"ChangeToNextOnEnd"));
+		hitboxPlayer.AnimationFinished += ChangeToNextOnEnd;
 	}
 	
 	public virtual void Stop()
@@ -190,7 +193,7 @@ public partial class AttackPart : Node2D, IHitter
 	public virtual void OnEnd() {}
 	public virtual void HitEvent(Hitbox hitbox, Hurtbox hurtbox) {}
 	
-	public void ChangeToNextOnEnd(string dummy="") => ChangeToNext(true);
+	public void ChangeToNextOnEnd(StringName dummy) => ChangeToNext(true);
 	
 	public virtual void ChangeToNext(bool end = false)
 	{

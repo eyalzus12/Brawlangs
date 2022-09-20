@@ -148,7 +148,7 @@ public partial class Character : CharacterBody2D, IHittable, IAttacker
 	public int framesSinceLastHit = 0;
 	public int comboCount = 0;
 	
-	public Vector2[] Velocities{get;set;} = new Vector2[8]{Vector2.Zero,Vector2.Zero,Vector2.Zero,Vector2.Zero,Vector2.Zero,Vector2.Zero,Vector2.Zero,Vector2.Zero};
+	public Vector2[] Velocities{get;set;} = {Vector2.Zero,Vector2.Zero,Vector2.Zero,Vector2.Zero,Vector2.Zero,Vector2.Zero,Vector2.Zero,Vector2.Zero};
 	public Vector2 vec;//normal velocity from movement
 	public Vector2 vac;//speed transferred from moving platforms
 	public Vector2 vic;//momentary force
@@ -336,7 +336,8 @@ public partial class Character : CharacterBody2D, IHittable, IAttacker
 	///////////////States//////////////////////
 	///////////////////////////////////////////
 	
-	public virtual State[] GenerateStates() => new State[]
+	public virtual IEnumerable<State> GenerateStates() =>
+	new State[]
 	{
 		new AirState(this),
 		new AirJumpState(this),
@@ -711,7 +712,7 @@ public partial class Character : CharacterBody2D, IHittable, IAttacker
 		//PlaySound("Clash");
 	}
 	
-	public virtual bool AttackInCooldown(Attack a) => a.SharesCooldownWith.Append((string)a.Name).Any(Cooldowns.InCooldown);
+	public virtual bool AttackInCooldown(Attack a) => a.SharesCooldownWith.Append(a.Name.ToString()).Any(Cooldowns.InCooldown);
 	
 	public virtual bool ExecuteAttack(Attack a)
 	{
@@ -720,7 +721,8 @@ public partial class Character : CharacterBody2D, IHittable, IAttacker
 		if(CurrentAttack != null) ResetCurrentAttack(null);
 		
 		CurrentAttack = a;
-		CurrentAttack.Connect("AttackEnds",new Callable(this,nameof(ResetCurrentAttack)));
+		//CurrentAttack.Connect("AttackEnds",new Callable(this,nameof(ResetCurrentAttack)));
+		CurrentAttack.AttackEnds += ResetCurrentAttack;
 		var s = States.Get<AttackState>();
 		s.att = CurrentAttack;
 		States.Change("Attack");
@@ -744,7 +746,8 @@ public partial class Character : CharacterBody2D, IHittable, IAttacker
 	public void ResetCurrentAttack(Attack a)
 	{
 		if(CurrentAttack is null) return;
-		CurrentAttack.Disconnect("AttackEnds",new Callable(this,nameof(ResetCurrentAttack)));
+		CurrentAttack.AttackEnds -= ResetCurrentAttack;
+		//CurrentAttack.Disconnect("AttackEnds",new Callable(this,nameof(ResetCurrentAttack)));
 		SetAttackCooldowns();
 		CurrentAttack = null;
 	}
@@ -766,7 +769,8 @@ public partial class Character : CharacterBody2D, IHittable, IAttacker
 			//add owner
 			//generatedProjectile.OwnerObject = this;
 			//connect destruction signal
-			generatedProjectile.Connect("ProjectileDied",new Callable(this,nameof(HandleProjectileDestruction)));
+			//generatedProjectile.Connect("ProjectileDied",new Callable(this,nameof(HandleProjectileDestruction)));
+			generatedProjectile.ProjectileDied += HandleProjectileDestruction;
 			//store as active
 			activeProjectiles[proj].Add(generatedProjectile);
 			//request that _Ready will be called
@@ -785,7 +789,8 @@ public partial class Character : CharacterBody2D, IHittable, IAttacker
 		
 		activeProjectiles[identifier].Remove(who);
 		projPool.InsertProjectile(who);
-		who.Disconnect("ProjectileDied",new Callable(this,nameof(HandleProjectileDestruction)));
+		//who.Disconnect("ProjectileDied",new Callable(this,nameof(HandleProjectileDestruction)));
+		who.ProjectileDied -= HandleProjectileDestruction;
 	}
 	
 	public virtual void SetAttackCooldowns()

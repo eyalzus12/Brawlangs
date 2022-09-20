@@ -117,13 +117,13 @@ public partial class AttackCreator
 		foreach(var s in transitionSections) BuildTransition(ap, s);
 		
 		var hitTransitionSection = inif[section, "HitTransition", ""].s();
-		if(hitTransitionSection != "") ap.TransitionManager.Add(new AttackPartTransition(Enumerable.Empty<Vector2>(), new AttackPartTransitionTagExpression(new object[]{("Hit",StateTag.Active),("Hit",StateTag.Starting),'|'}), hitTransitionSection));
+		if(hitTransitionSection != "") ap.TransitionManager.Add(new(Enumerable.Empty<Vector2>(), new(new object[]{("Hit",StateTag.NotActive),'!'}), hitTransitionSection));
 		
 		var missTransitionSection = inif[section, "MissTransition", ""].s();
-		if(missTransitionSection != "") ap.TransitionManager.Add(new AttackPartTransition(Enumerable.Empty<Vector2>(), new AttackPartTransitionTagExpression(new object[]{("Hit",StateTag.NotActive)}), missTransitionSection));
+		if(missTransitionSection != "") ap.TransitionManager.Add(new(Enumerable.Empty<Vector2>(), new(new object[]{("Hit",StateTag.NotActive)}), missTransitionSection));
 		
 		var nextTransitionSection = inif[section, "NextTransition", ""].s();
-		if(nextTransitionSection != "") ap.TransitionManager.Add(new AttackPartTransition(Enumerable.Empty<Vector2>(), new AttackPartTransitionTagExpression(), nextTransitionSection));
+		if(nextTransitionSection != "") ap.TransitionManager.Add(new(Enumerable.Empty<Vector2>(), new(), nextTransitionSection));
 		
 		ap.LoadProperties();
 		LoadExtraProperties(ap, section);
@@ -187,10 +187,10 @@ public partial class AttackCreator
 		h.TeamStunMult = tsm;
 		
 		var whitelistedStates = inif[section, "WhitelistedStates", Enumerable.Empty<string>()].ls();
-		h.WhitelistedStates = new HashSet<string>(whitelistedStates);
+		h.WhitelistedStates = new(whitelistedStates);
 		
 		var blacklistedStates = inif[section, "BlacklistedStates", Enumerable.Empty<string>()].ls();
-		h.BlacklistedStates = new HashSet<string>(blacklistedStates);
+		h.BlacklistedStates = new(blacklistedStates);
 		
 		h.LoadProperties();
 		LoadExtraProperties(h, section);
@@ -229,11 +229,11 @@ public partial class AttackCreator
 		var frames = inif[section, "Frames", Enumerable.Empty<Vector2>()].lv2();
 		
 		var tags = inif[section, "Tag", ""].s();
-		var tagExpression = new AttackPartTransitionTagExpression(ParseTagList(tags));
+		AttackPartTransitionTagExpression tagExpression = new(ParseTagList(tags));
 		
 		var nextPart = inif[section, "Next", ""].s();
 		
-		var addedTransition = new AttackPartTransition(frames, tagExpression, nextPart);
+		AttackPartTransition addedTransition = new(frames, tagExpression, nextPart);
 		ap.TransitionManager.Add(addedTransition);
 	}
 	
@@ -242,10 +242,10 @@ public partial class AttackCreator
 	{
 		if(s == "") yield break;
 		
-		var operators = new Stack<char>();
+		Stack<char> operators = new();
 		
-		var stateName = new StringBuilder();
-		var tagValue = new StringBuilder();
+		StringBuilder stateName = new();
+		StringBuilder tagValue = new();
 		bool doingTagValue = false;
 		
 		foreach(var c in s)

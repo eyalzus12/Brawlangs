@@ -29,28 +29,31 @@ public partial class AnimationSprite : Sprite2D
 		FramePlayer.PlaybackProcessMode = AnimationPlayer.AnimationProcessCallback.Physics;
 		FramePlayer.Name = "FramePlayer";
 		AddChild(FramePlayer);
+		
+		var anmlib = new AnimationLibrary();
 		foreach(var a in Animations)
 		{
 			var animationName = a.Key;
 			var animationSheet = a.Value;
 			
 			var anm = new Animation();
+			
 			anm.Step = 1/24f;
 			var frameCount = animationSheet.Length;
 			anm.Length = frameCount * anm.Step;
 			anm.LoopMode = animationSheet.Loop?Animation.LoopModeEnum.Linear:Animation.LoopModeEnum.None;
-			var anmlib = new AnimationLibrary();
-			anmlib.AddAnimation(animationName, anm);
-			FramePlayer.AddAnimationLibrary(animationName, anmlib);
+			
 			int trc = anm.AddTrack(Animation.TrackType.Value);
 			var path = GetPath() + ":frame";
 			anm.TrackSetPath(trc, path);
-			
-			for(int i = 0; i < frameCount; ++i)
-				anm.TrackInsertKey(trc, i*anm.Step, i);
+			for(int i = 0; i < frameCount; ++i) anm.TrackInsertKey(trc, i*anm.Step, i);
+				
+			anmlib.AddAnimation(animationName, anm);
 		}
 		
-		FramePlayer.Connect("animation_finished",new Callable(this,nameof(AnimationFinished)));
+		FramePlayer.AddAnimationLibrary("", anmlib);
+		//FramePlayer.Connect("animation_finished",new Callable(this,nameof(AnimationFinished)));
+		FramePlayer.AnimationFinished += AnimationFinished;
 	}
 	
 	public void Play(string anm, bool overwriteQueue)
@@ -92,7 +95,7 @@ public partial class AnimationSprite : Sprite2D
 	
 	public void ClearQueue() => Queued.Clear();
 	
-	public void AnimationFinished(string anm = "")
+	public void AnimationFinished(StringName anm)
 	{
 		FramePlayer?.Stop(true);
 		if(Queued.Count > 0)
@@ -104,7 +107,7 @@ public partial class AnimationSprite : Sprite2D
 	
 	public void Pause() => FramePlayer?.Stop(false);
 	public void Resume() => FramePlayer?.Play();
-	public void Stop() {ClearQueue(); AnimationFinished();}
+	public void Stop() {ClearQueue(); AnimationFinished("");}
 	
 	public string QueueToString() => string.Join(" ", Queued.Select(a=>a.Name).ToArray());
 }

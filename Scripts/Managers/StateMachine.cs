@@ -48,8 +48,9 @@ public class StateMachine
 	
 	public T Change<T>() where T : State
 	{
-		if(Change(Get<T>().ToString()) is T t) return t;
-		throw new Exception("This should never fucking happen. If anyone finds this, fuck you.");
+		var newState = Change(Get<T>().ToString());
+		if(newState is T t) return t;
+		throw new Exception($"The type safe Get function for states was called with {typeof(T).Name} and properly returned but attempt to change to that state found a wrong state type {newState.GetType().Name}. If this shows, something got really fucked up");
 	}
 	
 	public void Update(double delta)

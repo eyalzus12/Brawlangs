@@ -9,7 +9,8 @@ public partial class AudioPlayer : AudioStreamPlayer2D
 	
 	public override void _Ready()
 	{
-		Connect("finished",new Callable(this,nameof(OnFinish)));
+		//Connect("finished",new Callable(this,nameof(OnFinish)));
+		Finished += OnFinish;
 	}
 	
 	public void Play(AudioStream stream)

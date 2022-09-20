@@ -3,6 +3,8 @@ using System;
 
 public partial class DamageLabel : Label
 {
+	//TODO: only update on changes
+	
 	public const string PATH = "res://damage.shader";
 	
 	public Character ch;

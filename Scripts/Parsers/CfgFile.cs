@@ -101,7 +101,7 @@ public class CfgFile
 								store.Add(element + ',' + trim1 + ',' + trim2 + ',' + trim3);//add
 								i += 3;
 							}
-						}//end of Quaternion else
+						}//end of Vector4 else
 					}//end of Vector3 else
 				}//end of Vector check
 				else store.Add(element);
@@ -112,21 +112,12 @@ public class CfgFile
 		dict.Add(left, Norm(store));
 	}
 	
-	private object Norm(Strl l)
+	private object Norm(Strl l) => l.Count switch
 	{
-		switch(l.Count)
-		{
-			case 0:
-				return null;
-			case 1:
-				return Norm(l[0]);
-			default:
-				return l.Select(Norm).ToList();
-				/*var lo = new List<object>();
-				foreach(var s in l) lo.Add(Norm(s));
-				return lo;*/
-		}
-	}
+		0 => null,
+		1 => Norm(l[0]),
+		_ => l.Select(Norm).ToList(),
+	};
 	
 	private object Norm(string s)
 	{
@@ -134,101 +125,18 @@ public class CfgFile
 		float f;
 		Vector2 v2;
 		Vector3 v3;
-		Quaternion q;
+		Vector4 v4;
 			
 		if(string.Equals(s, "true",  StringComparison.OrdinalIgnoreCase)) return true;//represents true
 		else if(string.Equals(s, "false",  StringComparison.OrdinalIgnoreCase)) return false;//represents false
 		else if(int.TryParse(s, out i)) return i;//represents a number
 		else if(float.TryParse(s, out f)) return f;//represents a float
-		else if(s2v2(s, out v2)) return v2;//represents a Vector2
-		else if(s2v3(s, out v3)) return v3;//represents a Vector3
-		else if(s2q(s, out q)) return q;//represents a Quaternion
+		else if(StringUtils.TryParseVector2(s, out v2)) return v2;//represents a Vector2
+		else if(StringUtils.TryParseVector3(s, out v3)) return v3;//represents a Vector3
+		else if(StringUtils.TryParseVector4(s, out v4)) return v4;//represents a Vector4
 		else return s.Trim('\"');//represents a string
 	}
 	
-	private bool s2v2(string s, out Vector2 v)
-	{
-		var st = s.Trim();
-		if(st[0] != '(' || st[st.Length-1] != ')')
-		{
-			v = default;
-			return false;
-		}
-		else
-		{
-			string[] ss = st.Substring(1, st.Length-2).Split(',');
-			if(ss.Length != 2)
-			{
-				v = default;
-				return false;
-			}
-			float x = float.Parse(ss[0].Trim());
-			float y = float.Parse(ss[1].Trim());
-			v = new Vector2(x, y);
-			return true;
-		}
-	}
-	
-	private bool s2v3(string s, out Vector3 v)
-	{
-		var st = s.Trim();
-		if(st[0] != '(' || st[st.Length-1] != ')')
-		{
-			v = default;
-			return false;
-		}
-		else
-		{
-			string[] ss = st.Substring(1, st.Length-2).Split(',');
-			if(ss.Length != 3)
-			{
-				v = default;
-				return false;
-			}
-			float x = float.Parse(ss[0].Trim());
-			float y = float.Parse(ss[1].Trim());
-			float z = float.Parse(ss[2].Trim());
-			v = new Vector3(x, y, z);
-			return true;
-		}
-	}
-	
-	private bool s2q(string s, out Quaternion q)
-	{
-		if(s[0] != '(' || s[s.Length-1] != ')')
-		{
-			q = default;
-			return false;
-		}
-		else
-		{
-			string[] ss = s.Substring(1, s.Length-2).Split(',');
-			if(ss.Length != 4)
-			{
-				q = default;
-				return false;
-			}
-			float x = float.Parse(ss[0].Trim());
-			float y = float.Parse(ss[1].Trim());
-			float z = float.Parse(ss[2].Trim());
-			float w = float.Parse(ss[3].Trim());
-			q = new Quaternion(x, y, z, w);
-			return true;
-		}
-	}
-	
 	private Strl Clean(Strl l) => l.Select(Clean).Where(s => s != "").ToList<string>();
-	/*{
-		Strl ll = new Strl();
-		
-		foreach(var s in l)
-		{
-			string h = Clean(s);
-			if(h != "") ll.Add(h);
-		}
-		
-		return ll;
-	}*/
-	
 	private string Clean(string s) => s.Split(';')[0].Trim();
 }

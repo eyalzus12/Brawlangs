@@ -41,11 +41,11 @@ public class KeybindsParser
 	public void Parse(string s) => SplitToSections(EnsureNoPreData(RemoveRedundantLines(s))).ForEach(dat => ParseData(dat.Item1, dat.Item2));
 	
 	private const string IGNORE_LINE = @"^(?:;.*|[\s\n\r]*)";
-	private static readonly Regex IGNORE_REGEX = new Regex(IGNORE_LINE, RegexOptions.Compiled | RegexOptions.Multiline);
+	private static readonly Regex IGNORE_REGEX = new(IGNORE_LINE, RegexOptions.Compiled | RegexOptions.Multiline);
 	private string RemoveRedundantLines(string s) => IGNORE_REGEX.Replace(s, "");
 	
 	private const string NO_DATA_PRE = @"^[0-9]+:";
-	private static readonly Regex NO_PRE_REGEX = new Regex(NO_DATA_PRE, RegexOptions.Compiled);
+	private static readonly Regex NO_PRE_REGEX = new(NO_DATA_PRE, RegexOptions.Compiled);
 	private string EnsureNoPreData(string s)
 	{
 		if(!NO_PRE_REGEX.IsMatch(s)) throw new FormatException("Keybinds config: non comment lines before first section");
@@ -53,14 +53,14 @@ public class KeybindsParser
 	}
 	
 	private const string SECTION_SPLITTER = @"(?<section>[0-9]+):(?:\s*;\w*)?[\r\n]+(?<data>(?:.(?![0-9]+:))*)";
-	private static readonly Regex SECTION_REGEX = new Regex(SECTION_SPLITTER, RegexOptions.Compiled | RegexOptions.Singleline);
+	private static readonly Regex SECTION_REGEX = new(SECTION_SPLITTER, RegexOptions.Compiled | RegexOptions.Singleline);
 	private IEnumerable<(int, string)> SplitToSections(string s) => SECTION_REGEX
 		.Matches(s)
 		.Cast<Match>()
 		.Select(m => (int.Parse(m.Groups["section"].Value), m.Groups["data"].Value));
 	
 	private const string DATA_PARSER = @"^(?<action>\w+)\s*=\s*(?:@(?<deadzone>[+-]?[0-9]*\.?[0-9]*))?(?:\s+(?<device>[0-9]+)_(?<type>[a-zA-Z]*)(?<data>[0-9]+)_?(?<extra>[+-]?[0-9]*\.?[0-9]*)?)*\s*(?:;.*)?$";
-	private static readonly Regex DATA_REGEX = new Regex(DATA_PARSER, RegexOptions.Compiled | RegexOptions.Multiline);
+	private static readonly Regex DATA_REGEX = new(DATA_PARSER, RegexOptions.Compiled | RegexOptions.Multiline);
 	private void ParseData(int section, string s)
 	{
 		if(!Data.ContainsKey(section)) Data.Add(section, new ActionDict());

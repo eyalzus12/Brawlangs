@@ -6,7 +6,6 @@ using System.Text.RegularExpressions;
 
 public static class IterUtils
 {
-	
 	public static IEnumerable<T> Enumerable<[MustBeVariant] T>(this Godot.Collections.Array<T> a)
 	{
 		foreach(var h in a) yield return h;
@@ -21,17 +20,12 @@ public static class IterUtils
 		int i = 0; foreach(var o in e) yield return (i++, o);
 	}
 	
-	public static IEnumerable<TResult> Accumulate<TResult, T>(this IEnumerable<T> e, TResult seed, Func<TResult, T, TResult> accum)
+	public static IEnumerable<TResult> Accumulate<TResult, T>(this IEnumerable<T> e, Func<TResult, T, TResult> accum, TResult seed = default(TResult))
 	{
 		foreach(var o in e) yield return (seed = accum(seed, o));
 	}
 	
-	public static IEnumerable<TResult> SelectWhere<T, TResult>(this IEnumerable<T> e, Func<T, TResult> selector, Func<T, bool> checker)
-	{
-		foreach(var o in e) if(checker(o)) yield return selector(o);
-	}
-	
-	public static IEnumerable<TResult> FilterType<T, TResult>(this IEnumerable<T> e)
+	public static IEnumerable<TResult> FilterType<T, TResult>(this IEnumerable<T> e) where T : TResult
 	{
 		foreach(var o in e) if(o is TResult t) yield return t;
 	}
@@ -58,6 +52,7 @@ public static class IterUtils
 		int i = 0; foreach(var o in e) yield return i++;
 	}
 	
+	//TODO: SelectMany
 	public static IEnumerable<T> Flatten<T>(params IEnumerable<T>[] earr)
 	{
 		foreach(var e in earr) foreach(var o in e) yield return o;
@@ -74,6 +69,8 @@ public static class IterUtils
 	}
 	
 	public static Vector2 Sum(this IEnumerable<Vector2> e) => e.Aggregate(Vector2.Zero, (v1,v2)=>v1+v2);
+	
+	//NOTE: this could cause the enumerable to be generated twice
 	public static Vector2 Avg(this IEnumerable<Vector2> e) => e.Sum()/e.Count();
 	
 	public static void Rotate<T>(this Queue<T> q) => q.Enqueue(q.Dequeue());
@@ -171,7 +168,7 @@ public static class IterUtils
 	
 	public static IEnumerable<IEnumerable<T>> MultiZip<T>(params IEnumerable<T>[] es)
 	{
-		var ens = es.Select(e => e.GetEnumerator());
+		var ens = es.Select(e => e.GetEnumerator()).ToList();//ToList to ensure it only generates once
 		while(ens.All(en => en.MoveNext())) yield return ens.Select(en => en.Current);
 	}
 	

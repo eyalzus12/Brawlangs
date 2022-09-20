@@ -29,7 +29,8 @@ public partial class DeathHandeler : Node
 		count = 0;
 		foreach(var c in cr)
 		{
-			c.Connect("Dead",new Callable(this,nameof(CharacterDead)));
+			//c.Connect("Dead",new Callable(this,nameof(CharacterDead)));
+			c.Dead += CharacterDead;
 			++count;
 		}
 	}
@@ -55,7 +56,7 @@ public partial class DeathHandeler : Node
 			{
 				var left = exists[0];
 				var log = Log(left, 1);
-				var toAdd = new List<string>(new string[]{log});
+				var toAdd = new List<string>{log};
 				diedTotal.Add(toAdd);
 			}
 			HandleEndOfMatch();

@@ -75,7 +75,7 @@ public partial class State : Node
 		ch.FloorBlockOnWall = true;
 		ch.FloorConstantSpeed = false;
 		ch.FloorMaxAngle = FLOOR_ANGLE;
-		ch.FloorSnapLength = 10f;//Modify
+		ch.FloorSnapLength = 5f;//Modify
 		ch.FloorStopOnSlope = true;
 		ch.PlatformOnLeave = CharacterBody2D.PlatformOnLeaveEnum.AddUpwardVelocity;
 		ch.SlideOnCeiling = false;

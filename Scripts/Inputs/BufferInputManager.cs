@@ -1,4 +1,4 @@
-//#define DEBUG_INPUT_EVENTS
+////#define DEBUG_INPUT_EVENTS
 
 using Godot;
 using System;

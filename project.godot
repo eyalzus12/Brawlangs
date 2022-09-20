@@ -131,6 +131,10 @@ file_logging/enable_file_logging=true
 
 name_num_separator=1
 
+[physics]
+
+common/physics_jitter_fix=0.0
+
 [rendering]
 
 environment/default_environment="res://default_env.tres"

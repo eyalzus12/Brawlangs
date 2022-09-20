@@ -20,14 +20,14 @@ public class DamageCalculator
 	public static Color DamageToColor(float damage)
 	{
 		if(damage <= VALUES[0].Item1) return VALUES[0].Item2;
-		if(damage >= VALUES[VALUES.Length-1].Item1) return VALUES[VALUES.Length-1].Item2;
+		if(damage >= VALUES[^1].Item1) return VALUES[^1].Item2;
 		
 		int idx = Array.BinarySearch<(float,Color)>(VALUES, (damage, new Color()), COMPARER);
 		
 		if(idx < 0) idx = ~idx;
 		
 		if(idx == 0) return VALUES[0].Item2;
-		if(idx >= VALUES.Length) return VALUES[VALUES.Length-1].Item2;
+		if(idx >= VALUES.Length) return VALUES[^1].Item2;
 		
 		var prevDamage = VALUES[idx-1].Item1;
 		var nextDamage = VALUES[idx].Item1;

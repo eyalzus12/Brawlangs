@@ -6,7 +6,7 @@ public partial class CharacterCollision : CollisionShape2D
 {
 	public RectangleShape2D RecShape{get => (RectangleShape2D)Shape; set => Shape = value;}
 	
-	public Vector2 Extents {get => RecShape.Size; set => RecShape.SetDeferred("extents", value);}
+	public Vector2 Extents {get => RecShape.Size; set => RecShape.SetDeferred("size", value);}
 	
 	public Dictionary<string, CollisionShapeState> states = new();
 	public string CurrentCollisionState = "Default";

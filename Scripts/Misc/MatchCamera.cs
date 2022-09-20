@@ -52,7 +52,8 @@ public partial class MatchCamera : Camera2D
 		foreach(var n in GetParent().GetChildren()) if(n is Character c)
 		{
 			followed.Add(c);
-			c.Connect("Dead",new Callable(this,nameof(CharacterGone)));
+			//c.Connect("Dead",new Callable(this,nameof(CharacterGone)));
+			c.Dead += CharacterGone;
 		}
 	}
 	

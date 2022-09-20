@@ -31,24 +31,34 @@ public partial class AudioManager : Node
 	
 	public void Play(AudioStream stream)
 	{
-		if(stream is null || Available.Count <= 0) return;//TODO: add a waiting queue for sounds, that plays them at the fitting time
+		if(stream is null || !Godot.Object.IsInstanceValid(stream) || Available.Count <= 0) return;//TODO: add a waiting queue for sounds, that plays them at the fitting time
+		
 		var use = Available.Dequeue();
 		use.Play(stream);
-		use.Connect("FinishedPlaying",new Callable(this,nameof(StreamFinished)));
+		//use.Connect("FinishedPlaying",new Callable(this,nameof(StreamFinished)));
+		use.FinishedPlaying += StreamFinished;
 	}
 	
 	public void Play(string sound)
 	{
-		if(Sounds.ContainsKey(sound)) Play(Sounds[sound]);
+		if(Sounds.ContainsKey(sound)) Play(this[sound]);
 		else if(sound != "") GD.PushError($"Could not play sound {sound} as it does not exist");
 	}
 	
-	public void AddSound(string name, AudioStream audio) => Sounds.Add(name, audio);
+	public void AddSound(string name, AudioStream audio)
+	{
+		//audio.Changed += Temp;
+		Sounds.Add(name, audio);
+	}
+	
+	//public void Temp() => GD.Print("amogus");
 	
 	public void StreamFinished(AudioPlayer who, AudioStream what)
 	{
+		GD.Print(what);
 		Available.Enqueue(who);
-		who.Disconnect("FinishedPlaying",new Callable(this,nameof(StreamFinished)));
+		//who.Disconnect("FinishedPlaying",new Callable(this,nameof(StreamFinished)));
+		who.FinishedPlaying -= StreamFinished;
 	}
 	
 	public override string ToString()
@@ -72,8 +82,9 @@ public partial class AudioManager : Node
 	
 	public void CleanAfter(AudioPlayer player)
 	{
+		//player.Disconnect("FinishedPlaying",new Callable(this,nameof(StreamFinished)));
+		player.FinishedPlaying -= StreamFinished;
 		player.Stop();
-		player.Disconnect("FinishedPlaying",new Callable(this,nameof(StreamFinished)));
 		Available.Enqueue(player);
 	}
 	

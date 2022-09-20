@@ -58,10 +58,19 @@ public partial class Attack : Node2D
 		StunMult = 1;
 		frameCount = 0;
 		active = true;
+		
 		EmitSignal(nameof(AttackStarts), this);
-		if(connected is not null) Disconnect("AttackEnds",new Callable(connected,"SetEnd"));
-		Connect("AttackEnds",new Callable(ch.States.Current,"SetEnd"));
+		
+		//if(connected is not null)
+			//Disconnect("AttackEnds",new Callable(connected,"SetEnd"));
+		
+		if(connected is AttackState ast1) AttackEnds -= ast1.SetEnd;
+		
 		connected = ch.States.Current;
+		
+		//Connect("AttackEnds",new Callable(ch.States.Current,"SetEnd"));
+		if(connected is AttackState ast2) AttackEnds += ast2.SetEnd;
+		
 		CurrentPart = StartPart;
 		LastUsedPart = null;
 		OnStart();

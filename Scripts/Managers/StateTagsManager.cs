@@ -23,7 +23,7 @@ public class StateTagsManager
 	{
 		StateTag.Starting => StateTag.Active,
 		StateTag.Ending or StateTag.Instant => StateTag.NotActive,
-		_ => t,
+		_ => t,//NotActive, Active, or NotDefined
 	};
 	
 	public override string ToString()

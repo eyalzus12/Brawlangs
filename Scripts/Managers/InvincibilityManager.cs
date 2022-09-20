@@ -21,7 +21,7 @@ public class InvincibilityManager
 	
 	public void Update()
 	{
-		var keys = new List<string>(Timers.Keys);
+		List<string> keys = new(Timers.Keys);
 		foreach(var k in keys)
 		{
 			this[k]--;
@@ -31,8 +31,8 @@ public class InvincibilityManager
 	
 	public override string ToString()
 	{
-		var result = new StringBuilder();
-		foreach(var entry in Timers) result.Append($"{entry.Key.ToString()} : {entry.Value.ToString()}\n");
+		StringBuilder result = new();
+		foreach((string key, int @value) in Timers) result.Append($"{key.ToString()} : {@value.ToString()}\n");
 		return result.ToString();
 	}
 }

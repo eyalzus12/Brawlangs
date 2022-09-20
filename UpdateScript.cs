@@ -1,4 +1,4 @@
-#define DEBUG_INPUT_MAP
+//#define DEBUG_INPUT_MAP
 
 using Godot;
 using System;

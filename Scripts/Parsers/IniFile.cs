@@ -159,18 +159,12 @@ public class IniFile
 		DataDict[key].Add(left, Norm(store));
 	}
 	
-	private object Norm(Strl l)
+	private object Norm(Strl l) => l.Count switch
 	{
-		switch(l.Count)
-		{
-			case 0:
-				return null;
-			case 1:
-				return Norm(l[0]);
-			default:
-				return l.Select(Norm).ToList();
-		}
-	}
+		0 => null,
+		1 => Norm(l[0]),
+		_ => l.Select(Norm).ToList(),
+	};
 	
 	private object Norm(string s)
 	{

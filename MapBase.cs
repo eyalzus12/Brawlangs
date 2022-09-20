@@ -55,7 +55,8 @@ public partial class MapBase : Node2D
 		SetDamageLabelLocations(chars.ToArray());
 		var dh = new DeathHandeler(chars);
 		AddChild(dh);
-		dh.Connect("MatchEnds",new Callable(this,nameof(MatchEnd)));
+		//dh.Connect("MatchEnds",new Callable(this,nameof(MatchEnd)));
+		dh.MatchEnds += MatchEnd;
 	}
 	
 	public Character PathToCharacter(string path, int i)

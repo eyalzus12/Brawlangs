@@ -25,13 +25,11 @@ public partial class InfoLabel : Label
 		
 		Visible = debugMode && EnsureCorrectAppearence();
 		
-		commit.Clear();
+		if(!Visible) return;
 		
-		if(Visible)
-		{
-			UpdateLabel();
-			Commit();
-		}
+		commit.Clear();
+		UpdateLabel();
+		Commit();
 	}
 	
 	public virtual void UpdateLabel() {}

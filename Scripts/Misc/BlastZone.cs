@@ -36,7 +36,8 @@ public partial class BlastZone : Node2D
 		foreach(var n in GetParent().GetChildren()) if(n is Character c)
 		{
 			characters.Add(c);
-			c.Connect("Dead",new Callable(this,nameof(CharacterGone)));
+			//c.Connect("Dead",new Callable(this,nameof(CharacterGone)));
+			c.Dead += CharacterGone;
 		}
 	}
 	

@@ -17,15 +17,15 @@ public partial class CharacterCreator
 	public Character Build(Node2D n, int teamNum)
 	{
 		//create actual character
-		var ch = new Character();
+		Character ch = new();
 		//open cfg file
-		var charinif = new CfgFile();
+		CfgFile charinif = new();
 		charinif.Load(path);
 		var name = charinif["Name", ""].s();
 		//load name
 		ch.Name = name + teamNum;
 		
-		var projPool = new ProjectilePool(ch); 
+		ProjectilePool projPool = new(ch); 
 		projPool.Name = "ProjectilePool";
 		ch.AddChild(projPool);
 		ch.projPool = projPool;
@@ -38,7 +38,7 @@ public partial class CharacterCreator
 		//find stat file name
 		var statFile = charinif["Stats", ""].s();
 		//load properties from stat file
-		var prop = new PropertyMap();
+		PropertyMap prop = new();
 		prop.ReadFromConfigFile($"{directoryPath}/{statFile}.cfg", "Stats");
 		prop.LoadProperties(ch);
 		
@@ -55,19 +55,19 @@ public partial class CharacterCreator
 		//find collision file name
 		var collisionFile = charinif["Collision", ""].s();
 		//create collision
-		var collCreator = new CollisionCreator($"{directoryPath}/{collisionFile}.ini");
+		CollisionCreator collCreator = new($"{directoryPath}/{collisionFile}.ini");
 		collCreator.Build(ch);
 		
 		//find attack file name
 		var attackFile = charinif["Attacks", ""].s();
 		//create attacks
-		var attCreator = new AttackCreator($"{directoryPath}/{attackFile}.ini");
+		AttackCreator attCreator = new($"{directoryPath}/{attackFile}.ini");
 		attCreator.Build(ch);
 		
 		//find projectiles file name
 		var projFile = charinif["Projectiles", ""].s();
 		//create attacks
-		var projCreator = new ProjectileCreator($"{directoryPath}/{projFile}.ini");
+		ProjectileCreator projCreator = new($"{directoryPath}/{projFile}.ini");
 		ch.projPool.ProjCreate = projCreator;
 		/*var projectilesBuilt = projCreator.Build(ch);
 		foreach(var sp in projectilesBuilt)
@@ -90,6 +90,7 @@ public partial class CharacterCreator
 		var files = ListPostImportDirectoryFiles(animationsFolder, ".png").Distinct().ToList();
 		foreach(var file in files)
 		{
+			//TODO: make this a regex
 			var filename = StringUtils.RemoveExtension(file);
 			var resourcePath = $"{animationsFolder}/{file}";
 			var parts = filename.Split('_');
@@ -132,7 +133,7 @@ public partial class CharacterCreator
 	const int AUDIO_PLAYERS = 4;
 	public void BuildAudio(Character ch, string audioFolder)
 	{
-		var am = new AudioManager(AUDIO_PLAYERS);
+		AudioManager am = new(AUDIO_PLAYERS);
 		am.Name = "AudioManager";
 		
 		var files = ListPostImportDirectoryFiles(audioFolder, ".wav", ".ogg", ".mp3").Distinct().ToList();
@@ -142,7 +143,8 @@ public partial class CharacterCreator
 			var resourcePath = $"{audioFolder}/{file}";
 			var loop = filename.EndsWith("Loop");
 			var audio = GenerateAudioFromPath(resourcePath, loop);
-			var noloopname = filename.Substring(0, filename.Length - "Loop".Length);
+			//var noloopname = filename.Substring(0, filename.Length - "Loop".Length);
+			var noloopname = filename[0..^("Loop".Length)];
 			var normalizedFilename = (loop?noloopname:filename);
 			am.AddSound(normalizedFilename, audio);
 		}
@@ -190,7 +192,7 @@ public partial class CharacterCreator
 	public static List<string> ListPostImportDirectoryFiles(string path, params string[] desiredExtensions)
 	{
 		var tempArray = ListDirectoryFiles(path);
-		var fileArray = new List<string>();
+		List<string> fileArray = new();
 		foreach(var file in tempArray)
 		{
 			if(file.EndsWith(".import"))
@@ -212,31 +214,15 @@ public partial class CharacterCreator
 		return fileArray;
 	}
 	
-	public static List<string> ListDirectoryFiles(string path)
+	public static IEnumerable<string> ListDirectoryFiles(string path)
 	{
-		var files = new List<string>();
-		var dir = new Directory();
+		Directory dir = new();
 		var er = dir.Open(path);
-		if(er == Error.Ok)
-		{
-			dir.ListDirBegin();
-			string file;
-			
-			while((file = dir.GetNext()) != "")
-			{
-				if(!dir.CurrentIsDir() && file[0] != '.')
-				{
-					files.Add(file);
-				}
-			}
-			
-			dir.ListDirEnd();
-		}
+		if(er == Error.Ok) return dir.GetFiles();
 		else
 		{
 			GD.PushError($"Error opening folder {path}. error is {er}");
+			return Enumerable.Empty<string>();
 		}
-		
-		return files;
 	}
 }

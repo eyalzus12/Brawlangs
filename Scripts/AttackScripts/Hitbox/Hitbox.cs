@@ -86,7 +86,8 @@ public partial class Hitbox : Area2D
 		
 		Active = false;
 		
-		Connect("area_entered",new Callable(this,nameof(OnAreaEnter)));
+		//Connect("area_entered",new Callable(this,nameof(OnAreaEnter)));
+		AreaEntered += OnAreaEnter;
 		
 		//TODO: figure how this shit works
 		CollisionLayer ^= 0b11111;//reset five rightmost bits

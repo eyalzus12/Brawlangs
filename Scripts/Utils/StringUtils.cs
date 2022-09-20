@@ -9,8 +9,6 @@ public static class StringUtils
 	public static string GetExtension(string str) => System.IO.Path.GetExtension(str);
 	public static string RemoveExtension(string str) => System.IO.Path.GetFileNameWithoutExtension(str);
 	public static string PascalCaseToSentence(string str) => Regex.Replace(str, "([A-Z])", " $1", RegexOptions.Compiled).Trim();
-	public static bool RegexMatch(this object o, string regex) => Regex.IsMatch(o.ToString(), regex);
-	public static char FromEnd(this string s, int index) => s[s.Length-index];
 	
 	public static string GlobalizePath(string path)
 	{
@@ -40,7 +38,7 @@ public static class StringUtils
 	public static string IntToWordSuffix(int i)
 	{
 		var s = i.ToString();
-		var c = s.FromEnd(1);
+		var c = s[^1];
 		var lastnum = (int)(c-'0');
 		switch(lastnum)
 		{
@@ -51,7 +49,7 @@ public static class StringUtils
 		}
 	}
 	
-	public readonly static HashSet<char> VOWELS = new HashSet<char>(new char[]{'a','A','e','E','i','I','o','O','u','U'});
+	public readonly static HashSet<char> VOWELS = new HashSet<char>{'a','A','e','E','i','I','o','O','u','U'};
 	public static string AAN(this string s)
 	{
 		var firstchar = s[0];

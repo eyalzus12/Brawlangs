@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public partial class AttackPartTransitionTagExpression
+public class AttackPartTransitionTagExpression
 {
 	public List<object> ExpressionParts{get; set;} = new();
 	
@@ -13,7 +13,7 @@ public partial class AttackPartTransitionTagExpression
 	{
 		if(ExpressionParts.Count == 0) return true;
 		
-		var estack = new Stack<bool>();
+		Stack<bool> estack = new();
 		foreach(var part in ExpressionParts)
 		{
 			if(part is ValueTuple<string, StateTag> tag) estack.Push(tagsManager?[tag.Item1] == tag.Item2);
@@ -21,7 +21,7 @@ public partial class AttackPartTransitionTagExpression
 			{
 				if(c == '!')
 				{
-					if(estack.Count < 1) throw new FormatException($"Attempt to run operator {c} on less than two tags in attack part transition expression {this}");
+					if(estack.Count < 1) throw new FormatException($"Attempt to run operator {c} on less than one tag in attack part transition expression {this}");
 					estack.Push(!estack.Pop());
 				}
 				else

@@ -41,11 +41,11 @@ public partial class ProjectileCreator
 	public Projectile BuildProjectile(IAttacker n, string section)
 	{
 		if(!inif.HasSection(section)) {GD.PushError($"Can't generate projectile {section} as it is not a real section"); return null;}
-		var proj = new Projectile();
+		Projectile proj = new();
 		
 		proj.OwnerObject = n;
 		var characterAudioManager = proj.OwnerObject.Audio;
-		var am = new AudioManager(2);
+		AudioManager am = new(2);
 		am.Name = "AudioManager";
 		am.Sounds = characterAudioManager.Sounds;
 		proj.AddChild(am);
@@ -68,7 +68,7 @@ public partial class ProjectileCreator
 		
 		foreach(var hurtbox in hurtboxes)
 		{
-			var hr = new Hurtbox();
+			Hurtbox hr = new();
 			hr.Name = hurtbox;
 			hr.OwnerObject = proj;
 			proj.AddChild(hr);
@@ -156,16 +156,16 @@ public partial class ProjectileCreator
 		h.TeamStunMult = tsm;
 		
 		var whitelistedStates = inif[section, "WhitelistedStates", Enumerable.Empty<string>()].ls();
-		h.WhitelistedStates = new HashSet<string>(whitelistedStates);
+		h.WhitelistedStates = new(whitelistedStates);
 		
 		var blacklistedStates = inif[section, "BlacklistedStates", Enumerable.Empty<string>()].ls();
-		h.BlacklistedStates = new HashSet<string>(blacklistedStates);
+		h.BlacklistedStates = new(blacklistedStates);
 		
 		h.LoadProperties();
 		LoadExtraProperties(h, section);
 		
 		//Build collision. no need for seperate function
-		var cs = new CollisionShape2D();
+		CollisionShape2D cs = new();
 		
 		var pos = inif[section, "Position", Vector2.Zero].v2();
 		cs.Position = pos;
@@ -175,7 +175,7 @@ public partial class ProjectileCreator
 		cs.Rotation = rotrad;//turn to rads
 		h.OriginalRotation = rotrad;
 		
-		var ps = new CapsuleShape2D();
+		CapsuleShape2D ps = new();
 		
 		var rd = inif[section, "Radius", 16f].f();
 		ps.Radius = rd;
@@ -207,7 +207,7 @@ public partial class ProjectileCreator
 			
 			var prop_obj = inif[section, ininame, @default];
 			var prop = prop_obj.cast(type, $"loading extra properties for {loadTo.GetType().Name} {section}");
-			loadTo.Set(objname, Variant.CreateFrom((dynamic)prop));
+			loadTo.Set(objname, prop.ToVariant());
 		}
 	}
 }

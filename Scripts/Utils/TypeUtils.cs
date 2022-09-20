@@ -11,6 +11,7 @@ public static class TypeUtils
 	public static int i(this object o) => (o is Variant v)?v.AsInt32():Convert.ToInt32(o);
 	public static string s(this object o) => (o is Variant v)?v.AsString():(o is StringName sn)?sn.ToString():((string)o);
 	public static object ob(this object o) => (o is Variant v)?v.Obj:o;
+	public static Variant ToVariant(this object o) => Variant.CreateFrom((dynamic)o);
 	
 	
 	public static Vector2 v2(this object o)//aslkfjhakusdfghausjkfhsakuh
@@ -37,7 +38,7 @@ public static class TypeUtils
 		
 		Vector4 res;
 		if(StringUtils.TryParseVector4(o.ToString(), out res)) return res;
-		else throw new FormatException($"Bad Quaternion format {o}");
+		else throw new FormatException($"Bad Vector4 format {o}");
 	}
 	
 	public static List<object> lo(this object o) => o.lt<object>(ob);//(o as IEnumerable<object>).ToList<object>();

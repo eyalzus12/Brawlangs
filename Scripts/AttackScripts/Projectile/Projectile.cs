@@ -132,14 +132,16 @@ public partial class Projectile : Node2D, IHitter, IHittable
 	
 	public virtual void ConnectSignals()
 	{
-		Hitboxes.ForEach(h => h.Connect("HitboxHit",new Callable(this,nameof(HandleInitialHit))));
+		//Hitboxes.ForEach(h => h.Connect("HitboxHit",new Callable(this,nameof(HandleInitialHit))));
+		Hitboxes.ForEach(h => h.HitboxHit += HandleInitialHit);
 	}
 	
 	public virtual void DisonnectSignals()
 	{
 		foreach(var h in Hitboxes)
 		{
-			h.Disconnect("HitboxHit",new Callable(this,nameof(HandleInitialHit)));
+			//h.Disconnect("HitboxHit",new Callable(this,nameof(HandleInitialHit)));
+			h.HitboxHit -= HandleInitialHit;
 			h.OwnerObject = this;
 		}
 	}
