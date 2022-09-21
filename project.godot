@@ -14,7 +14,7 @@ config/name="Brawlangs"
 run/main_scene="res://StageSelectScreen.tscn"
 config/features=PackedStringArray("4.0", "C#")
 boot_splash/image="res://toki pona mage.png"
-config/icon="res://brawlangs.ico"
+config/icon="res://toki pona mage.png"
 config/windows_native_icon="res://brawlangs.ico"
 
 [autoload]
@@ -34,7 +34,8 @@ gdscript/warnings/unused_class_variable=true
 
 [display]
 
-window/stretch/mode="2d"
+window/vsync/vsync_mode=0
+window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 
 [dotnet]
@@ -115,6 +116,10 @@ toggle_camera_limits={
 ]
 }
 
+[input_devices]
+
+buffering/agile_event_flushing=true
+
 [layer_names]
 
 2d_physics/layer_1="Solid Platforms"
@@ -131,11 +136,8 @@ file_logging/enable_file_logging=true
 
 name_num_separator=1
 
-[physics]
-
-common/physics_jitter_fix=0.0
-
 [rendering]
 
+driver/driver_name="opengl3"
 environment/default_environment="res://default_env.tres"
 quality/dynamic_fonts/use_oversampling=false

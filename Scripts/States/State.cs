@@ -69,40 +69,12 @@ public partial class State : Node
 			if(this != ch.States.Current) return;
 		}
 		
-		//var norm = ch.grounded?ch.fnorm:Vector2.Zero;
-		//var v = ch.DesiredVelocity.TiltToNormal(norm);
-		
-		ch.FloorBlockOnWall = true;
-		ch.FloorConstantSpeed = false;
+		var norm = ch.grounded?ch.fnorm:Vector2.Zero;
 		ch.FloorMaxAngle = FLOOR_ANGLE;
-		ch.FloorSnapLength = 5f;//Modify
-		ch.FloorStopOnSlope = true;
 		ch.PlatformOnLeave = CharacterBody2D.PlatformOnLeaveEnum.AddUpwardVelocity;
-		ch.SlideOnCeiling = false;
-		
+		ch.FloorSnapLength = VCF*norm.Dot(Vector2.Up);
 		ch.Velocity = ch.DesiredVelocity;
-		
 		ch.MoveAndSlide();
-		
-		/*
-		Floor block on wall: try true, see how behaves
-		Floor constant speed: false?
-		Floor max angle: copy from current usage
-		Floor snap length: need to manually manage. and also to change all code to use that instead of a vector
-		Floor stop on slope: true? i remember this causing issues with moving platforms
-		Motion mode: keep default
-		Platform floor layers: useful!!!!!! keep default for now.
-		Platform wall layers: useful!!!!!! keep default for now.
-		Platform on leave: add upwards velocity?
-		Slide on ceiling: false?
-		Up direction: keep default
-		
-		Need to modify velocity myself
-		*/
-		
-		/*var moveRes = ch.
-			MoveAndSlideWithSnap(v, snapVector, Vector2.Up,
-			false, 4, FLOOR_ANGLE);*/
 		
 		ch.grounded = ch.IsOnFloor();
 		ch.walled = ch.IsOnWall();

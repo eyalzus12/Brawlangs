@@ -103,7 +103,7 @@ public partial class ProjectileCreator
 		var pos = inif[section, "Position", Vector2.Zero].v2();
 		var rot = inif[section, "Rotation", 0f].f();
 		rot = (float)(rot*Math.PI/180f);//to rads
-		var hurtboxState = new HurtboxCollisionState(state, rd, he, pos, rot);
+		var hurtboxState = new HurtboxCollisionState(state, rd, he+2f*rd, pos, rot);
 		hr.AddState(hurtboxState);
 	}
 	
@@ -180,7 +180,7 @@ public partial class ProjectileCreator
 		var rd = inif[section, "Radius", 16f].f();
 		ps.Radius = rd;
 		var hg = inif[section, "Height", 16f].f();
-		ps.Height = hg;
+		ps.Height = hg + 2f*rd;
 		
 		cs.Shape = ps;
 		cs.Disabled = true;

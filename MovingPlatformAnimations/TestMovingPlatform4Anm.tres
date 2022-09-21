@@ -1,18 +1,18 @@
-[gd_resource type="Animation" format=2]
+[gd_resource type="Animation" format=3 uid="uid://b6ainewubr0h8"]
 
 [resource]
 resource_name = "TestMovingPlatform4"
 length = 38.0
-loop = true
+loop_mode = 1
 tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
 tracks/0/path = NodePath(".:position")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
-tracks/0/imported = false
-tracks/0/enabled = true
 tracks/0/keys = {
-"times": PackedFloat32Array( 6, 19, 25, 38 ),
-"transitions": PackedFloat32Array( 1, 1, 1, 1 ),
+"times": PackedFloat32Array(6, 19, 25, 38),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 0,
-"values": [ Vector2( -1208, 1072 ), Vector2( 2792, 1272 ), Vector2( 2792, 1272 ), Vector2( -1208, 1072 ) ]
+"values": [Vector2(-1208, 1072), Vector2(2792, 1272), Vector2(2792, 1272), Vector2(-1208, 1072)]
 }

@@ -6,7 +6,7 @@ public partial class CharacterCollision : CollisionShape2D
 {
 	public RectangleShape2D RecShape{get => (RectangleShape2D)Shape; set => Shape = value;}
 	
-	public Vector2 Extents {get => RecShape.Size; set => RecShape.SetDeferred("size", value);}
+	public Vector2 Size {get => RecShape.Size; set => RecShape.SetDeferred("size", value);}
 	
 	public Dictionary<string, CollisionShapeState> states = new();
 	public string CurrentCollisionState = "Default";
@@ -68,8 +68,7 @@ public partial class CharacterCollision : CollisionShape2D
 	{
 		CurrentCollisionState = newState.Name;
 		CurrentCollisionStateData = newState;
-		//Extents = newState.Extents;
-		RecShape.SetDeferred("extents", newState.Extents);
+		Size = newState.Size;
 		DynamicPosition = newState.Position;
 		QueueRedraw();
 	}
@@ -77,7 +76,7 @@ public partial class CharacterCollision : CollisionShape2D
 	public override void _Draw()
 	{
 		if(!this.GetRootNode<UpdateScript>("UpdateScript").debugCollision) return;
-		var rect = GeometryUtils.RectFrom(Vector2.Zero, Extents);
+		var rect = GeometryUtils.RectFrom(Vector2.Zero, Size/2f);
 		DrawRect(rect, GetDrawColor(), true);
 		
 		DrawCircle(-DynamicPosition, 5, new Color(0,0,0,1));

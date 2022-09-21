@@ -56,16 +56,16 @@ public partial class CollisionCreator
 		var pos = inif[section, "Position", Vector2.Zero].v2();
 		var rot = inif[section, "Rotation", 0f].f();
 		rot = (float)(rot*Math.PI/180f);//to rads
-		HurtboxCollisionState hurtboxState = new(state, rd, he, pos, rot);
+		HurtboxCollisionState hurtboxState = new(state, rd, he+2f*rd, pos, rot);
 		hr.AddState(hurtboxState);
 	}
 	
 	public void BuildCollision(CharacterCollision cs, string section, string state)
 	{
 		if(!inif.HasSection(section)) {GD.PushError($"Can't generate character collision {section} as it is not a real section"); return;}
-		var ext = inif[section, "Extents", Vector2.Zero].v2();
+		var siz = inif[section, "Size", Vector2.Zero].v2();
 		var pos = inif[section, "Position", Vector2.Zero].v2();
-		CollisionShapeState collisionState = new(state, ext, pos);
+		CollisionShapeState collisionState = new(state, siz, pos);
 		cs.AddState(collisionState);
 	}
 	

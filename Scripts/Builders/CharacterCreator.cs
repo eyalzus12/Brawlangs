@@ -130,7 +130,7 @@ public partial class CharacterCreator
 		}
 	}
 	
-	const int AUDIO_PLAYERS = 4;
+	const int AUDIO_PLAYERS = 5;
 	public void BuildAudio(Character ch, string audioFolder)
 	{
 		AudioManager am = new(AUDIO_PLAYERS);
@@ -143,7 +143,6 @@ public partial class CharacterCreator
 			var resourcePath = $"{audioFolder}/{file}";
 			var loop = filename.EndsWith("Loop");
 			var audio = GenerateAudioFromPath(resourcePath, loop);
-			//var noloopname = filename.Substring(0, filename.Length - "Loop".Length);
 			var noloopname = filename[0..^("Loop".Length)];
 			var normalizedFilename = (loop?noloopname:filename);
 			am.AddSound(normalizedFilename, audio);

@@ -22,9 +22,9 @@ public partial class MatchCamera : Camera2D
 	[Export]
 	public float curveMultiplier = 0.8f;
 	[Export]
-	public float baseZoom = 2.1f;//multiplier for CalculateZoom
+	public float baseZoom = 0.9f;//multiplier for CalculateZoom
 	[Export]
-	public float startZoomMult = 5f;
+	public float startZoomMult = 0.5f;
 	[Export]
 	public Vector2 startPositionOffset = new Vector2(0, -500);
 	
@@ -92,7 +92,7 @@ public partial class MatchCamera : Camera2D
 		}
 		
 		//interpolate between the desired position and the current one, to smoothen it out
-		var desiredPosition = cameraRect.Center();//get center (desired position)
+		var desiredPosition = cameraRect.GetCenter();//get center (desired position)
 		Position = Position.SmoothLinearInterpolate(desiredPosition, interpolationWeight, curveMultiplier);
 		
 		//interpolate between the desired zoom and the current one, to smoothen it out
@@ -110,15 +110,15 @@ public partial class MatchCamera : Camera2D
 		if(viewportRect.Size.x == 0 || viewportRect.Size.y == 0) return Vector2.One; 
 		
 		//get the zoom that'll match on the xy
-		var cameraZoomXY = cameraRect.Size/viewportRect.Size;
+		var cameraZoomXY = viewportRect.Size/cameraRect.Size;
 		//get desired matching zoom
-		var cameraZoom = Math.Max(Math.Max(cameraZoomXY.x, cameraZoomXY.y), 1);
+		var cameraZoom = Math.Min(Math.Min(cameraZoomXY.x, cameraZoomXY.y), 1);
 		//get max zoom possible on the xy
-		var maxZoomXY = limits/viewportRect.Size;
+		var maxZoomXY = viewportRect.Size/limits;
 		//get max total zoom possible (conditionally)
-		var maxZoom = limit?Math.Max(maxZoomXY.x, maxZoomXY.y):float.PositiveInfinity;
+		var maxZoom = limit?Math.Min(maxZoomXY.x, maxZoomXY.y):float.PositiveInfinity;
 		//get resulting zoom that fits the max
-		return Math.Min(cameraZoom*baseZoom+zoomOffset, maxZoom)*Vector2.One;
+		return Math.Min(cameraZoom*baseZoom/*+zoomOffset*/, maxZoom)*Vector2.One;
 	}
 	
 	public override void _Draw()
@@ -139,7 +139,7 @@ public partial class MatchCamera : Camera2D
 		DrawRect(limitRect, Red, false);
 		DrawRect(viewportRect, White, false);
 		DrawRect(viewportRect.Zoomed(Zoom), Blue, false);
-		DrawCircle(cameraRect.Center(), 5, Red);
+		DrawCircle(cameraRect.GetCenter(), 5, Red);
 		DrawCircle(Position, 5, Yellow);
 		DrawCircle(middle, 5, White);
 		DrawCircle(center, 5, Blue);

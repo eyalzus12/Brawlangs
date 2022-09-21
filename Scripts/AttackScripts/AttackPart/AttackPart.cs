@@ -1,3 +1,5 @@
+//#define DEBUG_HITBOX_PLAYER
+
 using Godot;
 using System;
 using System.Collections.Generic;
@@ -59,7 +61,6 @@ public partial class AttackPart : Node2D, IHitter
 	public override void _Ready()
 	{
 		frameCount = 0;
-		if(Startup == 0) OnStartupFinish();
 		
 		//TOFIX: this is unsafe
 		Hitboxes = GetChildren().FilterType<Hitbox, Node>().ToList();
@@ -67,6 +68,8 @@ public partial class AttackPart : Node2D, IHitter
 		ConnectSignals();
 		BuildHitboxAnimator();
 		Init();
+		
+		if(Startup == 0) OnStartupFinish();
 	}
 	
 	public void ConnectSignals()

@@ -7,11 +7,6 @@ public static class Utils
 	public static Node GetRootNode(this Node n, string s) => n.Root().GetNode(s);
 	public static T GetRootNode<T>(this Node n, string s) where T : Node => (T)(n.GetRootNode(s));
 	
-	public static void SetProp(this object o, string s, object v) => o.GetType().GetProperty(s).SetValue(o, v);
-	public static void SetProp<T>(this object o, string s, T v) => o.GetType().GetProperty(s).SetValue(o, v);
-	
-	public static bool Flip(ref this bool b) => (b = !b);
-	
 	public static TResult Fork<T, T1, T2, TResult>(this T o, Func<T, T1> f1, Func<T, T2> f2, Func<T1, T2, TResult> f) => f(f1(o), f2(o));
 	public static object Fork(this object o, Func<object, object> f1, Func<object, object> f2, Func<object, object, object> f) => o.Fork<object, object, object, object>(f1, f2, f);
 	

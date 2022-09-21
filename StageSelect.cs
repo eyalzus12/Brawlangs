@@ -32,10 +32,7 @@ public partial class StageSelect : Control
 		
 		if(dir.Open(path) == Error.Ok)
 		{
-			dir.ListDirBegin();
-			
-			for(string file = dir.GetNext(); file != ""; file = dir.GetNext())
-			if(!dir.CurrentIsDir() && StringUtils.GetExtension(file) == MAP_EXT)
+			foreach(var file in dir.GetFiles()) if(StringUtils.GetExtension(file) == MAP_EXT)
 			{
 				AddMap(file, path);
 			}

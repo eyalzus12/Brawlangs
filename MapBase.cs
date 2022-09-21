@@ -134,16 +134,7 @@ public partial class MapBase : Node2D
 			ExitToMainMenu();
 	}
 	
-	public override void _Notification(long what)
-	{
-		//Node.NOTIFICATION_WM_CLOSE_REQUEST
-		/*if(what == 1006)
-		{
-			GetTree().Quit();
-		}*/
-	}
-	
-	public override void _PhysicsProcess(double delta) => QueueRedraw();
+	//public override void _PhysicsProcess(double delta) => QueueRedraw();
 	
 	public override void _Draw()
 	{

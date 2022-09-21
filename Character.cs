@@ -785,7 +785,10 @@ public partial class Character : CharacterBody2D, IHittable, IAttacker
 		var identifier = who.Identifier;
 		
 		if(!activeProjectiles.ContainsKey(identifier))
-			throw new Exception($"Projectile {identifier} died but was never reported as active");
+		{
+			GD.PushError($"Projectile {identifier} died but was never reported as active");
+			return;
+		}
 		
 		activeProjectiles[identifier].Remove(who);
 		projPool.InsertProjectile(who);

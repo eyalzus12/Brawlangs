@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 
-public partial class AudioManager : Node
+public partial class AudioManager : Node2D
 {
 	public Dictionary<string, AudioStream> Sounds{get; set;} = new();
 	public AudioStream this[string s] {get => Sounds[s]; set => Sounds[s] = value;}
@@ -18,7 +18,7 @@ public partial class AudioManager : Node
 	{
 		for(int i = 0; i < capacity; ++i)
 		{
-			var player = new AudioPlayer();
+			AudioPlayer player = new(i);
 			Players.Add(player);
 			Available.Enqueue(player);
 		}
@@ -35,7 +35,6 @@ public partial class AudioManager : Node
 		
 		var use = Available.Dequeue();
 		use.Play(stream);
-		//use.Connect("FinishedPlaying",new Callable(this,nameof(StreamFinished)));
 		use.FinishedPlaying += StreamFinished;
 	}
 	
@@ -45,19 +44,11 @@ public partial class AudioManager : Node
 		else if(sound != "") GD.PushError($"Could not play sound {sound} as it does not exist");
 	}
 	
-	public void AddSound(string name, AudioStream audio)
-	{
-		//audio.Changed += Temp;
-		Sounds.Add(name, audio);
-	}
+	public void AddSound(string name, AudioStream audio) => Sounds.Add(name, audio);
 	
-	//public void Temp() => GD.Print("amogus");
-	
-	public void StreamFinished(AudioPlayer who, AudioStream what)
+	public void StreamFinished(AudioPlayer who)
 	{
-		GD.Print(what);
 		Available.Enqueue(who);
-		//who.Disconnect("FinishedPlaying",new Callable(this,nameof(StreamFinished)));
 		who.FinishedPlaying -= StreamFinished;
 	}
 	
@@ -82,7 +73,6 @@ public partial class AudioManager : Node
 	
 	public void CleanAfter(AudioPlayer player)
 	{
-		//player.Disconnect("FinishedPlaying",new Callable(this,nameof(StreamFinished)));
 		player.FinishedPlaying -= StreamFinished;
 		player.Stop();
 		Available.Enqueue(player);

@@ -60,11 +60,6 @@ public static class GeometryUtils
 		Vector2 res = car + center;//get new position from relative position
 		return res;
 	}
-	
-	public static Vector2 Center(this Rect2 rec) => new Vector2(
-		rec.Position.x + rec.Size.x / 2,
-		rec.Position.y + rec.Size.y / 2
-	);
 		
 	public static Rect2 Limit(this Rect2 rec, float maxH, float maxV)
 	{
@@ -81,7 +76,7 @@ public static class GeometryUtils
 		return new Rect2(pos, size);
 	}
 	
-	public static Rect2 Zoomed(this Rect2 r, Vector2 zoom) => RectFrom(r.Center(), r.Size*zoom/2f);
+	public static Rect2 Zoomed(this Rect2 r, Vector2 zoom) => RectFrom(r.GetCenter(), r.Size/(2f*zoom));
 	
 	public static float Clamp(this float f, float m, float M) => Math.Min(M, Math.Max(m, f));
 		
@@ -123,10 +118,13 @@ public static class GeometryUtils
 		var height = shape.Height;
 		var radius = shape.Radius;
 		ci.DrawSetTransform(position, rotation, Vector2.One);
-		var middleRect = GeometryUtils.RectFrom(Vector2.Zero, new Vector2(radius, height/2));
+		
+		var realHeight = (height-2f*radius);
+		
+		var middleRect = GeometryUtils.RectFrom(Vector2.Zero, new Vector2(radius, realHeight/2f));
 		ci.DrawRect(middleRect, color);
-		ci.DrawCircle(new Vector2(0, height/2), radius, color);
-		ci.DrawCircle(new Vector2(0, -height/2), radius, color);
+		ci.DrawCircle(realHeight*Vector2.Up/2f, radius, color);
+		ci.DrawCircle(realHeight*Vector2.Down/2f, radius, color);
 	}
 	
 	public static Vector2 SmoothLinearInterpolate(this Vector2 @from, Vector2 to, float weight, float curve) => @from.Lerp(to, weight*Mathf.Tanh(curve*@from.DistanceSquaredTo(to)));

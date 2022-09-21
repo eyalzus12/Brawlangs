@@ -211,7 +211,7 @@ public partial class AttackCreator
 		var rd = inif[section, "Radius", 0f].f();
 		ps.Radius = rd;
 		var hg = inif[section, "Height", 0f].f();
-		ps.Height = hg;
+		ps.Height = hg + 2f*rd;
 		
 		cs.Shape = ps;
 		cs.Disabled = true;

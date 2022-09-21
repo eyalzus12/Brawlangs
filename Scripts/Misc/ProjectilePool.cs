@@ -90,9 +90,7 @@ public partial class ProjectilePool : Node
 	{
 		while(ReturnQueue.Count > 0)
 		{
-			var h = ReturnQueue.Dequeue();
-			var identifier = h.Item1;
-			var obj = h.Item2;
+			(string identifier, Projectile obj) = ReturnQueue.Dequeue();
 			if(obj is null || !Godot.Object.IsInstanceValid(obj))
 			{
 				GD.PushError($"Invalid instance of object {obj} was found while cleaning return queue. Cheese fucked up somewhere.");
@@ -109,16 +107,8 @@ public partial class ProjectilePool : Node
 	
 	public void ClearPool()
 	{
-		foreach(var entry in ProjectileDict)
-		{
-			var queue = entry.Value;
-			while(queue.Count > 0)
-			{
-				var obj = queue.Dequeue();
-				obj.QueueFree();
-			}
-		}
-		
+		foreach(var queue in ProjectileDict.Values)
+			while(queue.Count > 0) queue.Dequeue().QueueFree();
 		ProjectileDict.Clear();
 	}
 	
