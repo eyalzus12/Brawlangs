@@ -257,9 +257,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	
 	public string currentCollisionSetting;
 	public CharacterCollision collision;
-	//public PlatformDropDetector DropDetector;
 	
-	//private Attack currentAttack;
 	public Attack CurrentAttack{get; set;}
 	
 	public bool Hitting{get; set;}
@@ -283,7 +281,6 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	
 	public StateTagsManager Tags{get; set;} = new StateTagsManager();
 	
-	//public Dictionary<string, PackedScene> Projectiles{get; set;} = new Dictionary<string, PackedScene>();
 	public Dictionary<string, HashSet<Projectile>> ActiveProjectiles{get; set;} = new Dictionary<string, HashSet<Projectile>>();
 	public ProjectilePool ProjPool{get; set;}
 	
@@ -419,7 +416,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	
 	public void UpdateInputTags()
 	{
-		foreach(var inputTag in InputMap.GetActions().ToEnumerable<string>().Where(s=>s.StartsWith($"{TeamNumber}_")).Select(s=>s.Substring($"{TeamNumber}_".Length)))
+		foreach(var inputTag in InputMap.GetActions().ToEnumerable<string>().LeftQuotient($"{TeamNumber}_"))
 		{
 			if(Inputs.IsActionJustPressed(inputTag)) Tags[inputTag] = StateTag.Starting;
 			if(Inputs.IsActionJustReleased(inputTag)) Tags[inputTag] = StateTag.Ending;
@@ -558,7 +555,6 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	{
 		currentCollisionSetting = setting;
 		collision.ChangeState(setting);
-		//DropDetector.UpdateBasedOnCollisionShape();
 		Hurtboxes.ForEach(h=>h.ChangeState(setting));
 	}
 	
@@ -630,7 +626,10 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	
 	public virtual void HandleGettingHit(HitData data)
 	{
-		//GD.Print($"{this} runs Handle Getting Hit");
+		#if DEBUG_ATTACKS
+		GD.Print($"{this} runs Handle Getting Hit");
+		#endif
+		
 		var skb = data.SKB;
 		var vkb = data.VKB;
 		var d = data.Damage;
@@ -645,15 +644,23 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		damage += d * DamageTakenMult;
 		RestoreOptionsOnGettingHit();
 		
-		//GD.Print($"{this} checks if clashing");
+		#if DEBUG_ATTACKS
+		GD.Print($"{this} checks if clashing");
+		#endif
 		if(Clashing)
 		{
-			//GD.Print($"{this} is clashing. records data");
+			#if DEBUG_ATTACKS
+			GD.Print($"{this} is clashing. records data");
+			#endif
+			
 			ClashData = data;
 			return;
 		}
 		
-		//GD.Print($"{this} is not clashing. doing hit stuff");
+		#if DEBUG_ATTACKS
+		GD.Print($"{this} is not clashing. doing hit stuff");
+		#endif
+		
 		var force = (skb + damage*vkb/100f) * KnockbackTakenMult * (100f/weight);
 		var stunlen = (sstun + damage*vstun/100f) * StunTakenMult;
 		var hp = (shp + damage*vhp/100f);
@@ -674,11 +681,8 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		
 		if(force.x != 0f) Direction = Math.Sign(force.x);
 		
-		//GD.Print($"\nLast hit was {framesSinceLastHit} frames ago");
-		
 		if(framesSinceLastHit <= 0) ++comboCount;
 		else comboCount = 0;
-		//GD.Print($"Combo count is {comboCount+1}");
 		
 		framesSinceLastHit = 0;
 		
@@ -687,26 +691,40 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	
 	public virtual void HandleHitting(HitData data)
 	{
-		//GD.Print($"{this} runs Handle Hitting");
+		#if DEBUG_ATTACKS
+		GD.Print($"{this} runs Handle Hitting");
+		#endif
 		
 		Hitbox hitbox = data.Hitter;
 		Hurtbox hurtbox = data.Hitee;
 		
 		RestoreOptionsOnHitting();
 		
-		//GD.Print($"{this} ensures not clashing");
+		#if DEBUG_ATTACKS
+		GD.Print($"{this} ensures not clashing");
+		#endif
+		
 		if(Clashing) return;
-		//GD.Print($"{this} not currently clashing");
+		
+		#if DEBUG_ATTACKS
+		GD.Print($"{this} not currently clashing");
+		#endif
 		
 		if(hurtbox.OwnerObject is IAttacker attackerOwner && attackerOwner.Hitting && attackerOwner.LastHitee == this)
 		{
-			//GD.Print($"{this} detected a clash and is setting the clashing paramaters");
+			#if DEBUG_ATTACKS
+			GD.Print($"{this} detected a clash and is setting the clashing paramaters");
+			#endif
+			
 			Clashing = true;
 			attackerOwner.Clashing = true;
 			return;
 		}
 		
-		//GD.Print($"{this} is really not clashing so is entering Hit Lag State");
+		#if DEBUG_ATTACKS
+		GD.Print($"{this} is really not clashing so is entering Hit Lag State");
+		#endif
+		
 		if(hitbox.Hitlag > 0)
 		{
 			var s = States.Change<HitLagState>();
@@ -716,7 +734,10 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	
 	public virtual void HandleClashing(HitData data)
 	{
-		//GD.Print($"{this} gets Handle Clashing called and calls self's attack part's Handle Hits");
+		#if DEBUG_ATTACKS
+		GD.Print($"{this} gets Handle Clashing called and calls self's attack part's Handle Hits");
+		#endif
+		
 		GD.Print("CLASH");
 		CurrentAttack?.CurrentPart?.HandleHits();
 		var skb = data.SKB;
@@ -790,8 +811,6 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 				ActiveProjectiles.Add(proj, new HashSet<Projectile>());
 			//set direction
 			generatedProjectile.Direction = Direction;
-			//add owner
-			//generatedProjectile.OwnerObject = this;
 			//connect destruction signal
 			generatedProjectile.Connect("ProjectileDied", this, nameof(HandleProjectileDestruction));
 			//store as active

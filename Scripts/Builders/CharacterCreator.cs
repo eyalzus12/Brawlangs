@@ -148,7 +148,6 @@ public class CharacterCreator
 			else if(audio is AudioStreamSample wav)
 			{
 				GD.PushWarning("WAV does not support dynamic looping. Use ogg instead.");
-				//wav.LoopMode = AudioStreamSample.LoopModeEnum.Forward;
 				return wav;
 			}
 			else
@@ -196,12 +195,8 @@ public class CharacterCreator
 			string file;
 			
 			while((file = dir.GetNext()) != "")
-			{
 				if(!dir.CurrentIsDir() && file[0] != '.')
-				{
 					files.Add(file);
-				}
-			}
 			
 			dir.ListDirEnd();
 		}

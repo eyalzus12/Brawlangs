@@ -68,11 +68,6 @@ public static class IterUtils
 		foreach(var o1 in e1) foreach(var o2 in e2) yield return (o1, o2);
 	}
 	
-	public static void Debug<T>(this IEnumerable<T> e)
-	{
-		foreach(var o in e) GD.Print(o.ToString());
-	}
-	
 	public static Vector2 Sum(this IEnumerable<Vector2> e) => e.Aggregate(Vector2.Zero, (v1,v2)=>v1+v2);
 	public static Vector2 Avg(this IEnumerable<Vector2> e) => e.Sum()/e.Count();
 	

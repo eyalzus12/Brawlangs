@@ -12,8 +12,7 @@ public static class TypeUtils
 	public static string s(this object o) => (string)o;
 	public static object ob(this object o) => o;
 	
-	
-	public static Vector2 v2(this object o)//aslkfjhakusdfghausjkfhsakuh
+	public static Vector2 v2(this object o)
 	{
 		Vector2 res;
 		if(StringUtils.TryParseVector2(o.ToString(), out res)) return res;
@@ -51,6 +50,7 @@ public static class TypeUtils
 		else return null;
 	}
 	
+	//TOFIX: this doesn't account for inheritance
 	public static object cast(this object o, Type t, string debug = "")
 	{
 		if(t == typeof(object)) return o;
@@ -90,18 +90,6 @@ public static class TypeUtils
 		{
 			if(resource is CSharpScript script)
 			{
-				/*if(!path.StartsWith("res://"))
-				{
-					var filename = path.SplitByLast('/')[1];
-					var newthing = "res://Scripts/"+filename;
-					GD.Print(newthing);
-					
-					var f = new File();
-					f.Open(newthing, File.ModeFlags.Write);
-					f.Close();
-					GD.Print(new Directory().Copy(path, newthing));
-				}*/
-				
 				/*var h = new T();
 				return h.SafelySetScript<T>(script);*/
 				

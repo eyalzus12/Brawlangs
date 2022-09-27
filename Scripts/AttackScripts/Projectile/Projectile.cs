@@ -89,7 +89,6 @@ public class Projectile : Node2D, IHitter, IHittable
 		GettingHit = false;
 		Init();
 		Active = true;
-		Active = true;
 		Hitboxes.ForEach(InitHitbox);
 		Hurtboxes.ForEach(h=>h.ChangeState("Default"));
 	}

@@ -40,12 +40,6 @@ public class CollisionCreator
 			ch.Hurtboxes.Add(hr);
 			foreach(var state in states) BuildHurtbox(hr, state+hurtbox, state);
 		}
-		
-		/*var platDrop = new PlatformDropDetector();
-		platDrop.Name = "DropDetector";
-		platDrop.owner = ch;
-		ch.DropDetector = platDrop;
-		ch.AddChild(platDrop);*/
 	}
 	
 	public void BuildHurtbox(Hurtbox hr, string section, string state)
@@ -68,16 +62,4 @@ public class CollisionCreator
 		var collisionState = new CollisionShapeState(state, ext, pos);
 		cs.AddState(collisionState);
 	}
-	
-	/*public void BuildBase(Character ch, string section)
-	{
-		var pos = inif[section, "CollisionPosition", Vector2.Zero].v2();
-		var xt = inif[section, "CollisionExtents", new Vector2(16f, 16f)].v2();
-		var rd = inif[section, "HurtboxRadius", 30].f();
-		var he = inif[section, "HurtboxHeight", 16].f();
-		var hpos = inif[section, "HurtboxPosition", Vector2.Zero].v2();
-		var rot = inif[section, "HurtboxRotation", 0f].f();
-		rot = (float)(rot*Math.PI/180f);//to rads
-		ch.settings.Add(section, new CollisionSettings(section, xt, pos, rd, he, hpos, rot));
-	}*/
 }

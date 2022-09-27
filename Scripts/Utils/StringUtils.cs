@@ -9,7 +9,6 @@ public static class StringUtils
 	public static string GetExtension(string str) => System.IO.Path.GetExtension(str);
 	public static string RemoveExtension(string str) => System.IO.Path.GetFileNameWithoutExtension(str);
 	public static string PascalCaseToSentence(string str) => Regex.Replace(str, "([A-Z])", " $1", RegexOptions.Compiled).Trim();
-	public static bool RegexMatch(this object o, string regex) => Regex.IsMatch(o.ToString(), regex);
 	public static char FromEnd(this string s, int index) => s[s.Length-index];
 	
 	public static string GlobalizePath(string path)
@@ -26,7 +25,7 @@ public static class StringUtils
 	public static string[] SplitByLast(this string s, char c)
 	{
 		int idx = s.LastIndexOf(c);
-		var result = new string[2]{"",""};
+		string[] result = {"",""};
 		if (idx != -1)
 		{
 			result[0] = s.Substring(0, idx);
@@ -51,7 +50,7 @@ public static class StringUtils
 		}
 	}
 	
-	public readonly static HashSet<char> VOWELS = new HashSet<char>(new char[]{'a','A','e','E','i','I','o','O','u','U'});
+	public readonly static HashSet<char> VOWELS = new HashSet<char>{'a','A','e','E','i','I','o','O','u','U'};
 	public static string AAN(this string s)
 	{
 		var firstchar = s[0];
@@ -122,5 +121,15 @@ public static class StringUtils
 			v = default; 
 			return false;
 		}
+	}
+	
+	public static IEnumerable<string> LeftQuotient(this IEnumerable<string> e, string q)
+	{
+		foreach(var s in e) if(s.StartsWith(q)) yield return s.Substring(q.Length);
+	}
+	
+	public static IEnumerable<string> RightQuotient(this IEnumerable<string> e, string q)
+	{
+		foreach(var s in e) if(s.EndsWith(q)) yield return s.Substring(0, s.Length-q.Length);
 	}
 }

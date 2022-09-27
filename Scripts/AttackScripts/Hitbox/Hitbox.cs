@@ -128,12 +128,23 @@ public class Hitbox : Area2D
 				}
 			}
 			
-			//GD.Print($"{OwnerObject.OwnerObject} hitbox detects hurtbox");
-			//GD.Print($"{OwnerObject.OwnerObject} calls hurtbox Handle Hit");
+			#if DEBUG_ATTACKS
+			GD.Print($"{OwnerObject.OwnerObject} hitbox detects hurtbox");
+			GD.Print($"{OwnerObject.OwnerObject} calls hurtbox Handle Hit");
+			#endif
+			
 			hurtbox.HandleHit(this);
-			//GD.Print($"{OwnerObject.OwnerObject} hitbox calls self On Hit");
+			
+			#if DEBUG_ATTACKS
+			GD.Print($"{OwnerObject.OwnerObject} hitbox calls self On Hit");
+			#endif
+			
 			OnHit(hurtbox);
-			//GD.Print($"{OwnerObject.OwnerObject} hitbox emits signal Hitbox Hit");
+			
+			#if DEBUG_ATTACKS
+			GD.Print($"{OwnerObject.OwnerObject} hitbox emits signal Hitbox Hit");
+			#endif
+			
 			EmitSignal(nameof(HitboxHit), this, hurtbox);
 		}
 	}

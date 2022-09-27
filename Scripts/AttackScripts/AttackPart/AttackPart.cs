@@ -195,21 +195,37 @@ public class AttackPart : Node2D, IHitter
 	
 	public virtual void HandleInitialHit(Hitbox hitbox, Hurtbox hurtbox)
 	{
-		//GD.Print($"{OwnerObject} attack part is signaled Handle Initial Hit");
+		#if DEBUG_ATTACKS
+		GD.Print($"{OwnerObject} attack part is signaled Handle Initial Hit");
+		#endif
+		
 		if(!hitbox.Active) return;
 		
-		//GD.Print($"{OwnerObject} attack part Has Hit = true");
+		#if DEBUG_ATTACKS
+		GD.Print($"{OwnerObject} attack part Has Hit = true");
+		#endif
+		
 		HasHit = true;
 		
-		//GD.Print($"{OwnerObject} Hitting = true");
+		#if DEBUG_ATTACKS
+		GD.Print($"{OwnerObject} Hitting = true");
+		#endif
+		
 		OwnerObject.Hitting = true;
 		ch.Tags["Hit"] = StateTag.Starting;
-		//GD.Print($"{OwnerObject} Last Hitee = {hurtbox.OwnerObject}");
+		
+		#if DEBUG_ATTACKS
+		GD.Print($"{OwnerObject} Last Hitee = {hurtbox.OwnerObject}");
+		#endif
+		
 		OwnerObject.LastHitee = hurtbox.OwnerObject;
 		
-		//GD.Print($"{hurtbox.OwnerObject} Getting Hit = true");
+		#if DEBUG_ATTACKS
+		GD.Print($"{hurtbox.OwnerObject} Getting Hit = true");
+		GD.Print($"{hurtbox.OwnerObject} Last Hitter = {this.OwnerObject}");
+		#endif
+		
 		hurtbox.OwnerObject.GettingHit = true;
-		//GD.Print($"{hurtbox.OwnerObject} Last Hitter = {this.OwnerObject}");
 		hurtbox.OwnerObject.LastHitter = this;
 		
 		var hitChar = hurtbox.OwnerObject;
@@ -222,24 +238,37 @@ public class AttackPart : Node2D, IHitter
 		}
 		else
 		{
-			//GD.Print($"{OwnerObject} attack part adds hitbox to Hit List");
+			#if DEBUG_ATTACKS
+			GD.Print($"{OwnerObject} attack part adds hitbox to Hit List");
+			#endif
+			
 			HitList.Add(hurtbox, hitbox);
 		}
 	}
 	
 	public virtual void HandleHits()
 	{
-		//GD.Print($"{OwnerObject} attack part runs Handle Hits");
+		#if DEBUG_ATTACKS
+		GD.Print($"{OwnerObject} attack part runs Handle Hits");
+		#endif
+		
 		if(!Active) return;
 		var velocity = ch.Velocity;
-		foreach(var entry in HitList)
+		var copy = new Dictionary<Hurtbox, Hitbox>(HitList);//make copy to prevent this one crash
+		foreach(var entry in copy)
 		{
-			//GD.Print($"{OwnerObject} attack part iterates Hit List");
+			#if DEBUG_ATTACKS
+			GD.Print($"{OwnerObject} attack part iterates Hit List");
+			#endif
+			
 			Hitbox hitbox = entry.Value;
 			Hurtbox hurtbox = entry.Key;
 			var hitChar = hurtbox.OwnerObject;
 			
-			//GD.Print($"{OwnerObject} attack part runs Hit Event");
+			#if DEBUG_ATTACKS
+			GD.Print($"{OwnerObject} attack part runs Hit Event");
+			#endif
+			
 			HitEvent(hitbox, hurtbox);
 			
 			var kmult = OwnerObject.KnockbackDoneMult*KnockbackMult*att.KnockbackMult*hitbox.GetKnockbackMultiplier(hitChar);
@@ -255,17 +284,35 @@ public class AttackPart : Node2D, IHitter
  			
 			var data = new HitData(skb, vkb, damage, sstun, vstun, hitbox.SetHitpause, hitbox.VarHitpause, hitbox, hurtbox);
 			
-			//GD.Print($"{OwnerObject} attack part adds {hitChar} to Hit Ignore List");
+			#if DEBUG_ATTACKS
+			GD.Print($"{OwnerObject} attack part adds {hitChar} to Hit Ignore List");
+			#endif
+			
 			HitIgnoreList.Add(hitChar);
-			//GD.Print($"{OwnerObject} attack parts calls attack's On Hit");
+			
+			#if DEBUG_ATTACKS
+			GD.Print($"{OwnerObject} attack parts calls attack's On Hit");
+			#endif
+			
 			att.OnHit(hitbox, hurtbox);
-			//GD.Print($"{OwnerObject} attack part calls {OwnerObject} Handle Hitting");
+			
+			#if DEBUG_ATTACKS
+			GD.Print($"{OwnerObject} attack part calls {OwnerObject} Handle Hitting");
+			#endif
+			
 			OwnerObject.HandleHitting(data);
-			//GD.Print($"{OwnerObject} attack part calls {hitChar} Handle Getting Hit");
+			
+			#if DEBUG_ATTACKS
+			GD.Print($"{OwnerObject} attack part calls {hitChar} Handle Getting Hit");
+			#endif
+			
 			hitChar.HandleGettingHit(data);
 		}
 		
-		//GD.Print($"{OwnerObject} attack part clears Hit List");
+		#if DEBUG_ATTACKS
+		GD.Print($"{OwnerObject} attack part clears Hit List");
+		#endif
+		
 		HitList.Clear();
 	}
 	

@@ -37,25 +37,11 @@ public static class MathUtils
 		if(Math.Abs(v.y) < 1f) v.y = 0f;
 	}
 	
-	public static float Sign(this float f) => Math.Sign(f);
-	
-	public static bool IsInRange(this float i, float min, float max,
-		bool incmin=true, bool incmax=false) =>
-		(i>min||(incmin&&i==min))&&(i<max||(incmax&&i==max));
-	
-	//public static float Abs(this ref float i) => (i = Math.Abs(i));
-	//public static float ClampMinMax(this ref float i, float min, float max) => (i = Math.Min(Math.Max(i, min), max));
-	//public static float ClampMax(this ref float i, float max) => (i = Math.Min(i, max));
-	//public static float ClampMin(this ref float i, float min) => (i = Math.Max(i, min));
-	
 	public static float Bias01(this float v, float b)
 	{
-		var k = (float)Math.Pow(1f-b, 3f);
+		var k = Mathf.Pow(1f-b, 3f);
 		return (v*k)/(v*k-v+1f);
 	}
-	
-	public static int AddIf(this int i, int j, bool predicate) => i + (predicate?0:j);
-	public static int SubIf(this int i, int j, bool predicate) => i - (predicate?0:j);
 	
 	public static Vector2 Abs(this Vector2 v) => new Vector2(Math.Abs(v.x), Math.Abs(v.y));
 	public static Vector2 Max(this Vector2 v1, Vector2 v2) => new Vector2(Math.Max(v1.x,v2.x), Math.Max(v1.y,v2.y));

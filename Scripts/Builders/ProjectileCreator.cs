@@ -16,28 +16,6 @@ public class ProjectileCreator
 		inif.Load(path);
 	}
 	
-	/*public List<(string,Projectile)> Build(Node2D n)
-	{
-		var packs = new List<(string,Projectile)>();
-		var oProjectiles = inif["", "Projectiles", new List<string>()];
-		if(oProjectiles is string sproj)
-		{
-			var pack = BuildProjectile(n, sproj);
-			packs.Add((sproj,pack));
-		}
-		else
-		{
-			var Projectiles = oProjectiles.ls();
-			foreach(var s in Projectiles)
-			{
-				var pack = BuildProjectile(n, s);
-				packs.Add((s,pack));
-			}
-		}
-		
-		return packs;
-	}*/
-	
 	public Projectile BuildProjectile(IAttacker n, string section)
 	{
 		if(!inif.HasSection(section)) {GD.PushError($"Can't generate projectile {section} as it is not a real section"); return null;}
@@ -125,8 +103,6 @@ public class ProjectileCreator
 		h.Damage = dm;
 		var pr = inif[section, "Priority", 0].i();
 		h.HitPriority = pr;
-		//var cm = inif[section, "MomentumCarry", Vector2.Zero].v2();
-		//h.momentumCarry = cm;
 		
 		var hs = inif[section, "HitSound", "DefaultHit"].s();
 		if(p.Audio.ContainsSound(hs)) h.HitSound = p.Audio[hs];
