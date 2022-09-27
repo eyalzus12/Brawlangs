@@ -19,15 +19,6 @@ public class DirectionalAirDodgeState : GenericInvincibleState
 	public override string ActionName => "Dodge";
 	public override string StateAnimation => "DirectionalAirDodge";
 	
-	public override void Init()
-	{
-		base.Init();
-		touchedWall = false;
-		movement = ch.InputVector*ch.directionalAirDodgeSpeed;
-		ch.fastfalling = false;
-		CheckWavedashOption();
-	}
-	
 	protected override void LoopActions()
 	{
 		base.LoopActions();
@@ -45,6 +36,16 @@ public class DirectionalAirDodgeState : GenericInvincibleState
 		if(ch.grounded) ch.RestoreOptionsOnGroundTouch();
 	}
 	
+	protected override void OnStart()
+	{
+		touchedWall = false;
+		movement = ch.InputVector*ch.directionalAirDodgeSpeed;
+		ch.fastfalling = false;
+		ch.ResetVelocity();
+		ch.vuc = movement;
+		CheckWavedashOption();
+	}
+	
 	protected virtual void CheckWavedashOption()
 	{
 		if(ch.grounded && !IsInEndlag && movement.y >= 0)
@@ -55,12 +56,6 @@ public class DirectionalAirDodgeState : GenericInvincibleState
 			ch.vec.y = VCF;
 			ch.States.Change("Wavedash");
 		}
-	}
-	
-	protected override void OnIFramesStart()
-	{
-		ch.vec = Vector2.Zero;
-		ch.vuc = movement;
 	}
 	
 	protected override void DecideNextState()

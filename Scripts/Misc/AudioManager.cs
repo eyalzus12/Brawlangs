@@ -19,14 +19,12 @@ public class AudioManager : Node
 		for(int i = 0; i < capacity; ++i)
 		{
 			var player = new AudioPlayer();
+			player.Name = $"AudioPlayer{i}";
+			AddChild(player);
+			
 			Players.Add(player);
 			Available.Enqueue(player);
 		}
-	}
-	
-	public override void _Ready()
-	{
-		Players.ForEach(a => AddChild(a));
 	}
 	
 	public void Play(AudioStream stream)

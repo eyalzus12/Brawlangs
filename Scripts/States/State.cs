@@ -31,12 +31,8 @@ public class State : Node
 	protected Vector2 snapVector;
 	public bool justInit = false;
 	
-	public State() {}
-	
-	public State(Character link)
-	{
-		ch = link;
-	}
+	public State() {Name = GetType().Name;}
+	public State(Character link) {ch = link; Name = $"{ch.Name}_{GetType().Name}";}
 	
 	public override string ToString() => GetType().Name.Replace("State", "");
 	
@@ -245,8 +241,9 @@ public class State : Node
 		//FIX: for some reason, when on a slope multiple collsiions are given. this is the cause for fnorm not properly updating:
 		//the (0,-1) normal is also given
 		////////////////////////////////////////////////////////////////////////////////////////////////
-		foreach(var collision in GetSlideCollisions())
+		for(int i = 0; i < ch.GetSlideCount(); ++i)
 		{
+			var collision = ch.GetSlideCollision(i);
 			var body = collision.Collider;//get collided body
 			if(body is null || !Godot.Object.IsInstanceValid(body)) continue;//ensure the collided body actually exists
 			
@@ -322,11 +319,6 @@ public class State : Node
 		if(ch.grounded || ch.walled || ch.ceilinged) ch.aerial = false;
 		//collision exists, so character isnt aerial
 		//the check ensures that non clingable walls wont mark the character as non aerial
-	}
-	
-	private IEnumerable<KinematicCollision2D> GetSlideCollisions()
-	{
-		for(int i = 0; i < ch.GetSlideCount(); ++i) yield return ch.GetSlideCollision(i);
 	}
 	
 	public string VerySecretMethod() => base.ToString();

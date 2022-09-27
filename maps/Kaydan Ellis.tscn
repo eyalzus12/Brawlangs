@@ -22,9 +22,11 @@ load_path = "res://.import/grass.jpg-4ca37d76c8b391a7e96ec05260cb4207.stex"
 [node name="MapBase" type="Node2D"]
 position = Vector2( 512, 300 )
 script = ExtResource( 1 )
+CameraLimits = Vector2( 2000, 1000 )
 
 [node name="MainPlatform" type="StaticBody2D" parent="."]
 position = Vector2( 0, 384 )
+collision_mask = 0
 script = ExtResource( 2 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="MainPlatform"]
@@ -37,6 +39,8 @@ texture = ExtResource( 3 )
 
 [node name="LeftPlatform" type="KinematicBody2D" parent="."]
 position = Vector2( -704, 136 )
+collision_layer = 2
+collision_mask = 0
 script = ExtResource( 5 )
 Clingable = false
 FallThrough = true
@@ -54,6 +58,8 @@ texture = ExtResource( 4 )
 
 [node name="RightPlatform" type="KinematicBody2D" parent="."]
 position = Vector2( 704, 136 )
+collision_layer = 2
+collision_mask = 0
 script = ExtResource( 5 )
 Clingable = false
 FallThrough = true

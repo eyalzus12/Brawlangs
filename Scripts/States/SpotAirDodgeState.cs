@@ -14,16 +14,9 @@ public class SpotAirDodgeState : GenericInvincibleState
 	public override string ActionName => "Dodge";
 	public override string StateAnimation => "SpotAirDodge";
 	
-	protected override void DoGravity()
+	protected override void OnStart()
 	{
-		ch.vec.y.Towards(0, ch.AppropriateGravity);
-		ch.vuc.y.Towards(0, ch.AppropriateGravity);
-	}
-	
-	protected override void DoMovement()
-	{
-		ch.vec.x *= (1f-ch.AppropriateFriction);
-		ch.vuc.x *= (1f-ch.AppropriateFriction);
+		ch.ResetVelocity();
 	}
 	
 	protected override void DecideNextState()

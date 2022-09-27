@@ -25,15 +25,6 @@ public class CharacterCreator
 		//load name
 		ch.Name = name + teamNum;
 		
-		var projPool = new ProjectilePool(ch); 
-		projPool.Name = "ProjectilePool";
-		ch.AddChild(projPool);
-		ch.projPool = projPool;
-		
-		
-		ch.CollisionLayer = 0b100;
-		ch.CollisionMask = 0b011;
-		
 		var directoryPath = path.SplitByLast('/')[0];
 		//find stat file name
 		var statFile = charinif["Stats", ""].s();
@@ -68,14 +59,7 @@ public class CharacterCreator
 		var projFile = charinif["Projectiles", ""].s();
 		//create attacks
 		var projCreator = new ProjectileCreator($"{directoryPath}/{projFile}.ini");
-		ch.projPool.ProjCreate = projCreator;
-		/*var projectilesBuilt = projCreator.Build(ch);
-		foreach(var sp in projectilesBuilt)
-		{
-			var packname = sp.Item1;
-			var pack = sp.Item2;
-			ch.projectiles.Add(packname, pack);
-		}*/
+		ch.ProjPool.ProjCreate = projCreator;
 		
 		ch.TeamNumber = teamNum;
 		n.AddChild(ch);
@@ -84,9 +68,6 @@ public class CharacterCreator
 	
 	public void BuildAnimations(Character ch, string animationsFolder)
 	{
-		var spr = new AnimationSprite();
-		spr.Name = "CharacterSprite";
-		
 		var files = ListPostImportDirectoryFiles(animationsFolder, ".png").Distinct().ToList();
 		foreach(var file in files)
 		{
@@ -102,11 +83,8 @@ public class CharacterCreator
 				GD.PushError($"failed to load animation {animationName} from path {resourcePath}");
 				continue;
 			}
-			spr.Add(texture, animationName, frames, loop);
+			ch.CharacterSprite.Add(texture, animationName, frames, loop);
 		}
-		
-		ch.CharacterSprite = spr;
-		ch.AddChild(spr);
 	}
 	
 	public Texture GenerateTextureFromPath(string path)
@@ -131,12 +109,8 @@ public class CharacterCreator
 		}
 	}
 	
-	const int AUDIO_PLAYERS = 4;
 	public void BuildAudio(Character ch, string audioFolder)
 	{
-		var am = new AudioManager(AUDIO_PLAYERS);
-		am.Name = "AudioManager";
-		
 		var files = ListPostImportDirectoryFiles(audioFolder, ".wav", ".ogg", ".mp3").Distinct().ToList();
 		foreach(var file in files)
 		{
@@ -146,11 +120,8 @@ public class CharacterCreator
 			var audio = GenerateAudioFromPath(resourcePath, loop);
 			var noloopname = filename.Substring(0, filename.Length - "Loop".Length);
 			var normalizedFilename = (loop?noloopname:filename);
-			am.AddSound(normalizedFilename, audio);
+			ch.Audio.AddSound(normalizedFilename, audio);
 		}
-		
-		ch.AddChild(am);
-		ch.Audio = am;
 	}
 	
 	public AudioStream GenerateAudioFromPath(string path, bool loop = false)

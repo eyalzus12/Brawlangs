@@ -23,6 +23,7 @@ public interface IAttacker
 	Dictionary<string, Attack> Attacks{get; set;}
 	
 	AudioManager Audio{get; set;}
+	AnimationPlayer HitboxAnimator{get; set;}
 	
 	bool CanHit(IHittable hitObject);
 	void HandleHitting(HitData data);

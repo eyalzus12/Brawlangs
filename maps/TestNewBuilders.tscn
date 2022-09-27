@@ -12,10 +12,10 @@ extents = Vector2( 160, 8 )
 [node name="Node2D" type="Node2D"]
 position = Vector2( 512, 300 )
 script = ExtResource( 1 )
-BlastZones = Vector2( 2300, 1200 )
 
 [node name="StaticBody2D" type="StaticBody2D" parent="."]
 position = Vector2( 0, 264 )
+collision_mask = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
 shape = SubResource( 1 )

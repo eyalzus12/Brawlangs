@@ -41,15 +41,7 @@ public class ProjectileCreator
 	public Projectile BuildProjectile(IAttacker n, string section)
 	{
 		if(!inif.HasSection(section)) {GD.PushError($"Can't generate projectile {section} as it is not a real section"); return null;}
-		var proj = new Projectile();
-		
-		proj.OwnerObject = n;
-		var characterAudioManager = proj.OwnerObject.Audio;
-		var am = new AudioManager(2);
-		am.Name = "AudioManager";
-		am.Sounds = characterAudioManager.Sounds;
-		proj.AddChild(am);
-		proj.Audio = am;
+		var proj = new Projectile(n);
 		
 		proj.Name = section;
 		proj.Identifier = section;
@@ -59,6 +51,7 @@ public class ProjectileCreator
 		proj.MaxLifetime = lt;
 		var smf = inif[section, "MovementFunction", ""].s();
 		var movf = BuildMovementFunction(smf);
+		movf.Name = $"{section}MovementFunction";
 		proj.Movement = movf;
 		
 		var hitboxSections = inif[section, "Hitboxes", $"{section}Hitbox"].ls();

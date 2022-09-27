@@ -5,7 +5,7 @@ using System.Linq;
 
 public class AttackPartTransitionManager
 {
-	List<AttackPartTransition> Transitions{get; set;} = new List<AttackPartTransition>();
+	public List<AttackPartTransition> Transitions{get; set;} = new List<AttackPartTransition>();
 	public void Add(AttackPartTransition apt) => Transitions.Add(apt);
 	public void Clear() => Transitions.Clear();
 	

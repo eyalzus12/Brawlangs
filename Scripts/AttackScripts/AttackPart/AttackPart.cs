@@ -16,14 +16,20 @@ public class AttackPart : Node2D, IHitter
 	public int Direction {get => OwnerObject.Direction; set => OwnerObject.Direction = value;}
 	public int TeamNumber {get => OwnerObject.TeamNumber; set => OwnerObject.TeamNumber = value;}
 	
-	public bool active = false;
+	protected bool _active = false;
+	public virtual bool Active{get => _active; set
+	{
+		SetPhysicsProcess(value);
+		if(_active && !value) Stop();
+		else if(!_active && value) Activate();
+		_active = value;
+	}}
+	
 	public int Startup = 0;
-	public int Endlag = 0;
 	public int Length = 0;
 	public Vector2 Movement{get; set;}
 	public bool OverwriteXMovement{get; set;}
 	public bool OverwriteYMovement{get; set;}
-	public int MissEndlag{get; set;}
 	public int Cooldown{get; set;}
 	public int MissCooldown{get; set;}
 	public float GravityMultiplier{get; set;}
@@ -43,7 +49,6 @@ public class AttackPart : Node2D, IHitter
 	
 	public bool HasHit{get; set;}
 	
-	public AnimationPlayer hitboxPlayer;
 	public Attack att;
 	
 	public AttackPartTransitionManager TransitionManager{get; set;} = new AttackPartTransitionManager();
@@ -58,9 +63,10 @@ public class AttackPart : Node2D, IHitter
 	
 	public override void _Ready()
 	{
+		SetPhysicsProcess(false);
 		frameCount = 0;
-		if(Startup == 0) OnStartupFinish();
 		
+		//TOFIX: this is unsafe
 		Hitboxes = GetChildren().FilterType<Hitbox>().ToList();
 		ConnectSignals();
 		BuildHitboxAnimator();
@@ -79,44 +85,35 @@ public class AttackPart : Node2D, IHitter
 	}
 	
 	public virtual void LoadProperties() {}
-	/*
-	public void Connect(AttackPart ap)
-	{
-		dir.Add(ap.Name, ap);
-	}
-	
-	public void Connect(string name, AttackPart ap)
-	{
-		dir.Add(name, ap);
-	}
-	*/
 	
 	public virtual void Init() {}
 	
-	public virtual void Activate()
+	protected virtual void Activate()
 	{
+		if(Startup == 0) OnStartupFinish();
+		
 		HasHit = false;
+		frameCount = 0;
+		
+		OwnerObject.HitboxAnimator.Connect("animation_finished", this, "ChangeToNextOnEnd");
 		
 		ch.PlayAnimation(AttackAnimation, true);//overwrite animation
 		ch.PlaySound(AttackSound);
-		
-		active = true;
-		frameCount = 0;
 		
 		if(OverwriteXMovement) ch.vec.x = 0;
 		if(OverwriteYMovement) ch.vec.y = 0;
 		if(Movement != Vector2.Zero) ch.vec = Movement * new Vector2(ch.Direction, 1);
 		
 		OnStart();
-		hitboxPlayer.Play("HitboxActivation");
 		
 		HitList.Clear();
 		HitIgnoreList.Clear();
+		
+		OwnerObject.HitboxAnimator.Play($"{Name}HitboxActivation");
 	}
 	
 	public override void _PhysicsProcess(float delta)
 	{
-		if(!active) return;
 		if(frameCount == Startup) OnStartupFinish();
 		Loop();
 		HandleHits();
@@ -138,13 +135,9 @@ public class AttackPart : Node2D, IHitter
 	const float FPS = 60f;
 	public void BuildHitboxAnimator()
 	{
-		hitboxPlayer = new AnimationPlayer();
-		hitboxPlayer.PlaybackProcessMode = AnimationPlayer.AnimationProcessMode.Physics;
-		hitboxPlayer.Name = "AttackPlayer";
-		AddChild(hitboxPlayer);
 		var anm = new Animation();
-		anm.Length = (Startup+Length/*+endlag*/)/FPS;
-		hitboxPlayer.AddAnimation("HitboxActivation", anm);
+		anm.Length = (Startup+Length+1)/FPS;
+		OwnerObject.HitboxAnimator.AddAnimation($"{Name}HitboxActivation", anm);
 		foreach(var h in Hitboxes)
 		{
 			int trc = anm.AddTrack(Animation.TrackType.Value);
@@ -172,44 +165,31 @@ public class AttackPart : Node2D, IHitter
 		}
 		GD.Print("-------------------------------------------");
 		#endif
-		
-		hitboxPlayer.Connect("animation_finished", this, "ChangeToNextOnEnd");
 	}
 	
-	public virtual void Stop()
+	protected virtual void Stop()
 	{
 		HandleHits();
 		OnEnd();
-		hitboxPlayer.Stop(true);
+		OwnerObject.HitboxAnimator.Stop(true);
 		Hitboxes.ForEach(h => h.Active = false);
 		ch.Tags["Hit"] = StateTag.Ending;
 		HitList.Clear();
 		HitIgnoreList.Clear();
-		active = false;
+		OwnerObject.HitboxAnimator.Disconnect("animation_finished", this, "ChangeToNextOnEnd");
 	}
 	
-	public virtual void Pause() {hitboxPlayer.Stop(); ch.PauseAnimation();}
-	public virtual void Resume() {hitboxPlayer.Play(); ch.ResumeAnimation();}
+	public virtual void Pause() {OwnerObject.HitboxAnimator.Stop(); ch.PauseAnimation();}
+	public virtual void Resume() {OwnerObject.HitboxAnimator.Play(); ch.ResumeAnimation();}
 	public virtual void Loop() {}
 	public virtual void OnStart() {}
 	public virtual void OnEnd() {}
 	public virtual void HitEvent(Hitbox hitbox, Hurtbox hurtbox) {}
 	
-	public void ChangeToNextOnEnd(string dummy="") => ChangeToNext(true);
-	
-	public virtual void ChangeToNext(bool end = false)
-	{
-		if(!active) return;
-		ChangePart(NextPart(end));
-	}
-	
+	public void ChangeToNextOnEnd(string dummy = "") => ChangeToNext(true);
+	public virtual void ChangeToNext(bool end = false) => ChangePart(NextPart(end));
 	public virtual string NextPart(bool end = false) => TransitionManager.NextAttackPart(ch.Tags, end?-1:frameCount);
-	
-	public virtual void ChangePart(string part)
-	{
-		//if(!active) return;
-		att.SetPart(part);
-	}
+	public virtual void ChangePart(string part) => att.SetPart(part);
 	
 	public bool CanHit(IHittable h) => OwnerObject.CanHit(h) && !HitIgnoreList.Contains(h);
 	
@@ -234,7 +214,7 @@ public class AttackPart : Node2D, IHitter
 		
 		var hitChar = hurtbox.OwnerObject;
 		
-		var current = new Hitbox();
+		Hitbox current;
 		if(HitList.TryGetValue(hurtbox, out current))
 		{
 			if(hitbox.HitPriority > current.HitPriority)
@@ -250,7 +230,7 @@ public class AttackPart : Node2D, IHitter
 	public virtual void HandleHits()
 	{
 		//GD.Print($"{OwnerObject} attack part runs Handle Hits");
-		if(!active) return;
+		if(!Active) return;
 		var velocity = ch.Velocity;
 		foreach(var entry in HitList)
 		{
@@ -289,6 +269,5 @@ public class AttackPart : Node2D, IHitter
 		HitList.Clear();
 	}
 	
-	public virtual int GetEndlag() => Endlag + (HasHit?0:MissEndlag);
 	public virtual int GetCooldown() => Cooldown + (HasHit?0:MissCooldown);
 }

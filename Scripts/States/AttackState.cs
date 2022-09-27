@@ -87,61 +87,29 @@ public class AttackState : State
 	
 	public void SetEnd(Attack a)
 	{
-		//remove signal
-		a.Disconnect("AttackEnds", this, nameof(SetEnd));
-		a.connected = null;
+		//turnaround
+		ch.TurnConditional();
 		
-		//disable attack
-		if(a.active)
+		//transition to appropriate state
+		if(ch.grounded)
 		{
-			a.active = false;
-			//call ending function
-			a.OnEnd();
-			//stop attack part
-			a.CurrentPart?.Stop();
-			//reset character attack
-			ch.ResetCurrentAttack(a);
-			//revert attack state
-			a.CurrentPart = null;
-		}
-		
-		//apply enflag
-		int endlag = a.GetEndlag();
-		if(endlag > 0)//has endlag to apply
-		{
-			//switch state
-			var s = ch.States.Change<EndlagState>();
-			//supply state with endlag
-			s.endlag = endlag;
-			//supply state with attack
-			s.att = a;
-		}
-		else//no endlag. state transition immedietly
-		{
-			//turnaround
-			ch.TurnConditional();
-			
-			//transition to appropriate state
-			if(ch.grounded)
+			if(ch.downHeld)
 			{
-				if(ch.downHeld)
-				{
-					ch.Crouch();
-					ch.States.Change(ch.Idle?"Crouch":"Crawl");
-				}
-				else
-				{
-					ch.Uncrouch();
-					ch.States.Change(ch.Idle?"Idle":"Walk");
-				}
+				ch.Crouch();
+				ch.States.Change(ch.Idle?"Crouch":"Crawl");
 			}
-			else if(ch.walled && touchedWall)
+			else
 			{
-				ch.ApplySettings("Wall");
-				ch.States.Change("Wall");
+				ch.Uncrouch();
+				ch.States.Change(ch.Idle?"Idle":"Walk");
 			}
-			else ch.States.Change("Air");
 		}
+		else if(ch.walled && touchedWall)
+		{
+			ch.ApplySettings("Wall");
+			ch.States.Change("Wall");
+		}
+		else ch.States.Change("Air");
 		
 		//forget attack
 		att = null;
@@ -151,18 +119,7 @@ public class AttackState : State
 	public override void OnChange(State newState)
 	{
 		//GD.Print($"{ch} is changing from Attack State");
-		
 		//got hit
-		if(newState is StunState || newState is HitPauseState)
-		{
-			//GD.Print($"{ch} is changing to Stun or Hit Pause State so need to cleanup");
-			att.Disconnect("AttackEnds", this, nameof(SetEnd));
-			att.connected = null;
-			att.active = false;
-			att.OnEnd();
-			att.CurrentPart?.Stop();
-			ch.ResetCurrentAttack(att);
-			att.CurrentPart = null;
-		}
+		if(newState is StunState || newState is HitPauseState) att.Active = false;
 	}
 }

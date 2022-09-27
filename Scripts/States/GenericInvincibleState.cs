@@ -21,9 +21,9 @@ public class GenericInvincibleState : State
 	{
 		IFramesStarted = false;
 		IsInEndlag = false;
-		ch.Resources.Give(ActionName, -1);
 		ch.PlayAnimation(StateAnimation, true);
 		ch.Uncrouch();
+		OnStart();
 	}
 	
 	protected override void LoopActions()
@@ -43,12 +43,17 @@ public class GenericInvincibleState : State
 		}
 	}
 	
+	protected virtual void OnStart() {}
 	protected virtual void OnIFramesStart() {}
 	protected virtual void OnEndlagStart() {}
 	
 	protected override bool CalcStateChange()
 	{
-		if(frameCount >= Startup+IFrames+Endlag) DecideNextState();
+		if(frameCount >= Startup+IFrames+Endlag)
+		{
+			DecideNextState();
+			ch.Resources.Give(ActionName, -1);
+		}
 		else return false;
 		
 		return true;

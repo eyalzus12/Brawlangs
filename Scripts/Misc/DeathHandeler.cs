@@ -67,15 +67,6 @@ public class DeathHandeler : Node
 		diedTotal.Reverse();
 		this.GetPublicData().Add("GameResults", diedTotal);
 		EmitSignal(nameof(MatchEnds));
-		/*var sb = new StringBuilder();
-		sb.Append("\n");
-		for(int i = 1; winList.Count > 0; ++i)
-		{
-			var ch = winList.Pop();
-			if(!Godot.Object.IsInstanceValid(ch)) ch = null;
-			sb.Append($"Character {ch?.Name} of team {ch?.teamNumber} is {StringUtils.IntToWord(i)} place\n");
-		}
-		GD.Print(sb.ToString());*/
 	}
 	
 	public string Log(Character c, int logcount) => $"Character {c.Name} from team {c.TeamNumber} placed {StringUtils.IntToWord(logcount)}";

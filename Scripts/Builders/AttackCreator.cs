@@ -68,8 +68,6 @@ public class AttackCreator
 		ap.Startup = su;
 		var ln = inif[section, "Length", 0].i();
 		ap.Length = ln;
-		var el = inif[section, "Endlag", 0].i();
-		ap.Endlag = el;
 		var cd = inif[section, "Cooldown", 0].i();
 		ap.Cooldown = cd;
 		var mv = inif[section, "Movement", Vector2.Zero].v2();
@@ -90,8 +88,6 @@ public class AttackCreator
 		ap.SlowOnWalls = ws;
 		var ffl = inif[section, "FastFallLocked", false].b();
 		ap.FastFallLocked = ffl;
-		var me = inif[section, "MissEndlag", 0].i();
-		ap.MissEndlag = me;
 		var mc = inif[section, "MissCooldown", 0].i();
 		ap.MissCooldown = mc;
 		var gm = inif[section, "GravityMultiplier", 1f].f();

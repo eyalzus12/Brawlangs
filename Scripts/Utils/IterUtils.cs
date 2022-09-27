@@ -6,17 +6,20 @@ using System.Text.RegularExpressions;
 
 public static class IterUtils
 {
-	public static IEnumerable<T> Enumerable<T>(this Godot.Collections.Array<T> a)
+	public static IEnumerable<T> ToEnumerable<T>(this Godot.Collections.Array<T> a)
 	{
 		foreach(var h in a) yield return h;
 	}
 	
-	public static IEnumerable<T> Enumerable<T>(this Godot.Collections.Array a)
+	public static IEnumerable<T> ToEnumerable<T>(this Godot.Collections.Array a)
 	{
 		foreach(var h in a) yield return (T)h;
 	}
 	
-	public static IEnumerable<object> Enumerable(this Godot.Collections.Array a) => a.Enumerable<object>();
+	public static IEnumerable<T> ToFilteredEnumerable<T>(this Godot.Collections.Array a)
+	{
+		foreach(var h in a) if(a is T t) yield return t;
+	}
 	
 	public static IEnumerable<(int, T)> Indexed<T>(this IEnumerable<T> e)
 	{
@@ -198,4 +201,37 @@ public static class IterUtils
 		int i = 0; foreach(var o in e) {++i; if(o.Equals(v)) return i;}
 		return i;
 	}
+	
+	public static IEnumerable<T> RepeatListOf<T>(this T t, int times)
+	{
+		for(int i = 0; i < times; ++i) yield return t;
+	}
+	
+	public static IEnumerable<T> CircularTake<T>(this IEnumerable<T> e, int amount)
+	{
+		var en = e.GetEnumerator();
+		for(int i = 0; i < amount; en.Reset())
+		{
+			while(i < amount && en.MoveNext())
+			{
+				yield return en.Current;
+				++i;
+			}
+		}
+	}
+	
+	public static IEnumerable<T> CircularTakeOrDefault<T>(this IEnumerable<T> e, int amount, T @default = default(T))
+	{
+		var a = e.ToArray<T>();//make sure not to generate it multiple times
+		if(a.Length == 0) return @default.RepeatListOf<T>(amount);
+		else return a.CircularTake<T>(amount);
+	}
+	
+	public static T Choice<T>(this List<T> l, Randomizer RNG) => l[RNG.RNG.Next(l.Count)];
+	public static T Choice<T>(this T[] a, Randomizer RNG) => a[RNG.RNG.Next(a.Length)];
+	public static T Choice<T>(this IEnumerable<T> e, Randomizer RNG) => e.ToArray<T>().Choice<T>(RNG);
+	
+	public static T ChoiceOrDefault<T>(this List<T> l, Randomizer RNG, T @default = default(T)) => (l.Count == 0)?@default:l.Choice<T>(RNG);
+	public static T ChoiceOrDefault<T>(this T[] a, Randomizer RNG, T @default = default(T)) => (a.Length == 0)?@default:a.Choice<T>(RNG);
+	public static T ChoiceOrDefault<T>(this IEnumerable<T> e, Randomizer RNG, T @default = default(T)) => e.ToArray<T>().ChoiceOrDefault(RNG, @default);
 }

@@ -4,52 +4,46 @@ using System.Collections.Generic;
 
 public class ProjectilePool : Node
 {
-	public const int LOAD_AMOUNT = 3;
+	public const int LOAD_AMOUNT = 5;
+	
 	public Dictionary<string, Queue<Projectile>> ProjectileDict{get; set;} = new Dictionary<string, Queue<Projectile>>();
 	public Queue<(string, Projectile)> ReturnQueue{get; set;} = new Queue<(string, Projectile)>();
 	public HashSet<Projectile> ReturnQueueSet{get; set;} = new HashSet<Projectile>();
 	public ProjectileCreator ProjCreate{get; set;} = new ProjectileCreator();
 	public IAttacker OwnerObject{get; set;}
 	
-	public ProjectilePool()
-	{
-		
-	}
-	
-	public ProjectilePool(IAttacker owner)
-	{
-		OwnerObject = owner;
-	}
+	public ProjectilePool() {}
+	public ProjectilePool(IAttacker owner) {OwnerObject = owner;}
 	
 	public override void _PhysicsProcess(float delta)
 	{
 		CleanReturnQueue();
 	}
 	
-	public Projectile GetProjectile(string identifier, string loader = "")
+	public Projectile GetProjectile(string identifier, int loadAmount = LOAD_AMOUNT, string loader = "")
 	{
 		Queue<Projectile> poolQueue;
 		if(!ProjectileDict.TryGetValue(identifier, out poolQueue) || poolQueue.Count <= 0)//no available objects
 		{
-			poolQueue = CreateNewProjectile(identifier);//load new ones
+			poolQueue = CreateNewProjectiles(identifier, loadAmount);//load new ones
 		}
 		
 		return poolQueue?.Dequeue();//get available object if exists
 	}
 	
-	public Queue<Projectile> CreateNewProjectile(string identifier)
+	public Queue<Projectile> CreateNewProjectiles(string identifier, int amount)
 	{
-		if(!ProjectileDict.ContainsKey(identifier))//no queue exists
-			ProjectileDict.Add(identifier, new Queue<Projectile>());//make a queue
-		
-		for(int i = 0; i < LOAD_AMOUNT; ++i)
+		if(OwnerObject is null)
 		{
-			if(OwnerObject is null)
-			{
-				GD.PushError("projectile pool's owner is null. failed to create new pooled projectiles");
-				return null;
-			}
-			
+			GD.PushError("projectile pool's owner is null. failed to create new pooled projectiles");
+			return null;
+		}
+		
+		if(!ProjectileDict.ContainsKey(identifier))//no queue exists
+			ProjectileDict[identifier] = new Queue<Projectile>();//make a queue
+		
+		for(int i = 0; i < amount; ++i)
+		{
 			var obj = ProjCreate.BuildProjectile(OwnerObject, identifier);
 			
 			if(obj is null)
@@ -90,17 +84,14 @@ public class ProjectilePool : Node
 	{
 		while(ReturnQueue.Count > 0)
 		{
-			var h = ReturnQueue.Dequeue();
-			var identifier = h.Item1;
-			var obj = h.Item2;
+			(string identifier, Projectile obj) = ReturnQueue.Dequeue();
 			if(obj is null || !Godot.Object.IsInstanceValid(obj))
 			{
 				GD.PushError($"Invalid instance of object {obj} was found while cleaning return queue. Cheese fucked up somewhere.");
 				continue;
 			}
 			
-			if(!ProjectileDict.ContainsKey(identifier))
-				ProjectileDict.Add(identifier, new Queue<Projectile>());//make a queue
+			if(!ProjectileDict.ContainsKey(identifier)) ProjectileDict[identifier] = new Queue<Projectile>();//make a queue
 			ProjectileDict[identifier].Enqueue(obj);
 			
 			ReturnQueueSet.Remove(obj);
@@ -109,16 +100,13 @@ public class ProjectilePool : Node
 	
 	public void ClearPool()
 	{
-		foreach(var entry in ProjectileDict)
+		foreach(var queue in ProjectileDict.Values)
+		while(queue.Count > 0)
 		{
-			var queue = entry.Value;
-			while(queue.Count > 0)
-			{
-				var obj = queue.Dequeue();
-				obj.QueueFree();
-			}
+			var p = queue.Dequeue();
+			p.Movement.QueueFree();
+			p.QueueFree();
 		}
-		
 		ProjectileDict.Clear();
 	}
 	

@@ -57,4 +57,10 @@ public class StateMachine
 		Current?.SetInputs();
 		Current?.DoPhysics(delta);
 	}
+	
+	public void Clear()
+	{
+		States.Values.ForEach(s=>s.QueueFree());
+		States.Clear();
+	}
 }

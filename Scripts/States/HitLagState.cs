@@ -48,7 +48,7 @@ public class HitLagState : State
 	{
 		if(newState is StunState || newState is HitPauseState)
 		{
-			var att = ch.CurrentAttack;
+			/*var att = ch.CurrentAttack;
 			if(att is null) return;
 			att.Disconnect("AttackEnds", ch.States["Attack"], "SetEnd");
 			att.connected = null;
@@ -56,7 +56,8 @@ public class HitLagState : State
 			att.OnEnd();
 			att.CurrentPart?.Stop();
 			ch.ResetCurrentAttack(att);
-			att.CurrentPart = null;
+			att.CurrentPart = null;*/
+			if(ch.CurrentAttack != null) ch.CurrentAttack.Active = false;
 		}
 	}
 }

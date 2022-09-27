@@ -19,10 +19,10 @@ extents = Vector2( 128, 32 )
 [node name="Base" type="Node2D"]
 position = Vector2( 256, 300 )
 script = ExtResource( 1 )
-BlastZones = Vector2( 2300, 1200 )
 
 [node name="WallLeft" type="StaticBody2D" parent="."]
 position = Vector2( -512, 0 )
+collision_mask = 0
 script = ExtResource( 2 )
 
 [node name="LeftCollision" type="CollisionShape2D" parent="WallLeft"]
@@ -35,6 +35,7 @@ texture = ExtResource( 5 )
 
 [node name="WallRight" type="StaticBody2D" parent="."]
 position = Vector2( 512, 0 )
+collision_mask = 0
 script = ExtResource( 2 )
 
 [node name="RightCollision" type="CollisionShape2D" parent="WallRight"]
@@ -47,6 +48,7 @@ texture = ExtResource( 5 )
 
 [node name="Top" type="StaticBody2D" parent="."]
 position = Vector2( 0, -1028 )
+collision_mask = 0
 script = ExtResource( 2 )
 
 [node name="TopCollision" type="CollisionShape2D" parent="Top"]
@@ -62,6 +64,7 @@ texture = ExtResource( 6 )
 
 [node name="Start" type="StaticBody2D" parent="."]
 position = Vector2( 0, 100 )
+collision_mask = 0
 script = ExtResource( 3 )
 
 [node name="StartCollision" type="CollisionShape2D" parent="Start"]

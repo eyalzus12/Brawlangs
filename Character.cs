@@ -251,7 +251,6 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	
 	public bool crouching = false;//is currently crouching
 	
-	
 	public StateMachine States{get; set;}
 	
 	public List<Hurtbox> Hurtboxes{get; set;} = new List<Hurtbox>();
@@ -260,8 +259,8 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public CharacterCollision collision;
 	//public PlatformDropDetector DropDetector;
 	
-	private Attack currentAttack;
-	public Attack CurrentAttack{get => currentAttack; set => currentAttack = value;}
+	//private Attack currentAttack;
+	public Attack CurrentAttack{get; set;}
 	
 	public bool Hitting{get; set;}
 	public IHittable LastHitee{get; set;}
@@ -271,8 +270,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public bool Clashing{get; set;}
 	public HitData ClashData{get; set;}
 	
-	private Dictionary<string, Attack> attackDict = new Dictionary<string, Attack>();
-	public Dictionary<string, Attack> Attacks{get => attackDict; set => attackDict = value;}
+	public Dictionary<string, Attack> Attacks{get; set;} = new Dictionary<string, Attack>();
 	
 	public CooldownManager Cooldowns{get; set;} = new CooldownManager();
 	
@@ -285,25 +283,47 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	
 	public StateTagsManager Tags{get; set;} = new StateTagsManager();
 	
-	public Dictionary<string, PackedScene> projectiles = new Dictionary<string, PackedScene>();
-	public Dictionary<string, HashSet<Projectile>> activeProjectiles = new Dictionary<string, HashSet<Projectile>>();
-	public ProjectilePool projPool;
+	//public Dictionary<string, PackedScene> Projectiles{get; set;} = new Dictionary<string, PackedScene>();
+	public Dictionary<string, HashSet<Projectile>> ActiveProjectiles{get; set;} = new Dictionary<string, HashSet<Projectile>>();
+	public ProjectilePool ProjPool{get; set;}
 	
-	public List<string> StatList = new List<string>();
+	public List<string> StatList{get; set;} = new List<string>();
 	public PropertyMap prop = new PropertyMap();
 	
 	public InputManager Inputs;
 	
-	public AnimationSprite CharacterSprite{get; set;}
+	public AnimationSprite CharacterSprite{get; set;} = new AnimationSprite();
 	public Color SpriteModulate{get; set;}
 	
-	public AudioManager Audio{get; set;}
+	public const int AUDIO_PLAYERS = 4;
+	public AudioManager Audio{get; set;} = new AudioManager(AUDIO_PLAYERS);
 	
-	public Character() {}
+	public AnimationPlayer HitboxAnimator{get; set;} = new AnimationPlayer();
+	
+	public Character()
+	{
+		ProjPool = new ProjectilePool(this);
+	}
 	
 	public override void _Ready()
 	{
 		States = new StateMachine(CreateStates());
+		
+		ProjPool.Name = "ProjectilePool";
+		AddChild(ProjPool);
+		
+		HitboxAnimator.PlaybackProcessMode = AnimationPlayer.AnimationProcessMode.Physics;
+		HitboxAnimator.Name = "HitboxAnimator";
+		AddChild(HitboxAnimator);
+		
+		CharacterSprite.Name = "CharacterSprite";
+		AddChild(CharacterSprite);
+		
+		Audio.Name = "AudioManager";
+		AddChild(Audio);
+		
+		CollisionLayer = 0b100;
+		CollisionMask = 0b011;
 	}
 
 	public override void _PhysicsProcess(float delta)
@@ -316,16 +336,23 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		++framesSinceLastHit;
 		StoreVelocities();
 		TruncateVelocityIfInsignificant();
+		
 		Cooldowns.Update();
 		IFrames.Update();
 		TimedActions.Update();
 		Tags.Update();
 		UpdateInputTags();
 		States.Update(delta);
+		
 		if(Input.IsActionJustPressed("reset")) Respawn();
 		
 		CharacterSprite.FlipH = (Direction == -1);
 		CharacterSprite.SelfModulate = Invincible?new Color(1,1,1,1):SpriteModulate;
+	}
+	
+	public override void _ExitTree()
+	{
+		States.Clear();//free states
 	}
 	
 	public void PlayAnimation(string anm, bool overwriteQueue) => CharacterSprite.Play(anm, overwriteQueue);
@@ -392,7 +419,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	
 	public void UpdateInputTags()
 	{
-		foreach(var inputTag in InputMap.GetActions().Enumerable<string>().Where(s=>s.StartsWith($"{TeamNumber}_")).Select(s=>s.Substring($"{TeamNumber}_".Length)))
+		foreach(var inputTag in InputMap.GetActions().ToEnumerable<string>().Where(s=>s.StartsWith($"{TeamNumber}_")).Select(s=>s.Substring($"{TeamNumber}_".Length)))
 		{
 			if(Inputs.IsActionJustPressed(inputTag)) Tags[inputTag] = StateTag.Starting;
 			if(Inputs.IsActionJustReleased(inputTag)) Tags[inputTag] = StateTag.Ending;
@@ -422,7 +449,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	{
 		GD.Print("\nRespawning...");
 		Inputs?.MarkAllForDeletion();
-		CurrentAttack?.Stop();
+		if(CurrentAttack != null) CurrentAttack.Active = false;
 		ApplySettings("Default");
 		States.Change("Air");
 		Position = 10f * Vector2.Left * TeamNumber;
@@ -439,7 +466,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	
 	public virtual void DisableAllProjectiles()
 	{
-		foreach(var activeProjectileSet in activeProjectiles.Values)
+		foreach(var activeProjectileSet in ActiveProjectiles.Values)
 			activeProjectileSet.ToList().ForEach(p => p.Destruct());
 	}
 	
@@ -725,7 +752,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		s.att = CurrentAttack;
 		States.Change("Attack");
 		
-		CurrentAttack.Start();
+		CurrentAttack.Active = true;
 		return true;
 	}
 	
@@ -745,22 +772,22 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	{
 		if(CurrentAttack is null) return;
 		CurrentAttack.Disconnect("AttackEnds", this, nameof(ResetCurrentAttack));
-		SetAttackCooldowns();
+		if(!GettingHit) SetAttackCooldowns();
 		CurrentAttack = null;
 	}
 	
 	public virtual void EmitProjectile(string proj)
 	{
 		//get pooled projectile
-		var generatedProjectile = projPool.GetProjectile(proj);
+		var generatedProjectile = ProjPool.GetProjectile(proj);
 		if(generatedProjectile is null)
 		{
 			GD.PushError($"Failed to emit projectile {proj} because the object pool returned a null");
 		}
 		else
 		{
-			if(!activeProjectiles.ContainsKey(proj))//projectile havent been used yet. create storage
-				activeProjectiles.Add(proj, new HashSet<Projectile>());
+			if(!ActiveProjectiles.ContainsKey(proj))//projectile havent been used yet. create storage
+				ActiveProjectiles.Add(proj, new HashSet<Projectile>());
 			//set direction
 			generatedProjectile.Direction = Direction;
 			//add owner
@@ -768,7 +795,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 			//connect destruction signal
 			generatedProjectile.Connect("ProjectileDied", this, nameof(HandleProjectileDestruction));
 			//store as active
-			activeProjectiles[proj].Add(generatedProjectile);
+			ActiveProjectiles[proj].Add(generatedProjectile);
 			//request that _Ready will be called
 			generatedProjectile.RequestReady();
 			//add to scene
@@ -780,16 +807,19 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	{
 		var identifier = who.Identifier;
 		
-		if(!activeProjectiles.ContainsKey(identifier))
-			throw new Exception($"Projectile {identifier} died but was never reported as active");
+		if(!ActiveProjectiles.ContainsKey(identifier))
+		{
+			GD.PushError($"Projectile {identifier} died but was never reported as active");
+			return;
+		}
 		
-		activeProjectiles[identifier].Remove(who);
-		projPool.InsertProjectile(who);
+		ActiveProjectiles[identifier].Remove(who);
+		ProjPool.InsertProjectile(who);
 		who.Disconnect("ProjectileDied", this, nameof(HandleProjectileDestruction));
 	}
 	
 	public virtual void SetAttackCooldowns()
 	{
-		Cooldowns[CurrentAttack.Name] = CurrentAttack.GetEndlag() + CurrentAttack.GetCooldown();
+		Cooldowns[CurrentAttack.Name] = CurrentAttack.GetCooldown();
 	}
 }

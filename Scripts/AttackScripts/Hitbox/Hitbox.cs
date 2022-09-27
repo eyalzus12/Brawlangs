@@ -37,20 +37,20 @@ public class Hitbox : Area2D
 	public HashSet<string> WhitelistedStates{get; set;} = new HashSet<string>();
 	public HashSet<string> BlacklistedStates{get; set;} = new HashSet<string>();
 	
-	private bool active = false;
-	
 	public Vector2 OriginalPosition{get; set;} = Vector2.Zero;
 	public float OriginalRotation{get; set;} = 0f;
 	
+	protected bool _active = false;
 	public bool Active
 	{
-		get => active;
+		get => _active;
 		set
 		{
-			active = value;
+			SetPhysicsProcess(value);
 			if(value) UpdateHitboxPosition();
+			HitboxShape?.SetDeferred("disabled", !value);
 			Visible = value;
-			HitboxShape?.SetDeferred("disabled", !active);
+			_active = value;
 		}
 	}
 	
@@ -80,11 +80,11 @@ public class Hitbox : Area2D
 	
 	public override void _Ready()
 	{
+		Active = false;
+		
 		frameCount = 0;
 		
 		Init();
-		
-		Active = false;
 		
 		Connect("area_entered", this, nameof(OnAreaEnter));
 		
@@ -101,6 +101,7 @@ public class Hitbox : Area2D
 	{
 		CollisionPosition = OriginalPosition;
 		CollisionRotation = OriginalRotation;
+		Update();
 	}
 	
 	public virtual void Init() {}
@@ -119,7 +120,7 @@ public class Hitbox : Area2D
 		{
 			if(hurtbox.OwnerObject is Character c)
 			{
-				for(var t = c.States.Current.GetType(); t.Name != "State"; t = t.BaseType)
+				for(var t = c.States.Current.GetType(); t != typeof(State); t = t.BaseType)
 				{
 					var Whitelisted = (WhitelistedStates.Count == 0 || WhitelistedStates.Contains(t.Name));
 					var Blacklisted = BlacklistedStates.Contains(t.Name);
@@ -141,10 +142,8 @@ public class Hitbox : Area2D
 	
 	public override void _PhysicsProcess(float delta)
 	{
-		if(!Active) return;
 		Loop();
 		UpdateHitboxPosition();
-		Update();
 		++frameCount;
 	}
 	

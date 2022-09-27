@@ -22,6 +22,6 @@ public class MapSelectorButton : OnPressButton
 		var str = te.Text;
 		if(str != "") this.AddData("ini_path", str);
 		
-		GetTree().CallDeferred("change_scene", path + dest);
+		this.ChangeScene(path + dest);
 	}
 }

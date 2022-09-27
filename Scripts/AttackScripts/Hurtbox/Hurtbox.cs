@@ -46,6 +46,7 @@ public class Hurtbox : Area2D
 	{
 		ZIndex = 2;
 		var coli = new CollisionShape2D();
+		coli.Name = "HurtboxCollision";
 		AddChild(coli);
 		col = coli;
 		var shape = new CapsuleShape2D();

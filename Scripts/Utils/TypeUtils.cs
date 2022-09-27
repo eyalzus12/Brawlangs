@@ -74,30 +74,6 @@ public static class TypeUtils
 		var ToPrint = (debug!="")?$"\nDebug message: {debug}":"";
 		GD.PushError($"Type {t.Name} isn't available in the cast method" + ToPrint);
 		return null;
-		
-		/*var t = typeof(T);
-		var name = t.Name;
-		switch(name)
-		{
-			case typeof(object).Name: return o;
-			case typeof(string).Name: return o.s();
-			case typeof(float).Name: return o.f();
-			case typeof(int).Name: return o.i();
-			case typeof(Vector2).Name: return o.v2();
-			case typeof(Vector3).Name: return o.v3();
-			case typeof(bool).Name: return o.b();
-			
-			case typeof(List<object>).Name: return o.lo();
-			case typeof(List<string>).Name: return o.ls();
-			case typeof(List<float>).Name: return o.lf();
-			case typeof(List<int>).Name: return o.li();
-			case typeof(List<Vector2>).Name: return o.lv2();
-			case typeof(List<Vector3>).Name: return o.lv3();
-			case typeof(List<bool>).Name: return o.lb();
-			default:
-				GD.Print($"ERROR: Type {name} isn't available in the cast method" + (debug=="")?"":$"\nDebug message: {debug}");
-				return null;
-		}*/
 	}
 	
 	public static object cast<T>(this object o, string debug) => o.cast(typeof(T), debug);
@@ -134,6 +110,7 @@ public static class TypeUtils
 				{
 					if(o is T t)
 					{
+						@default.QueueFree();
 						return t;
 					}
 					else GD.PushError($"Attempt to load script {path} failed because the object in that path is not {typeName.AAN()} script");

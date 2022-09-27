@@ -18,7 +18,15 @@ public class Attack : Node2D
 	}
 	
 	public int frameCount = 0;
-	public bool active = false;
+	
+	protected bool _active = false;
+	public bool Active{get => _active; set
+	{
+		SetPhysicsProcess(value);
+		if(_active && !value) Stop();
+		else if(!_active && value) Activate();
+		_active = value;
+	}}
 	
 	public float DamageMult{get; set;}
 	public float KnockbackMult{get; set;}
@@ -47,25 +55,27 @@ public class Attack : Node2D
 	
 	public override void _Ready()
 	{
+		SetPhysicsProcess(false);
 		frameCount = 0;
 		Init();
 	}
 	
-	public virtual void Start()
+	protected virtual void Activate()
 	{
 		DamageMult = 1f;
 		KnockbackMult = 1f;
 		StunMult = 1;
 		frameCount = 0;
-		active = true;
+		
+		OnStart();
+		
 		EmitSignal(nameof(AttackStarts), this);
-		if(connected != null) Disconnect("AttackEnds", connected, "SetEnd");
-		Connect("AttackEnds", ch.States.Current, "SetEnd");
-		connected = ch.States.Current;
+		Connect("AttackEnds", ch.States["Attack"], "SetEnd");
+		
 		CurrentPart = StartPart;
 		LastUsedPart = null;
-		OnStart();
-		CurrentPart.Activate();
+		
+		CurrentPart.Active = true;
 	}
 	
 	public virtual void SetPart(string s)
@@ -73,20 +83,23 @@ public class Attack : Node2D
 		if(Parts.ContainsKey(s) && Parts[s] != null)
 		{
 			LastUsedPart = CurrentPart;
-			CurrentPart?.Stop();
+			if(CurrentPart != null) CurrentPart.Active = false;
 			CurrentPart = Parts[s];
-			CurrentPart.Activate();
+			CurrentPart.Active = true;
 		}
-		else Stop();
+		else Active = false;
 	}
 	
-	public virtual void Stop()
+	protected virtual void Stop()
 	{
 		LastUsedPart = CurrentPart;
-		active = false;
+		
 		OnEnd();
-		CurrentPart?.Stop();
+		
 		EmitSignal(nameof(AttackEnds), this);
+		Disconnect("AttackEnds", ch.States["Attack"], "SetEnd");
+		
+		CurrentPart.Active = false;
 		CurrentPart = null;
 	}
 	
@@ -111,5 +124,4 @@ public class Attack : Node2D
 	}
 	
 	public virtual int GetCooldown() => (CurrentPart??LastUsedPart).GetCooldown();
-	public virtual int GetEndlag() => (CurrentPart??LastUsedPart).GetEndlag();
 }

@@ -22,22 +22,30 @@ public class MapBase : Node2D
 	
 	public override void _Ready()
 	{
-		LoadCharacters();
-		var camera = new MatchCamera();
-		camera.limits = CameraLimits;
+		var chars = LoadCharacters();
+		
+		SetDamageLabelLocations(chars.ToArray());
+		
+		var dh = new DeathHandeler(chars);
+		dh.Name = "DeathHandler";
+		AddChild(dh);
+		dh.Connect("MatchEnds", this, nameof(MatchEnd));
+		
+		var camera = new CameraFocus(chars, CameraLimits);
+		camera.Name = "CameraFocus";
 		AddChild(camera);
-		camera.Current = true;
 		
 		var bz = new BlastZone(Vector2.Zero, BlastZones);
+		bz.Name = "Blastzones";
 		AddChild(bz);
 	}
 	
-	public void LoadCharacters()
+	public List<Character> LoadCharacters()
 	{
 		var data = this.GetPublicData();
 		data.Add("CurrentInfoLabelCharacter", 0);
 		var chars = new List<Character>();
-		foreach(var i in 1.To(8))
+		for(int i = 0; i < 7; ++i)
 		{
 			object o = "";
 			if(data.TryGet($"LoadedCharacter{i}", out o))
@@ -48,10 +56,7 @@ public class MapBase : Node2D
 			}
 		}
 		
-		SetDamageLabelLocations(chars.ToArray());
-		var dh = new DeathHandeler(chars);
-		AddChild(dh);
-		dh.Connect("MatchEnds", this, nameof(MatchEnd));
+		return chars;
 	}
 	
 	public Character PathToCharacter(string path, int i)
@@ -65,6 +70,7 @@ public class MapBase : Node2D
 		c.Respawn();
 		
 		var im = new BufferInputManager(c.TeamNumber);
+		im.Name = "InputManager";
 		c.AddChild(im);
 		c.Inputs = im;
 		return c;
@@ -82,9 +88,11 @@ public class MapBase : Node2D
 			var ch = characters[i];
 			var v = locations[i];
 			var lb = new DebugLabel();
+			lb.Name = $"DebugLabel{i}";
 			lb.ch = ch;
 			cl.AddChild(lb);
 			var dl = new DamageLabel(ch);
+			dl.Name = $"DamageLabel{i}";
 			dl.RectPosition = v;
 			cl.AddChild(dl);
 		}
@@ -137,11 +145,8 @@ public class MapBase : Node2D
 		}
 	}
 	
-	public override void _PhysicsProcess(float delta) => Update();
-	
 	public override void _Draw()
 	{
-		//if(!this.GetRootNode<UpdateScript>("UpdateScript").debugCollision) return;
 		DrawRect(GeometryUtils.RectFrom(Vector2.Zero, BlastZones), new Color(1,0,1), false);
 	}
 	

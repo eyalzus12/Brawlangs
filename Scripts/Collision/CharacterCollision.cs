@@ -68,8 +68,7 @@ public class CharacterCollision : CollisionShape2D
 	{
 		CurrentCollisionState = newState.Name;
 		CurrentCollisionStateData = newState;
-		//Extents = newState.Extents;
-		RecShape.SetDeferred("extents", newState.Extents);
+		Extents = newState.Extents;
 		DynamicPosition = newState.Position;
 		Update();
 	}

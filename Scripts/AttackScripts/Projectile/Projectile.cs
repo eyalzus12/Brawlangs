@@ -45,7 +45,8 @@ public class Projectile : Node2D, IHitter, IHittable
 	public float KnockbackDoneMult{get => OwnerObject.KnockbackDoneMult; set => OwnerObject.KnockbackDoneMult = value;}
 	public float StunDoneMult{get => OwnerObject.StunDoneMult; set => OwnerObject.StunDoneMult = value;}
 	
-	public AudioManager Audio{get; set;} = new AudioManager();
+	public const int AUDIO_PLAYERS = 2;
+	public AudioManager Audio{get; set;} = new AudioManager(AUDIO_PLAYERS);
 	public void PlaySound(string sound) => Audio.Play(sound);
 	public void PlaySound(AudioStream sound) => Audio.Play(sound);
 	
@@ -70,6 +71,14 @@ public class Projectile : Node2D, IHitter, IHittable
 	}
 	
 	public Projectile() {}
+	public Projectile(IAttacker owner)
+	{
+		OwnerObject = owner;
+		
+		Audio.Sounds = OwnerObject.Audio.Sounds;
+		Audio.Name = "AudioManager";
+		AddChild(Audio);
+	}
 	
 	public override void _Ready()
 	{
@@ -79,6 +88,7 @@ public class Projectile : Node2D, IHitter, IHittable
 		HasHit = false;
 		GettingHit = false;
 		Init();
+		Active = true;
 		Active = true;
 		Hitboxes.ForEach(InitHitbox);
 		Hurtboxes.ForEach(h=>h.ChangeState("Default"));

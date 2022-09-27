@@ -13,6 +13,8 @@ public class KeybindsParser
 	
 	public Error Load(string path)
 	{
+		Reset();
+		
 		File f = new File();//create new file
 		var er = f.Open(path, File.ModeFlags.Read);//open file
 		if(er != Error.Ok) return er;//if error, return
@@ -108,5 +110,11 @@ public class KeybindsParser
 			case 'M': return new InputEventMouseButton();
 			default: throw new FormatException($"Keybinds config: invalid input type {type}");
 		}
+	}
+	
+	public void Reset()
+	{
+		Data.ForEach(de => de.Value.ForEach(ae => InputMap.ActionEraseEvents($"{de.Key}_{ae.Key}")));
+		Data = new Dictionary<int, ActionDict>();
 	}
 }

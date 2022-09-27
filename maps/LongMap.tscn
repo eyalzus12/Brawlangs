@@ -9,10 +9,10 @@ extents = Vector2( 512, 32 )
 [node name="Base" type="Node2D"]
 position = Vector2( 512, 300 )
 script = ExtResource( 1 )
-BlastZones = Vector2( 2300, 1200 )
 
 [node name="Platform1" type="StaticBody2D" parent="."]
 position = Vector2( 0, 100 )
+collision_mask = 0
 
 [node name="Platform1Sprite" type="Sprite" parent="Platform1"]
 scale = Vector2( 16, 1 )

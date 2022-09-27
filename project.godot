@@ -21,6 +21,7 @@ config/windows_native_icon="res://brawlangs.ico"
 PublicData="*res://PublicData.cs"
 UpdateScript="*res://UpdateScript.cs"
 PauseHandeler="*res://Scripts/Misc/PauseHandeler.cs"
+Randomizer="*res://Scripts/Misc/Randomizer.cs"
 
 [debug]
 
@@ -108,6 +109,16 @@ toggle_camera_limits={
 "events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":16777249,"physical_scancode":0,"unicode":0,"echo":false,"script":null)
  ]
 }
+reload_keybinds={
+"deadzone": 0.5,
+"events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":16777252,"physical_scancode":0,"unicode":0,"echo":false,"script":null)
+ ]
+}
+dump_orphans={
+"deadzone": 0.5,
+"events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":16777349,"physical_scancode":0,"unicode":0,"echo":false,"script":null)
+ ]
+}
 
 [layer_names]
 
@@ -124,6 +135,10 @@ file_logging/enable_file_logging=true
 [node]
 
 name_num_separator=1
+
+[physics]
+
+common/enable_pause_aware_picking=true
 
 [rendering]
 

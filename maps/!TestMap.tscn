@@ -1,4 +1,4 @@
-[gd_scene load_steps=45 format=2]
+[gd_scene load_steps=44 format=2]
 
 [ext_resource path="res://MapBase.cs" type="Script" id=1]
 [ext_resource path="res://MovingPlatformAnimations/TestMovingPlatform5Anm.tres" type="Animation" id=3]
@@ -13,7 +13,6 @@
 [ext_resource path="res://MapArt/TestMap/AllSidesSlope.png" type="Texture" id=12]
 [ext_resource path="res://MapArt/TestMap/NoSides.png" type="Texture" id=13]
 [ext_resource path="res://MapArt/TestMap/Connection.png" type="Texture" id=14]
-[ext_resource path="res://Scripts/Labels/DamageLabel.cs" type="Script" id=15]
 [ext_resource path="res://MovingPlatformAnimations/TestMovingPlatform1Anm.tres" type="Animation" id=16]
 [ext_resource path="res://MovingPlatformAnimations/TestMovingPlatform2Anm.tres" type="Animation" id=17]
 [ext_resource path="res://MapArt/TestMap/AllSides.png" type="Texture" id=18]
@@ -310,8 +309,8 @@ tracks/0/keys = {
 [node name="TestMap" type="Node2D"]
 position = Vector2( 512, 300 )
 script = ExtResource( 1 )
-BlastZones = Vector2( 13000, 3400 )
-CameraLimits = Vector2( 12000, 3200 )
+BlastZones = Vector2( 13000, 12000 )
+CameraLimits = Vector2( 12800, 11800 )
 
 [node name="ground" type="TileMap" parent="."]
 tile_set = SubResource( 10 )
@@ -371,6 +370,7 @@ one_way_collision = true
 
 [node name="MovingPlatform1" type="KinematicBody2D" parent="."]
 position = Vector2( -152, -48 )
+collision_mask = 0
 motion/sync_to_physics = true
 
 [node name="Sprite" type="Sprite" parent="MovingPlatform1"]
@@ -398,6 +398,7 @@ __meta__ = {
 
 [node name="MovingPlatform2" type="KinematicBody2D" parent="."]
 position = Vector2( 792, -242 )
+collision_mask = 0
 motion/sync_to_physics = true
 
 [node name="Sprite" type="Sprite" parent="MovingPlatform2"]
@@ -414,6 +415,7 @@ anims/TestMovingPlatform2 = ExtResource( 17 )
 
 [node name="MovingPlatform3" type="KinematicBody2D" parent="."]
 position = Vector2( 2000, 150 )
+collision_mask = 0
 motion/sync_to_physics = true
 
 [node name="Sprite" type="Sprite" parent="MovingPlatform3"]
@@ -430,6 +432,7 @@ anims/TestMovingPlatform3 = ExtResource( 5 )
 
 [node name="MovingPlatform4" type="KinematicBody2D" parent="."]
 position = Vector2( -1208, 1072 )
+collision_mask = 0
 motion/sync_to_physics = true
 
 [node name="Sprite" type="Sprite" parent="MovingPlatform4"]
@@ -446,6 +449,7 @@ anims/TestMovingPlatform4 = ExtResource( 7 )
 
 [node name="MovingPlatform5" type="KinematicBody2D" parent="."]
 position = Vector2( -4944, -168 )
+collision_mask = 0
 motion/sync_to_physics = true
 
 [node name="Sprite" type="Sprite" parent="MovingPlatform5"]
@@ -462,6 +466,7 @@ anims/TestMovingPlatform5 = ExtResource( 3 )
 
 [node name="MovingPlatform6" type="KinematicBody2D" parent="."]
 position = Vector2( -3000, 550 )
+collision_mask = 0
 motion/sync_to_physics = true
 
 [node name="Sprite" type="Sprite" parent="MovingPlatform6"]
@@ -566,16 +571,6 @@ margin_top = -40.0
 margin_right = 6.0
 margin_bottom = -26.0
 text = "moving slope"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="UI" type="CanvasLayer" parent="."]
-
-[node name="DMG" type="Label" parent="UI"]
-margin_right = 40.0
-margin_bottom = 14.0
-script = ExtResource( 15 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
