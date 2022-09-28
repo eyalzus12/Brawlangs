@@ -279,6 +279,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	
 	public TimedActionsManager TimedActions{get; set;} = new TimedActionsManager();
 	
+	public string[] RelevantInputTags{get; set;}
 	public StateTagsManager Tags{get; set;} = new StateTagsManager();
 	
 	public Dictionary<string, HashSet<Projectile>> ActiveProjectiles{get; set;} = new Dictionary<string, HashSet<Projectile>>();
@@ -304,6 +305,8 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	
 	public override void _Ready()
 	{
+		RelevantInputTags = InputMap.GetActions().ToEnumerable<string>().LeftQuotient($"{TeamNumber}_").ToArray();
+		
 		States = new StateMachine(CreateStates());
 		
 		ProjPool.Name = "ProjectilePool";
@@ -416,7 +419,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	
 	public void UpdateInputTags()
 	{
-		foreach(var inputTag in InputMap.GetActions().ToEnumerable<string>().LeftQuotient($"{TeamNumber}_"))
+		foreach(var inputTag in RelevantInputTags)
 		{
 			if(Inputs.IsActionJustPressed(inputTag)) Tags[inputTag] = StateTag.Starting;
 			if(Inputs.IsActionJustReleased(inputTag)) Tags[inputTag] = StateTag.Ending;
