@@ -75,7 +75,7 @@ public static class StringUtils
 		}
 		else
 		{
-			v = default; 
+			v = default;
 			return false;
 		}
 	}
@@ -96,7 +96,7 @@ public static class StringUtils
 		}
 		else
 		{
-			v = default; 
+			v = default;
 			return false;
 		}
 	}
@@ -118,7 +118,7 @@ public static class StringUtils
 		}
 		else
 		{
-			v = default; 
+			v = default;
 			return false;
 		}
 	}
