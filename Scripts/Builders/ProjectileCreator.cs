@@ -104,10 +104,12 @@ public class ProjectileCreator
 		h.SetStun = sst;
 		var vst = inif[section, "VarStun", 0].f();
 		h.VarStun = vst;
-		var hp = inif[section, "HitPause", 0].f();
-		h.SetHitpause = hp;
-		var vhp = inif[section, "VarHitPause", 0].f();
-		h.VarHitpause = vhp;
+		var hl = inif[section, "HitLag", 0].f();
+		h.HitLag = hl;
+		var hp = inif[section, "ExtraOpponentHitLag", 0].f();
+		h.SetHitPause = hl+hp;
+		var ehp = inif[section, "ExtraOpponentVarHitLag", 0].f();
+		h.VarHitPause = ehp;
 		var dm = inif[section, "Damage", 0f].f();
 		h.Damage = dm;
 		var pr = inif[section, "Priority", 0].i();

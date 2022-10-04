@@ -3,10 +3,6 @@ using System;
 
 public class HitPauseState : State
 {
-	public int hitPauseLength = 0;
-	public int stunLength = 0;
-	public Vector2 force = Vector2.Zero;
-	
 	public HitPauseState() : base() {}
 	public HitPauseState(Character link) : base(link) {}
 	
@@ -21,14 +17,10 @@ public class HitPauseState : State
 	
 	protected override bool CalcStateChange()
 	{
-		if(frameCount >= hitPauseLength)
+		if(frameCount >= ch.HitPauseFrames)
 		{
-			var s = ch.States.Change<StunState>();
-			s.Force = force;
-			s.stunLength = stunLength;
-			force = Vector2.Zero;
-			stunLength = 0;
-			hitPauseLength = 0;
+			ch.States.Change<StunState>();
+			ch.HitPauseFrames = 0;
 		}
 		else return false;
 		

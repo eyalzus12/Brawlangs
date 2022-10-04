@@ -148,11 +148,11 @@ public class AttackCreator
 		var vst = inif[section, "VarStun", 0f].f();
 		h.VarStun = vst;
 		var hl = inif[section, "HitLag", 0].f();
-		h.Hitlag = hl;
-		var hp = inif[section, "ExtraOpponentHitlag", 0].f();
-		h.SetHitpause = hl+hp;
-		var ehp = inif[section, "ExtraOpponentVarHitlag", 0].f();
-		h.VarHitpause = ehp;
+		h.HitLag = hl;
+		var hp = inif[section, "ExtraOpponentHitLag", 0].f();
+		h.SetHitPause = hl+hp;
+		var ehp = inif[section, "ExtraOpponentVarHitLag", 0].f();
+		h.VarHitPause = ehp;
 		var dm = inif[section, "Damage", 0f].f();
 		h.Damage = dm;
 		var pr = inif[section, "Priority", 0].i();

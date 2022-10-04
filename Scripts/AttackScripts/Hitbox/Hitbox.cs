@@ -12,9 +12,9 @@ public class Hitbox : Area2D
 	public Vector2 VarKnockback{get; set;}
 	public float SetStun{get; set;}
 	public float VarStun{get; set;}
-	public float SetHitpause{get; set;}
-	public float VarHitpause{get; set;}
-	public float Hitlag{get; set;}
+	public float SetHitPause{get; set;}
+	public float VarHitPause{get; set;}
+	public float HitLag{get; set;}
 	public float Damage{get; set;}
 	public int HitPriority{get; set;}
 	public float TeamKnockbackMult{get; set;}
@@ -252,7 +252,7 @@ public class Hitbox : Area2D
 	
 	public virtual Color GetDrawColor()
 	{
-		if((SetStun == 0) && (VarStun == 0) && (SetHitpause == 0) && (VarHitpause == 0) && (Hitlag == 0)) return new Color(0.9f,0.9f,0.9f,1);
+		if((SetStun == 0) && (VarStun == 0) && (SetHitPause == 0) && (VarHitPause == 0) && (HitLag == 0)) return new Color(0.9f,0.9f,0.9f,1);
 		switch(HorizontalAngleFlipper)
 		{
 			case AngleFlipper.AwayHitbox:

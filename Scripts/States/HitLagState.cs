@@ -3,8 +3,6 @@ using System;
 
 public class HitLagState : State
 {
-	public int hitLagLength = 0;
-	
 	public HitLagState() : base() {}
 	public HitLagState(Character link) : base(link) {}
 	
@@ -33,11 +31,10 @@ public class HitLagState : State
 	
 	protected override bool CalcStateChange()
 	{
-		if(frameCount >= hitLagLength)
+		if(frameCount >= ch.HitLagFrames)
 		{
 			ch.States.Change("Attack");
 			ch.CurrentAttack?.CurrentPart?.Resume();
-			hitLagLength = 0;
 		}
 		else return false;
 		
@@ -47,5 +44,6 @@ public class HitLagState : State
 	public override void OnChange(State newState)
 	{
 		if((newState is StunState || newState is HitPauseState) && ch.CurrentAttack != null) ch.CurrentAttack.Active = false;
+		ch.HitLagFrames = 0;
 	}
 }

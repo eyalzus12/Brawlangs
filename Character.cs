@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-public class Character : KinematicBody2D, IHittable, IAttacker
+public class Character : KinematicBody2D, IStunnable, IKnockable, IHitPausable, IHitLaggable, IAttacker
 {
 	public const int DROP_THRU_BIT = 1;
 	protected const int CF = 30;
@@ -267,6 +267,11 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	
 	public bool Clashing{get; set;}
 	public HitData ClashData{get; set;}
+	
+	public int StunFrames{get; set;} = 0;
+	public int HitPauseFrames{get; set;} = 0;
+	public int HitLagFrames{get; set;} = 0;
+	public Vector2 Knockback{get; set;} = Vector2.Zero;
 	
 	public Dictionary<string, Attack> Attacks{get; set;} = new Dictionary<string, Attack>();
 	
@@ -644,8 +649,8 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		var d = data.Damage;
 		var sstun = data.SStun;
 		var vstun = data.VStun;
-		var shp = data.SHitpause;
-		var vhp = data.VHitpause;
+		var shp = data.SHitPause;
+		var vhp = data.VHitPause;
 		Hitbox hitbox = data.Hitter;
 		Hurtbox hurtbox = data.Hitee;
 		var hitSound = hitbox.HitSound;
@@ -676,16 +681,16 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		
 		if(hp > 0)
 		{
-			var s = States.Change<HitPauseState>();
-			s.force = force;
-			s.stunLength = (int)stunlen;
-			s.hitPauseLength = (int)hp;
+			StunFrames = (int)stunlen;
+			Knockback = force;
+			HitPauseFrames = (int)hp;
+			States.Change<HitPauseState>();
 		}
 		else if(stunlen > 0)
 		{
-			var s = States.Change<StunState>();
-			s.Force = force;
-			s.stunLength = (int)stunlen;
+			StunFrames = (int)stunlen;
+			Knockback = force;
+			States.Change<StunState>();
 		}
 		
 		if(force.x != 0f) Direction = Math.Sign(force.x);
@@ -734,10 +739,10 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		GD.Print($"{this} is really not clashing so is entering Hit Lag State");
 		#endif
 		
-		if(hitbox.Hitlag > 0)
+		if(hitbox.HitLag > 0)
 		{
-			var s = States.Change<HitLagState>();
-			s.hitLagLength = (int)hitbox.Hitlag;
+			HitLagFrames = (int)hitbox.HitLag;
+			States.Change<HitLagState>();
 		}
 	}
 	
@@ -758,9 +763,9 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		
 		if(stun > 0)
 		{
-			var s = States.Change<StunState>();
-			s.Force = force;
-			s.stunLength = (int)stun;
+			Knockback = force;
+			StunFrames = (int)stun;
+			States.Change<StunState>();
 		}
 		
 		if(force.x != 0f) Direction = Math.Sign(force.x);

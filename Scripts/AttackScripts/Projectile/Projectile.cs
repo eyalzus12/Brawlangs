@@ -192,7 +192,7 @@ public class Projectile : Node2D, IHitter, IHittable
 			var sstun = hitbox.SetStun*smult;
 			var vstun = hitbox.VarStun*smult;
  			
-			var data = new HitData(skb, vkb, damage, sstun, vstun, hitbox.SetHitpause, hitbox.VarHitpause, hitbox, hurtbox);
+			var data = new HitData(skb, vkb, damage, sstun, vstun, hitbox.SetHitPause, hitbox.VarHitPause, hitbox, hurtbox);
 			
 			hitChar.HandleGettingHit(data);
 			OwnerObject.HandleHitting(data);

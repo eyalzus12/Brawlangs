@@ -285,7 +285,7 @@ public class AttackPart : Node2D, IHitter
 			var sstun = hitbox.SetStun*smult;
 			var vstun = hitbox.VarStun*smult;
  			
-			var data = new HitData(skb, vkb, damage, sstun, vstun, hitbox.SetHitpause, hitbox.VarHitpause, hitbox, hurtbox);
+			var data = new HitData(skb, vkb, damage, sstun, vstun, hitbox.SetHitPause, hitbox.VarHitPause, hitbox, hurtbox);
 			
 			#if DEBUG_ATTACKS
 			GD.Print($"{OwnerObject} attack part adds {hitChar} to Hit Ignore List");

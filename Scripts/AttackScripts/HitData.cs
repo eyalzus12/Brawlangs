@@ -12,8 +12,8 @@ public struct HitData
 	public float SStun {get; set;}
 	public float VStun{get; set;}
 	
-	public float SHitpause {get; set;}
-	public float VHitpause {get; set;}
+	public float SHitPause {get; set;}
+	public float VHitPause {get; set;}
 	
 	public Hitbox Hitter {get; set;}
 	public Hurtbox Hitee {get; set;}
@@ -45,8 +45,8 @@ public struct HitData
 		SStun = sstun;
 		VStun = vstun;
 		
-		SHitpause = shitpause;
-		VHitpause = vhitpause;
+		SHitPause = shitpause;
+		VHitPause = vhitpause;
 		
 		Hitter = hitter;
 		Hitee = hitee;
