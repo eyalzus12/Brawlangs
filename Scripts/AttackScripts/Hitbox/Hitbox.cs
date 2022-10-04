@@ -55,6 +55,7 @@ public class Hitbox : Area2D
 			Visible = value;
 			_active = value;
 			Monitoring = value;
+			Monitorable = value;
 		}
 	}
 	
@@ -251,31 +252,36 @@ public class Hitbox : Area2D
 		}
 	}
 	
+	private static readonly Color PaleWhite = new Color(0.9f, 0.9f, 0.9f, 1);
+	private static readonly Color Orange = new Color(1, 0.3f, 0.1f, 1);
+	private static readonly Color Yellowish = new Color(0.7f, 0.7f, 0.1f, 1);
+	private static readonly Color DarkYellow = new Color(0.5f, 0.5f, 0, 1);
+	private static readonly Color LightRed = new Color(1, 0.1f, 0.1f, 1);
 	public virtual Color GetDrawColor()
 	{
-		if((SetStun == 0) && (VarStun == 0) && (SetHitPause == 0) && (VarHitPause == 0) && (HitLag == 0)) return new Color(0.9f,0.9f,0.9f,1);
+		if((SetStun == 0) && (VarStun == 0) && (SetHitPause == 0) && (VarHitPause == 0) && (HitLag == 0)) return PaleWhite;
 		switch(HorizontalAngleFlipper)
 		{
 			case AngleFlipper.AwayHitbox:
 			case AngleFlipper.AwayCharacter:
 			case AngleFlipper.Away:
-				return new Color(1, 0.3f, 0.1f, 1);
+				return Orange;
 			case AngleFlipper.None:
 				switch(VerticalAngleFlipper)
 				{
 					case AngleFlipper.AwayHitbox:
 					case AngleFlipper.AwayCharacter:
 					case AngleFlipper.Away:
-						return new Color(0.7f, 0.7f, 0.1f, 1);
+						return Yellowish;
 					case AngleFlipper.None:
 					case AngleFlipper.Direction:
 					default:
-						return new Color(0.5f, 0.5f, 0, 1);
+						return DarkYellow;
 				}
 				
 			case AngleFlipper.Direction:
 			default:
-				return new Color(1, 0.1f, 0.1f, 1);
+				return LightRed;
 		}
 	}
 	

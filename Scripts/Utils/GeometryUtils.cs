@@ -72,13 +72,13 @@ public static class GeometryUtils
 		Vector2 end = rec.End.Clamp(-maxH, maxH, -maxV, maxV);
 		//keep bottom right corner inside bounding box
 		
-		Vector2 size = end-pos;
+		Vector2 size = (end-pos).Abs();
 		//get size
 		
 		return new Rect2(pos, size);
 	}
 	
-	public static Rect2 Zoomed(this Rect2 r, Vector2 zoom) => RectFrom(r.Center(), r.Size*zoom/2f);
+	public static Rect2 Zoomed(this Rect2 r, Vector2 zoom) => RectFrom(r.Center(), r.Size*zoom/2f).Abs();
 	
 	public static float Clamp(this float f, float m, float M) => Math.Min(M, Math.Max(m, f));
 		
@@ -135,7 +135,7 @@ public static class GeometryUtils
 		var en = ev.GetEnumerator();
 		if(!en.MoveNext()) return default;
 		var rect = new Rect2(en.Current, Vector2.Zero);
-		while(en.MoveNext()) rect = rect.Expand(en.Current);
-		return rect;
+		while(en.MoveNext()) rect = rect.Expand(en.Current).Abs();;
+		return rect.Abs();
 	}
 }

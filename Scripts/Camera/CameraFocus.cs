@@ -8,7 +8,8 @@ public class CameraFocus : Node2D
 	public readonly static Vector2 DEFAULT_LIMITS = new Vector2(1300, 900);
 	public const float CAMERA_SPEED = 6.5f;
 	public const float MIN_ZOOM = 1.5f;
-	public const float ZOOM_MULT = 1.3f;
+	public const float GROW_H = 100f;
+	public const float GROW_V = 50f;
 	
 	public List<Node2D> Followed{get; set;} = new List<Node2D>();
 	
@@ -17,9 +18,22 @@ public class CameraFocus : Node2D
 	
 	public Vector2 Limits{get; set;} = DEFAULT_LIMITS;
 	
-	public bool LimitOn{get; set;} = true;
+	private bool _limitOn = true;
+	public bool LimitOn
+	{
+		get => _limitOn;
+		set
+		{
+			FollowingCamera.LimitLeft = -(int)(value?Limits.x:10000000);
+			FollowingCamera.LimitRight = (int)(value?Limits.x:10000000);
+			FollowingCamera.LimitTop = -(int)(value?Limits.y:10000000);
+			FollowingCamera.LimitBottom = (int)(value?Limits.y:10000000);
+		}
+	}
 	
 	public Camera2D FollowingCamera{get; set;}
+	public Listener2D FollowingListener{get; set;}
+	public Rect2 DesiredCameraRect{get; set;}
 	
 	public CameraFocus() {}
 	
@@ -37,11 +51,20 @@ public class CameraFocus : Node2D
 		
 		FollowingCamera = new Camera2D();
 		FollowingCamera.Name = "FollowingCamera";
-		
 		FollowingCamera.SmoothingEnabled = true;
+		FollowingCamera.LimitSmoothed = true;
 		FollowingCamera.SmoothingSpeed = CAMERA_SPEED;
+		FollowingCamera.LimitLeft = -(int)Limits.x;
+		FollowingCamera.LimitRight = (int)Limits.x;
+		FollowingCamera.LimitTop = -(int)Limits.y;
+		FollowingCamera.LimitBottom = (int)Limits.y;
 		FollowingCamera.Current = true;
 		AddChild(FollowingCamera);
+		
+		FollowingListener = new Listener2D();
+		FollowingListener.Name = "FollowingListener";
+		FollowingListener.MakeCurrent();
+		AddChild(FollowingListener);
 	}
 
 	public override void _Process(float delta)
@@ -51,7 +74,7 @@ public class CameraFocus : Node2D
 		if(Input.IsActionJustPressed("toggle_camera_limits"))
 			LimitOn = !LimitOn;
 		
-		var desiredRect = Followed
+		DesiredCameraRect = Followed
 			.Select(n=>n.Position
 				.Clamp(
 					FollowingCamera.LimitLeft,
@@ -60,25 +83,26 @@ public class CameraFocus : Node2D
 					FollowingCamera.LimitBottom
 				)
 			)
-			.Aggregate(new Rect2(Vector2.Zero, Vector2.Zero), (a,v)=>a.Expand(v));
+			.RectWithAll()
+			.GrowIndividual(GROW_H,GROW_V,GROW_H,GROW_V);
+		Position = DesiredCameraRect.Center();
 		
-		Position = desiredRect.Center();
-		
-		var cameraZoomXY = desiredRect.Size/GetViewportRect().Size;
-		var cameraZoom = Math.Max(Math.Max(cameraZoomXY.x, cameraZoomXY.y), MIN_ZOOM);
-		var maxZoomXY = Limits/GetViewportRect().Size;
-		var maxZoom = LimitOn?Math.Min(maxZoomXY.x, maxZoomXY.y):float.PositiveInfinity;
-		var desiredZoom = Math.Min(ZOOM_MULT*cameraZoom, maxZoom);
-		FollowingCamera.Zoom = desiredZoom*Vector2.One;
+		var cameraZoomXY = DesiredCameraRect.Size/GetViewportRect().Size;
+		var cameraZoom = Math.Max(Math.Max(cameraZoomXY.x, cameraZoomXY.y), MIN_ZOOM)*Vector2.One;
+		FollowingCamera.Zoom = cameraZoom;
 		
 		//NaN failsafe
-		if(float.IsNaN(FollowingCamera.Zoom.x) || float.IsNaN(FollowingCamera.Zoom.y)) FollowingCamera.Zoom = Vector2.One;
+		if(float.IsNaN(FollowingCamera.Zoom.x) || float.IsNaN(FollowingCamera.Zoom.y)) FollowingCamera.Zoom = MIN_ZOOM*Vector2.One;
+		if(Debug) Update();
 	}
 	
 	public override void _Draw()
 	{
 		if(!Debug) return;
-		DrawCircle(Vector2.Zero, 5, new Color(1,0,0));
+		DrawSetTransform(-Position,0f,Vector2.One);
+		DrawCircle(Position, 5, new Color(1,0,0));
+		DrawRect(DesiredCameraRect, new Color(0,1,0), false);
+		DrawRect(GeometryUtils.RectFrom(Vector2.Zero, Limits), new Color(0,0,1), false);
 	}
 	
 	public void CharacterGone(Node2D who) => Followed.Remove(who);

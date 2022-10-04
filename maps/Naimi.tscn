@@ -308,8 +308,8 @@ extents = Vector2( 160, 8 )
 [node name="Base" type="Node2D"]
 position = Vector2( 512, 300 )
 script = ExtResource( 3 )
-BlastZones = Vector2( 2700, 3000 )
-CameraLimits = Vector2( 2650, 2950 )
+BlastZones = Vector2( 2700, 2300 )
+CameraLimits = Vector2( 2650, 2200 )
 
 [node name="Ground" type="TileMap" parent="."]
 position = Vector2( 0, 4 )
