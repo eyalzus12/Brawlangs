@@ -129,4 +129,13 @@ public static class GeometryUtils
 	public static Vector2 SmoothLinearInterpolate(this Vector2 @from, Vector2 to, float weight, float curve) => @from.LinearInterpolate(to, weight*Mathf.Tanh(curve*@from.DistanceSquaredTo(to)));
 	
 	public static Rect2 RectFrom(Vector2 Center, Vector2 Size) => new Rect2(Center-Size, 2*Size);
+	
+	public static Rect2 RectWithAll(this IEnumerable<Vector2> ev)
+	{
+		var en = ev.GetEnumerator();
+		if(!en.MoveNext()) return default;
+		var rect = new Rect2(en.Current, Vector2.Zero);
+		while(en.MoveNext()) rect = rect.Expand(en.Current);
+		return rect;
+	}
 }

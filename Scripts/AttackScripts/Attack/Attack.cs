@@ -28,9 +28,9 @@ public class Attack : Node2D
 		_active = value;
 	}}
 	
-	public float DamageMult{get; set;}
-	public float KnockbackMult{get; set;}
-	public int StunMult{get; set;}
+	public float DamageDoneMult{get; set;}
+	public float KnockbackDoneMult{get; set;}
+	public int StunDoneMult{get; set;}
 	
 	public State connected = null;
 	
@@ -62,9 +62,10 @@ public class Attack : Node2D
 	
 	protected virtual void Activate()
 	{
-		DamageMult = 1f;
-		KnockbackMult = 1f;
-		StunMult = 1;
+		DamageDoneMult = 1f;
+		KnockbackDoneMult = 1f;
+		StunDoneMult = 1;
+		
 		frameCount = 0;
 		
 		OnStart();

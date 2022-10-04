@@ -33,9 +33,6 @@ public class AttackPart : Node2D, IHitter
 	public int Cooldown{get; set;}
 	public int MissCooldown{get; set;}
 	public float GravityMultiplier{get; set;}
-	public float DamageMult{get; set;}
-	public float KnockbackMult{get; set;}
-	public float StunMult{get; set;}
 	public string AttackAnimation{get; set;}
 	public string AttackSound{get; set;}
 	public float DriftForwardAcceleration{get; set;}
@@ -44,6 +41,10 @@ public class AttackPart : Node2D, IHitter
 	public float DriftBackwardsSpeed{get; set;}
 	public bool SlowOnWalls{get; set;}
 	public bool FastFallLocked{get; set;}
+	
+	public float DamageDoneMult{get; set;}
+	public float KnockbackDoneMult{get; set;}
+	public float StunDoneMult{get; set;}
 	
 	public bool FriendlyFire{get => OwnerObject.FriendlyFire; set => OwnerObject.FriendlyFire = value;}
 	
@@ -274,9 +275,9 @@ public class AttackPart : Node2D, IHitter
 			
 			HitEvent(hitbox, hurtbox);
 			
-			var kmult = OwnerObject.KnockbackDoneMult*KnockbackMult*att.KnockbackMult*hitbox.GetKnockbackMultiplier(hitChar);
-			var dmult = OwnerObject.DamageDoneMult*DamageMult*att.DamageMult*hitbox.GetDamageMultiplier(hitChar);
-			var smult = OwnerObject.StunDoneMult*StunMult*att.StunMult*hitbox.GetStunMultiplier(hitChar);
+			var kmult = OwnerObject.KnockbackDoneMult*KnockbackDoneMult*att.KnockbackDoneMult*hitbox.GetKnockbackMultiplier(hitChar);
+			var dmult = OwnerObject.DamageDoneMult*DamageDoneMult*att.DamageDoneMult*hitbox.GetDamageMultiplier(hitChar);
+			var smult = OwnerObject.StunDoneMult*StunDoneMult*att.StunDoneMult*hitbox.GetStunMultiplier(hitChar);
 			
 			var dirvec = hitbox.KnockbackDir(hitChar)*kmult;
 			var skb = dirvec*hitbox.SetKnockback + hitbox.MomentumCarry*velocity;

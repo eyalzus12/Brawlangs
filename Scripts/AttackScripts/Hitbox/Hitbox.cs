@@ -54,6 +54,7 @@ public class Hitbox : Area2D
 			HitboxShape?.SetDeferred("disabled", !value);
 			Visible = value;
 			_active = value;
+			Monitoring = value;
 		}
 	}
 	

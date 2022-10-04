@@ -6,8 +6,12 @@ public interface IHitter
 {
 	Vector2 Position{get; set;}
 	int Direction{get; set;}
-	
 	int TeamNumber{get; set;}
+	
+	float DamageDoneMult{get; set;}
+	float KnockbackDoneMult{get; set;}
+	float StunDoneMult{get; set;}
+	
 	List<Hitbox> Hitboxes{get; set;}
 	HashSet<IHittable> HitIgnoreList{get; set;}
 	Dictionary<Hurtbox, Hitbox> HitList{get; set;}
