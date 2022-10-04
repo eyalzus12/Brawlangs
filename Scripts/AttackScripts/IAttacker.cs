@@ -15,6 +15,8 @@ public interface IAttacker
 	bool Hitting{get; set;}
 	IHittable LastHitee{get; set;}
 	
+	bool FriendlyFire{get; set;}
+	
 	bool Clashing{get; set;}
 	HitData ClashData{get; set;}
 	void HandleClashing(HitData data);
@@ -25,6 +27,8 @@ public interface IAttacker
 	AudioManager Audio{get; set;}
 	AnimationPlayer HitboxAnimator{get; set;}
 	
-	bool CanHit(IHittable hitObject);
 	void HandleHitting(HitData data);
+	
+	bool CanGenerallyHit(IHittable hitObject);
+	bool CanHit(IHittable hitObject);
 }

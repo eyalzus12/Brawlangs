@@ -18,7 +18,7 @@ public class RespawnPoint : Position2D, IComparable<RespawnPoint>
 	
 	public override void _Ready()
 	{
-		TagSet = new HashSet<string>(Tags.ToFilteredEnumerable<string>());
+		TagSet = new HashSet<string>(Tags.FilterType<string>());
 	}
 	
 	public int CompareTo(RespawnPoint point) => ID.CompareTo(point.ID);

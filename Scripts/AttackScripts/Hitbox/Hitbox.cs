@@ -29,6 +29,9 @@ public class Hitbox : Area2D
 	public AngleFlipper HorizontalAngleFlipper{get; set;}
 	public AngleFlipper VerticalAngleFlipper{get; set;}
 	
+	public HitCondition TeamHitCondition{get; set;}
+	public HitCondition SelfHitCondition{get; set;}
+	
 	public Dictionary<string, ParamRequest> LoadExtraProperties = new Dictionary<string, ParamRequest>();
 	
 	public List<Vector2> ActiveFrames{get; set;}
@@ -114,20 +117,37 @@ public class Hitbox : Area2D
 		LoadExtraProperties.Add(s, toAdd);
 	}
 	
-	public void OnAreaEnter(Area2D area)
+	public virtual bool CanHit(IHittable hit)
 	{
-		if(area is Hurtbox hurtbox && OwnerObject.CanHit(hurtbox.OwnerObject))
+		if(OwnerObject == hit || OwnerObject.OwnerObject == hit)
 		{
-			if(hurtbox.OwnerObject is Character c)
+			if(OwnerObject.FriendlyFire) return SelfHitCondition != HitCondition.ForceNo;
+			else return SelfHitCondition == HitCondition.Force;
+		}
+		else if(OwnerObject.TeamNumber == hit.TeamNumber)
+		{
+			if(OwnerObject.FriendlyFire) return TeamHitCondition != HitCondition.ForceNo;
+			else return TeamHitCondition == HitCondition.Force;
+		}
+		else
+		{
+			if(hit is Character c)
 			{
 				for(var t = c.States.Current.GetType(); t != typeof(State); t = t.BaseType)
 				{
 					var Whitelisted = (WhitelistedStates.Count == 0 || WhitelistedStates.Contains(t.Name));
 					var Blacklisted = BlacklistedStates.Contains(t.Name);
-					if(!Whitelisted || Blacklisted) return;
+					if(!Whitelisted || Blacklisted) return false;
 				}
 			}
-			
+			return true;
+		}
+	}
+	
+	public void OnAreaEnter(Area2D area)
+	{
+		if(area is Hurtbox hurtbox && (CanHit(hurtbox.OwnerObject) || hurtbox.CanBeHitBy(OwnerObject)) && OwnerObject.CanHit(hurtbox.OwnerObject))
+		{
 			#if DEBUG_ATTACKS
 			GD.Print($"{OwnerObject.OwnerObject} hitbox detects hurtbox");
 			GD.Print($"{OwnerObject.OwnerObject} calls hurtbox Handle Hit");

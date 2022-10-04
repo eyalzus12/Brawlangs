@@ -15,6 +15,11 @@ public class Hurtbox : Area2D
 	public string CurrentCollisionState{get; set;} = "Default";
 	public HurtboxCollisionState CurrentCollisionStateData;
 	
+	public HitCondition TeamHitCondition{get; set;}
+	public HitCondition SelfHitCondition{get; set;}
+	
+	public int TeamNumber{get => OwnerObject.TeamNumber; set => OwnerObject.TeamNumber = value;}
+	
 	public Vector2 CollisionPosition
 	{
 		get => col.Position;
@@ -95,7 +100,39 @@ public class Hurtbox : Area2D
 		Height = newState.Height;
 		CollisionPosition = newState.Position;
 		CollisionRotation = newState.Rotation;
+		SelfHitCondition = newState.SelfHitCondition;
+		TeamHitCondition = newState.TeamHitCondition;
 		Update();
+	}
+	
+	public virtual bool CanBeHitBy(IHitter hitter)
+	{
+		if(hitter == OwnerObject || hitter.OwnerObject == OwnerObject)
+		{
+			if(OwnerObject.FriendlyFire) return SelfHitCondition != HitCondition.ForceNo;
+			else return SelfHitCondition == HitCondition.Force;
+		}
+		else if(TeamNumber == hitter.TeamNumber)
+		{
+			if(OwnerObject.FriendlyFire) return TeamHitCondition != HitCondition.ForceNo;
+			else return TeamHitCondition == HitCondition.Force;
+		}
+		else return true;
+	}
+	
+	public virtual bool CanBeHitBy(IAttacker attacker)
+	{
+		if(attacker == OwnerObject)
+		{
+			if(OwnerObject.FriendlyFire) return SelfHitCondition != HitCondition.ForceNo;
+			else return SelfHitCondition == HitCondition.Force;
+		}
+		else if(TeamNumber == attacker.TeamNumber)
+		{
+			if(OwnerObject.FriendlyFire) return TeamHitCondition != HitCondition.ForceNo;
+			else return TeamHitCondition == HitCondition.Force;
+		}
+		else return true;
 	}
 	
 	public override void _Draw()

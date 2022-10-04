@@ -36,6 +36,7 @@ public class Projectile : Node2D, IHitter, IHittable
 	public List<Hurtbox> Hurtboxes{get; set;} = new List<Hurtbox>();
 	
 	public int TeamNumber{get => OwnerObject.TeamNumber; set => OwnerObject.TeamNumber = value;}
+	public bool FriendlyFire{get => OwnerObject.FriendlyFire; set => OwnerObject.FriendlyFire = value;}
 	
 	public float DamageTakenMult{get=>1f;set{}}
 	public float KnockbackTakenMult{get=>1f;set{}}
@@ -156,7 +157,7 @@ public class Projectile : Node2D, IHitter, IHittable
 	{
 		if(!hitbox.Active) return;
 		var hitChar = hurtbox.OwnerObject;
-		if(!CanHit(hitChar)) return;
+		if(!CanHit(hitChar) || !hitbox.CanHit(hitChar) || !hurtbox.CanBeHitBy(this)) return;
 		
 		Hitbox current;
 		if(HitList.TryGetValue(hurtbox, out current))
@@ -212,5 +213,11 @@ public class Projectile : Node2D, IHitter, IHittable
 	public virtual void DidHit() => Destruct();
 	public virtual void HandleGettingHit(HitData data) => Destruct();
 	
-	public bool CanHit(IHittable h) => (h != this) && OwnerObject.CanHit(h) && !HitIgnoreList.Contains(h);
+	public virtual bool CanGenerallyHit(IHittable hitObject) => OwnerObject.CanHit(hitObject) && !HitIgnoreList.Contains(hitObject);
+	public virtual bool CanGenerallyBeHitBy(IHitter hitter) => true;
+	public virtual bool CanGenerallyBeHitBy(IAttacker attacker) => true;
+	
+	public bool CanHit(IHittable hitObject) => CanGenerallyHit(hitObject)&&hitObject.CanGenerallyBeHitBy(this);
+	public bool CanBeHitBy(IHitter hitter) => CanGenerallyBeHitBy(hitter)&&hitter.CanGenerallyHit(this);
+	public bool CanBeHitBy(IAttacker attacker) => CanGenerallyBeHitBy(attacker)&&attacker.CanGenerallyHit(this);
 }

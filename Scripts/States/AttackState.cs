@@ -12,8 +12,6 @@ public class AttackState : State
 	
 	public override bool Actionable => false;
 	
-	public Attack att;
-	
 	public override void Init()
 	{
 		Unsnap();
@@ -25,12 +23,12 @@ public class AttackState : State
 	public override void SetInputs()
 	{
 		base.SetInputs();
-		if(!att?.CurrentPart?.FastFallLocked ?? true) SetFastFallInput();
+		if(!ch.CurrentAttack?.CurrentPart?.FastFallLocked ?? true) SetFastFallInput();
 	}
 	
 	protected override void DoMovement()
 	{
-		if(att?.CurrentPart is null) return;
+		if(ch.CurrentAttack?.CurrentPart is null) return;
 		if(ch.InputtingHorizontalDirection) DoInputMovement();
 		DoFriction();
 	}
@@ -38,9 +36,9 @@ public class AttackState : State
 	protected virtual void DoInputMovement()
 	{
 		if(ch.InputDirection == ch.Direction)
-			ch.vec.x.Towards(ch.Direction * att.CurrentPart.DriftForwardSpeed, att.CurrentPart.DriftForwardAcceleration);
+			ch.vec.x.Towards(ch.Direction * ch.CurrentAttack.CurrentPart.DriftForwardSpeed, ch.CurrentAttack.CurrentPart.DriftForwardAcceleration);
 		else
-			ch.vec.x.Towards(-ch.Direction * att.CurrentPart.DriftBackwardsSpeed, att.CurrentPart.DriftBackwardsAcceleration);
+			ch.vec.x.Towards(-ch.Direction * ch.CurrentAttack.CurrentPart.DriftBackwardsSpeed, ch.CurrentAttack.CurrentPart.DriftBackwardsAcceleration);
 	}
 	
 	protected virtual void DoFriction()
@@ -58,7 +56,7 @@ public class AttackState : State
 			ch.vuc.y.Towards(0, ch.AppropriateGravity);
 		}
 		//grounded and moves up
-		else if((att?.CurrentPart?.Movement.y ?? 0) < 0) Unsnap();
+		else if((ch.CurrentAttack?.CurrentPart?.Movement.y ?? 0) < 0) Unsnap();
 		//grounded and moves down
 		else
 		{
@@ -70,11 +68,14 @@ public class AttackState : State
 	
 	protected override void LoopActions()
 	{
+		//failsafe for getting locked into the attack state
+		if(ch.CurrentAttack is null) SetEnd(null);
+		
 		SetupCollisionParamaters();
 		if(ch.walled && ch.Resources.Has("Clings") && !touchedWall)
 		{
 			ch.RestoreOptionsOnWallTouch();
-			if(att?.CurrentPart?.SlowOnWalls ?? true) ch.vec.y *= (1-ch.wallFriction*ch.wfric);
+			if(ch.CurrentAttack?.CurrentPart?.SlowOnWalls ?? true) ch.vec.y *= (1-ch.wallFriction*ch.wfric);
 			touchedWall = true;
 		}
 		
@@ -110,16 +111,16 @@ public class AttackState : State
 			ch.States.Change("Wall");
 		}
 		else ch.States.Change("Air");
-		
-		//forget attack
-		att = null;
 	}
 	
 	//handle state change
 	public override void OnChange(State newState)
 	{
-		//GD.Print($"{ch} is changing from Attack State");
+		#if DEBUG_ATTACKS
+		GD.Print($"{ch} is changing from Attack State");
+		#endif
+		
 		//got hit
-		if(newState is StunState || newState is HitPauseState) att.Active = false;
+		if((newState is StunState || newState is HitPauseState) && ch.CurrentAttack != null) ch.CurrentAttack.Active = false;
 	}
 }

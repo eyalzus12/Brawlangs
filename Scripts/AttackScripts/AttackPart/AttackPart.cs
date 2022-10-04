@@ -45,6 +45,8 @@ public class AttackPart : Node2D, IHitter
 	public bool SlowOnWalls{get; set;}
 	public bool FastFallLocked{get; set;}
 	
+	public bool FriendlyFire{get => OwnerObject.FriendlyFire; set => OwnerObject.FriendlyFire = value;}
+	
 	public List<string> EmittedProjectiles{get; set;}
 	
 	public bool HasHit{get; set;}
@@ -191,7 +193,8 @@ public class AttackPart : Node2D, IHitter
 	public virtual string NextPart(bool end = false) => TransitionManager.NextAttackPart(ch.Tags, end?-1:frameCount);
 	public virtual void ChangePart(string part) => att.SetPart(part);
 	
-	public bool CanHit(IHittable h) => OwnerObject.CanHit(h) && !HitIgnoreList.Contains(h);
+	public virtual bool CanGenerallyHit(IHittable hitObject) => OwnerObject.CanGenerallyHit(hitObject) && !HitIgnoreList.Contains(hitObject);
+	public bool CanHit(IHittable hitObject) => CanGenerallyHit(hitObject)&&hitObject.CanGenerallyBeHitBy(this);
 	
 	public virtual void HandleInitialHit(Hitbox hitbox, Hurtbox hurtbox)
 	{

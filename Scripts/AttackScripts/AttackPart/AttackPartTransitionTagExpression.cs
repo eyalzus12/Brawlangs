@@ -1,24 +1,18 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 public class AttackPartTransitionTagExpression
 {
-	public List<object> ExpressionParts{get; set;} = new List<object>();
+	public object[] ExpressionParts{get; set;}
 	
-	public AttackPartTransitionTagExpression()
-	{
-		ExpressionParts = new List<object>();
-	}
-	
-	public AttackPartTransitionTagExpression(IEnumerable<object> parts)
-	{
-		ExpressionParts = new List<object>(parts);
-	}
+	public AttackPartTransitionTagExpression(){ExpressionParts = new object[]{};}
+	public AttackPartTransitionTagExpression(IEnumerable<object> parts){ExpressionParts = parts.ToArray();}
 	
 	public bool Get(StateTagsManager tagsManager)
 	{
-		if(ExpressionParts.Count == 0) return true;
+		if(ExpressionParts.Length == 0) return true;
 		
 		var estack = new Stack<bool>();
 		foreach(var part in ExpressionParts)
@@ -28,24 +22,47 @@ public class AttackPartTransitionTagExpression
 			{
 				if(c == '!')
 				{
-					if(estack.Count < 1) throw new FormatException($"Attempt to run operator {c} on less than two tags in attack part transition expression {this}");
+					if(estack.Count < 1)
+					{
+						GD.PushError($"Attempt to run operator {c} on zero tags in attack part transition expression {this}");
+						return false;
+					}
+					
 					estack.Push(!estack.Pop());
 				}
 				else
 				{
-					if(estack.Count < 2) throw new FormatException($"Attempt to run operator {c} on less than two tags in attack part transition expression {this}");
+					if(estack.Count < 2)
+					{
+						GD.PushError($"Attempt to run operator {c} on one or zero tags in attack part transition expression {this}");
+						return false;
+					}
+					
 					var value1 = estack.Pop(); var value2 = estack.Pop();
 					if(c == '&') estack.Push(value1&&value2);
 					else if(c == '|') estack.Push(value1||value2);
-					else throw new FormatException($"Unknown operator {c} in attack part transition expression {this}");
+					else
+					{
+						GD.PushError($"Unknown operator {c} in attack part transition expression {this}");
+						return false;
+					}
 				}
 			}
-			else throw new Exception($"Unkown object {part} of type {part.GetType().Name} found in attack part transition expression {this}");
+			else
+			{
+				GD.PushError($"Unkown object {part} with ToString {part?.ToString()} of type {part?.GetType()?.Name} found in attack part transition expression {this}");
+				return false;
+			}
 		}
 		
-		if(estack.Count != 1) throw new FormatException($"Not enough operators in attack part transition expression {this}");
+		if(estack.Count != 1)
+		{
+			GD.PushError($"Not enough operators in attack part transition expression {this}");
+			return false;
+		}
+		
 		return estack.Pop();
 	}
 	
-	public override string ToString() => ExpressionParts.ToArray().ToString();
+	public override string ToString() => ExpressionParts.ToString();
 }

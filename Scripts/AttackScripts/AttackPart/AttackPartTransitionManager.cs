@@ -13,6 +13,6 @@ public class AttackPartTransitionManager
 		Transitions
 		.FirstOrDefault(
 			t => t.MatchesTag(tagsManager, currentFrames), 
-			new AttackPartTransition()
-		).NextPart;
+			null
+		)?.NextPart ?? "";
 }

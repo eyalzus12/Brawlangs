@@ -8,16 +8,20 @@ public interface IHitter
 	int Direction{get; set;}
 	
 	int TeamNumber{get; set;}
-	List<Hitbox> Hitboxes{get;set;}
-	HashSet<IHittable> HitIgnoreList{get;set;}
-	Dictionary<Hurtbox, Hitbox> HitList{get;set;}
-	IAttacker OwnerObject{get;set;}
+	List<Hitbox> Hitboxes{get; set;}
+	HashSet<IHittable> HitIgnoreList{get; set;}
+	Dictionary<Hurtbox, Hitbox> HitList{get; set;}
+	IAttacker OwnerObject{get; set;}
 	
 	bool HasHit{get; set;}
+	
+	bool FriendlyFire{get; set;}
 	
 	void ConnectSignals();
 	void HandleInitialHit(Hitbox hitbox, Hurtbox hurtbox);
 	void HandleHits();
 	void HitEvent(Hitbox hitbox, Hurtbox hurtbox);
-	bool CanHit(IHittable h);
+	
+	bool CanGenerallyHit(IHittable hitObject);
+	bool CanHit(IHittable hitObject);
 }

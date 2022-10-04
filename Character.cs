@@ -140,7 +140,7 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	public int Direction{get; set;}//1 for right -1 for left
 	
 	public int TeamNumber{get; set;}
-	public bool friendlyFire = false;
+	public bool FriendlyFire{get; set;} = false;
 	public int stocks = 3;
 	
 	public float weight = 100f;
@@ -625,7 +625,13 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 	////////////////Attacks////////////////////
 	///////////////////////////////////////////
 	
-	public virtual bool CanHit(IHittable hitObject) => (hitObject != this)&&(!hitObject.Invincible)&&(hitObject.TeamNumber!=TeamNumber||friendlyFire);
+	public virtual bool CanGenerallyHit(IHittable hitObject) => !hitObject.Invincible;
+	public virtual bool CanGenerallyBeHitBy(IHitter hitter) => !Invincible;
+	public virtual bool CanGenerallyBeHitBy(IAttacker attacker) => !Invincible;
+	
+	public bool CanHit(IHittable hitObject) => CanGenerallyHit(hitObject)&&hitObject.CanGenerallyBeHitBy(this);
+	public bool CanBeHitBy(IHitter hitter) => CanGenerallyBeHitBy(hitter)&&hitter.CanGenerallyHit(this);
+	public bool CanBeHitBy(IAttacker attacker) => CanGenerallyBeHitBy(attacker)&&attacker.CanGenerallyHit(this);
 	
 	public virtual void HandleGettingHit(HitData data)
 	{
@@ -773,7 +779,6 @@ public class Character : KinematicBody2D, IHittable, IAttacker
 		CurrentAttack = a;
 		CurrentAttack.Connect("AttackEnds", this, nameof(ResetCurrentAttack));
 		var s = States.Get<AttackState>();
-		s.att = CurrentAttack;
 		States.Change("Attack");
 		
 		CurrentAttack.Active = true;

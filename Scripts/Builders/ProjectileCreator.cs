@@ -74,7 +74,16 @@ public class ProjectileCreator
 		var pos = inif[section, "Position", Vector2.Zero].v2();
 		var rot = inif[section, "Rotation", 0f].f();
 		rot = (float)(rot*Math.PI/180f);//to rads
-		var hurtboxState = new HurtboxCollisionState(state, rd, he, pos, rot);
+		
+		var shcs = inif[section, "SelfHitCondition", "DecideByFriendlyFire"].s();
+		HitCondition shc;
+		Enum.TryParse<HitCondition>(shcs, out shc);
+		
+		var thcs = inif[section, "TeamHitCondition", "DecideByFriendlyFire"].s();
+		HitCondition thc;
+		Enum.TryParse<HitCondition>(thcs, out thc);
+		
+		var hurtboxState = new HurtboxCollisionState(state, rd, he, pos, rot, shc, thc);
 		hr.AddState(hurtboxState);
 	}
 	
@@ -116,6 +125,15 @@ public class ProjectileCreator
 		Hitbox.AngleFlipper vaf;
 		Enum.TryParse<Hitbox.AngleFlipper>(vafs, out vaf);
 		h.VerticalAngleFlipper = vaf;
+		
+		var shcs = inif[section, "SelfHitCondition", "DecideByFriendlyFire"].s();
+		HitCondition shc;
+		Enum.TryParse<HitCondition>(shcs, out shc);
+		h.SelfHitCondition = shc;
+		var thcs = inif[section, "TeamHitCondition", "DecideByFriendlyFire"].s();
+		HitCondition thc;
+		Enum.TryParse<HitCondition>(thcs, out thc);
+		h.TeamHitCondition = thc;
 		
 		var tkm = inif[section, "TeamKnockbackMultiplier", 1f].f();
 		h.TeamKnockbackMult = tkm;

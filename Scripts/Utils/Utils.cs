@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 
 public static class Utils
 {
@@ -14,4 +15,11 @@ public static class Utils
 	public static float Index(this Quat q, int i) => (i==0)?q.x:(i==1)?q.y:(i==2)?q.z:q.w;
 	
 	public static T GetProp<T>(this Godot.Object o, string s, T @default = default(T)) => (T)(o.Get(s)??@default);
+	
+	public static Action<T> Chain<T>(this Action<T> a1, Action<T> a2) => (T t) => {a1(t); a2(t);};
+	
+	public static Action<T> Chain<T>(this IEnumerable<Action<T>> ae) => (T t) => {foreach(var a in ae) a(t);};
+	
+	public static Action<T> Chain<T>(this Action<T> a1, params Action<T>[] ae) => (T t) => {a1(t); ae.Chain<T>()(t);};
+	public static Action<T> Chain<T>(this Action<T> a1, IEnumerable<Action<T>> ae) => (T t) => {a1(t); ae.Chain<T>()(t);};
 }

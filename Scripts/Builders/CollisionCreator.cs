@@ -30,7 +30,7 @@ public class CollisionCreator
 		ch.AddChild(cs);
 		
 		foreach(var state in states) BuildCollision(cs, state+collision, state);
-			
+		
 		foreach(var hurtbox in hurtboxes)
 		{
 			var hr = new Hurtbox();
@@ -50,7 +50,16 @@ public class CollisionCreator
 		var pos = inif[section, "Position", Vector2.Zero].v2();
 		var rot = inif[section, "Rotation", 0f].f();
 		rot = (float)(rot*Math.PI/180f);//to rads
-		var hurtboxState = new HurtboxCollisionState(state, rd, he, pos, rot);
+		
+		var shcs = inif[section, "SelfHitCondition", "DecideByFriendlyFire"].s();
+		HitCondition shc;
+		Enum.TryParse<HitCondition>(shcs, out shc);
+		
+		var thcs = inif[section, "TeamHitCondition", "DecideByFriendlyFire"].s();
+		HitCondition thc;
+		Enum.TryParse<HitCondition>(thcs, out thc);
+		
+		var hurtboxState = new HurtboxCollisionState(state, rd, he, pos, rot, shc, thc);
 		hr.AddState(hurtboxState);
 	}
 	

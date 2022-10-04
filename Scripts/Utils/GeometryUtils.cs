@@ -61,10 +61,7 @@ public static class GeometryUtils
 		return res;
 	}
 	
-	public static Vector2 Center(this Rect2 rec) => new Vector2(
-		rec.Position.x + rec.Size.x / 2,
-		rec.Position.y + rec.Size.y / 2
-	);
+	public static Vector2 Center(this Rect2 rec) => rec.Position + rec.Size/2f;
 		
 	public static Rect2 Limit(this Rect2 rec, float maxH, float maxV)
 	{

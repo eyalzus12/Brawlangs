@@ -6,77 +6,34 @@ using System.Text.RegularExpressions;
 
 public static class IterUtils
 {
-	public static IEnumerable<T> ToEnumerable<T>(this Godot.Collections.Array<T> a)
-	{
-		foreach(var h in a) yield return h;
-	}
+	public static IEnumerable<T> ToEnumerable<T>(this Godot.Collections.Array<T> a) {foreach(var h in a) yield return h;}
+	public static IEnumerable<T> ToEnumerable<T>(this Godot.Collections.Array a){foreach(var h in a) yield return (T)h;}
 	
-	public static IEnumerable<T> ToEnumerable<T>(this Godot.Collections.Array a)
-	{
-		foreach(var h in a) yield return (T)h;
-	}
-	
-	public static IEnumerable<T> ToFilteredEnumerable<T>(this Godot.Collections.Array a)
-	{
-		foreach(var h in a) if(a is T t) yield return t;
-	}
-	
-	public static IEnumerable<(int, T)> Indexed<T>(this IEnumerable<T> e)
-	{
-		int i = 0; foreach(var o in e) yield return (i++, o);
-	}
+	public static IEnumerable<(int, T)> Indexed<T>(this IEnumerable<T> e) {int i = 0; foreach(var o in e) yield return (i++, o);}
 	
 	public static IEnumerable<TResult> Accumulate<TResult, T>(this IEnumerable<T> e, TResult seed, Func<TResult, T, TResult> accum)
-	{
-		foreach(var o in e) yield return (seed = accum(seed, o));
-	}
-	
-	public static IEnumerable<TResult> SelectWhere<T, TResult>(this IEnumerable<T> e, Func<T, TResult> selector, Func<T, bool> checker)
-	{
-		foreach(var o in e) if(checker(o)) yield return selector(o);
-	}
+		{foreach(var o in e) yield return (seed = accum(seed, o));}
 	
 	public static IEnumerable<TResult> FilterType<T, TResult>(this IEnumerable<T> e)
-	{
-		foreach(var o in e) if(o is TResult t) yield return t;
-	}
+		{foreach(var o in e) if(o is TResult t) yield return t;}
 	
 	public static IEnumerable<T> FilterType<T>(this Godot.Collections.Array a)
-	{
-		foreach(var o in a) if(o is T t) yield return t;
-	}
-	
-	public static IEnumerable<int> To(this int a, int b)
-	{
-		for(int i = a; i <= b; ++i) yield return i;
-	}
+		{foreach(var o in a) if(o is T t) yield return t;}
 	
 	public static int Mult(this IEnumerable<int> e) => e.Aggregate(1, (a,n)=>a*n);
 	
-	public static IEnumerable<int> Indexes(this IEnumerable<object> e)
-	{
-		int i = 0; foreach(var o in e) yield return i++;
-	}
-	
 	public static IEnumerable<T> Flatten<T>(params IEnumerable<T>[] earr)
-	{
-		foreach(var e in earr) foreach(var o in e) yield return o;
-	}
+		{foreach(var e in earr) foreach(var o in e) yield return o;}
 	
 	public static IEnumerable<(T1, T2)> Product<T1, T2>(this IEnumerable<T1> e1, IEnumerable<T2> e2)
-	{
-		foreach(var o1 in e1) foreach(var o2 in e2) yield return (o1, o2);
-	}
+		{foreach(var o1 in e1) foreach(var o2 in e2) yield return (o1, o2);}
 	
 	public static Vector2 Sum(this IEnumerable<Vector2> e) => e.Aggregate(Vector2.Zero, (v1,v2)=>v1+v2);
 	public static Vector2 Avg(this IEnumerable<Vector2> e) => e.Sum()/e.Count();
 	
 	public static void Rotate<T>(this Queue<T> q) => q.Enqueue(q.Dequeue());
 	
-	public static void ForEach<T>(this IEnumerable<T> e, Action<T> a)
-	{
-		foreach(var h in e) a(h);
-	}
+	public static void ForEach<T>(this IEnumerable<T> e, Action<T> a) {foreach(var h in e) a(h);}
 	
 	public static IEnumerable<(T1,T2)> Zip<T1,T2>(this IEnumerable<T1> e1, IEnumerable<T2> e2)
 	{
@@ -147,9 +104,9 @@ public static class IterUtils
 			yield return (en1.Current, en2.Current, en3.Current, en4.Current, en5.Current, en6.Current, en7.Current);
 	}
 	
-	public static IEnumerable<(T1,T2,T3,T4,T5,T6,T7,T8)> Zip<T1,T2,T3,T4,T5,T6,T7,T8>(
+	public static IEnumerable<(T1,T2,T3,T4,T5,T6,T7,TRest)> Zip<T1,T2,T3,T4,T5,T6,T7,TRest>(
 		IEnumerable<T1> e1, IEnumerable<T2> e2, IEnumerable<T3> e3, IEnumerable<T4> e4,
-		IEnumerable<T5> e5, IEnumerable<T6> e6, IEnumerable<T7> e7, IEnumerable<T8> e8)
+		IEnumerable<T5> e5, IEnumerable<T6> e6, IEnumerable<T7> e7, IEnumerable<TRest> erest)
 	{
 		var en1 = e1.GetEnumerator();
 		var en2 = e2.GetEnumerator();
@@ -158,10 +115,10 @@ public static class IterUtils
 		var en5 = e5.GetEnumerator();
 		var en6 = e6.GetEnumerator();
 		var en7 = e7.GetEnumerator();
-		var en8 = e8.GetEnumerator();
+		var enrest = erest.GetEnumerator();
 		while(en1.MoveNext() && en2.MoveNext() && en3.MoveNext() && en4.MoveNext()
-			&& en5.MoveNext() && en6.MoveNext() && en7.MoveNext() && en8.MoveNext())
-			yield return (en1.Current, en2.Current, en3.Current, en4.Current, en5.Current, en6.Current, en7.Current, en8.Current);
+			&& en5.MoveNext() && en6.MoveNext() && en7.MoveNext() && enrest.MoveNext())
+			yield return (en1.Current, en2.Current, en3.Current, en4.Current, en5.Current, en6.Current, en7.Current, enrest.Current);
 	}
 	
 	public static IEnumerable<IEnumerable<T>> MultiZip<T>(params IEnumerable<T>[] es)
@@ -176,43 +133,36 @@ public static class IterUtils
 		return @default;
 	}
 	
+	public static int FirstIndexWhere<T>(this IEnumerable<T> e, Func<T, bool> predicate)
+	{
+		int i = 0;
+		foreach(var o in e)
+			if(predicate(o)) return i;
+			else ++i;
+		return i;
+	}
+	
 	public static IEnumerable<int> IndicesWhere<T>(this IEnumerable<T> e, Func<T, bool> predicate)
 	{
 		int i = 0;
 		foreach(var h in e)
-		{
 			if(predicate(h)) yield return i;
-			i++;
-		}
+			else i++;
 	}
+	
+	public static int FindIndex<T>(this IEnumerable<T> e, T v) where T : IEquatable<T> => e.FirstIndexWhere<T>(v.Equals);
 	
 	public static TValue GetValueOrDefault<TKey,TValue>(this Dictionary<TKey,TValue> d, TKey k, TValue @default = default)
-	{
-		TValue res; return d.TryGetValue(k, out res)?res:@default;
-	}
+		{TValue res; return d.TryGetValue(k, out res)?res:@default;}
 	
-	public static int FindIndex<T>(this IEnumerable<T> e, T v) where T : IEquatable<T>
-	{
-		int i = 0; foreach(var o in e) {++i; if(o.Equals(v)) return i;}
-		return i;
-	}
 	
 	public static IEnumerable<T> RepeatListOf<T>(this T t, int times)
-	{
-		for(int i = 0; i < times; ++i) yield return t;
-	}
+		{for(int i = 0; i < times; ++i) yield return t;}
 	
 	public static IEnumerable<T> CircularTake<T>(this IEnumerable<T> e, int amount)
 	{
 		var en = e.GetEnumerator();
-		for(int i = 0; i < amount; en.Reset())
-		{
-			while(i < amount && en.MoveNext())
-			{
-				yield return en.Current;
-				++i;
-			}
-		}
+		for(int i = 0; i < amount; en.Reset()) for(; i < amount && en.MoveNext(); ++i) yield return en.Current;
 	}
 	
 	public static IEnumerable<T> CircularTakeOrDefault<T>(this IEnumerable<T> e, int amount, T @default = default(T))

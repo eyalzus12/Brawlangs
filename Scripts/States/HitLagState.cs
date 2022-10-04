@@ -36,7 +36,7 @@ public class HitLagState : State
 		if(frameCount >= hitLagLength)
 		{
 			ch.States.Change("Attack");
-			ch.CurrentAttack.CurrentPart.Resume();
+			ch.CurrentAttack?.CurrentPart?.Resume();
 			hitLagLength = 0;
 		}
 		else return false;
@@ -46,18 +46,6 @@ public class HitLagState : State
 	
 	public override void OnChange(State newState)
 	{
-		if(newState is StunState || newState is HitPauseState)
-		{
-			/*var att = ch.CurrentAttack;
-			if(att is null) return;
-			att.Disconnect("AttackEnds", ch.States["Attack"], "SetEnd");
-			att.connected = null;
-			att.active = false;
-			att.OnEnd();
-			att.CurrentPart?.Stop();
-			ch.ResetCurrentAttack(att);
-			att.CurrentPart = null;*/
-			if(ch.CurrentAttack != null) ch.CurrentAttack.Active = false;
-		}
+		if((newState is StunState || newState is HitPauseState) && ch.CurrentAttack != null) ch.CurrentAttack.Active = false;
 	}
 }

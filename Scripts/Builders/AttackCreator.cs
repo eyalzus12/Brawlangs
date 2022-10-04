@@ -175,6 +175,15 @@ public class AttackCreator
 		Enum.TryParse<Hitbox.AngleFlipper>(vafs, out vaf);
 		h.VerticalAngleFlipper = vaf;
 		
+		var shcs = inif[section, "SelfHitCondition", "DecideByFriendlyFire"].s();
+		HitCondition shc;
+		Enum.TryParse<HitCondition>(shcs, out shc);
+		h.SelfHitCondition = shc;
+		var thcs = inif[section, "TeamHitCondition", "DecideByFriendlyFire"].s();
+		HitCondition thc;
+		Enum.TryParse<HitCondition>(thcs, out thc);
+		h.TeamHitCondition = thc;
+		
 		var tkm = inif[section, "TeamKnockbackMultiplier", 1f].f();
 		h.TeamKnockbackMult = tkm;
 		var tdm = inif[section, "TeamDamageMultiplier", 1f].f();
@@ -222,15 +231,24 @@ public class AttackCreator
 	public void BuildTransition(AttackPart ap, string section)
 	{
 		if(!inif.HasSection(section)) {GD.PushError($"Can't generate transition {section} as it is not a real section"); return;}
-		var frames = inif[section, "Frames", Enumerable.Empty<Vector2>()].lv2();
 		
 		var tags = inif[section, "Tag", ""].s();
-		var tagExpression = new AttackPartTransitionTagExpression(ParseTagList(tags));
 		
-		var nextPart = inif[section, "Next", ""].s();
-		
-		var addedTransition = new AttackPartTransition(frames, tagExpression, nextPart);
-		ap.TransitionManager.Add(addedTransition);
+		try
+		{
+			var parsedTagList = ParseTagList(tags);
+			var tagExpression = new AttackPartTransitionTagExpression();
+			var frames = inif[section, "Frames", Enumerable.Empty<Vector2>()].lv2();
+			var nextPart = inif[section, "Next", ""].s();
+			var addedTransition = new AttackPartTransition(frames, tagExpression, nextPart);
+			ap.TransitionManager.Add(addedTransition);
+			
+		}
+		catch(FormatException fe)
+		{
+			GD.PushError(fe.Message);
+			return;
+		}
 	}
 	
 	private static readonly char[] OPERATORS = new char[]{'!', '|', '&', '(', ')'};

@@ -15,10 +15,17 @@ public interface IHittable
 	bool GettingHit{get; set;}
 	IHitter LastHitter{get; set;}
 	
+	bool FriendlyFire{get; set;}
+	
 	List<Hurtbox> Hurtboxes{get; set;}
 	
 	InvincibilityManager IFrames{get; set;}
 	bool Invincible{get;}
 	
 	void HandleGettingHit(HitData data);
+	
+	bool CanGenerallyBeHitBy(IHitter hitter);
+	bool CanGenerallyBeHitBy(IAttacker attacker);
+	bool CanBeHitBy(IHitter hitter);
+	bool CanBeHitBy(IAttacker attacker);
 }
