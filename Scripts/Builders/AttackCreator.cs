@@ -237,7 +237,7 @@ public class AttackCreator
 		try
 		{
 			var parsedTagList = ParseTagList(tags);
-			var tagExpression = new AttackPartTransitionTagExpression();
+			var tagExpression = new AttackPartTransitionTagExpression(parsedTagList);
 			var frames = inif[section, "Frames", Enumerable.Empty<Vector2>()].lv2();
 			var nextPart = inif[section, "Next", ""].s();
 			var addedTransition = new AttackPartTransition(frames, tagExpression, nextPart);

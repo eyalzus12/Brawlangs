@@ -12,6 +12,10 @@ public class AttackPartTransitionTagExpression
 	
 	public bool Get(StateTagsManager tagsManager)
 	{
+		#if DEBUG_TAG_EXPRESSIONS
+		GD.Print(ToString());
+		#endif
+		
 		if(ExpressionParts.Length == 0) return true;
 		
 		var estack = new Stack<bool>();
