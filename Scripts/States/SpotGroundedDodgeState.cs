@@ -8,9 +8,9 @@ public class SpotGroundedDodgeState : GenericInvincibleState
 	
 	public override bool Actionable => false;
 	
-	public override int Startup => ch.spotGroundedDodgeStartup;
-	public override int IFrames => ch.spotGroundedDodgeLength;
-	public override int Endlag => ch.spotGroundedDodgeEndlag;
+	public override int Startup => ch.SpotGroundedDodgeStartup;
+	public override int IFrames => ch.SpotGroundedDodgeLength;
+	public override int Endlag => ch.SpotGroundedDodgeEndlag;
 	public override string ActionName => "Dodge";
 	public override string StateAnimation => "SpotGroundedDodge";
 	
@@ -18,7 +18,7 @@ public class SpotGroundedDodgeState : GenericInvincibleState
 	{
 		ch.vec.x *= (1f-ch.AppropriateFriction);
 		ch.vuc.x *= (1f-ch.AppropriateFriction);
-		ch.vuc.y *= (1f-ch.airFriction);
+		ch.vuc.y *= (1f-ch.AirFriction);
 	}
 	
 	protected override void DecideNextState()

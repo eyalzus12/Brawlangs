@@ -34,12 +34,12 @@ public class JumpState : GroundedState
 		if(Inputs.IsActionPressed("Run")) forceShortHop = true;
 		AdjustVelocity();
 		
-		if(frameCount >= ch.jumpSquat)
+		if(frameCount >= ch.JumpSquat)
 		{
 			jumpActive = true;
 			//ch.vec.x *= (1f-Math.Abs(ch.fnorm.x));
-			var height = (!forceShortHop && Inputs.IsActionReallyPressed("Jump"))?ch.jumpHeight:ch.shorthopHeight;
-			ch.fnorm = new Vector2(0,-1);
+			var height = (!forceShortHop && Inputs.IsActionReallyPressed("Jump"))?ch.JumpHeight:ch.ShorthopHeight;
+			ch.FNorm = Vector2.Up;
 			ch.vec.y = -height;
 			Unsnap();
 		}
@@ -62,7 +62,7 @@ public class JumpState : GroundedState
 	
 	protected override bool CalcStateChange()
 	{
-		if(!ch.grounded && jumpActive)
+		if(!ch.Grounded && jumpActive)
 		{
 			ch.ApplySettings("Default");
 			ch.States.Change("Air");

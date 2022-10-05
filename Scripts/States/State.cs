@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-public class State : Node
+public class State
 {
 	[Signal]
 	public delegate void StateEnd(State s);
@@ -31,8 +31,8 @@ public class State : Node
 	protected Vector2 snapVector;
 	public bool justInit = false;
 	
-	public State() {Name = GetType().Name;}
-	public State(Character link) {ch = link; Name = $"{ch.Name}_{GetType().Name}";}
+	public State() {}
+	public State(Character link) {ch = link;}
 	
 	public override string ToString() => GetType().Name.Replace("State", "");
 	
@@ -65,16 +65,12 @@ public class State : Node
 			if(this != ch.States.Current) return;
 		}
 		
-		var norm = ch.grounded?ch.fnorm:Vector2.Zero;
+		var norm = ch.Grounded?ch.FNorm:Vector2.Zero;
 		var v = ch.Velocity.TiltToNormal(norm);
 		
 		var moveRes = ch.
 			MoveAndSlideWithSnap(v, snapVector, Vector2.Up,
 			false, 4, FLOOR_ANGLE);
-		
-		ch.grounded = ch.IsOnFloor();
-		ch.walled = ch.IsOnWall();
-		ch.ceilinged = ch.IsOnCeiling();
 		
 		SetupCollisionParamaters();
 		CalcStateChange();
@@ -129,94 +125,94 @@ public class State : Node
 	{
 		if(Inputs.IsActionJustPressed("Left"))
 		{
-			if(ch.rightHeld && !ch.leftHeld)
-				ch.rightHeld = false;
-			ch.leftHeld = true;
+			if(ch.RightHeld && !ch.LeftHeld)
+				ch.RightHeld = false;
+			ch.LeftHeld = true;
 		}
 		
 		if(Inputs.IsActionJustReleased("Left"))
 		{
-			ch.leftHeld = false;
+			ch.LeftHeld = false;
 			if(Inputs.IsActionPressed("Right"))
-				ch.rightHeld = true;
+				ch.RightHeld = true;
 		}
 		
-		if(Inputs.IsActionPressed("Left") && !ch.leftHeld && !ch.rightHeld)
-			ch.leftHeld = true;
+		if(Inputs.IsActionPressed("Left") && !ch.LeftHeld && !ch.RightHeld)
+			ch.LeftHeld = true;
 		
-		if(!Inputs.IsActionPressed("Left") && ch.leftHeld)
-			ch.leftHeld = false;
+		if(!Inputs.IsActionPressed("Left") && ch.LeftHeld)
+			ch.LeftHeld = false;
 		
 		if(Inputs.IsActionJustPressed("Right"))
 		{
-			if(ch.leftHeld && !ch.rightHeld) 
-				ch.leftHeld = false;
-			ch.rightHeld = true;
+			if(ch.LeftHeld && !ch.RightHeld) 
+				ch.LeftHeld = false;
+			ch.RightHeld = true;
 		}
 		
 		if(Inputs.IsActionJustReleased("Right"))
 		{
-			ch.rightHeld = false;
+			ch.RightHeld = false;
 			if(Inputs.IsActionPressed("Left")) 
-				ch.leftHeld = true;
+				ch.LeftHeld = true;
 		}
 		
-		if(Inputs.IsActionPressed("Right") && !ch.leftHeld && !ch.rightHeld)
-			ch.rightHeld = true;
+		if(Inputs.IsActionPressed("Right") && !ch.LeftHeld && !ch.RightHeld)
+			ch.RightHeld = true;
 		
-		if(!Inputs.IsActionPressed("Right") && ch.rightHeld)
-			ch.rightHeld = false;
+		if(!Inputs.IsActionPressed("Right") && ch.RightHeld)
+			ch.RightHeld = false;
 	}
 	
 	protected void SetVerticalAlternatingInputs()
 	{
 		if(Inputs.IsActionJustPressed("Up"))
 		{
-			if(ch.downHeld && !ch.upHeld)
-				ch.downHeld = false;
-			ch.upHeld = true;
+			if(ch.DownHeld && !ch.UpHeld)
+				ch.DownHeld = false;
+			ch.UpHeld = true;
 		}
 		
 		if(Inputs.IsActionJustReleased("Up"))
 		{
-			ch.upHeld = false;
+			ch.UpHeld = false;
 			if(Inputs.IsActionPressed("Down"))
-				ch.downHeld = true;
+				ch.DownHeld = true;
 		}
 		
-		if(Inputs.IsActionPressed("Up") && !ch.upHeld && !ch.downHeld)
-			ch.upHeld = true;
+		if(Inputs.IsActionPressed("Up") && !ch.UpHeld && !ch.DownHeld)
+			ch.UpHeld = true;
 		
-		if(!Inputs.IsActionPressed("Up") && ch.upHeld)
-			ch.upHeld = false;
+		if(!Inputs.IsActionPressed("Up") && ch.UpHeld)
+			ch.UpHeld = false;
 		
 		if(Inputs.IsActionJustPressed("Down"))
 		{
-			if(ch.upHeld && !ch.downHeld) 
-				ch.upHeld = false;
-			ch.downHeld = true;
+			if(ch.UpHeld && !ch.DownHeld) 
+				ch.UpHeld = false;
+			ch.DownHeld = true;
 		}
 		
 		if(Inputs.IsActionJustReleased("Down"))
 		{
-			ch.downHeld = false;
+			ch.DownHeld = false;
 			if(Inputs.IsActionPressed("Up")) 
-				ch.upHeld = true;
+				ch.UpHeld = true;
 		}
 		
-		if(Inputs.IsActionPressed("Down") && !ch.upHeld && !ch.downHeld)
-			ch.downHeld = true;
+		if(Inputs.IsActionPressed("Down") && !ch.UpHeld && !ch.DownHeld)
+			ch.DownHeld = true;
 		
-		if(!Inputs.IsActionPressed("Down") && ch.downHeld)
-			ch.downHeld = false;
+		if(!Inputs.IsActionPressed("Down") && ch.DownHeld)
+			ch.DownHeld = false;
 	}
 	
 	protected void SetFastFallInput()
 	{
-		if(ch.InputtingRun && ch.Velocity.y >= ch.fastfallMargin)
-			ch.fastfalling = true;
-		if(!ch.HoldingRun || ch.Velocity.y < ch.fastfallMargin)
-			ch.fastfalling = false;
+		if(ch.InputtingRun && ch.Velocity.y >= ch.FastfallMargin)
+			ch.Fastfalling = true;
+		if(!ch.HoldingRun || ch.Velocity.y < ch.FastfallMargin)
+			ch.Fastfalling = false;
 	}
 	
 	protected virtual void SetPlatformDropping()
@@ -224,8 +220,8 @@ public class State : Node
 		ch.SetCollisionMaskBit(DROP_THRU_BIT, !ShouldDrop);
 	}
 	
-	protected void SetDownHoldingInput() => ch.downHeld = Inputs.IsActionPressed("Down");
-	protected void SetUpHoldingInput() => ch.upHeld = Inputs.IsActionPressed("Up");
+	protected void SetDownHoldingInput() => ch.DownHeld = Inputs.IsActionPressed("Down");
+	protected void SetUpHoldingInput() => ch.UpHeld = Inputs.IsActionPressed("Up");
 	
 	public void Unsnap() => snapVector = Vector2.Zero;
 	
@@ -234,9 +230,13 @@ public class State : Node
 	public void SetupCollisionParamaters()
 	//does all the needed calculations on collision
 	{
-		ch.onSemiSolid = false;//reset semi solid detection
-		ch.onSlope = false;//reset slope detection
-		ch.aerial = true;//assume no collision for the start
+		ch.Grounded = ch.IsOnFloor();
+		ch.Walled = ch.IsOnWall();
+		ch.Ceilinged = ch.IsOnCeiling();
+		
+		ch.OnSemiSolid = false;//reset semi solid detection
+		ch.OnSlope = false;//reset slope detection
+		ch.Aerial = true;//assume no collision for the start
 		////////////////////////////////////////////////////////////////////////////////////////////////
 		//FIX: for some reason, when on a slope multiple collsiions are given. this is the cause for fnorm not properly updating:
 		//the (0,-1) normal is also given
@@ -264,36 +264,36 @@ public class State : Node
 			//Wall if straight right or left
 			{
 				var cling = body.GetProp<bool>("Clingable", true);//get if clingable
-				if(ch.walled && !cling) ch.walled = false;//if not clingable, ignore being on a wall
+				if(ch.Walled && !cling) ch.Walled = false;//if not clingable, ignore being on a wall
 				
-				ch.wnorm = norm;//get wall normal
-				ch.wvel = vel;//get wall velocity
-				ch.wfric = fric;//get wall friction
-				ch.wbounce = bounce;//get wall bounce
+				ch.WNorm = norm;//get wall normal
+				ch.WVel = vel;//get wall velocity
+				ch.WFric = fric;//get wall friction
+				ch.WBounce = bounce;//get wall bounce
 			}
 			else if(norm.Angle() > Vector2.Right.Angle()
 				 && norm.Angle() < Vector2.Left.Angle())
 			//Ceiling if steeper than a straight wall
 			{
-				ch.cnorm = norm;//get ceiling normal
-				ch.cvel = vel;//get ceiling velocity
-				ch.cfric = fric;//get ceiling friction
-				ch.cbounce = bounce;//get ceiling bounce
+				ch.CNorm = norm;//get ceiling normal
+				ch.CVel = vel;//get ceiling velocity
+				ch.CFric = fric;//get ceiling friction
+				ch.CBounce = bounce;//get ceiling bounce
 			}
 			else
 			//Floor if neither of those
 			{
-				ch.fnorm = norm;//get floor normal
-				ch.fvel = vel;//get floor velocity
-				ch.ffric = fric;//get floor friction
-				ch.fbounce = bounce;//get floor bounce
-				if(!ch.onSlope && norm != Vector2.Up) ch.onSlope = true;//get if you're on a slope, based on if the floor is straight
+				ch.FNorm = norm;//get floor normal
+				ch.FVel = vel;//get floor velocity
+				ch.FFric = fric;//get floor friction
+				ch.FBounce = bounce;//get floor bounce
+				if(!ch.OnSlope && norm != Vector2.Up) ch.OnSlope = true;//get if you're on a slope, based on if the floor is straight
 				
 				////////////////////////////////////////////////////////////////////////////////////////////////
 				//check if we can fall through the platform
 				////////////////////////////////////////////////////////////////////////////////////////////////
 				
-				if(ch.onSemiSolid) continue;//character IS on semi solid, so skip checking for this collision body
+				if(ch.OnSemiSolid) continue;//character IS on semi solid, so skip checking for this collision body
 				
 				var fallthrough = body.GetProp<bool?>("FallThroughPlatform", null);//get if can fall through the platform
 				
@@ -312,11 +312,11 @@ public class State : Node
 					}
 				}
 				
-				ch.onSemiSolid = fallthrough??false;//set on semi solid
+				ch.OnSemiSolid = fallthrough??false;//set on semi solid
 			}
 		}
 		
-		if(ch.grounded || ch.walled || ch.ceilinged) ch.aerial = false;
+		if(ch.Grounded || ch.Walled || ch.Ceilinged) ch.Aerial = false;
 		//collision exists, so character isnt aerial
 		//the check ensures that non clingable walls wont mark the character as non aerial
 	}

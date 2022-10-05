@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 
-public class AudioManager : Node
+public class AudioManager : Node2D
 {
 	public Dictionary<string, AudioStream> Sounds{get; set;} = new Dictionary<string, AudioStream>();
 	public AudioStream this[string s] {get => Sounds[s]; set => Sounds[s] = value;}

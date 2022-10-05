@@ -24,14 +24,14 @@ public class GetupState : GroundedState
 		ch.TurnConditional();
 		
 		if(ch.InputtingHorizontalDirection)
-			ch.vec.x = ch.MovementDirection * ch.crawlSpeed;
+			ch.vec.x = ch.MovementDirection * ch.CrawlSpeed;
 		else ch.vec.x = 0;
 	}
 	
 	protected override bool CalcStateChange()
 	{
 		if(base.CalcStateChange()) return true;
-		else if(frameCount >= ch.getupLength)
+		else if(frameCount >= ch.GetupLength)
 		{
 			ch.Uncrouch();
 			if(ch.Idle) ch.States.Change("Idle");

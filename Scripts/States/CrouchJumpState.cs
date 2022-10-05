@@ -34,11 +34,11 @@ public class CrouchJumpState : BaseCrouchState
 		if(Inputs.IsActionPressed("Run")) forceShortHop = true;
 		AdjustVelocity();
 		
-		if(frameCount >= ch.crouchJumpSquat)
+		if(frameCount >= ch.CrouchJumpSquat)
 		{
 			jumpActive = true;
-			var height =(!forceShortHop && Inputs.IsActionReallyPressed("Jump"))?ch.crouchJumpHeight:ch.crouchShorthopHeight;
-			ch.fnorm = new Vector2(0,-1);
+			var height =(!forceShortHop && Inputs.IsActionReallyPressed("Jump"))?ch.CrouchJumpHeight:ch.CrouchShorthopHeight;
+			ch.FNorm = Vector2.Up;
 			ch.vec.y = -height;
 			Unsnap();
 		}
@@ -61,7 +61,7 @@ public class CrouchJumpState : BaseCrouchState
 	
 	protected override bool CalcStateChange()
 	{
-		if(!ch.grounded && jumpActive)
+		if(!ch.Grounded && jumpActive)
 		{
 			ch.ApplySettings("Default");
 			ch.States.Change("Air");

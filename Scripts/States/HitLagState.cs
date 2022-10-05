@@ -7,20 +7,20 @@ public class HitLagState : State
 	public HitLagState(Character link) : base(link) {}
 	
 	public override bool Actionable => false;
-	public override bool ShouldDrop => ch.downHeld && ch.HoldingRun;
+	public override bool ShouldDrop => ch.DownHeld && ch.HoldingRun;
 	
 	public override void Init()
 	{
 		ch.ResetVelocity();
 		//pause animation
-		ch.fastfalling = false;
+		ch.Fastfalling = false;
 		ch.CurrentAttack?.CurrentPart?.Pause();
 	}
 	
 	protected override void DoGravity()
 	{
-		if(ch.grounded) ch.vec.y = VCF;
-		else if(ch.fastfalling) ch.vec.y.Towards(ch.fastFallSpeed, ch.fastFallGravity);
+		if(ch.Grounded) ch.vec.y = VCF;
+		else if(ch.Fastfalling) ch.vec.y.Towards(ch.FastFallSpeed, ch.FastFallGravity);
 	}
 	
 	public override void SetInputs()

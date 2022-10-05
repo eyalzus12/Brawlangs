@@ -6,7 +6,7 @@ public class GroundedState : State
 	public override string LightAttackType => "Light";
 	public override string SpecialAttackType => "Special";
 	public override string TauntType => "Taunt";
-	public override bool ShouldDrop => ch.downHeld && ch.HoldingRun;
+	public override bool ShouldDrop => ch.DownHeld && ch.HoldingRun;
 	
 	public bool jump = false;
 	
@@ -17,7 +17,7 @@ public class GroundedState : State
 	{
 		base.ForcedInit();
 		jump = false;
-		ch.fastfalling = false;
+		ch.Fastfalling = false;
 		ch.vuc.y = 0;
 	}
 	
@@ -90,8 +90,8 @@ public class GroundedState : State
 			ch.States.Change("RunStartup");
 		}
 		else if(jump) ch.States.Change("Jump");
-		else if(!ch.grounded) ch.States.Change("Air");
-		else if(ch.downHeld && !ch.crouching && ch.vec.y > 0f) ch.States.Change("Duck");
+		else if(!ch.Grounded) ch.States.Change("Air");
+		else if(ch.DownHeld && !ch.Crouching && ch.vec.y > 0f) ch.States.Change("Duck");
 		else return false;
 		
 		return true;
@@ -106,12 +106,12 @@ public class GroundedState : State
 	{
 		SetupCollisionParamaters();
 		
-		if(ch.fvel.y > 0)
-			ch.vec.y = ch.fvel.y;
+		if(ch.FVel.y > 0)
+			ch.vec.y = ch.FVel.y;
 		else ch.vec.y = 0;
 		
 		ch.vec.y += VCF;
 		
-		snapVector = -VCF * ch.fnorm;
+		snapVector = -VCF * ch.FNorm;
 	}
 }

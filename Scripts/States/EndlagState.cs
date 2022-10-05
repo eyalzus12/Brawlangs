@@ -10,7 +10,7 @@ public class EndlagState : State
 	public Attack att = null;
 	
 	public override bool Actionable => false;
-	public override bool ShouldDrop => ch.downHeld && ch.HoldingRun;
+	public override bool ShouldDrop => ch.DownHeld && ch.HoldingRun;
 	
 	public override void Init()
 	{
@@ -46,7 +46,7 @@ public class EndlagState : State
 	
 	protected override void DoGravity()
 	{
-		if(!ch.grounded)
+		if(!ch.Grounded)
 		{
 			ch.vec.y.Towards(ch.AppropriateFallingSpeed, ch.AppropriateGravity);
 			ch.vuc.y.Towards(0, ch.AppropriateGravity);
@@ -60,10 +60,10 @@ public class EndlagState : State
 			var s = ch.States.Get<AttackState>();
 			ch.TurnConditional();
 			
-			if(ch.grounded)
+			if(ch.Grounded)
 			{
 				if(!s.touchedGround) ch.RestoreOptionsOnGroundTouch();
-				if(ch.downHeld)
+				if(ch.DownHeld)
 				{
 					ch.Crouch();
 					ch.States.Change(ch.Idle?"Crouch":"Crawl");
@@ -74,10 +74,10 @@ public class EndlagState : State
 					ch.States.Change(ch.Idle?"Idle":"Walk");
 				}
 			}
-			else if(ch.walled && ch.Resources.Has("Clings"))
+			else if(ch.Walled && ch.Resources.Has("Clings"))
 			{
 				if(!s.touchedWall) ch.RestoreOptionsOnWallTouch();
-				else ch.vec.y *= (1-ch.wallFriction*ch.wfric);
+				else ch.vec.y *= (1f-ch.WallFriction*ch.WFric);
 				ch.ApplySettings("Wall");
 				ch.States.Change("Wall");
 			}

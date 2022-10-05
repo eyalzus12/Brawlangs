@@ -8,9 +8,9 @@ public class SpotAirDodgeState : GenericInvincibleState
 	
 	public override bool Actionable => false;
 	
-	public override int Startup => ch.spotAirDodgeStartup;
-	public override int IFrames => ch.spotAirDodgeLength;
-	public override int Endlag => ch.spotAirDodgeEndlag;
+	public override int Startup => ch.SpotAirDodgeStartup;
+	public override int IFrames => ch.SpotAirDodgeLength;
+	public override int Endlag => ch.SpotAirDodgeEndlag;
 	public override string ActionName => "Dodge";
 	public override string StateAnimation => "SpotAirDodge";
 	

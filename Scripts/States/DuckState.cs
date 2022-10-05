@@ -22,7 +22,7 @@ public class DuckState : BaseCrouchState
 	protected override bool CalcStateChange()
 	{
 		if(base.CalcStateChange()) return true;
-		else if(frameCount >= ch.duckLength)
+		else if(frameCount >= ch.DuckLength)
 		{
 			if(ch.InputtingHorizontalDirection) ch.States.Change("Crawl");
 			else ch.States.Change("Crouch");

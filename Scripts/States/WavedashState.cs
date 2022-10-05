@@ -15,7 +15,7 @@ public class WavedashState : GroundedState
 		ch.PlayAnimation("WavedashStart", true);
 		ch.QueueAnimation("Wavewdash", false, false);
 		
-		ch.vuc.x *= ch.wavedashVelocityMutliplier;
+		ch.vuc.x *= ch.WavedashVelocityMutliplier;
 	}
 	
 	protected override void LoopActions()
@@ -23,11 +23,11 @@ public class WavedashState : GroundedState
 		//koopabackdashwaveslidehoverwalkmoonlanding
 		if(Math.Sign(ch.vuc.x) != ch.Direction && ch.InputDirection == ch.Direction)
 		{
-			ch.vuc.x.Towards(0, ch.wavedashFrictionMultiplier*ch.groundAcceleration);
+			ch.vuc.x.Towards(0, ch.WavedashFrictionMultiplier*ch.GroundAcceleration);
 		}
 		else
 		{
-			ch.vuc.x *= (1f-ch.wavedashFrictionMultiplier*ch.AppropriateFriction);
+			ch.vuc.x *= (1f-ch.WavedashFrictionMultiplier*ch.AppropriateFriction);
 		}
 	}
 	
@@ -37,9 +37,9 @@ public class WavedashState : GroundedState
 	protected override bool CalcStateChange()
 	{
 		if(jump) ch.States.Change("Jump");
-		else if(!ch.grounded) ch.States.Change("Air");
+		else if(!ch.Grounded) ch.States.Change("Air");
 		else if(ch.Idle) ch.States.Change("Idle");
-		else if(Math.Abs(ch.vuc.x) < ch.groundSpeed)
+		else if(Math.Abs(ch.vuc.x) < ch.GroundSpeed)
 		{
 			if(ch.InputtingHorizontalDirection) ch.States.Change("Walk");
 			else ch.States.Change("WalkStop");

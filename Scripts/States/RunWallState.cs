@@ -14,7 +14,7 @@ public class RunWallState: GroundedState
 	protected override void DoMovement()
 	{
 		if(ch.InputtingHorizontalDirection)
-			ch.vuc.x = ch.MovementDirection * ch.runInitialSpeed * (2-ch.ffric);
+			ch.vuc.x = ch.MovementDirection * ch.RunInitialSpeed * (2f-ch.FFric);
 		else
 			ch.vuc.x = 0;
 	}
@@ -23,7 +23,7 @@ public class RunWallState: GroundedState
 	{
 		if(base.CalcStateChange()) return true;
 		if(ch.InputtingTurn) ch.States.Change("RunTurn");
-		else if(!ch.walled) ch.States.Change("Run");
+		else if(!ch.Walled) ch.States.Change("Run");
 		else return false;
 		
 		return false;

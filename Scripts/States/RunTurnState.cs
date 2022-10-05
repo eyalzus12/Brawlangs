@@ -17,16 +17,16 @@ public class RunTurnState : GroundedState
 	
 	protected override void DoMovement()
 	{
-		ch.vuc.x.Towards(ch.MovementDirection * ch.runSpeed * (2-ch.ffric), ch.runAcceleration * ch.ffric);
+		ch.vuc.x.Towards(ch.MovementDirection * ch.RunSpeed * (2f-ch.FFric), ch.RunAcceleration * ch.FFric);
 	}
 	
 	protected override void DoDodge() {}
 	
 	protected override bool CalcStateChange()
 	{
-		if(!ch.grounded)
+		if(!ch.Grounded)
 			ch.States.Change("Air");
-		else if(frameCount >= ch.runTurn + Math.Round(TURNING_MULT*(1-ch.ffric)))
+		else if(frameCount >= ch.RunTurn + Math.Round(TURNING_MULT*(1f-ch.FFric)))
 			ch.States.Change(/*"Run"*/"RunStartup");
 		else return false;
 		

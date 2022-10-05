@@ -24,12 +24,12 @@ public class AirJumpState : AirState
 	
 	protected override void LoopActions()
 	{
-		if(frameCount >= ch.airJumpSquat)
+		if(frameCount >= ch.AirJumpSquat)
 		{
 			jumpActive = true;
-			ch.vec.y = -ch.doubleJumpHeight;
+			ch.vec.y = -ch.AirJumpHeight;
 			ch.Resources.Give("AirJumps", -1);
-			ch.fastfalling = false;
+			ch.Fastfalling = false;
 			Unsnap();
 		}
 	}
@@ -45,7 +45,7 @@ public class AirJumpState : AirState
 	{
 		if(jumpActive)
 		{
-			if(ch.walled && ch.Resources.Has("Clings")) ch.States.Change("WallLand");
+			if(ch.Walled && ch.Resources.Has("Clings")) ch.States.Change("WallLand");
 			else ch.States.Change("Air");
 		}
 		else return false;

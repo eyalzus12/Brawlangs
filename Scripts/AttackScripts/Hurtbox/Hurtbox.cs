@@ -42,6 +42,15 @@ public class Hurtbox : Area2D
 		}
 	}
 	
+	public Hurtbox()
+	{
+		col = new CollisionShape2D();
+		col.Name = $"HurtboxCollision";
+		AddChild(col);
+		var shape = new CapsuleShape2D();
+		col.Shape = shape;
+	}
+	
 	public Vector2 originalPosition = Vector2.Zero;
 	public float originalRotation = 0f;
 	
@@ -50,12 +59,6 @@ public class Hurtbox : Area2D
 	public override void _Ready()
 	{
 		ZIndex = 2;
-		var coli = new CollisionShape2D();
-		coli.Name = "HurtboxCollision";
-		AddChild(coli);
-		col = coli;
-		var shape = new CapsuleShape2D();
-		col.Shape = shape;
 		CollisionLayer ^= 0b11111;//reset five rightmost bits
 		CollisionLayer |= 0b01000;//rightmost bits set to 01000
 		CollisionMask ^= 0b11111;//reset five rightmost bits

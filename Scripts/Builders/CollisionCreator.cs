@@ -26,7 +26,7 @@ public class CollisionCreator
 		var cs = new CharacterCollision();
 		cs.Name = "Collision";
 		cs.owner = ch;
-		ch.collision = cs;
+		ch.Collision = cs;
 		ch.AddChild(cs);
 		
 		foreach(var state in states) BuildCollision(cs, state+collision, state);

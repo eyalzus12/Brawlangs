@@ -23,7 +23,6 @@ public class StateMachine
 		var tempState = this[s];
 		
 		Current?.OnChange(tempState);
-		Current?.EmitSignal("StateEnd", Current);
 		
 		if(Current == tempState)
 		{
@@ -43,24 +42,24 @@ public class StateMachine
 		var name = typeof(T).Name.Replace("State", "");
 		var state = Get(name);
 		if(state is T t) return t;
-		else throw new Exception($"When getting state of type {typeof(T).Name} StateMachine found state of type {state.GetType().Name}");
+		else
+		{
+			GD.PushError($"When getting state of type {typeof(T).Name} StateMachine found state of type {state.GetType().Name}");
+			return null;
+		}
 	}
 	
 	public T Change<T>() where T : State
 	{
-		if(Change(Get<T>().ToString()) is T t) return t;
-		throw new Exception("This should never fucking happen. If anyone finds this, fuck you.");
+		State s = Change(Get<T>().ToString());
+		if(s is T t) return t;
+		GD.PushError("The StateMachine state change function got the name of a state of type {typeof(T).Name} but returned a state of type {s.GetType().Name}");
+		return null;
 	}
 	
 	public void Update(float delta)
 	{
 		Current?.SetInputs();
 		Current?.DoPhysics(delta);
-	}
-	
-	public void Clear()
-	{
-		States.Values.ForEach(s=>s.QueueFree());
-		States.Clear();
 	}
 }

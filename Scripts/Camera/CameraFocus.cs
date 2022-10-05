@@ -9,7 +9,7 @@ public class CameraFocus : Node2D
 	public const float CAMERA_SPEED = 6.5f;
 	public const float MIN_ZOOM = 1.5f;
 	public const float GROW_H = 100f;
-	public const float GROW_V = 50f;
+	public const float GROW_V = 70f;
 	
 	public List<Node2D> Followed{get; set;} = new List<Node2D>();
 	

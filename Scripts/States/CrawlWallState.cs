@@ -14,7 +14,7 @@ public class CrawlWallState: BaseCrouchState
 	protected override bool CalcStateChange()
 	{
 		if(base.CalcStateChange()) return true;
-		else if(!ch.walled)
+		else if(!ch.Walled)
 		{
 			if(ch.TurnConditional()) ch.States.Change("Crawl");
 			else ch.States.Change("Crouch");

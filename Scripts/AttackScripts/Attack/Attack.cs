@@ -71,7 +71,6 @@ public class Attack : Node2D
 		OnStart();
 		
 		EmitSignal(nameof(AttackStarts), this);
-		Connect("AttackEnds", ch.States["Attack"], "SetEnd");
 		
 		CurrentPart = StartPart;
 		LastUsedPart = null;
@@ -98,7 +97,6 @@ public class Attack : Node2D
 		OnEnd();
 		
 		EmitSignal(nameof(AttackEnds), this);
-		Disconnect("AttackEnds", ch.States["Attack"], "SetEnd");
 		
 		CurrentPart.Active = false;
 		CurrentPart = null;

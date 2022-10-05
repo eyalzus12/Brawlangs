@@ -5,7 +5,7 @@ public class StunState : State
 {
 	public const float BOUNCE_FACTOR = 0.95f;
 	
-	public int framesSinceLastBounce = 0;
+	public int FramesSinceLastBounce{get; set;} = 0;
 	public const int BOUNCE_PERIOD = 2;
 	
 	private Color originalModulate;
@@ -21,15 +21,16 @@ public class StunState : State
 		
 		ch.SetCollisionMaskBit(DROP_THRU_BIT, ch.Knockback.y <= 0);
 		ch.ResetVelocity();
+		
 		ch.voc = ch.Knockback;
 		
-		framesSinceLastBounce = 0;
+		FramesSinceLastBounce = 0;
 		ch.PlayAnimation("Stun", true);
 		
-		if(ch.grounded && !ch.onSemiSolid)
+		if(ch.Grounded && !ch.OnSemiSolid)
 		{
-			ch.voc = ch.voc.Bounce(ch.fnorm);
-			framesSinceLastBounce = 0;
+			ch.voc = ch.voc.Bounce(ch.FNorm);
+			FramesSinceLastBounce = 0;
 		}
 		originalModulate = ch.CharacterSprite.Modulate;
 		ch.CharacterSprite.Modulate = new Color(0,0,0,1);
@@ -37,19 +38,18 @@ public class StunState : State
 	
 	protected override void RepeatActions()
 	{
-		ch.framesSinceLastHit = 0;
-		++framesSinceLastBounce;
-		var friction = ch.grounded?ch.groundFriction*ch.ffric:ch.airFriction;
-		ch.voc.x *= (1f-friction);
-		if(!ch.grounded) ch.voc.y.Towards(ch.stunFallSpeed, ch.stunGravity);
+		ch.FramesSinceLastHit = 0;
+		++FramesSinceLastBounce;
+		ch.voc.x *= (1f-ch.AppropriateFriction);
+		if(!ch.Grounded) ch.voc.y.Towards(ch.StunFallSpeed, ch.StunGravity);
 		
-		if(framesSinceLastBounce >= BOUNCE_PERIOD && !ch.aerial && (!ch.grounded || ch.voc.y > VCF))
+		if(FramesSinceLastBounce >= BOUNCE_PERIOD && !ch.Aerial && (!ch.Grounded || ch.voc.y > VCF))
 		{
 			var r = ch.voc.Bounce(ch.Norm);
 			var bounce = ch.CharBounce;
 			r.y *= bounce;
 			ch.voc = r;
-			framesSinceLastBounce = 0;
+			FramesSinceLastBounce = 0;
 		}
 	}
 	
@@ -59,8 +59,8 @@ public class StunState : State
 	{
 		if(frameCount >= ch.StunFrames)
 		{
-			ch.framesSinceLastHit = 0;
-			ch.States.Change(ch.grounded?"Idle":ch.walled?"Wall":"Air");
+			ch.FramesSinceLastHit = 0;
+			ch.States.Change(ch.Grounded?"Idle":ch.Walled?"Wall":"Air");
 			ch.Knockback = Vector2.Zero;
 			ch.StunFrames = 0;
 		}

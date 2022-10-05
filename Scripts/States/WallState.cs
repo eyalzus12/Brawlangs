@@ -10,6 +10,7 @@ public class WallState : State
 	
 	public override void Init()
 	{
+		ch.WallClinging = true;
 		ch.QueueAnimation("Wall", ch.AnimationLooping, true);
 		jump = false;
 	}
@@ -18,15 +19,15 @@ public class WallState : State
 	{
 		if(ch.InputtingTurn)
 		{
-			ch.vec.x = -ch.Direction * ch.airAcceleration;
-			ch.walled = false;
+			ch.vec.x = -ch.Direction * ch.AirAcceleration;
+			ch.Walled = false;
 		}
 	}
 	
 	protected override void DoGravity()
 	{
-		ch.vec.y.Towards(ch.AppropriateFallingSpeed * (2-ch.wfric), ch.AppropriateGravity * (2-ch.wfric));
-		ch.vuc.y.Towards(0, ch.AppropriateGravity * (2-ch.wfric));
+		ch.vec.y.Towards(ch.AppropriateFallingSpeed * (2f-ch.WFric), ch.AppropriateGravity * (2f-ch.WFric));
+		ch.vuc.y.Towards(0, ch.AppropriateGravity * (2f-ch.WFric));
 	}
 	
 	protected override void DoJump()
@@ -43,8 +44,8 @@ public class WallState : State
 	
 	protected override bool CalcStateChange()
 	{
-		if(ch.grounded) ch.States.Change("Land");
-		else if(ch.TurnConditional() || !ch.walled) ch.States.Change("Air");
+		if(ch.Grounded) ch.States.Change("Land");
+		else if(ch.TurnConditional() || !ch.Walled) ch.States.Change("Air");
 		else 
 		{
 			if(jump) ch.States.Change("WallJump");
@@ -58,10 +59,10 @@ public class WallState : State
 	
 	protected override void RepeatActions()
 	{
-		if(ch.ceilinged)
+		if(ch.Ceilinged)
 		{
-			if(ch.cnorm == Vector2.Down)
-				ch.vec *= ch.ceilingBounce;
+			if(ch.CNorm == Vector2.Down)
+				ch.vec *= ch.CeilingBounce;
 			else if(ch.vec.y < 0) 
 				ch.vec.x = 0;
 		}
@@ -73,16 +74,20 @@ public class WallState : State
 	{
 		if(ch.InputtingTurn) return;
 		
-		if(ch.MovementDirection * ch.wvel.x > 0)
-			ch.vec.x = ch.wvel.x;
+		if(ch.MovementDirection * ch.WVel.x > 0)
+			ch.vec.x = ch.WVel.x;
 		else ch.vec.x = 0;
 		
 		ch.vec.x += ch.MovementDirection * HCF;
-		ch.vac.y = ch.wvel.y;
+		ch.vac.y = ch.WVel.y;
 	}
 	
 	public override void OnChange(State newState)
 	{
-		if(!(newState is WallState)) ch.CharacterSprite.Stop();
+		if(!(newState is WallState))
+		{
+			ch.CharacterSprite.Stop();
+			ch.WallClinging = false;
+		}
 	}
 }

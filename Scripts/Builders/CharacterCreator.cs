@@ -76,7 +76,7 @@ public class CharacterCreator
 			var parts = filename.Split('_');
 			var animationName = parts[0];
 			var frames = int.Parse(parts[1]);
-			var loop = int.Parse(parts[2]).b();
+			var loop = parts[2] != "0";
 			var texture = GenerateTextureFromPath(resourcePath);
 			if(texture is null)
 			{

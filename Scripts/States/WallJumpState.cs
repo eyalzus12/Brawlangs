@@ -23,13 +23,13 @@ public class WallJumpState : WallState
 	
 	protected override bool CalcStateChange()
 	{
-		if(ch.grounded) ch.States.Change("Land");
-		else if(frameCount >= ch.wallJumpSquat)
+		if(ch.Grounded) ch.States.Change("Land");
+		else if(frameCount >= ch.WallJumpSquat)
 		{
 			ch.Turn();
-			ch.vec.x = ch.Direction * ch.horizontalWallJump;
-			ch.vec.y = -ch.verticalWallJump;
-			ch.fastfalling = false;
+			ch.vec.x = ch.Direction * ch.HorizontalWallJump;
+			ch.vec.y = -ch.VerticalWallJump;
+			ch.Fastfalling = false;
 			
 			ch.States.Change("Air");
 		}
@@ -39,5 +39,8 @@ public class WallJumpState : WallState
 		return true;
 	}
 	
-	public override void OnChange(State newState) {}
+	public override void OnChange(State newState)
+	{
+		ch.WallClinging = false;
+	}
 }

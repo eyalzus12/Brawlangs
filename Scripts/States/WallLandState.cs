@@ -10,15 +10,16 @@ public class WallLandState : WallState
 	
 	public override void Init()
 	{
+		ch.WallClinging = true;
 		if(ch.Velocity.x != 0) ch.Direction = Math.Sign(ch.Velocity.x);
 		Unsnap();
 		ch.vac = Vector2.Zero;
 		SetupCollisionParamaters();
 		
-		ch.vec.y *= (1-ch.wallFriction*ch.wfric);
+		ch.vec.y *= (1-ch.WallFriction*ch.WFric);
 		
 		ch.vuc.x = 0;
-		ch.vuc.y *= (1-ch.wallFriction*ch.wfric);
+		ch.vuc.y *= (1-ch.WallFriction*ch.WFric);
 		
 		//ch.onSemiSolid = false;
 		ch.PlayAnimation("WallLand", true);
@@ -31,12 +32,12 @@ public class WallLandState : WallState
 	
 	protected override bool CalcStateChange()
 	{
-		if(!ch.walled)
+		if(!ch.Walled)
 		{
 			ch.States.Change("Air");
 			ch.ApplySettings("Default");
 		}
-		else if(frameCount >= ch.wallLand) ch.States.Change("Wall");
+		else if(frameCount >= ch.WallLand) ch.States.Change("Wall");
 		else return false;
 		
 		return true;

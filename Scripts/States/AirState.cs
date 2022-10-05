@@ -5,7 +5,7 @@ public class AirState : State
 {
 	public override string LightAttackType => "Air";
 	public override string SpecialAttackType => "ASpecial";
-	public override bool ShouldDrop => ch.downHeld && ch.HoldingRun;
+	public override bool ShouldDrop => ch.DownHeld && ch.HoldingRun;
 	
 	public bool jump = false;
 	public bool wallTouch = false;
@@ -17,8 +17,8 @@ public class AirState : State
 	{
 		ch.vac = Vector2.Zero;
 		Unsnap();
-		ch.onSemiSolid = false;
-		ch.onSlope = false;
+		ch.OnSemiSolid = false;
+		ch.OnSlope = false;
 		jump = false;
 		wallTouch = false;
 		
@@ -78,8 +78,8 @@ public class AirState : State
 	protected override bool CalcStateChange()
 	{
 		if(jump) ch.States.Change("AirJump");
-		else if(ch.walled && ch.Resources.Has("Clings")) ch.States.Change("WallLand");
-		else if(ch.grounded) ch.States.Change("Land");
+		else if(ch.Walled && ch.Resources.Has("Clings")) ch.States.Change("WallLand");
+		else if(ch.Grounded) ch.States.Change("Land");
 		else return false;
 		
 		return true;
@@ -87,38 +87,34 @@ public class AirState : State
 	
 	protected override void LoopActions()
 	{
-		if(ch.ceilinged)
+		if(ch.Ceilinged)
 		{
 			ch.PlayAnimation("Bonk", true);
 			ch.QueueAnimation("Drift", false, false);
 			
-			if(ch.cnorm == Vector2.Down)
+			if(ch.CNorm == Vector2.Down)
 			{
-				ch.vec.y *= ch.ceilingBonkBounce;
+				ch.vec.y *= ch.CeilingBonkBounce;
 				ch.vuc.y = 0;
 			}
 			else if(ch.vec.y < 0)
 			{
 				ch.vec.x = 0;
-				if(ch.cvel.y != 0f)
-					ch.vec.y *= ch.ceilingBonkBounce;
+				if(ch.CVel.y != 0f)
+					ch.vec.y *= ch.CeilingBonkBounce;
 			}
 		}
 		
-		if(!ch.walled) wallTouch = false;
-		else if(ch.walled && !wallTouch && !ch.Resources.Has("Clings"))
-		{
+		if(!ch.Walled) wallTouch = false;
+		else if(!wallTouch && !ch.Resources.Has("Clings"))
 			wallTouch = true;
-			//ch.vec.y *= (1-ch.wallFriction*ch.wfric);
-			//ch.vuc.y *= (1-ch.wallFriction*ch.wfric);
-		}
 	}
 	
 	protected override void RepeatActions()
 	{
 		ch.TurnConditional();
-		if(ch.crouching) ch.Uncrouch();
-		if(!ch.Resources.Has("Clings")) ch.walled = false;
+		if(ch.Crouching) ch.Uncrouch();
+		if(!ch.Resources.Has("Clings")) ch.Walled = false;
 		
 		//ch.SetCollisionMaskBit(DROP_THRU_BIT, !ch.downHeld);
 	}

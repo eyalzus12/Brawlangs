@@ -5,7 +5,7 @@ public class AttackState : State
 {
 	public bool touchedWall = false;
 	public bool touchedGround = false;
-	public override bool ShouldDrop => ch.downHeld && ch.HoldingRun;
+	public override bool ShouldDrop => ch.DownHeld && ch.HoldingRun;
 	
 	public AttackState() : base() {}
 	public AttackState(Character link) : base(link) {}
@@ -50,7 +50,7 @@ public class AttackState : State
 	protected override void DoGravity()
 	{
 		//aerial
-		if(!ch.grounded)
+		if(!ch.Grounded)
 		{
 			ch.vec.y.Towards(ch.AppropriateFallingSpeed, ch.AppropriateGravity);
 			ch.vuc.y.Towards(0, ch.AppropriateGravity);
@@ -62,39 +62,39 @@ public class AttackState : State
 		{
 			ch.vec.y = VCF;
 			ch.vuc.y = 0;
-			snapVector = -VCF * ch.fnorm;
+			snapVector = -VCF * ch.FNorm;
 		}
 	}
 	
 	protected override void LoopActions()
 	{
 		//failsafe for getting locked into the attack state
-		if(ch.CurrentAttack is null) SetEnd(null);
+		if(ch.CurrentAttack is null || !ch.CurrentAttack.Active) SetEnd();
 		
 		SetupCollisionParamaters();
-		if(ch.walled && ch.Resources.Has("Clings") && !touchedWall)
+		if(ch.Walled && ch.Resources.Has("Clings") && !touchedWall)
 		{
 			ch.RestoreOptionsOnWallTouch();
-			if(ch.CurrentAttack?.CurrentPart?.SlowOnWalls ?? true) ch.vec.y *= (1-ch.wallFriction*ch.wfric);
+			if(ch.CurrentAttack?.CurrentPart?.SlowOnWalls ?? true) ch.vec.y *= (1-ch.WallFriction*ch.WFric);
 			touchedWall = true;
 		}
 		
-		if(ch.grounded && !touchedGround)
+		if(ch.Grounded && !touchedGround)
 		{
 			ch.RestoreOptionsOnGroundTouch();
 			touchedGround = true;
 		}
 	}
 	
-	public void SetEnd(Attack a)
+	public void SetEnd()
 	{
 		//turnaround
 		ch.TurnConditional();
 		
 		//transition to appropriate state
-		if(ch.grounded)
+		if(ch.Grounded)
 		{
-			if(ch.downHeld)
+			if(ch.DownHeld)
 			{
 				ch.Crouch();
 				ch.States.Change(ch.Idle?"Crouch":"Crawl");
@@ -105,7 +105,7 @@ public class AttackState : State
 				ch.States.Change(ch.Idle?"Idle":"Walk");
 			}
 		}
-		else if(ch.walled && touchedWall)
+		else if(ch.Walled && touchedWall)
 		{
 			ch.ApplySettings("Wall");
 			ch.States.Change("Wall");

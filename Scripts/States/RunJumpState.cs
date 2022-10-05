@@ -31,12 +31,12 @@ public class RunJumpState : RunState
 	{
 		AdjustVelocity();
 		
-		if(frameCount >= ch.runJumpSquat)
+		if(frameCount >= ch.RunJumpSquat)
 		{
 			jumpActive = true;
-			ch.fnorm = new Vector2(0,-1);
-			ch.vuc.x = Math.Sign(ch.vuc.x) * ch.runJumpSpeed * (2-ch.ffric);
-			ch.vuc.y = -ch.runJumpHeight;
+			ch.FNorm = Vector2.Up;
+			ch.vuc.x = Math.Sign(ch.vuc.x) * ch.RunJumpSpeed * (2-ch.FFric);
+			ch.vuc.y = -ch.RunJumpHeight;
 			Unsnap();
 		}
 	}
@@ -51,7 +51,7 @@ public class RunJumpState : RunState
 	
 	protected override bool CalcStateChange()
 	{
-		if(!ch.grounded && jumpActive)
+		if(!ch.Grounded && jumpActive)
 		{
 			ch.ApplySettings("Default");
 			ch.States.Change("Air");

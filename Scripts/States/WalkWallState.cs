@@ -23,7 +23,7 @@ public class WalkWallState: GroundedState
 	{
 		if(base.CalcStateChange()) return true;
 		if(ch.InputtingTurn) ch.States.Change("WalkTurn");
-		else if(!ch.walled) ch.States.Change("Walk");
+		else if(!ch.Walled) ch.States.Change("Walk");
 		else return false;
 		
 		return false;

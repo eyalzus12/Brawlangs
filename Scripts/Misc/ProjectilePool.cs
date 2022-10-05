@@ -1,10 +1,12 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 public class ProjectilePool : Node
 {
-	public const int LOAD_AMOUNT = 5;
+	public const int INITIAL_LOAD_AMOUNT = 5;
+	public const int ADDITIONAL_LOAD_AMOUNT = 2;
 	
 	public Dictionary<string, Queue<Projectile>> ProjectileDict{get; set;} = new Dictionary<string, Queue<Projectile>>();
 	public Queue<(string, Projectile)> ReturnQueue{get; set;} = new Queue<(string, Projectile)>();
@@ -15,12 +17,18 @@ public class ProjectilePool : Node
 	public ProjectilePool() {}
 	public ProjectilePool(IAttacker owner) {OwnerObject = owner;}
 	
+	public override void _Ready()
+	{
+		var projectiles = ProjCreate.inif["","Projectiles",Enumerable.Empty<string>()].ls();
+		foreach(var p in projectiles) CreateNewProjectiles(p, INITIAL_LOAD_AMOUNT);
+	}
+	
 	public override void _PhysicsProcess(float delta)
 	{
 		CleanReturnQueue();
 	}
 	
-	public Projectile GetProjectile(string identifier, int loadAmount = LOAD_AMOUNT, string loader = "")
+	public Projectile GetProjectile(string identifier, int loadAmount = ADDITIONAL_LOAD_AMOUNT, string loader = "")
 	{
 		Queue<Projectile> poolQueue;
 		if(!ProjectileDict.TryGetValue(identifier, out poolQueue) || poolQueue.Count <= 0)//no available objects
