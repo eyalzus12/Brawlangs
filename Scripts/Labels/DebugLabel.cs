@@ -5,22 +5,37 @@ using System.Linq;
 
 public class DebugLabel : InfoLabel
 {
-	private const int LABEL_COUNT = 2;
-	public Character ch = null;
+	public DebugLabel() {}
+	public DebugLabel(Character[] characters){Characters = characters;}
 	
 	private int whichlabel = 0;
+	private int currentCharacter = 0;
+	
+	private Action<Character>[] labels;
+	
+	public Character[] Characters{get; set;}
+	
+	public override void Init()
+	{
+		labels = new Action<Character>[]{UpdateLabel_0,UpdateLabel_1};
+	}
 	
 	public override void UpdateLabel()
 	{
-		if(!Valid(ch) || !Visible) return;
-		
+		if(Input.IsActionJustPressed("next_label_character"))
+		{currentCharacter++; currentCharacter %= Characters.Length;}
+		if(Input.IsActionJustPressed("prev_label_character"))
+		{currentCharacter += Characters.Length-1; currentCharacter %= Characters.Length;}
 		if(Input.IsActionJustPressed("debug_label_switch"))
-			{whichlabel++; whichlabel %= LABEL_COUNT;}
+		{whichlabel++; whichlabel %= labels.Length;}
 		
-		new Action[]{UpdateLabel_1,UpdateLabel_2}[whichlabel]();
+		var ch = Characters[currentCharacter];
+		
+		if(!Valid(ch)) return;
+		labels[whichlabel](ch);
 	}
 	
-	public void UpdateLabel_1()
+	public void UpdateLabel_0(Character ch)
 	{
 		Add("Name", ch.Name);
 		Add("Script", ch.GetType().Name);
@@ -52,12 +67,12 @@ public class DebugLabel : InfoLabel
 		Add("ShouldDrop", ch.States.Current?.ShouldDrop);
 		Newline();
 		Add("Attack", ch.CurrentAttack?.Name??"None");
-		Add("AttackFrame", ch.CurrentAttack?.frameCount??0);
+		Add("AttackFrame", ch.CurrentAttack?.FrameCount??0);
 		Add("AttackScript", ch.CurrentAttack?.GetType()?.Name??"None");
 		Newline();
-		var part = ch.CurrentAttack?.CurrentPart??null;
+		var part = ch.CurrentAttack?.CurrentPart;
 		Add("AttackPart", part?.Name??"None");
-		Add("AttackPartFrame", part?.frameCount??0);
+		Add("AttackPartFrame", part?.FrameCount??0);
 		Add("NextPart", part?.NextPart()??"None");
 		Add("AttackPartScript", part?.GetType()?.Name??"None");
 		Add("AttackPartHit", part?.HasHit ?? false);
@@ -92,12 +107,12 @@ public class DebugLabel : InfoLabel
 		Add("Down", ch.DownHeld);
 		Add("Up", ch.UpHeld);
 		Newline();
-		Add("Jump", GetInputString("Jump"));
-		Add("Dodge", GetInputString("Dodge"));
-		Add("Run", GetInputString("Run"));
-		Add("Light", GetInputString("Light"));
-		Add("Special", GetInputString("Special"));
-		Add("Taunt", GetInputString("Taunt"));
+		Add("Jump", GetInputString(ch, "Jump"));
+		Add("Dodge", GetInputString(ch, "Dodge"));
+		Add("Run", GetInputString(ch, "Run"));
+		Add("Light", GetInputString(ch, "Light"));
+		Add("Special", GetInputString(ch, "Special"));
+		Add("Taunt", GetInputString(ch, "Taunt"));
 		Newline();
 		Add("FPS", Engine.GetFramesPerSecond());
 		Add("PhysicsFrame", Engine.GetPhysicsFrames());
@@ -105,9 +120,11 @@ public class DebugLabel : InfoLabel
 		Add("OS", OS.GetName());
 	}
 	
-	public void UpdateLabel_2()
+	public void UpdateLabel_1(Character ch)
 	{
 		Add("Name", ch.Name);
+		Add("Script", ch.GetType().Name);
+		Add("TeamNumber", ch.TeamNumber);
 		Newline();
 		Add("PlayedSounds", "\n"+ch.Audio);
 		if(ch.Inputs is BufferInputManager buff)
@@ -133,9 +150,7 @@ public class DebugLabel : InfoLabel
 		Add("Tags", "\n"+ch.Tags);
 	}
 	
-	protected override bool EnsureCorrectAppearence() => (this.GetDataOrDefault("CurrentInfoLabelCharacter",0).i() == ch.TeamNumber);
-	
-	private string GetInputString(string s) =>
+	private string GetInputString(Character ch, string s) =>
 		ch.Inputs.IsActionJustPressed(s)?"P"://press
 		ch.Inputs.IsActionPressed(s)?"H"://hold
 		ch.Inputs.IsActionJustReleased(s)?"R"://release

@@ -58,7 +58,7 @@ public class AttackCreator
 		var PartScript = inif[section, "Script", ""].s();
 		var baseFolder = path.SplitByLast('/')[0];
 		var ap = TypeUtils.LoadScript<AttackPart>(PartScript, new AttackPart(), baseFolder);
-		ap.att = a;
+		ap.OwnerAttack = a;
 		ap.OwnerObject = a.OwnerObject;
 		ap.Name = section;
 		a.Parts.Add(section, ap);
@@ -72,10 +72,10 @@ public class AttackCreator
 		ap.Cooldown = cd;
 		var mv = inif[section, "Movement", Vector2.Zero].v2();
 		ap.Movement = mv;
-		var ox = inif[section, "OverwriteXMovement", false].b();
-		ap.OverwriteXMovement = ox;
-		var oy = inif[section, "OverwriteYMovement", false].b();
-		ap.OverwriteYMovement = oy;
+		var mp = inif[section, "MomentumPreservation", Vector2.One].v2();
+		ap.MomentumPreservation = mp;
+		var bmp = inif[section, "BurstMomentumPreservation", Vector2.One].v2();
+		ap.BurstMomentumPreservation = bmp;
 		var dfa = inif[section, "DriftForwardAcceleration", 0f].f();
 		ap.DriftForwardAcceleration = dfa;
 		var dfs = inif[section, "DriftForwardSpeed", 0f].f();

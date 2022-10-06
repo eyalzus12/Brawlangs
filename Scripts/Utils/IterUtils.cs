@@ -155,6 +155,15 @@ public static class IterUtils
 	public static TValue GetValueOrDefault<TKey,TValue>(this Dictionary<TKey,TValue> d, TKey k, TValue @default = default)
 		{TValue res; return d.TryGetValue(k, out res)?res:@default;}
 	
+	public static bool TryAdd<TKey,TValue>(this Dictionary<TKey,TValue> d, TKey k, TValue v)
+	{
+		if(!d.ContainsKey(k))
+		{
+			d.Add(k,v);
+			return true;
+		}
+		return false;
+	}
 	
 	public static IEnumerable<T> RepeatListOf<T>(this T t, int times)
 		{for(int i = 0; i < times; ++i) yield return t;}

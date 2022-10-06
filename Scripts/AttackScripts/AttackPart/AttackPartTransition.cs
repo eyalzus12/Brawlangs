@@ -6,7 +6,7 @@ using System.Linq;
 public class AttackPartTransition
 {
 	public List<Vector2> Frames{get; set;} = new List<Vector2>();
-	public AttackPartTransitionTagExpression TagExpression{get; set;} = new AttackPartTransitionTagExpression();
+	public AttackPartTransitionTagExpression TagExpression{get; set;}
 	public string NextPart{get; set;} = "";
 	
 	public AttackPartTransition() {}
@@ -19,8 +19,8 @@ public class AttackPartTransition
 		NextPart = nextPart;
 	}
 	
-	public bool ContainsFrame(int frame) => Frames.Any(v => v.x <= frame && frame <= v.y);
-	public bool MatchesTag(StateTagsManager tagsManager, int currentFrame) =>
+	public bool ContainsFrame(long frame) => Frames.Any(v => v.x <= frame && frame <= v.y);
+	public bool MatchesTag(StateTagsManager tagsManager, long currentFrame) =>
 		(currentFrame == -1 || ContainsFrame(currentFrame)) &&
 		TagExpression.Get(tagsManager);
 }

@@ -1,8 +1,9 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://MapBase.cs" type="Script" id=1]
 [ext_resource path="res://MapArt/TestMap/ThreeSides.png" type="Texture" id=2]
 [ext_resource path="res://icon.png" type="Texture" id=3]
+[ext_resource path="res://Untitled_04-10-2021_10-51-27sus.png" type="Texture" id=4]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 320, 64 )
@@ -13,7 +14,7 @@ extents = Vector2( 128, 8 )
 [node name="Base" type="Node2D"]
 position = Vector2( 512, 300 )
 script = ExtResource( 1 )
-BlastZones = Vector2( 2300, 1200 )
+BackgroundTexture = ExtResource( 4 )
 
 [node name="StaticBody2D" type="StaticBody2D" parent="."]
 position = Vector2( 0, 100 )

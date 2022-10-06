@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-public class ProjectilePool : Node
+public class ProjectilePool
 {
 	public const int INITIAL_LOAD_AMOUNT = 5;
 	public const int ADDITIONAL_LOAD_AMOUNT = 2;
@@ -17,13 +17,13 @@ public class ProjectilePool : Node
 	public ProjectilePool() {}
 	public ProjectilePool(IAttacker owner) {OwnerObject = owner;}
 	
-	public override void _Ready()
+	public void LoadInitialProjectiles()
 	{
 		var projectiles = ProjCreate.inif["","Projectiles",Enumerable.Empty<string>()].ls();
 		foreach(var p in projectiles) CreateNewProjectiles(p, INITIAL_LOAD_AMOUNT);
 	}
 	
-	public override void _PhysicsProcess(float delta)
+	public void Update()
 	{
 		CleanReturnQueue();
 	}
@@ -47,8 +47,7 @@ public class ProjectilePool : Node
 			return null;
 		}
 		
-		if(!ProjectileDict.ContainsKey(identifier))//no queue exists
-			ProjectileDict[identifier] = new Queue<Projectile>();//make a queue
+		ProjectileDict.TryAdd(identifier, new Queue<Projectile>());//make a queue if none exists
 		
 		for(int i = 0; i < amount; ++i)
 		{
@@ -99,14 +98,14 @@ public class ProjectilePool : Node
 				continue;
 			}
 			
-			if(!ProjectileDict.ContainsKey(identifier)) ProjectileDict[identifier] = new Queue<Projectile>();//make a queue
+			ProjectileDict.TryAdd(identifier, new Queue<Projectile>());//make a queue if none exists
 			ProjectileDict[identifier].Enqueue(obj);
 			
 			ReturnQueueSet.Remove(obj);
 		}
 	}
 	
-	public void ClearPool()
+	public void Clear()
 	{
 		foreach(var queue in ProjectileDict.Values)
 		while(queue.Count > 0)
@@ -116,11 +115,6 @@ public class ProjectilePool : Node
 			p.QueueFree();
 		}
 		ProjectileDict.Clear();
-	}
-	
-	public override void _ExitTree()
-	{
-		ClearPool();
 		ReturnQueue.Clear();
 		ReturnQueueSet.Clear();
 	}

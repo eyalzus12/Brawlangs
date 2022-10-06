@@ -29,14 +29,14 @@ public class ChargePart : AttackPart
 	
 	public override void OnEnd()
 	{
-		if(frameCount < MinimumChargeForBoost) return;
-		att.DamageDoneMult *= CalculateDamageMult();
-		att.KnockbackDoneMult *= CalculateKnockbackMult();
+		if(FrameCount < MinimumChargeForBoost) return;
+		OwnerAttack.DamageDoneMult *= CalculateDamageMult();
+		OwnerAttack.KnockbackDoneMult *= CalculateKnockbackMult();
 	}
 	
 	public virtual float ChargeFraction()
 	{
-		var timeHeld = Math.Max(0, frameCount-Startup);
+		var timeHeld = Math.Max(0, FrameCount-Startup);
 		return (float)timeHeld/(float)Length;
 	}
 	

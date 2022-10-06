@@ -17,7 +17,7 @@ public class Attack : Node2D
 		}
 	}
 	
-	public int frameCount = 0;
+	public long FrameCount{get; set;} = 0;
 	
 	protected bool _active = false;
 	public bool Active{get => _active; set
@@ -32,18 +32,16 @@ public class Attack : Node2D
 	public float KnockbackDoneMult{get; set;}
 	public int StunDoneMult{get; set;}
 	
-	public State connected = null;
-	
 	public List<string> SharesCooldownWith{get; set;} = new List<string>();
 	
-	public Dictionary<string, ParamRequest> LoadExtraProperties = new Dictionary<string, ParamRequest>();
+	public Dictionary<string, ParamRequest> LoadExtraProperties{get; set;} = new Dictionary<string, ParamRequest>();
 	
 	[Signal]
 	public delegate void AttackStarts(Attack a);
 	[Signal]
 	public delegate void AttackEnds(Attack a);
 	
-	public float AttackFriction{get; set;}
+	public float AttackFriction{get; set;} = 1f;
 	
 	public Attack() {}
 	
@@ -56,7 +54,7 @@ public class Attack : Node2D
 	public override void _Ready()
 	{
 		SetPhysicsProcess(false);
-		frameCount = 0;
+		FrameCount = 0;
 		Init();
 	}
 	
@@ -66,7 +64,7 @@ public class Attack : Node2D
 		KnockbackDoneMult = 1f;
 		StunDoneMult = 1;
 		
-		frameCount = 0;
+		FrameCount = 0;
 		
 		OnStart();
 		
@@ -105,7 +103,7 @@ public class Attack : Node2D
 	public override void _PhysicsProcess(float delta)
 	{
 		Loop();
-		++frameCount;
+		++FrameCount;
 	}
 	
 	public virtual void Init() {}
@@ -122,5 +120,5 @@ public class Attack : Node2D
 		LoadExtraProperties.Add(s, toAdd);
 	}
 	
-	public virtual int GetCooldown() => (CurrentPart??LastUsedPart).GetCooldown();
+	public virtual int FinalCooldown => (CurrentPart??LastUsedPart).FinalCooldown;
 }

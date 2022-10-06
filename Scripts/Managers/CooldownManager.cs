@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 
 public class CooldownManager
 {
@@ -17,7 +18,8 @@ public class CooldownManager
 	
 	public void Update()
 	{
-		var keys = new List<string>(Cooldowns.Keys);
+		if(Cooldowns.Count == 0) return;
+		var keys = Cooldowns.Keys.ToArray();
 		foreach(var k in keys)
 		{
 			Cooldowns[k]--;

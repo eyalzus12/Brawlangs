@@ -37,7 +37,8 @@ public class AudioManager : Node2D
 	
 	public void Play(string sound)
 	{
-		if(Sounds.ContainsKey(sound)) Play(Sounds[sound]);
+		AudioStream audio;
+		if(Sounds.TryGetValue(sound, out audio)) Play(audio);
 		else if(sound != "") GD.PushError($"Could not play sound {sound} as it does not exist");
 	}
 	
@@ -65,14 +66,7 @@ public class AudioManager : Node2D
 	
 	public void Cleanup()
 	{
-		Players.Where(p=>p.Playing).ForEach(CleanAfter);
-	}
-	
-	public void CleanAfter(AudioPlayer player)
-	{
-		player.Stop();
-		player.Disconnect("FinishedPlaying", this, nameof(StreamFinished));
-		Available.Enqueue(player);
+		Players.Where(p=>p.Playing).ForEach(p=>p.Stop());
 	}
 	
 	public override void _ExitTree()

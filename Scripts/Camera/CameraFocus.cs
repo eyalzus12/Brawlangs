@@ -14,7 +14,7 @@ public class CameraFocus : Node2D
 	public List<Node2D> Followed{get; set;} = new List<Node2D>();
 	
 	private bool _debug = false;
-	public bool Debug{get => _debug; set {_debug = value; Update();}}
+	public bool Debug{get => _debug; set {if(_debug != value) {_debug = value; Update();}}}
 	
 	public Vector2 Limits{get; set;} = DEFAULT_LIMITS;
 	
@@ -83,13 +83,15 @@ public class CameraFocus : Node2D
 					FollowingCamera.LimitBottom
 				)
 			)
+			.Append(Vector2.Zero)
 			.RectWithAll()
-			.GrowIndividual(GROW_H,GROW_V,GROW_H,GROW_V);
+			.GrowIndividual(GROW_H,GROW_V,GROW_H,GROW_V)
+			.Limit(FollowingCamera.LimitRight,FollowingCamera.LimitBottom);
 		Position = DesiredCameraRect.Center();
 		
 		var cameraZoomXY = DesiredCameraRect.Size/GetViewportRect().Size;
 		var cameraZoom = Math.Max(Math.Max(cameraZoomXY.x, cameraZoomXY.y), MIN_ZOOM)*Vector2.One;
-		FollowingCamera.Zoom = cameraZoom;
+		FollowingCamera.Zoom = FollowingCamera.Zoom.LinearInterpolate(cameraZoom, 0.6f);
 		
 		//NaN failsafe
 		if(float.IsNaN(FollowingCamera.Zoom.x) || float.IsNaN(FollowingCamera.Zoom.y)) FollowingCamera.Zoom = MIN_ZOOM*Vector2.One;

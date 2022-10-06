@@ -3,8 +3,8 @@ using System;
 
 public class LimitedAttack : Attack
 {
-	public string ResourceName;
-	public int AmountCanUse;
+	public string ResourceName{get; set;}
+	public int AmountCanUse{get; set;}
 	
 	public override void Init()
 	{

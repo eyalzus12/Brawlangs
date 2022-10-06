@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 
 public class InvincibilityManager
 {
@@ -9,7 +10,7 @@ public class InvincibilityManager
 	
 	public int Count => Timers.Count;
 	public void Add(string source, int length) => Timers.Add(source, length);
-	public void Remove(string source) => Timers.Remove(source);
+	public bool Remove(string source) => Timers.Remove(source);
 	public void Has(string source) => Timers.ContainsKey(source);
 	public void Clear() => Timers.Clear();
 	
@@ -21,7 +22,8 @@ public class InvincibilityManager
 	
 	public void Update()
 	{
-		var keys = new List<string>(Timers.Keys);
+		if(Timers.Count == 0) return;
+		var keys = Timers.Keys.ToArray();
 		foreach(var k in keys)
 		{
 			this[k]--;

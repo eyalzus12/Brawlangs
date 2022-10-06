@@ -24,7 +24,7 @@ public class Hitbox : Area2D
 	
 	public AudioStream HitSound{get; set;}
 	
-	public int frameCount = 0;
+	public long FrameCount{get; set;} = 0;
 	
 	public AngleFlipper HorizontalAngleFlipper{get; set;}
 	public AngleFlipper VerticalAngleFlipper{get; set;}
@@ -32,7 +32,7 @@ public class Hitbox : Area2D
 	public HitCondition TeamHitCondition{get; set;}
 	public HitCondition SelfHitCondition{get; set;}
 	
-	public Dictionary<string, ParamRequest> LoadExtraProperties = new Dictionary<string, ParamRequest>();
+	public Dictionary<string, ParamRequest> LoadExtraProperties{get; set;} = new Dictionary<string, ParamRequest>();
 	
 	public List<Vector2> ActiveFrames{get; set;}
 	public IHitter OwnerObject{get; set;}
@@ -53,9 +53,16 @@ public class Hitbox : Area2D
 			if(value) UpdateHitboxPosition();
 			HitboxShape?.SetDeferred("disabled", !value);
 			Visible = value;
-			_active = value;
 			Monitoring = value;
 			Monitorable = value;
+			
+			if(!_active && value)
+			{
+				FrameCount = 0;
+				Init();
+			}
+			
+			_active = value;
 		}
 	}
 	
@@ -87,8 +94,7 @@ public class Hitbox : Area2D
 	{
 		Active = false;
 		
-		frameCount = 0;
-		
+		FrameCount = 0;
 		Init();
 		
 		Connect("area_entered", this, nameof(OnAreaEnter));
@@ -133,6 +139,7 @@ public class Hitbox : Area2D
 		}
 		else
 		{
+			//IStateManaged
 			if(hit is Character c)
 			{
 				for(var t = c.States.Current.GetType(); t != typeof(State); t = t.BaseType)
@@ -177,18 +184,14 @@ public class Hitbox : Area2D
 	{
 		Loop();
 		UpdateHitboxPosition();
-		++frameCount;
+		++FrameCount;
 	}
 	
 	public override void _Draw()
 	{
-		//if(!(UpdateScript)n.GetRootNode("UpdateScript").debugCollision) return;
 		ZIndex = 4;
-		GeometryUtils.DrawCapsuleShape(this,
-			HitboxShape.Shape as CapsuleShape2D, //shape
-			CollisionPosition, //position
-			CollisionRotation, //rotation
-			GetDrawColor()); //color
+		DrawSetTransform(CollisionPosition, CollisionRotation, Vector2.One);
+		this.DrawShape(HitboxShape.Shape, GetDrawColor());
 	}
 	
 	public virtual void Loop() {}
@@ -252,11 +255,11 @@ public class Hitbox : Area2D
 		}
 	}
 	
-	private static readonly Color PaleWhite = new Color(0.9f, 0.9f, 0.9f, 1);
-	private static readonly Color Orange = new Color(1, 0.3f, 0.1f, 1);
-	private static readonly Color Yellowish = new Color(0.7f, 0.7f, 0.1f, 1);
-	private static readonly Color DarkYellow = new Color(0.5f, 0.5f, 0, 1);
-	private static readonly Color LightRed = new Color(1, 0.1f, 0.1f, 1);
+	private static readonly Color PaleWhite = new Color(0.9f, 0.9f, 0.9f, 0.5f);
+	private static readonly Color Orange = new Color(1, 0.3f, 0.1f, 0.5f);
+	private static readonly Color Yellowish = new Color(0.7f, 0.7f, 0.1f, 0.5f);
+	private static readonly Color DarkYellow = new Color(0.5f, 0.5f, 0, 0.5f);
+	private static readonly Color LightRed = new Color(1, 0.1f, 0.1f, 0.5f);
 	public virtual Color GetDrawColor()
 	{
 		if((SetStun == 0) && (VarStun == 0) && (SetHitPause == 0) && (VarHitPause == 0) && (HitLag == 0)) return PaleWhite;

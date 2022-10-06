@@ -15,7 +15,7 @@ public class Projectile : Node2D, IHitter, IHittable
 	public int Direction{get; set;}
 	
 	public ProjectileMovementFunction Movement{get; set;}
-	public int frameCount = 0;
+	public long FrameCount{get; set;} = 0;
 	
 	public List<Hitbox> Hitboxes{get; set;} = new List<Hitbox>();
 	
@@ -28,7 +28,7 @@ public class Projectile : Node2D, IHitter, IHittable
 	
 	public IAttacker OwnerObject{get; set;}
 	
-	public string currentCollisionSetting;
+	public string CurrentCollisionSetting{get; set;}
 	
 	public InvincibilityManager IFrames{get; set;} = new InvincibilityManager();
 	public bool Invincible => IFrames.Count > 0;
@@ -51,7 +51,7 @@ public class Projectile : Node2D, IHitter, IHittable
 	public void PlaySound(string sound) => Audio.Play(sound);
 	public void PlaySound(AudioStream sound) => Audio.Play(sound);
 	
-	public Dictionary<string, ParamRequest> LoadExtraProperties = new Dictionary<string, ParamRequest>();
+	public Dictionary<string, ParamRequest> LoadExtraProperties{get; set;} = new Dictionary<string, ParamRequest>();
 	public virtual void LoadProperties() {}
 	public void LoadExtraProperty<T>(string s, T @default = default(T))
 	{
@@ -83,34 +83,27 @@ public class Projectile : Node2D, IHitter, IHittable
 	
 	public override void _Ready()
 	{
-		frameCount = 0;
+		FrameCount = 0;
 		Position = SpawningPosition + OwnerObject.Position;
 		ConnectSignals();
 		HasHit = false;
 		GettingHit = false;
 		Init();
 		Active = true;
-		Hitboxes.ForEach(InitHitbox);
+		Hitboxes.ForEach(h=>h.Active = true);
 		Hurtboxes.ForEach(h=>h.ChangeState("Default"));
-	}
-	
-	protected void InitHitbox(Hitbox h)
-	{
-		h.Active = true;
-		h.frameCount = 0;
-		h.Init();
 	}
 	
 	public override void _PhysicsProcess(float delta)
 	{
 		if(!Active) return;
 		GettingHit = false;
-		++frameCount;
+		++FrameCount;
 		HandleHits();
 		Loop();
 		Position = Movement.GetNext(this);
 		
-		if(frameCount >= MaxLifetime)
+		if(FrameCount >= MaxLifetime)
 			Destruct();
 	}
 	
@@ -146,11 +139,7 @@ public class Projectile : Node2D, IHitter, IHittable
 	
 	public virtual void DisonnectSignals()
 	{
-		foreach(var h in Hitboxes)
-		{
-			h.Disconnect("HitboxHit", this, nameof(HandleInitialHit));
-			h.OwnerObject = this;
-		}
+		Hitboxes.ForEach(h => h.Disconnect("HitboxHit", this, nameof(HandleInitialHit)));
 	}
 	
 	public void HandleInitialHit(Hitbox hitbox, Hurtbox hurtbox)
@@ -205,7 +194,7 @@ public class Projectile : Node2D, IHitter, IHittable
 	
 	public void ApplySettings(string setting)
 	{
-		currentCollisionSetting = setting;
+		CurrentCollisionSetting = setting;
 		Hurtboxes.ForEach(h=>h.ChangeState(setting));
 	}
 	

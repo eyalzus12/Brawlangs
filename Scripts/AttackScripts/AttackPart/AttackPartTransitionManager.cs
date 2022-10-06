@@ -9,7 +9,7 @@ public class AttackPartTransitionManager
 	public void Add(AttackPartTransition apt) => Transitions.Add(apt);
 	public void Clear() => Transitions.Clear();
 	
-	public string NextAttackPart(StateTagsManager tagsManager, int currentFrames) =>
+	public string NextAttackPart(StateTagsManager tagsManager, long currentFrames) =>
 		Transitions
 		.FirstOrDefault(
 			t => t.MatchesTag(tagsManager, currentFrames), 

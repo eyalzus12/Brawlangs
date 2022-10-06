@@ -23,17 +23,16 @@ public class StateTagsManager
 	{
 		switch(t)
 		{
-			case StateTag.NotDefined:
-			case StateTag.NotActive:
-			case StateTag.Active:
-				return t;
 			case StateTag.Starting:
 				return StateTag.Active;
 			case StateTag.Ending:
 			case StateTag.Instant:
 				return StateTag.NotActive;
+			case StateTag.NotDefined:
+			case StateTag.NotActive:
+			case StateTag.Active:
 			default:
-				throw new Exception("If you see this someone really fucked up");
+				return t;
 		}
 	}
 	

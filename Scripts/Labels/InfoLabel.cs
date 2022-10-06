@@ -6,46 +6,52 @@ public class InfoLabel : Label
 {
 	public InfoLabel() {}
 	
-	public bool debugMode;
-	protected StringBuilder commit = new StringBuilder();
+	private bool _debugMode = false;
+	public bool DebugMode
+	{
+		get => _debugMode;
+		set
+		{
+			_debugMode = value;
+			Visible = value;
+		}
+	}
+	
+	protected StringBuilder Commit{get; set;} = new StringBuilder();
 	
 	public override void _Ready()
 	{
 		PauseMode = Node.PauseModeEnum.Process;
-		debugMode = false;
-		Connect();
+		DebugMode = false;
+		Init();
 	}
 	
-	public virtual void Connect() {}
+	public virtual void Init() {}
 	
 	public override void _PhysicsProcess(float delta)
 	{
-		if(Input.IsActionJustPressed("debug_toggle"))
-			debugMode = !debugMode;
-		
-		Visible = debugMode && EnsureCorrectAppearence();
-		
-		commit.Clear();
-		
+		if(Input.IsActionJustPressed("debug_toggle")) DebugMode = !DebugMode;
 		if(Visible)
 		{
+			Commit.Clear();
 			UpdateLabel();
-			Commit();
+			ApplyText();
 		}
 	}
 	
 	public virtual void UpdateLabel() {}
 	
-	public void Commit() => Text = commit.ToString().Trim();
+	public void ApplyText() => Text = Commit.ToString().Trim();
 	
-	public void Add(string name, object obj, bool dot=true) 
+	public void Add(string name, object obj, bool dot=true, bool space=true) 
 	{
-		commit.Append($"{name}");
-		if(dot) commit.Append(": ");
-		commit.Append($"{obj.ToString()}    ");
+		Commit.Append(name);
+		if(dot) Dot();
+		Commit.Append(obj.ToString());
+		if(space) Space();
 	}
 	
-	public void Newline() => commit.AppendLine();
-	
-	protected virtual bool EnsureCorrectAppearence() => true;
+	public void Dot() => Commit.Append(": ");
+	public void Space() => Commit.Append("    ");
+	public void Newline() => Commit.AppendLine();
 }

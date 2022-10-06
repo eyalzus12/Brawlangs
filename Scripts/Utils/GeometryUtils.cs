@@ -126,6 +126,8 @@ public static class GeometryUtils
 		ci.DrawCircle(new Vector2(0, -height/2), radius, color);
 	}
 	
+	public static void DrawShape(this CanvasItem ci, Shape2D shape, Color color) => shape.Draw(ci.GetCanvasItem(), color);
+	
 	public static Vector2 SmoothLinearInterpolate(this Vector2 @from, Vector2 to, float weight, float curve) => @from.LinearInterpolate(to, weight*Mathf.Tanh(curve*@from.DistanceSquaredTo(to)));
 	
 	public static Rect2 RectFrom(Vector2 Center, Vector2 Size) => new Rect2(Center-Size, 2*Size);

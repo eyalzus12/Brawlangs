@@ -5,14 +5,14 @@ public class SelectScreenLineEdit : LineEdit
 {
 	public CheckBox check;
 	
-	public int number = 1;
+	public int number = 0;
 	public const string PREFIX = "LoadedCharacter";
 	
 	private PublicData data;
 	
 	public override void _Ready()
 	{
-		number = int.Parse(GetParent().Name.Substring("Load".Length));
+		number = int.Parse(GetParent().Name.Substring("Load".Length))-1;
 		//take parent name
 		//remove "Load"
 		//parse
@@ -28,13 +28,7 @@ public class SelectScreenLineEdit : LineEdit
 	
 	public void OnExit()
 	{
-		if(Text == "")
-		{
-			data.Remove($"{PREFIX}{number}");
-		}
-		else
-		{
-			data.AddOverride($"{PREFIX}{number}", Text);
-		}
+		if(Text == "") {data.Remove($"{PREFIX}{number}");}
+		else {data[$"{PREFIX}{number}"] = Text;}
 	}
 }

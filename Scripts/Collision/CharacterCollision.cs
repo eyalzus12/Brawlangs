@@ -8,14 +8,14 @@ public class CharacterCollision : CollisionShape2D
 	
 	public Vector2 Extents {get => RecShape.Extents; set => RecShape.SetDeferred("extents", value);}
 	
-	public Dictionary<string, CollisionShapeState> states = new Dictionary<string, CollisionShapeState>();
-	public string CurrentCollisionState = "Default";
-	public CollisionShapeState CurrentCollisionStateData;
+	public Dictionary<string, CollisionShapeState> States{get; set;} = new Dictionary<string, CollisionShapeState>();
+	public string CurrentCollisionState{get; set;} = "Default";
+	public CollisionShapeState CurrentCollisionStateData{get; set;}
 	
-	public Vector2 originalPosition = Vector2.Zero;
+	public Vector2 OriginalPosition{get; set;} = Vector2.Zero;
 	
-	public int Direction => owner.Direction;
-	public Character owner;
+	public int Direction => OwnerObject.Direction;
+	public Character OwnerObject{get; set;}
 	
 	public Vector2 DynamicPosition
 	{
@@ -24,7 +24,21 @@ public class CharacterCollision : CollisionShape2D
 		{
 			var val = value*new Vector2(Direction, 1);
 			SetDeferred("position", val);
-			originalPosition = value;
+			OriginalPosition = value;
+		}
+	}
+	
+	private bool _debugCollision = false;
+	public bool DebugCollision
+	{
+		get => _debugCollision;
+		set
+		{
+			if(_debugCollision != value)
+			{
+				_debugCollision = value;
+				Update();
+			}
 		}
 	}
 	
@@ -37,31 +51,29 @@ public class CharacterCollision : CollisionShape2D
 		//CollisionMask ^= 0b11111;//reset five rightmost bits
 		//CollisionMask |= 0b00000;//rightmost bits set to 00000. basically does nothing
 		
-		originalPosition = DynamicPosition;
+		OriginalPosition = DynamicPosition;
 	}
 	
 	public override void _PhysicsProcess(float delta)
 	{
-		DynamicPosition = originalPosition;
-		Update();
+		DynamicPosition = OriginalPosition;
+		
+		if(Input.IsActionJustPressed("debug_collision"))
+			DebugCollision = !DebugCollision;
+		
+		if(DebugCollision) Update();
 	}
 	
 	public virtual void AddState(CollisionShapeState newState)
 	{
-		states.Add(newState.Name, newState);
+		States.Add(newState.Name, newState);
 	}
 	
 	public virtual void ChangeState(string newState)
 	{
-		if(states.ContainsKey(newState))
-		{
-			var changeTo = states[newState];
-			ChangeState(changeTo);
-		}
-		else
-		{
-			GD.PushError($"Collision State {newState} is not defined for collision {this}");
-		}
+		CollisionShapeState changeTo;
+		if(States.TryGetValue(newState, out changeTo)) ChangeState(changeTo); 
+		else GD.PushError($"Collision State {newState} is not defined for collision {this}");
 	}
 	
 	public virtual void ChangeState(CollisionShapeState newState)
@@ -73,14 +85,14 @@ public class CharacterCollision : CollisionShape2D
 		Update();
 	}
 	
+	public static readonly Color Black = new Color(0,0,0,1);
+	public static readonly Color Yellow = new Color(1,1,0,0.5f);
 	public override void _Draw()
 	{
-		if(!this.GetRootNode<UpdateScript>("UpdateScript").debugCollision) return;
-		var rect = GeometryUtils.RectFrom(Vector2.Zero, Extents);
-		DrawRect(rect, GetDrawColor(), true);
-		
-		DrawCircle(-DynamicPosition, 5, new Color(0,0,0,1));
+		if(!DebugCollision) return;
+		this.DrawShape(Shape, DrawColor);
+		DrawCircle(-DynamicPosition, 5, Black);
 	}
 	
-	public virtual Color GetDrawColor() => new Color(1,1,0,1);
+	public virtual Color DrawColor => Yellow;
 }

@@ -9,6 +9,8 @@ public class MapBase : Node2D
 	public Vector2 BlastZones = new Vector2(2300, 1200);
 	[Export]
 	public Vector2 CameraLimits = new Vector2(1300, 900);
+	[Export]
+	public Texture BackgroundTexture = null;
 	
 	public readonly static Color blue = new Color(0, 0, 1);
 	public readonly static Color red = new Color(1, 0, 0);
@@ -26,26 +28,42 @@ public class MapBase : Node2D
 		
 		SetDamageLabelLocations(chars.ToArray());
 		
+		//death handler
 		var dh = new DeathHandeler(chars);
 		dh.Name = "DeathHandler";
 		AddChild(dh);
 		dh.Connect("MatchEnds", this, nameof(MatchEnd));
 		
+		//camera
 		var camera = new CameraFocus(chars, CameraLimits);
 		camera.Name = "CameraFocus";
 		AddChild(camera);
 		
+		//blastzones
 		var bz = new BlastZone(Vector2.Zero, BlastZones);
 		bz.Name = "Blastzones";
 		AddChild(bz);
+		
+		//background
+		var pb = new ParallaxBackground();
+		pb.Name = "ParallaxBackground";
+		pb.ScrollIgnoreCameraZoom = true;
+		var pl = new ParallaxLayer();
+		pl.Name = "BackgroundParallaxLayer";
+		pl.MotionScale = Vector2.Zero;
+		var sp = new BackgroundSprite();
+		sp.Name = "BackgroundSprite";
+		sp.Texture = BackgroundTexture;
+		pl.AddChild(sp);
+		pb.AddChild(pl);
+		AddChild(pb);
 	}
 	
 	public List<Character> LoadCharacters()
 	{
 		var data = this.GetPublicData();
-		data.Add("CurrentInfoLabelCharacter", 0);
 		var chars = new List<Character>();
-		for(int i = 0; i < 7; ++i)
+		for(int i = 0; i < 8 ; ++i)
 		{
 			object o = "";
 			if(data.TryGet($"LoadedCharacter{i}", out o))
@@ -64,9 +82,9 @@ public class MapBase : Node2D
 		var charname = path.SplitByLast('/')[1];
 		path = $"{path}/{charname}.cfg";
 		var cr = new CharacterCreator(path);
-		var c = cr.Build(this, i-1);
+		var c = cr.Build(this, i);
 		
-		c.SpriteModulate = colorlist[i-1];
+		c.SpriteModulate = colorlist[i];
 		c.Respawn();
 		
 		var im = new BufferInputManager(c.TeamNumber);
@@ -82,20 +100,19 @@ public class MapBase : Node2D
 		var locations = GetDamageLabelLocations(counts);
 		var cl = new CanvasLayer();
 		cl.Name = "UI";
-		AddChild(cl);
+		var lb = new DebugLabel(characters);
+		lb.Name = "DebugLabel";
+		cl.AddChild(lb);
 		for(int i = 0; i < characters.Length; ++i)
 		{
 			var ch = characters[i];
 			var v = locations[i];
-			var lb = new DebugLabel();
-			lb.Name = $"DebugLabel{i}";
-			lb.ch = ch;
-			cl.AddChild(lb);
 			var dl = new DamageLabel(ch);
 			dl.Name = $"DamageLabel{i}";
 			dl.RectPosition = v;
 			cl.AddChild(dl);
 		}
+		AddChild(cl);
 	}
 	
 	public const float MARGIN = 50f;
@@ -115,7 +132,7 @@ public class MapBase : Node2D
 	
 	public override void _Process(float delta)
 	{
-		if(Input.IsActionJustPressed("next_label_character"))
+		/*if(Input.IsActionJustPressed("next_label_character"))
 		{
 			var data = this.GetPublicData();
 			var current = data["CurrentInfoLabelCharacter"].i();
@@ -131,7 +148,7 @@ public class MapBase : Node2D
 			--current;
 			if(current < 0) current = 8;
 			data["CurrentInfoLabelCharacter"] = current;
-		}
+		}*/
 		
 		if(Input.IsActionJustPressed("exit_game"))
 			ExitToMainMenu();

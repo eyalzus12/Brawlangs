@@ -5,13 +5,13 @@ using System.Linq;
 
 public class AttackPart : Node2D, IHitter
 {
-	public int frameCount = 0;
+	public long FrameCount{get; set;} = 0;
 	
 	public List<Hitbox> Hitboxes{get; set;}
 	public HashSet<IHittable> HitIgnoreList{get; set;} = new HashSet<IHittable>();
 	public Dictionary<Hurtbox, Hitbox> HitList{get; set;} = new Dictionary<Hurtbox, Hitbox>();
 	
-	public Dictionary<string, ParamRequest> LoadExtraProperties = new Dictionary<string, ParamRequest>();
+	public Dictionary<string, ParamRequest> LoadExtraProperties{get; set;} = new Dictionary<string, ParamRequest>();
 	
 	public int Direction {get => OwnerObject.Direction; set => OwnerObject.Direction = value;}
 	public int TeamNumber {get => OwnerObject.TeamNumber; set => OwnerObject.TeamNumber = value;}
@@ -25,11 +25,11 @@ public class AttackPart : Node2D, IHitter
 		_active = value;
 	}}
 	
-	public int Startup = 0;
-	public int Length = 0;
+	public int Startup{get; set;}
+	public int Length{get; set;}
 	public Vector2 Movement{get; set;}
-	public bool OverwriteXMovement{get; set;}
-	public bool OverwriteYMovement{get; set;}
+	public Vector2 MomentumPreservation{get; set;}
+	public Vector2 BurstMomentumPreservation{get; set;}
 	public int Cooldown{get; set;}
 	public int MissCooldown{get; set;}
 	public float GravityMultiplier{get; set;}
@@ -52,7 +52,7 @@ public class AttackPart : Node2D, IHitter
 	
 	public bool HasHit{get; set;}
 	
-	public Attack att;
+	public Attack OwnerAttack{get; set;}
 	
 	public AttackPartTransitionManager TransitionManager{get; set;} = new AttackPartTransitionManager();
 	
@@ -67,7 +67,7 @@ public class AttackPart : Node2D, IHitter
 	public override void _Ready()
 	{
 		SetPhysicsProcess(false);
-		frameCount = 0;
+		FrameCount = 0;
 		
 		//TOFIX: this is unsafe
 		Hitboxes = GetChildren().FilterType<Hitbox>().ToList();
@@ -96,16 +96,16 @@ public class AttackPart : Node2D, IHitter
 		if(Startup == 0) OnStartupFinish();
 		
 		HasHit = false;
-		frameCount = 0;
+		FrameCount = 0;
 		
 		OwnerObject.HitboxAnimator.Connect("animation_finished", this, "ChangeToNextOnEnd");
 		
 		ch.PlayAnimation(AttackAnimation, true);//overwrite animation
 		ch.PlaySound(AttackSound);
 		
-		if(OverwriteXMovement) ch.vec.x = 0;
-		if(OverwriteYMovement) ch.vec.y = 0;
-		if(Movement != Vector2.Zero) ch.vec = Movement * new Vector2(ch.Direction, 1);
+		ch.vec *= MomentumPreservation;
+		ch.vec += Movement * new Vector2(ch.Direction, 1);
+		ch.vuc *= BurstMomentumPreservation;
 		
 		OnStart();
 		
@@ -117,7 +117,7 @@ public class AttackPart : Node2D, IHitter
 	
 	public override void _PhysicsProcess(float delta)
 	{
-		if(frameCount == Startup) OnStartupFinish();
+		if(FrameCount == Startup) OnStartupFinish();
 		Loop();
 		HandleHits();
 		
@@ -127,7 +127,7 @@ public class AttackPart : Node2D, IHitter
 			if(next != "") ChangePart(next);
 		}
 		
-		++frameCount;
+		++FrameCount;
 	}
 	
 	public virtual void OnStartupFinish()
@@ -191,8 +191,8 @@ public class AttackPart : Node2D, IHitter
 	
 	public void ChangeToNextOnEnd(string dummy = "") => ChangeToNext(true);
 	public virtual void ChangeToNext(bool end = false) => ChangePart(NextPart(end));
-	public virtual string NextPart(bool end = false) => TransitionManager.NextAttackPart(ch.Tags, end?-1:frameCount);
-	public virtual void ChangePart(string part) => att.SetPart(part);
+	public virtual string NextPart(bool end = false) => TransitionManager.NextAttackPart(ch.Tags, end?-1:FrameCount);
+	public virtual void ChangePart(string part) => OwnerAttack.SetPart(part);
 	
 	public virtual bool CanGenerallyHit(IHittable hitObject) => OwnerObject.CanGenerallyHit(hitObject) && !HitIgnoreList.Contains(hitObject);
 	public bool CanHit(IHittable hitObject) => CanGenerallyHit(hitObject)&&hitObject.CanGenerallyBeHitBy(this);
@@ -275,9 +275,9 @@ public class AttackPart : Node2D, IHitter
 			
 			HitEvent(hitbox, hurtbox);
 			
-			var kmult = OwnerObject.KnockbackDoneMult*KnockbackDoneMult*att.KnockbackDoneMult*hitbox.GetKnockbackMultiplier(hitChar);
-			var dmult = OwnerObject.DamageDoneMult*DamageDoneMult*att.DamageDoneMult*hitbox.GetDamageMultiplier(hitChar);
-			var smult = OwnerObject.StunDoneMult*StunDoneMult*att.StunDoneMult*hitbox.GetStunMultiplier(hitChar);
+			var kmult = OwnerObject.KnockbackDoneMult*KnockbackDoneMult*OwnerAttack.KnockbackDoneMult*hitbox.GetKnockbackMultiplier(hitChar);
+			var dmult = OwnerObject.DamageDoneMult*DamageDoneMult*OwnerAttack.DamageDoneMult*hitbox.GetDamageMultiplier(hitChar);
+			var smult = OwnerObject.StunDoneMult*StunDoneMult*OwnerAttack.StunDoneMult*hitbox.GetStunMultiplier(hitChar);
 			
 			var dirvec = hitbox.KnockbackDir(hitChar)*kmult;
 			var skb = dirvec*hitbox.SetKnockback + hitbox.MomentumCarry*velocity;
@@ -298,7 +298,7 @@ public class AttackPart : Node2D, IHitter
 			GD.Print($"{OwnerObject} attack parts calls attack's On Hit");
 			#endif
 			
-			att.OnHit(hitbox, hurtbox);
+			OwnerAttack.OnHit(hitbox, hurtbox);
 			
 			#if DEBUG_ATTACKS
 			GD.Print($"{OwnerObject} attack part calls {OwnerObject} Handle Hitting");
@@ -320,5 +320,5 @@ public class AttackPart : Node2D, IHitter
 		HitList.Clear();
 	}
 	
-	public virtual int GetCooldown() => Cooldown + (HasHit?0:MissCooldown);
+	public virtual int FinalCooldown => Cooldown + (HasHit?0:MissCooldown);
 }

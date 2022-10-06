@@ -55,7 +55,7 @@ public class DeathHandeler : Node
 			{
 				var left = exists[0];
 				var log = Log(left, 1);
-				var toAdd = new List<string>(new string[]{log});
+				var toAdd = new List<string>{log};
 				diedTotal.Add(toAdd);
 			}
 			HandleEndOfMatch();
@@ -65,7 +65,7 @@ public class DeathHandeler : Node
 	public virtual void HandleEndOfMatch()
 	{
 		diedTotal.Reverse();
-		this.GetPublicData().Add("GameResults", diedTotal);
+		this.GetPublicData()["GameResults"] = diedTotal;
 		EmitSignal(nameof(MatchEnds));
 	}
 	

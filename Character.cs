@@ -321,8 +321,7 @@ public class Character : KinematicBody2D, IStunnable, IKnockable, IHitPausable, 
 	{
 		RelevantInputTags = InputMap.GetActions().ToEnumerable<string>().LeftQuotient($"{TeamNumber}_").ToArray();
 		
-		ProjPool.Name = "ProjectilePool";
-		AddChild(ProjPool);
+		ProjPool.LoadInitialProjectiles();
 		
 		HitboxAnimator.PlaybackProcessMode = AnimationPlayer.AnimationProcessMode.Physics;
 		HitboxAnimator.Name = "HitboxAnimator";
@@ -337,7 +336,8 @@ public class Character : KinematicBody2D, IStunnable, IKnockable, IHitPausable, 
 		CollisionLayer = 0b100;
 		CollisionMask = 0b011;
 	}
-
+	
+	private static readonly Color Black = new Color(1,1,1,1);
 	public override void _PhysicsProcess(float delta)
 	{
 		if(Clashing) HandleClashing(ClashData);
@@ -349,6 +349,7 @@ public class Character : KinematicBody2D, IStunnable, IKnockable, IHitPausable, 
 		StoreVelocities();
 		TruncateVelocityIfInsignificant();
 		
+		ProjPool.Update();
 		Cooldowns.Update();
 		IFrames.Update();
 		TimedActions.Update();
@@ -359,14 +360,28 @@ public class Character : KinematicBody2D, IStunnable, IKnockable, IHitPausable, 
 		if(Input.IsActionJustPressed("reset")) Respawn();
 		
 		CharacterSprite.FlipH = (Direction == -1);
-		CharacterSprite.SelfModulate = Invincible?new Color(1,1,1,1):SpriteModulate;
+		CharacterSprite.SelfModulate = Invincible?Black:SpriteModulate;
 	}
+	
+	public override void _ExitTree()
+	{
+		ProjPool.Clear();
+	}
+	
+	///////////////////////////////////////////
+	///////////////Animation///////////////////
+	///////////////////////////////////////////
 	
 	public void PlayAnimation(string anm, bool overwriteQueue) => CharacterSprite.Play(anm, overwriteQueue);
 	public void QueueAnimation(string anm, bool goNext, bool overwriteQueue) => CharacterSprite.Queue(anm, goNext, overwriteQueue);
 	public bool AnimationLooping => CharacterSprite.Looping;
 	public void PauseAnimation() => CharacterSprite.Pause();
 	public void ResumeAnimation() => CharacterSprite.Resume();
+	
+	///////////////////////////////////////////
+	///////////////Sound///////////////////////
+	///////////////////////////////////////////
+	
 	public void PlaySound(string sound) => Audio.Play(sound);
 	public void PlaySound(AudioStream sound) => Audio.Play(sound);
 	
@@ -850,6 +865,6 @@ public class Character : KinematicBody2D, IStunnable, IKnockable, IHitPausable, 
 	public virtual void SetAttackCooldowns()
 	{
 		if(CurrentAttack is null) return;
-		Cooldowns[CurrentAttack.Name] = CurrentAttack.GetCooldown();
+		Cooldowns[CurrentAttack.Name] = CurrentAttack.FinalCooldown;
 	}
 }

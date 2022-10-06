@@ -10,14 +10,11 @@ public class TimedActionsManager
 	
 	public void Add(string s, int time, Action action)
 	{
-		if(!Actions.ContainsKey(s)) Actions.Add(s, new List<TimedAction>());
+		Actions.TryAdd(s, new List<TimedAction>());
 		Actions[s].Add(new TimedAction(s,time,action));
 	}
 	
-	public void Remove(string s)
-	{
-		if(Actions.ContainsKey(s)) Actions.Remove(s);
-	}
+	public void Remove(string s) => Actions.Remove(s);
 	
 	public void Update()
 	{

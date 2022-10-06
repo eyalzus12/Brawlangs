@@ -4,8 +4,6 @@ using System.Linq;
 
 public class UpdateScript : Node
 {
-	public bool debugCollision = false;
-	
 	private const string FIRST_KEYBINDS_PATH = "user://keybinds.kbd";
 	private const string SECOND_KEYBINDS_PATH = "res://keybinds.kbd";
 	
@@ -22,8 +20,6 @@ public class UpdateScript : Node
 	{
 		if(Input.IsActionJustPressed("toggle_fullscreen"))
 			OS.WindowFullscreen = !OS.WindowFullscreen;
-		if(Input.IsActionJustPressed("debug_collision"))
-			debugCollision = !debugCollision;
 		if(Input.IsActionJustPressed("reload_keybinds"))
 			LoadKeybinds();
 		if(Input.IsActionJustPressed("dump_orphans"))

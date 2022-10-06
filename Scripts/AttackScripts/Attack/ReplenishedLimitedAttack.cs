@@ -3,10 +3,10 @@ using System;
 
 public class ReplenishedLimitedAttack : LimitedAttack
 {
-	public bool RestoreOnGround;
-	public bool RestoreOnWall;
-	public bool RestoreOnHitting;
-	public bool RestoreOnGettingHit;
+	public bool RestoreOnGround{get; set;}
+	public bool RestoreOnWall{get; set;}
+	public bool RestoreOnHitting{get; set;}
+	public bool RestoreOnGettingHit{get; set;}
 	
 	public override void LoadProperties()
 	{

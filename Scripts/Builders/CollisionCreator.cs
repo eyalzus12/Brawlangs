@@ -25,7 +25,7 @@ public class CollisionCreator
 		var collision = inif["", "Collision", "Collision"].s();
 		var cs = new CharacterCollision();
 		cs.Name = "Collision";
-		cs.owner = ch;
+		cs.OwnerObject = ch;
 		ch.Collision = cs;
 		ch.AddChild(cs);
 		

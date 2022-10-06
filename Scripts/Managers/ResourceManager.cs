@@ -20,10 +20,7 @@ public class ResourceManager
 		else this[resource] = desired;
 	}
 	
-	public void Remove(string resource)
-	{
-		if(Resources.ContainsKey(resource)) Resources.Remove(resource);
-	}
+	public bool Remove(string resource) => Resources.Remove(resource);
 	
 	public void Give(string resource, int amount, int max) => Give(resource, amount, 0, max);
 	public void Give(string resource, int amount) => Give(resource, amount, int.MaxValue);
