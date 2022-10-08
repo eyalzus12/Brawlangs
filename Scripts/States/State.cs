@@ -5,9 +5,6 @@ using System.Linq;
 
 public class State
 {
-	[Signal]
-	public delegate void StateEnd(State s);
-	
 	public virtual bool Actionable => true;
 	public virtual string LightAttackType => "";
 	public virtual string SpecialAttackType => "";
@@ -57,11 +54,11 @@ public class State
 		
 		if(this == ch.States.Current && Actionable && ch.CurrentAttack is null)
 		{
-			if(ch.InputtingAttack("Light")) LightAttack();
+			if(ch.InputtingLight) LightAttack();
 			if(this != ch.States.Current) return;
-			if(ch.InputtingAttack("Special")) SpecialAttack();
+			if(ch.InputtingSpecial) SpecialAttack();
 			if(this != ch.States.Current) return;
-			if(ch.InputtingAttack("Taunt")) Taunt();
+			if(ch.InputtingTaunt) Taunt();
 			if(this != ch.States.Current) return;
 		}
 		
@@ -116,95 +113,102 @@ public class State
 	protected void HandleAttack(string baseInput, string attackType)
 	{
 		if(attackType == "") return;
+		
+		if(attackType == "Taunt")
+		{
+			ch.ExecuteAttack("Taunt");
+			return;
+		}
+		
+		var dirInput = ch.AttackInputDir(baseInput);
+		if(dirInput == "L" || dirInput == "R") dirInput = "S";
 		ch.TurnConditional();
-		ch.ExecuteAttack(ch.AttackInputDir(baseInput) + attackType);
+		
+		ch.ExecuteAttack(dirInput + attackType);
+		
 		Character.INPUT_DIRS.ForEach(s => MarkForDeletion(s + baseInput, true));
 	}
 	
 	protected void SetHorizontalAlternatingInputs()
 	{
-		if(Inputs.IsActionJustPressed("Left"))
+		if(ch.LeftPressed)
 		{
-			if(ch.RightHeld && !ch.LeftHeld)
-				ch.RightHeld = false;
-			ch.LeftHeld = true;
+			if(ch.RightInput && !ch.LeftInput)
+				ch.RightInput = false;
+			ch.LeftInput = true;
 		}
 		
-		if(Inputs.IsActionJustReleased("Left"))
+		if(ch.LeftReleased)
 		{
-			ch.LeftHeld = false;
-			if(Inputs.IsActionPressed("Right"))
-				ch.RightHeld = true;
+			ch.LeftInput = false;
+			if(ch.RightHeld) ch.RightInput = true;
 		}
 		
-		if(Inputs.IsActionPressed("Left") && !ch.LeftHeld && !ch.RightHeld)
-			ch.LeftHeld = true;
+		if(ch.LeftHeld && !ch.LeftInput && !ch.RightInput)
+			ch.LeftInput = true;
 		
-		if(!Inputs.IsActionPressed("Left") && ch.LeftHeld)
-			ch.LeftHeld = false;
+		if(!ch.LeftHeld && ch.LeftInput)
+			ch.LeftInput = false;
 		
-		if(Inputs.IsActionJustPressed("Right"))
+		if(ch.RightPressed)
 		{
-			if(ch.LeftHeld && !ch.RightHeld) 
-				ch.LeftHeld = false;
-			ch.RightHeld = true;
+			if(ch.LeftInput && !ch.RightInput) 
+				ch.LeftInput = false;
+			ch.RightInput = true;
 		}
 		
-		if(Inputs.IsActionJustReleased("Right"))
+		if(ch.RightReleased)
 		{
-			ch.RightHeld = false;
-			if(Inputs.IsActionPressed("Left")) 
-				ch.LeftHeld = true;
+			ch.RightInput = false;
+			if(ch.LeftHeld) ch.LeftInput = true;
 		}
 		
-		if(Inputs.IsActionPressed("Right") && !ch.LeftHeld && !ch.RightHeld)
-			ch.RightHeld = true;
+		if(ch.RightHeld && !ch.LeftInput && !ch.RightInput)
+			ch.RightInput = true;
 		
-		if(!Inputs.IsActionPressed("Right") && ch.RightHeld)
-			ch.RightHeld = false;
+		if(!ch.RightHeld && ch.RightInput)
+			ch.RightInput = false;
 	}
 	
 	protected void SetVerticalAlternatingInputs()
 	{
-		if(Inputs.IsActionJustPressed("Up"))
+		if(ch.UpPressed)
 		{
-			if(ch.DownHeld && !ch.UpHeld)
-				ch.DownHeld = false;
-			ch.UpHeld = true;
+			if(ch.DownInput && !ch.UpInput)
+				ch.DownInput = false;
+			ch.UpInput = true;
 		}
 		
-		if(Inputs.IsActionJustReleased("Up"))
+		if(ch.UpReleased)
 		{
-			ch.UpHeld = false;
-			if(Inputs.IsActionPressed("Down"))
-				ch.DownHeld = true;
+			ch.UpInput = false;
+			if(ch.DownHeld) ch.DownInput = true;
 		}
 		
-		if(Inputs.IsActionPressed("Up") && !ch.UpHeld && !ch.DownHeld)
-			ch.UpHeld = true;
+		if(ch.UpHeld && !ch.UpInput && !ch.DownInput)
+			ch.UpInput = true;
 		
-		if(!Inputs.IsActionPressed("Up") && ch.UpHeld)
-			ch.UpHeld = false;
+		if(!ch.UpHeld && ch.UpInput)
+			ch.UpInput = false;
 		
-		if(Inputs.IsActionJustPressed("Down"))
+		if(ch.DownPressed)
 		{
-			if(ch.UpHeld && !ch.DownHeld) 
-				ch.UpHeld = false;
-			ch.DownHeld = true;
+			if(ch.UpInput && !ch.DownInput) 
+				ch.UpInput = false;
+			ch.DownInput = true;
 		}
 		
-		if(Inputs.IsActionJustReleased("Down"))
+		if(ch.DownReleased)
 		{
-			ch.DownHeld = false;
-			if(Inputs.IsActionPressed("Up")) 
-				ch.UpHeld = true;
+			ch.DownInput = false;
+			if(ch.UpHeld) ch.UpInput = true;
 		}
 		
-		if(Inputs.IsActionPressed("Down") && !ch.UpHeld && !ch.DownHeld)
-			ch.DownHeld = true;
+		if(ch.DownHeld && !ch.UpInput && !ch.DownInput)
+			ch.DownInput = true;
 		
-		if(!Inputs.IsActionPressed("Down") && ch.DownHeld)
-			ch.DownHeld = false;
+		if(!ch.DownHeld && ch.DownInput)
+			ch.DownInput = false;
 	}
 	
 	protected void SetFastFallInput()
@@ -220,8 +224,8 @@ public class State
 		ch.SetCollisionMaskBit(DROP_THRU_BIT, !ShouldDrop);
 	}
 	
-	protected void SetDownHoldingInput() => ch.DownHeld = Inputs.IsActionPressed("Down");
-	protected void SetUpHoldingInput() => ch.UpHeld = Inputs.IsActionPressed("Up");
+	protected void SetDownHoldingInput() => ch.DownInput = ch.DownHeld;
+	protected void SetUpHoldingInput() => ch.UpInput = ch.UpHeld;
 	
 	public void Unsnap() => snapVector = Vector2.Zero;
 	

@@ -102,10 +102,10 @@ public class DebugLabel : InfoLabel
 		Add("Gravity", ch.AppropriateGravity);
 		Add("FallSpeed", ch.AppropriateFallingSpeed);
 		Newline();
-		Add("Left", ch.LeftHeld);
-		Add("Right", ch.RightHeld);
-		Add("Down", ch.DownHeld);
-		Add("Up", ch.UpHeld);
+		Add("Left", ch.LeftInput);
+		Add("Right", ch.RightInput);
+		Add("Down", ch.DownInput);
+		Add("Up", ch.UpInput);
 		Newline();
 		Add("Jump", GetInputString(ch, "Jump"));
 		Add("Dodge", GetInputString(ch, "Dodge"));

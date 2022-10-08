@@ -6,7 +6,7 @@ public class LandState : GroundedState
 	public LandState() : base() {}
 	public LandState(Character link) : base(link) {}
 	
-	public override bool ShouldDrop => ch.DownHeld && ch.HoldingRun;
+	public override bool ShouldDrop => ch.DownInput && ch.HoldingRun;
 	
 	public override void Init()
 	{

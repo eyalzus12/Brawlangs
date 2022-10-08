@@ -197,42 +197,62 @@ public class Character : KinematicBody2D, IStunnable, IKnockable, IHitPausable, 
 	public float AppropriateGravity => (CurrentAttack?.CurrentPart?.GravityMultiplier ?? 1f)*((States.Current is StunState)?StunGravity:Fastfalling?WallClinging?WallFastFallGravity:FastFallGravity:WallClinging?WallGravity*(2f-WFric):Gravity);
 	public float AppropriateFallingSpeed => (CurrentAttack?.CurrentPart?.GravityMultiplier ?? 1f)*((States.Current is StunState)?StunFallSpeed:Fastfalling?WallClinging?WallFastFallSpeed:FastFallSpeed:WallClinging?WallFallSpeed*(2f-WFric):FallSpeed);
 	
-	public int InputDirection => RightHeld?(LeftHeld?0:1):(LeftHeld?-1:0);
+	public bool LeftPressed => Inputs.IsActionJustPressed("Left")||Inputs.IsActionJustPressed("LLight")||Inputs.IsActionJustPressed("LSpecial");
+	public bool RightPressed => Inputs.IsActionJustPressed("Right")||Inputs.IsActionJustPressed("RLight")||Inputs.IsActionJustPressed("RSpecial");
+	public bool DownPressed => Inputs.IsActionJustPressed("Down")||Inputs.IsActionJustPressed("DLight")||Inputs.IsActionJustPressed("DSpecial");
+	public bool UpPressed => Inputs.IsActionJustPressed("Up")||Inputs.IsActionJustPressed("ULight")||Inputs.IsActionJustPressed("USpecial");
+	
+	public bool LeftHeld => Inputs.IsActionPressed("Left")||Inputs.IsActionPressed("LLight")||Inputs.IsActionPressed("LSpecial");
+	public bool RightHeld => Inputs.IsActionPressed("Right")||Inputs.IsActionPressed("RLight")||Inputs.IsActionPressed("RSpecial");
+	public bool DownHeld => Inputs.IsActionPressed("Down")||Inputs.IsActionPressed("DLight")||Inputs.IsActionPressed("DSpecial");
+	public bool UpHeld => Inputs.IsActionPressed("Up")||Inputs.IsActionPressed("ULight")||Inputs.IsActionPressed("USpecial");
+	
+	public bool LeftReleased => Inputs.IsActionJustReleased("Left")||Inputs.IsActionJustReleased("LLight")||Inputs.IsActionJustReleased("LSpecial");
+	public bool RightReleased => Inputs.IsActionJustReleased("Right")||Inputs.IsActionJustReleased("RLight")||Inputs.IsActionJustReleased("RSpecial");
+	public bool DownReleased => Inputs.IsActionJustReleased("Down")||Inputs.IsActionJustReleased("DLight")||Inputs.IsActionJustReleased("DSpecial");
+	public bool UpReleased => Inputs.IsActionJustReleased("Up")||Inputs.IsActionJustReleased("ULight")||Inputs.IsActionJustReleased("USpecial");
+	
+	public int InputDirection => RightInput?(LeftInput?0:1):(LeftInput?-1:0);
 	public int MovementDirection => (HoldingStrafe && InputDirection != 0)?InputDirection:Direction;
 	public int FutureDirection => (InputDirection == 0)?Direction:InputDirection;
-	public Vector2 InputVector => new Vector2((RightHeld?1:LeftHeld?-1:0),(DownHeld?1:UpHeld?-1:0)).Normalized();
+	public Vector2 InputVector => new Vector2((RightInput?1:LeftInput?-1:0),(DownInput?1:UpInput?-1:0)).Normalized();
 	
 	public bool InputtingTurn => !HoldingStrafe && (FutureDirection != Direction);
-	public bool InputtingHorizontalDirection => LeftHeld||RightHeld;
+	public bool InputtingHorizontalDirection => LeftInput||RightInput;
 	public bool NowInputtingHorizontalDirection => Inputs.IsActionJustPressed("Left")||Inputs.IsActionJustPressed("Right");
-	public bool InputtingVerticalDirection => UpHeld||DownHeld;
+	public bool InputtingVerticalDirection => UpInput||DownInput;
 	public bool NowInputtingVerticalDirection => Inputs.IsActionJustPressed("Up")||Inputs.IsActionJustPressed("Down");
 	public bool InputtingDirection => InputtingHorizontalDirection||InputtingVerticalDirection;
 	public bool NowInputtingDirection => NowInputtingHorizontalDirection||NowInputtingVerticalDirection;
 	
 	public bool Idle => (Math.Truncate(Velocity.x / 100f) == 0);
 	public bool Still => (Idle && !InputtingHorizontalDirection);
-	public string AttackDirPrefix => UpHeld?"U":DownHeld?"D":LeftHeld?"S":RightHeld?"S":"N";
+	
+	public string AttackDirPrefix => UpInput?"U":DownInput?"D":LeftInput?"L":RightInput?"R":"N";
+	
 	public bool InputtingDodge => Inputs.IsActionJustPressed("NDodge") || Inputs.IsActionJustPressed("Dodge");
 	public bool InputtingNatDodge => Inputs.IsActionJustPressed("NDodge") || (!InputtingDirection && Inputs.IsActionJustPressed("Dodge"));
+	
 	public bool InputtingJump => Inputs.IsActionJustPressed("Jump");
 	public bool HoldingJump => Inputs.IsActionPressed("Jump");
+	
 	public bool InputtingRun => Inputs.IsActionJustPressed("Run");
 	public bool HoldingRun => Inputs.IsActionPressed("Run");
 	public bool ReleasingRun => Inputs.IsActionJustReleased("Run");
+	
 	public bool InputtingStrafe => Inputs.IsActionJustPressed("Strafe");
 	public bool HoldingStrafe => Inputs.IsActionPressed("Strafe");
 	public bool ReleasingStrafe => Inputs.IsActionJustReleased("Strafe");
 	
 	public bool ShouldInitiateRun => (HoldingRun&&NowInputtingHorizontalDirection) || (InputtingHorizontalDirection&&InputtingRun);
 	
-	public static readonly string[] INPUT_DIRS = {"U", "D", "S", "N", ""};
-	public static readonly string[] ATTACK_TYPES = {"Light", "Special", "Taunt"};
+	public static readonly string[] INPUT_DIRS = {"U", "D", "L", "R", "N", ""};
+	public static readonly string[] ATTACK_TYPES = {"Light", "Special"};
 	public bool InputtingAttack(string type) => INPUT_DIRS.Any(s => Inputs.IsActionJustPressed($"{s}{type}"));
 	public bool InputtingLight => INPUT_DIRS.Any(s => Inputs.IsActionJustPressed($"{s}Light"));
-	public bool InputtingSpecial => INPUT_DIRS.Any(s => Inputs.IsActionJustPressed($"{s}Heavy"));
-	public bool InputtingTaunt => INPUT_DIRS.Any(s => Inputs.IsActionJustPressed($"{s}Taunt"));
-	public bool InputtingAnyAttack => ATTACK_TYPES.Any(InputtingAttack);
+	public bool InputtingSpecial => INPUT_DIRS.Any(s => Inputs.IsActionJustPressed($"{s}Special"));
+	public bool InputtingTaunt => Inputs.IsActionJustPressed("Taunt");
+	public bool InputtingAnyAttack => ATTACK_TYPES.Any(InputtingAttack) || InputtingTaunt;
 	
 	public string AttackInputDir(string type)
 	{
@@ -252,10 +272,10 @@ public class Character : KinematicBody2D, IStunnable, IKnockable, IHitPausable, 
 	public bool OnSemiSolid{get; set;} = false;//is currently on a semi solid platform
 	public bool OnSlope{get; set;} = false;//is currently on a slope
 	
-	public bool LeftHeld{get; set;} = false;//is left currently held
-	public bool RightHeld{get; set;} = false;//is right currently held
-	public bool DownHeld{get; set;} = false;//is down currently held
-	public bool UpHeld{get; set;} = false;//is up currently held
+	public bool LeftInput{get; set;} = false;//is left currently held
+	public bool RightInput{get; set;} = false;//is right currently held
+	public bool DownInput{get; set;} = false;//is down currently held
+	public bool UpInput{get; set;} = false;//is up currently held
 	
 	public bool Crouching{get; set;} = false;//is currently crouching
 	

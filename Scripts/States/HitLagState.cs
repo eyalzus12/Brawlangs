@@ -7,7 +7,7 @@ public class HitLagState : State
 	public HitLagState(Character link) : base(link) {}
 	
 	public override bool Actionable => false;
-	public override bool ShouldDrop => ch.DownHeld && ch.HoldingRun;
+	public override bool ShouldDrop => ch.DownInput && ch.HoldingRun;
 	
 	public override void Init()
 	{

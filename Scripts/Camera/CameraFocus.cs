@@ -10,6 +10,7 @@ public class CameraFocus : Node2D
 	public const float MIN_ZOOM = 1.5f;
 	public const float GROW_H = 100f;
 	public const float GROW_V = 70f;
+	public const float ZOOM_WEIGHT = 0.5f;
 	
 	public List<Node2D> Followed{get; set;} = new List<Node2D>();
 	
@@ -91,7 +92,7 @@ public class CameraFocus : Node2D
 		
 		var cameraZoomXY = DesiredCameraRect.Size/GetViewportRect().Size;
 		var cameraZoom = Math.Max(Math.Max(cameraZoomXY.x, cameraZoomXY.y), MIN_ZOOM)*Vector2.One;
-		FollowingCamera.Zoom = FollowingCamera.Zoom.LinearInterpolate(cameraZoom, 0.6f);
+		FollowingCamera.Zoom = FollowingCamera.Zoom.LinearInterpolate(cameraZoom, ZOOM_WEIGHT);
 		
 		//NaN failsafe
 		if(float.IsNaN(FollowingCamera.Zoom.x) || float.IsNaN(FollowingCamera.Zoom.y)) FollowingCamera.Zoom = MIN_ZOOM*Vector2.One;

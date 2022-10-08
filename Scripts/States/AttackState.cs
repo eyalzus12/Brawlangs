@@ -5,7 +5,7 @@ public class AttackState : State
 {
 	public bool touchedWall = false;
 	public bool touchedGround = false;
-	public override bool ShouldDrop => ch.DownHeld && ch.HoldingRun;
+	public override bool ShouldDrop => ch.DownInput && ch.HoldingRun;
 	
 	public AttackState() : base() {}
 	public AttackState(Character link) : base(link) {}
@@ -94,7 +94,7 @@ public class AttackState : State
 		//transition to appropriate state
 		if(ch.Grounded)
 		{
-			if(ch.DownHeld)
+			if(ch.DownInput)
 			{
 				ch.Crouch();
 				ch.States.Change(ch.Idle?"Crouch":"Crawl");

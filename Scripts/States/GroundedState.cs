@@ -6,7 +6,7 @@ public class GroundedState : State
 	public override string LightAttackType => "Light";
 	public override string SpecialAttackType => "Special";
 	public override string TauntType => "Taunt";
-	public override bool ShouldDrop => ch.DownHeld && ch.HoldingRun;
+	public override bool ShouldDrop => ch.DownInput && ch.HoldingRun;
 	
 	public bool jump = false;
 	
@@ -91,7 +91,7 @@ public class GroundedState : State
 		}
 		else if(jump) ch.States.Change("Jump");
 		else if(!ch.Grounded) ch.States.Change("Air");
-		else if(ch.DownHeld && !ch.Crouching && ch.vec.y > 0f) ch.States.Change("Duck");
+		else if(ch.DownInput && !ch.Crouching && ch.vec.y > 0f) ch.States.Change("Duck");
 		else return false;
 		
 		return true;

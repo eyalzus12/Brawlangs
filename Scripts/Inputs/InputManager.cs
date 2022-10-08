@@ -10,6 +10,8 @@ public class InputManager : Node
 		PauseMode = Node.PauseModeEnum.Process;
 	}
 	
+	public virtual void SimulateInput(InputEvent @event) => Input.ParseInputEvent(@event);
+	
 	public virtual bool IsActionJustPressed(string str) => Input.IsActionJustPressed(str);
 	public virtual bool IsActionPressed(string str) => Input.IsActionPressed(str);
 	public virtual bool IsActionJustReleased(string str) => Input.IsActionJustReleased(str);

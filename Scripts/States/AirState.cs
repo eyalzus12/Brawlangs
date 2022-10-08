@@ -5,7 +5,7 @@ public class AirState : State
 {
 	public override string LightAttackType => "Air";
 	public override string SpecialAttackType => "ASpecial";
-	public override bool ShouldDrop => ch.DownHeld && ch.HoldingRun;
+	public override bool ShouldDrop => ch.DownInput && ch.HoldingRun;
 	
 	public bool jump = false;
 	public bool wallTouch = false;

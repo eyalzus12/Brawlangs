@@ -10,7 +10,7 @@ public class EndlagState : State
 	public Attack att = null;
 	
 	public override bool Actionable => false;
-	public override bool ShouldDrop => ch.DownHeld && ch.HoldingRun;
+	public override bool ShouldDrop => ch.DownInput && ch.HoldingRun;
 	
 	public override void Init()
 	{
@@ -63,7 +63,7 @@ public class EndlagState : State
 			if(ch.Grounded)
 			{
 				if(!s.touchedGround) ch.RestoreOptionsOnGroundTouch();
-				if(ch.DownHeld)
+				if(ch.DownInput)
 				{
 					ch.Crouch();
 					ch.States.Change(ch.Idle?"Crouch":"Crawl");

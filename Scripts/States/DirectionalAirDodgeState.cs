@@ -6,7 +6,7 @@ public class DirectionalAirDodgeState : GenericInvincibleState
 	public DirectionalAirDodgeState() : base() {}
 	public DirectionalAirDodgeState(Character link) : base(link) {}
 	
-	public override bool ShouldDrop => ch.DownHeld && ch.HoldingRun;
+	public override bool ShouldDrop => ch.DownInput && ch.HoldingRun;
 	
 	public bool touchedWall = false;
 	public Vector2 movement;
