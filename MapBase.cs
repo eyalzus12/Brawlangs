@@ -132,26 +132,7 @@ public class MapBase : Node2D
 	
 	public override void _Process(float delta)
 	{
-		/*if(Input.IsActionJustPressed("next_label_character"))
-		{
-			var data = this.GetPublicData();
-			var current = data["CurrentInfoLabelCharacter"].i();
-			++current;
-			if(current > 7) current = 0;
-			data["CurrentInfoLabelCharacter"] = current;
-		}
-		
-		if(Input.IsActionJustPressed("prev_label_character"))
-		{
-			var data = this.GetPublicData();
-			var current = data["CurrentInfoLabelCharacter"].i();
-			--current;
-			if(current < 0) current = 8;
-			data["CurrentInfoLabelCharacter"] = current;
-		}*/
-		
-		if(Input.IsActionJustPressed("exit_game"))
-			ExitToMainMenu();
+		if(Input.IsActionJustPressed("exit_game")) ExitToMainMenu();
 	}
 	
 	public override void _Notification(int what)

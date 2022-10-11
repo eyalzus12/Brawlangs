@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-public class Character : KinematicBody2D, IStunnable, IKnockable, IHitPausable, IHitLaggable, IAttacker
+public class Character : KinematicBody2D,
+	IStunnable, IKnockable, IHitPausable, IDamagable,
+	IAttacker, IHitLaggable
 {
 	public const int DROP_THRU_BIT = 1;
 	protected const int CF = 30;
@@ -132,6 +134,7 @@ public class Character : KinematicBody2D, IStunnable, IKnockable, IHitPausable, 
 	////////////////////////////////////////////
 	public float ClashStun{get; set;} = 20f;
 	public float ClashForce{get; set;} = 1000f;
+	public float ClashHitLag{get; set;} = 4f;
 	////////////////////////////////////////////
 	public float Damage{get; set;} = 0f;
 	////////////////////////////////////////////
@@ -712,25 +715,14 @@ public class Character : KinematicBody2D, IStunnable, IKnockable, IHitPausable, 
 		GD.Print($"{this} is not clashing. doing hit stuff");
 		#endif
 		
-		var force = (skb + Damage*vkb/100f) * KnockbackTakenMult * (100f/Weight);
-		var stunlen = (sstun + Damage*vstun/100f) * StunTakenMult;
-		var hp = (shp + Damage*vhp/100f);
+		StunFrames = (int)((sstun + Damage*vstun/100f) * StunTakenMult);
+		Knockback = (skb + Damage*vkb/100f) * KnockbackTakenMult * (100f/Weight);
+		HitPauseFrames = (int)(shp + Damage*vhp/100f);
 		
-		if(hp > 0)
-		{
-			StunFrames = (int)stunlen;
-			Knockback = force;
-			HitPauseFrames = (int)hp;
-			States.Change<HitPauseState>();
-		}
-		else if(stunlen > 0)
-		{
-			StunFrames = (int)stunlen;
-			Knockback = force;
-			States.Change<StunState>();
-		}
+		if(HitPauseFrames > 0) States.Change<HitPauseState>();
+		else if(StunFrames > 0) States.Change<StunState>();
 		
-		if(force.x != 0f) Direction = Math.Sign(force.x);
+		if(Knockback.x != 0f) Direction = Math.Sign(Knockback.x);
 		
 		if(FramesSinceLastHit <= 0) ++ComboCount;
 		else ComboCount = 0;
@@ -776,11 +768,10 @@ public class Character : KinematicBody2D, IStunnable, IKnockable, IHitPausable, 
 		GD.Print($"{this} is really not clashing so is entering Hit Lag State");
 		#endif
 		
-		if(hitbox.HitLag > 0)
-		{
-			HitLagFrames = (int)hitbox.HitLag;
-			States.Change<HitLagState>();
-		}
+		var dam = ((hurtbox.OwnerObject is IDamagable damagable)?damagable.Damage:0) + data.Damage;
+		HitLagFrames = (int)(data.SHitLag + dam*data.VHitLag/100f);
+		
+		if(HitLagFrames > 0) States.Change<HitLagState>();
 	}
 	
 	public virtual void HandleClashing(HitData data)
@@ -791,23 +782,16 @@ public class Character : KinematicBody2D, IStunnable, IKnockable, IHitPausable, 
 		
 		GD.Print("CLASH");
 		CurrentAttack?.CurrentPart?.HandleHits();
-		var skb = data.SKB;
-		var vkb = data.VKB;
 		
-		var force = (skb + Damage*vkb/100f);
-		if(force != Vector2.Zero) force = force.Normalized() * ClashForce;
-		var stun = ClashStun;
+		Knockback = (data.SKB + Damage*data.VKB/100f);
+		if(Knockback != Vector2.Zero) Knockback = Knockback.Normalized() * ClashForce;
 		
-		if(stun > 0)
-		{
-			Knockback = force;
-			StunFrames = (int)stun;
-			States.Change<StunState>();
-		}
+		StunFrames = (int)ClashStun;
+		HitPauseFrames = (int)ClashHitLag;
+		if(HitPauseFrames > 0) States.Change<HitPauseState>();
+		else if(StunFrames > 0) States.Change<StunState>();
 		
-		if(force.x != 0f) Direction = Math.Sign(force.x);
-		
-		//PlaySound("Clash");
+		if(Knockback.x != 0f) Direction = Math.Sign(Knockback.x);
 	}
 	
 	public virtual bool AttackInCooldown(Attack a) => a.SharesCooldownWith.Append(a.Name).Any(Cooldowns.InCooldown);

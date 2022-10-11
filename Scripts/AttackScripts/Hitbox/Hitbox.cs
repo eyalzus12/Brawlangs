@@ -1,3 +1,4 @@
+
 using Godot;
 using System;
 using System.Collections.Generic;
@@ -14,7 +15,8 @@ public class Hitbox : Area2D
 	public float VarStun{get; set;}
 	public float SetHitPause{get; set;}
 	public float VarHitPause{get; set;}
-	public float HitLag{get; set;}
+	public float SetHitLag{get; set;}
+	public float VarHitLag{get; set;}
 	public float Damage{get; set;}
 	public int HitPriority{get; set;}
 	public float TeamKnockbackMult{get; set;}
@@ -262,7 +264,7 @@ public class Hitbox : Area2D
 	private static readonly Color LightRed = new Color(1, 0.1f, 0.1f, 0.5f);
 	public virtual Color GetDrawColor()
 	{
-		if((SetStun == 0) && (VarStun == 0) && (SetHitPause == 0) && (VarHitPause == 0) && (HitLag == 0)) return PaleWhite;
+		if((SetStun == 0) && (VarStun == 0) && (SetHitPause == 0) && (VarHitPause == 0) && (SetHitLag == 0) && (VarHitLag == 0)) return PaleWhite;
 		switch(HorizontalAngleFlipper)
 		{
 			case AngleFlipper.AwayHitbox:

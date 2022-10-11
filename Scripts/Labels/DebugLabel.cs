@@ -78,8 +78,8 @@ public class DebugLabel : InfoLabel
 		Add("AttackPartHit", part?.HasHit ?? false);
 		Add("LastAttackPart", ch.CurrentAttack?.LastUsedPart?.Name??"None");
 		Newline();
-		Add("LastHitee", Valid(ch.LastHitee)?ch.LastHitee.ToString():"None");
-		Add("LastHitter", Valid(ch.LastHitter)?ch.LastHitter.ToString():"None");
+		Add("LastHitee", (Valid(ch.LastHitee) && ch.LastHitee is Node nodehitee)?nodehitee.Name:"None");
+		Add("LastHitter", (Valid(ch.LastHitter) && ch.LastHitter is Node nodehitter)?nodehitter.Name:"None");
 		Newline();
 		Add("CurrentAnimation", ch.CharacterSprite.Current?.Name ?? "");
 		Add("AnimationPlaying", ch.CharacterSprite.Playing);

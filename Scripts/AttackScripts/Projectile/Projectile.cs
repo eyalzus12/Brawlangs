@@ -37,10 +37,6 @@ public class Projectile : Node2D, IHitter, IHittable
 	
 	public int TeamNumber{get => OwnerObject.TeamNumber; set => OwnerObject.TeamNumber = value;}
 	public bool FriendlyFire{get => OwnerObject.FriendlyFire; set => OwnerObject.FriendlyFire = value;}
-	
-	public float DamageTakenMult{get=>1f;set{}}
-	public float KnockbackTakenMult{get=>1f;set{}}
-	public float StunTakenMult{get=>1f;set{}}
 
 	public float DamageDoneMult{get => OwnerObject.DamageDoneMult; set => OwnerObject.DamageDoneMult = value;}
 	public float KnockbackDoneMult{get => OwnerObject.KnockbackDoneMult; set => OwnerObject.KnockbackDoneMult = value;}
@@ -181,7 +177,7 @@ public class Projectile : Node2D, IHitter, IHittable
 			var sstun = hitbox.SetStun*smult;
 			var vstun = hitbox.VarStun*smult;
  			
-			var data = new HitData(skb, vkb, damage, sstun, vstun, hitbox.SetHitPause, hitbox.VarHitPause, hitbox, hurtbox);
+			var data = new HitData(skb, vkb, damage, sstun, vstun, hitbox.SetHitPause, hitbox.VarHitPause, hitbox.SetHitLag, hitbox.VarHitLag, hitbox, hurtbox);
 			
 			hitChar.HandleGettingHit(data);
 			OwnerObject.HandleHitting(data);

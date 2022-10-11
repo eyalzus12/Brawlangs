@@ -105,13 +105,7 @@ public class GroundedState : State
 	protected override void AdjustVelocity()
 	{
 		SetupCollisionParamaters();
-		
-		if(ch.FVel.y > 0)
-			ch.vec.y = ch.FVel.y;
-		else ch.vec.y = 0;
-		
-		ch.vec.y += VCF;
-		
+		ch.vec.y = Math.Max(ch.FVel.y, 0) + VCF;
 		snapVector = -VCF * ch.FNorm;
 	}
 }

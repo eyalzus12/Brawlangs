@@ -38,7 +38,7 @@ public class AttackState : State
 		if(ch.InputDirection == ch.Direction)
 			ch.vec.x.Towards(ch.Direction * ch.CurrentAttack.CurrentPart.DriftForwardSpeed, ch.CurrentAttack.CurrentPart.DriftForwardAcceleration);
 		else
-			ch.vec.x.Towards(-ch.Direction * ch.CurrentAttack.CurrentPart.DriftBackwardsSpeed, ch.CurrentAttack.CurrentPart.DriftBackwardsAcceleration);
+			ch.vec.x.Towards(ch.Direction * -ch.CurrentAttack.CurrentPart.DriftBackwardsSpeed, ch.CurrentAttack.CurrentPart.DriftBackwardsAcceleration);
 	}
 	
 	protected virtual void DoFriction()
@@ -60,9 +60,10 @@ public class AttackState : State
 		//grounded and moves down
 		else
 		{
-			ch.vec.y = VCF;
-			ch.vuc.y = 0;
+			SetupCollisionParamaters();
+			ch.vec.y = Math.Max(ch.FVel.y, 0) + VCF;
 			snapVector = -VCF * ch.FNorm;
+			ch.vuc.y = 0;
 		}
 	}
 	
@@ -75,7 +76,7 @@ public class AttackState : State
 		if(ch.Walled && ch.Resources.Has("Clings") && !touchedWall)
 		{
 			ch.RestoreOptionsOnWallTouch();
-			if(ch.CurrentAttack?.CurrentPart?.SlowOnWalls ?? true) ch.vec.y *= (1-ch.WallFriction*ch.WFric);
+			if(ch.CurrentAttack?.CurrentPart?.SlowOnWalls ?? true) ch.vec.y *= (1f-ch.WallFriction*ch.WFric);
 			touchedWall = true;
 		}
 		

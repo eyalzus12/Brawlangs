@@ -7,9 +7,6 @@ public interface IHittable
 	Vector2 Position{get; set;}
 	int Direction{get; set;}
 	
-	float DamageTakenMult{get; set;}
-	float KnockbackTakenMult{get; set;}
-	float StunTakenMult{get; set;}
 	int TeamNumber{get; set;}
 	
 	bool GettingHit{get; set;}

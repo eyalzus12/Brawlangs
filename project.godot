@@ -22,6 +22,7 @@ PublicData="*res://PublicData.cs"
 UpdateScript="*res://UpdateScript.cs"
 PauseHandeler="*res://Scripts/Misc/PauseHandeler.cs"
 Randomizer="*res://Scripts/Misc/Randomizer.cs"
+RawInputMap="*res://Scripts/RawInput/RawInputMap.cs"
 
 [debug]
 
@@ -117,6 +118,11 @@ reload_keybinds={
 dump_orphans={
 "deadzone": 0.5,
 "events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":16777349,"physical_scancode":0,"unicode":0,"echo":false,"script":null)
+ ]
+}
+list_devices={
+"deadzone": 0.5,
+"events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":16777253,"physical_scancode":0,"unicode":0,"echo":false,"script":null)
  ]
 }
 

@@ -60,7 +60,7 @@ public class KeybindsParser
 	private static readonly Regex DATA_REGEX = new Regex(DATA_PARSER, RegexOptions.Compiled | RegexOptions.Multiline);
 	private void ParseData(int section, string s)
 	{
-		if(!Data.ContainsKey(section)) Data.Add(section, new ActionDict());
+		Data.TryAdd(section, new ActionDict());
 		
 		var matches = DATA_REGEX.Matches(s);
 		foreach(Match match in matches)
