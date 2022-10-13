@@ -13,33 +13,25 @@ using Strl = System.Collections.Generic.List<string>;
 //TODO: update to match changes to IniFile
 public class CfgFile
 {
-	public CfgDictionary dict;
+	public CfgDictionary Dict{get; set;} = new CfgDictionary();
 	
-	public CfgFile() => Reset();
-	public void Reset() {dict = new CfgDictionary();}
+	public CfgFile() {}
 	
-	public int Count => dict.Count;
-	public CfgDictionary.KeyCollection Keys => dict.Keys;
-	public CfgDictionary.ValueCollection Values => dict.Values;
+	public int Count => Dict.Count;
+	public CfgDictionary.KeyCollection Keys => Dict.Keys;
+	public CfgDictionary.ValueCollection Values => Dict.Values;
 	
-	public object this[string key, object @default = null]
-	{
-		get
-		{
-			if(dict.ContainsKey(key)) return dict[key];
-			else return @default;
-		}
-	}
+	public object this[string key, object @default = null] => Dict.GetValueOrDefault(key, @default);
 	
 	public override string ToString()
 	{
 		var res = new StringBuilder();
-		foreach(var entry in dict) res.Append($"{entry.Key} = {entry.Value.ToString()}\n");
+		foreach(var entry in Dict) res.Append($"{entry.Key} = {entry.Value.ToString()}\n");
 		return res.ToString();
 	}
 	
-	public bool HasKey(string key) => dict.ContainsKey(key);
-	public bool HasValue(object val) => dict.ContainsValue(val);
+	public bool ContainsKey(string key) => Dict.ContainsKey(key);
+	public bool ContainsValue(object val) => Dict.ContainsValue(val);
 	
 	public Error Load(string path)
 	{
@@ -109,7 +101,7 @@ public class CfgFile
 		}//end of list check
 		else store.Add(right);
 		
-		dict.Add(left, Norm(store));
+		Dict.Add(left, Norm(store));
 	}
 	
 	private object Norm(Strl l)

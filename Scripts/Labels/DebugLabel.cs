@@ -127,17 +127,8 @@ public class DebugLabel : InfoLabel
 		Add("TeamNumber", ch.TeamNumber);
 		Newline();
 		Add("PlayedSounds", "\n"+ch.Audio);
-		if(ch.Inputs is BufferInputManager buff)
-		{
-			Newline();
-			
-			var buffstring = new StringBuilder();
-			foreach(var entry in buff.buffer) if(entry.Value.bufferTimeLeft >= 0)
-				buffstring.Append($"{entry.Key} : {entry.Value.bufferTimeLeft}\n");
-			
-			Add("Buffer", "\n"+buffstring.ToString());
-		}
-		
+		Newline();
+		Add("Buffer", "\n"+ch.Inputs);
 		Newline();
 		Add("Cooldowns", "\n"+ch.Cooldowns);
 		Newline();

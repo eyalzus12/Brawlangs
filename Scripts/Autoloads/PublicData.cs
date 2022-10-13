@@ -27,7 +27,7 @@ public class PublicData : Node
 	public bool Remove(string str) => Dict.Remove(str);
 	public bool HasKey(string str) => Dict.ContainsKey(str);
 	public bool HasValue(object obj) => Dict.ContainsValue(obj);
-	public bool TryGet(string str, out object o) => Dict.TryGetValue(str, out o);
+	public bool TryGetValue(string str, out object o) => Dict.TryGetValue(str, out o);
 	public object GetValueOrDefault(string str, object @default = default) => Dict.GetValueOrDefault(str, @default);
 
 	public void Clear() => Dict.Clear();

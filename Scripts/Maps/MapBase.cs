@@ -66,7 +66,7 @@ public class MapBase : Node2D
 		for(int i = 0; i < 8 ; ++i)
 		{
 			object o = "";
-			if(data.TryGet($"LoadedCharacter{i}", out o))
+			if(data.TryGetValue($"LoadedCharacter{i}", out o))
 			{
 				var s = o.s();
 				var ch = PathToCharacter(s, i);
@@ -87,7 +87,8 @@ public class MapBase : Node2D
 		c.SpriteModulate = colorlist[i];
 		c.Respawn();
 		
-		var im = new BufferInputManager(c.TeamNumber);
+		//var im = new BufferInputManager(c.TeamNumber);
+		var im = new BufferInputManagerWrapper(c.TeamNumber, 0);
 		im.Name = "InputManager";
 		c.AddChild(im);
 		c.Inputs = im;

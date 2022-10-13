@@ -701,6 +701,7 @@ public class Character : KinematicBody2D,
 		#if DEBUG_ATTACKS
 		GD.Print($"{this} checks if clashing");
 		#endif
+		
 		if(Clashing)
 		{
 			#if DEBUG_ATTACKS
@@ -784,7 +785,7 @@ public class Character : KinematicBody2D,
 		CurrentAttack?.CurrentPart?.HandleHits();
 		
 		Knockback = (data.SKB + Damage*data.VKB/100f);
-		if(Knockback != Vector2.Zero) Knockback = Knockback.Normalized() * ClashForce;
+		Knockback = Knockback.NormalizedSafe() * ClashForce;
 		
 		StunFrames = (int)ClashStun;
 		HitPauseFrames = (int)ClashHitLag;
@@ -800,7 +801,7 @@ public class Character : KinematicBody2D,
 	{
 		if(a is null || !a.CanActivate() || AttackInCooldown(a)) return false;
 		
-		if(CurrentAttack != null) ResetCurrentAttack(null);
+		ResetCurrentAttack(CurrentAttack);
 		
 		CurrentAttack = a;
 		CurrentAttack.Connect("AttackEnds", this, nameof(ResetCurrentAttack));
@@ -837,31 +838,26 @@ public class Character : KinematicBody2D,
 		if(generatedProjectile is null)
 		{
 			GD.PushError($"Failed to emit projectile {proj} because the object pool returned a null");
+			return;
 		}
-		else
-		{
-			if(!ActiveProjectiles.ContainsKey(proj))//projectile havent been used yet. create storage
-				ActiveProjectiles.Add(proj, new HashSet<Projectile>());
-			//set direction
-			generatedProjectile.Direction = Direction;
-			//connect destruction signal
-			generatedProjectile.Connect("ProjectileDied", this, nameof(HandleProjectileDestruction));
-			//store as active
-			ActiveProjectiles[proj].Add(generatedProjectile);
-			//request that _Ready will be called
-			generatedProjectile.RequestReady();
-			//add to scene
-			GetParent().AddChild(generatedProjectile);
-		}
+		
+		ActiveProjectiles.TryAdd(proj, new HashSet<Projectile>());
+		//set direction
+		generatedProjectile.Direction = Direction;
+		//connect destruction signal
+		generatedProjectile.Connect("ProjectileDied", this, nameof(HandleProjectileDestruction));
+		//store as active
+		ActiveProjectiles[proj].Add(generatedProjectile);
+		//request that _Ready will be called
+		generatedProjectile.RequestReady();
+		//add to scene
+		GetParent().AddChild(generatedProjectile);
 	}
 	
 	public virtual void HandleProjectileDestruction(Projectile who)
 	{
 		var identifier = who.Identifier;
-		
-		if(!ActiveProjectiles.ContainsKey(identifier)) GD.PushError($"Projectile {identifier} died but was never reported as active");
-		else ActiveProjectiles[identifier].Remove(who);
-		
+		ActiveProjectiles[identifier].Remove(who);
 		ProjPool.InsertProjectile(who);
 		who.Disconnect("ProjectileDied", this, nameof(HandleProjectileDestruction));
 	}

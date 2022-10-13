@@ -1,47 +1,35 @@
-//#define DEBUG_INPUT_EVENTS
-
 using Godot;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Linq;
 
 public class BufferInputManager : InputManager
 {
 	protected const string CONFIG_PATH = "res://buffer.cfg";
 		
-	public Dictionary<string, BufferInfo> buffer = new Dictionary<string, BufferInfo>();
+	public Dictionary<string, BufferInfo> Buffer{get; set;} = new Dictionary<string, BufferInfo>();
 		
-	CfgFile config = new CfgFile();
+	CfgFile Config{get; set;} = new CfgFile();
 	
-	public int playerDeviceNumber = 0;
-		
+	private const string PROFILE_REMOVAL_PATTERN = @"^P[0-9]+_(?<action>.*?)$";
+	private static readonly Regex PROFILE_REMOVAL_REGEX = new Regex(PROFILE_REMOVAL_PATTERN, RegexOptions.Compiled);
 	public BufferInputManager(): base() 
 	{
-		ParseConfig();
-	}
-	
-	public BufferInputManager(int device): base() 
-	{
-		playerDeviceNumber = device;
-		ParseConfig();
-	}
-	
-	public void ParseConfig()
-	{
 		//reads from buffer.ini
-		if(config.Load(CONFIG_PATH) != Error.Ok)
+		if(Config.Load(CONFIG_PATH) != Error.Ok)
 		{
 			GD.PushError($"failed to parse buffer config at path {CONFIG_PATH}");
 			return;
 		}
 		
-		//GD.Print(config.ToString());
-		
-		foreach(var key in config.Keys)
+		foreach(string action in InputMap.GetActions())
 		{
-			int res = config[key, 1].i();
-			buffer.Add($"{playerDeviceNumber}_{key}", new BufferInfo(res));
+			var match = PROFILE_REMOVAL_REGEX.Match(action);
+			if(!match.Success) continue;
+			var baseAction = match.Groups["action"].Value;
+			Buffer.Add(action, new BufferInfo(Config[baseAction, 1].i()));
 		}
 	}
 		
@@ -53,71 +41,65 @@ public class BufferInputManager : InputManager
 		GD.Print(@event.AsText());
 		#endif
 		
-		buffer.Keys
-			.Where(action => @event.IsAction(action))
-			.ForEach(action => buffer[action].Activate(-1));
+		Buffer.Keys
+			.Where(action => @event.IsActionIgnoreDevice(action))//select matching actions
+			.ForEach(action =>
+			{
+				var newName = $"D{@event.Device}_{action}";
+				Buffer.TryAdd(newName, new BufferInfo(Buffer[action].DefaultBufferTime));
+				Buffer[newName].Activate(-1);
+			}
+		);
 	}
 	
 	public override void MarkForDeletion(string action, bool now=false)
 	{
-		action = $"{playerDeviceNumber}_{action}";
-		
-		if(buffer.ContainsKey(action))
+		if(Buffer.ContainsKey(action))
 		{
-			if(now) buffer[action].Delete();
-			else buffer[action].markedForDeletion = true;
+			if(now) Buffer[action].Delete();
+			else Buffer[action].MarkedForDeletion = true;
 		}
 	}
 	
 	public override bool IsActionJustPressed(string str)
 	{
-		str = $"{playerDeviceNumber}_{str}";
-		
-		if(buffer.ContainsKey(str)) return buffer[str].IsActive();
+		if(Buffer.ContainsKey(str)) return Buffer[str].IsActive();
 		else return base.IsActionJustPressed(str);
 	}
 	
 	public override bool IsActionPressed(string str)
 	{
-		str = $"{playerDeviceNumber}_{str}";
-		
-		if(buffer.ContainsKey(str)) return buffer[str].IsActive() || base.IsActionPressed(str);
+		if(Buffer.ContainsKey(str)) return Buffer[str].IsActive() || base.IsActionPressed(str);
 		else return base.IsActionPressed(str);
 	}
 	
 	public override bool IsActionJustReleased(string str)
 	{
-		str = $"{playerDeviceNumber}_{str}";
-		
-		if(buffer.ContainsKey(str)) return
-			(base.IsActionJustReleased(str) && buffer[str].bufferTimeLeft < 0) ||
-			(!base.IsActionPressed(str) && buffer[str].bufferTimeLeft == 0);
+		if(Buffer.ContainsKey(str)) return
+			(base.IsActionJustReleased(str) && Buffer[str].BufferTimeLeft < 0) ||
+			(!base.IsActionPressed(str) && Buffer[str].BufferTimeLeft == 0);
 		else return base.IsActionJustReleased(str);
 	}
 	
-	public override bool IsActionReallyJustPressed(string str) => base.IsActionJustPressed($"{playerDeviceNumber}_{str}");
-	public override bool IsActionReallyPressed(string str) => base.IsActionPressed($"{playerDeviceNumber}_{str}");
-	public override bool IsActionReallyJustReleased(string str) => base.IsActionJustReleased($"{playerDeviceNumber}_{str}");
-	
 	public override void _PhysicsProcess(float delta)
 	{
-		//if(GetTree().Paused) return;
-		foreach(var buff in buffer.Values)
+		foreach(var buff in Buffer.Values)
 		{
-			if(buff.markedForDeletion) buff.Delete();
+			if(buff.MarkedForDeletion) buff.Delete();
 			else buff.Advance();
 		}
 	}
 	
-	public override string ToString()
+	public override string ToString() => ToString("");
+	public override string ToString(string prefix)
 	{
 		var res = new StringBuilder();
-		foreach(var entry in buffer) res.Append($"{{{entry.Key}, {entry.Value.ToString()}}}\n");
+		foreach(var entry in Buffer) if(entry.Key.StartsWith(prefix) && entry.Value.BufferTimeLeft >= 0) res.Append($"{{{entry.Key}, {entry.Value.ToString()}}}\n");
 		return res.ToString();
 	}
 	
-	public override void MarkAllForDeletion()
+	public override void MarkAllForDeletion(string prefix = "")
 	{
-		foreach(var buff in buffer.Values) buff.Delete();
+		foreach(var action in Buffer.Keys) if(action.StartsWith(prefix)) Buffer[action].Delete();
 	}
 }

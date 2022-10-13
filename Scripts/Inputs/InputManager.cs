@@ -20,5 +20,7 @@ public class InputManager : Node
 	public virtual bool IsActionReallyJustReleased(string str) => Input.IsActionJustReleased(str);
 	
 	public virtual void MarkForDeletion(string action, bool now=false) {}
-	public virtual void MarkAllForDeletion() {}
+	public virtual void MarkAllForDeletion(string prefix = "") {}
+	
+	public virtual string ToString(string prefix) => ToString();
 }

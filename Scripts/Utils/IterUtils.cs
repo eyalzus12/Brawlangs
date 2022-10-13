@@ -33,6 +33,11 @@ public static class IterUtils
 	
 	public static void Rotate<T>(this Queue<T> q) => q.Enqueue(q.Dequeue());
 	
+	public static void ForEach<T>(this T[] arr, Action<T> a)
+	{
+		for(int i = 0; i < arr.Length; ++i) a(arr[i]);
+	}
+	
 	public static void ForEach<T>(this IEnumerable<T> e, Action<T> a) {foreach(var h in e) a(h);}
 	
 	public static IEnumerable<(T1,T2)> Zip<T1,T2>(this IEnumerable<T1> e1, IEnumerable<T2> e2)

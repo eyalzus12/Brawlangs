@@ -8,7 +8,7 @@ public class RawInputReceiverWindow : NativeWindow
 {
 	public event EventHandler<RawInputKeyEvent> KeycodePress;
 	
-	public RawInputReceiverWindow()
+	public RawInputReceiverWindow(Form parent)
 	{
 		CreateHandle(new CreateParams{
 			X = 0,
@@ -16,6 +16,7 @@ public class RawInputReceiverWindow : NativeWindow
 			Width = 0,
 			Height = 0,
 			Style = 0x800000,
+			Parent = parent.Handle,
 		});
 	}
 	

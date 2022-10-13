@@ -19,7 +19,7 @@ public class SelectScreenLineEdit : LineEdit
 		
 		data = this.GetPublicData();
 		object o = null;
-		if(data.TryGet($"{PREFIX}{number}", out o)) Text = o.s();
+		if(data.TryGetValue($"{PREFIX}{number}", out o)) Text = o.s();
 		
 		//bruh wtf is this
 		GetParent().GetParent().GetParent().GetNode<Button>("ExitButton").Connect("pressed", this, nameof(OnExit));

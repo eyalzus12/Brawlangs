@@ -7,7 +7,7 @@ using System.Linq;
 using Action = System.ValueTuple<int, char, int, float>;
 using ActionDict = System.Collections.Generic.Dictionary<string, (float, System.Collections.Generic.List<System.ValueTuple<int, char, int, float>>)>;
 
-public class KeybindsParser
+public class KeybindsParser_Old
 {
 	public Dictionary<int, ActionDict> Data{get; set;} = new Dictionary<int, ActionDict>();
 	
@@ -45,15 +45,14 @@ public class KeybindsParser
 	private static readonly Regex NO_PRE_REGEX = new Regex(NO_DATA_PRE, RegexOptions.Compiled);
 	private string EnsureNoPreData(string s)
 	{
-		if(!NO_PRE_REGEX.IsMatch(s)) throw new FormatException("Keybinds config: non comment lines before first section");
+		if(!NO_PRE_REGEX.IsMatch(s)) throw new FormatException("[KeybindsParser.cs]: Non comment lines before first section.");
 		return s;
 	}
 	
 	private const string SECTION_SPLITTER = @"(?<section>[0-9]+):(?:\s*;\w*)?[\r\n]+(?<data>(?:.(?![0-9]+:))*)";
 	private static readonly Regex SECTION_REGEX = new Regex(SECTION_SPLITTER, RegexOptions.Compiled | RegexOptions.Singleline);
 	private IEnumerable<(int, string)> SplitToSections(string s) => SECTION_REGEX
-		.Matches(s)
-		.Cast<Match>()
+		.Matches(s).Cast<Match>()
 		.Select(m => (int.Parse(m.Groups["section"].Value), m.Groups["data"].Value));
 	
 	private const string DATA_PARSER = @"^(?<action>\w+)\s*=\s*(?:@(?<deadzone>[+-]?[0-9]*\.?[0-9]*))?(?:\s+(?<device>[0-9]+)_(?<type>[a-zA-Z]*)(?<data>[0-9]+)_?(?<extra>[+-]?[0-9]*\.?[0-9]*)?)*\s*(?:;.*)?$";
@@ -71,7 +70,7 @@ public class KeybindsParser
 			var string_deadzone = groups["deadzone"].Value;
 			var deadzone = (string_deadzone == "")?0.5f:float.Parse(string_deadzone);
 			
-			if(!Data[section].ContainsKey(action)) Data[section].Add(action, (deadzone, new List<Action>()));
+			Data[section].TryAdd(action, (deadzone, new List<Action>()));
 			
 			var devices = groups["device"].Captures.Cast<Capture>().Select(c=>int.Parse(c.Value));
 			var types = groups["type"].Captures.Cast<Capture>().Select(c=>c.Value[0]);
@@ -108,7 +107,7 @@ public class KeybindsParser
 			case 'J': return new InputEventJoypadMotion();
 			case 'K': return new InputEventKey();
 			case 'M': return new InputEventMouseButton();
-			default: throw new FormatException($"Keybinds config: invalid input type {type}");
+			default: throw new FormatException($"[KeybindsParser.cs]: Invalid input type {type}.");
 		}
 	}
 	

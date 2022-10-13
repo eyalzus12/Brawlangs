@@ -14,7 +14,7 @@ public class RawInputReceiverForm : Form
 		ShowInTaskbar = false;
 		Opacity = 0;
 		Size = new System.Drawing.Size(0, 0);
-		Window = new RawInputReceiverWindow();
+		Window = new RawInputReceiverWindow(this);
 		Window.KeycodePress += (sender, t) => KeycodePress?.Invoke(this, t);
 	}
 	

@@ -1,6 +1,6 @@
 [gd_scene load_steps=7 format=2]
 
-[ext_resource path="res://MapBase.cs" type="Script" id=1]
+[ext_resource path="res://Scripts/Maps/MapBase.cs" type="Script" id=1]
 [ext_resource path="res://MapArt/TestMap/ThreeSides.png" type="Texture" id=2]
 [ext_resource path="res://icon.png" type="Texture" id=3]
 [ext_resource path="res://Untitled_04-10-2021_10-51-27sus.png" type="Texture" id=4]

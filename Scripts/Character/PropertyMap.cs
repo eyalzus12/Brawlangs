@@ -45,7 +45,7 @@ public class PropertyMap
 			return false;
 		}
 		
-		dict = cfg.dict;
+		dict = cfg.Dict;
 		return true;
 	}
 	

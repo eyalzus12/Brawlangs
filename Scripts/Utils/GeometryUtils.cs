@@ -137,7 +137,9 @@ public static class GeometryUtils
 		var en = ev.GetEnumerator();
 		if(!en.MoveNext()) return default;
 		var rect = new Rect2(en.Current, Vector2.Zero);
-		while(en.MoveNext()) rect = rect.Expand(en.Current).Abs();;
+		while(en.MoveNext()) rect = rect.Expand(en.Current).Abs();
 		return rect.Abs();
 	}
+	
+	public static Vector2 NormalizedSafe(this Vector2 v) => (v == Vector2.Zero)?v:v.Normalized();
 }

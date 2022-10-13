@@ -22,4 +22,41 @@ public static class Utils
 	
 	public static Action<T> Chain<T>(this Action<T> a1, params Action<T>[] ae) => (T t) => {a1(t); ae.Chain<T>()(t);};
 	public static Action<T> Chain<T>(this Action<T> a1, IEnumerable<Action<T>> ae) => (T t) => {a1(t); ae.Chain<T>()(t);};
+	
+	public static bool IsActionIgnoreDevice(this InputEvent e, string action)
+	{
+		var temp = e.Device;
+		e.Device = -1;
+		var result = e.IsAction(action);
+		e.Device = temp;
+		return result;
+	}
+	
+	public static Error ReadFile(string path, out string content)
+	{
+		var f = new File();//create new file
+		var er = f.Open(path, File.ModeFlags.Read);//open file
+		
+		if(er != Error.Ok)//if error, return
+		{
+			content = "";
+			return er;
+		}
+		
+		content = f.GetAsText();//read text
+		f.Close();//flush buffer
+		return Error.Ok;
+	}
+	
+	public static Error SaveFile(string path, string content)
+	{
+		var f = new File();
+		var er = f.Open(path, File.ModeFlags.Write);
+		
+		if(er != Error.Ok) return er;
+		
+		f.StoreString(content);
+		f.Close();
+		return Error.Ok;
+	}
 }

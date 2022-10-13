@@ -1,33 +1,42 @@
+#define MULTI_KEYBOARD
+
+//#define DEBUG_INPUT_EVENTS
+//#define DEBUG_INPUT_MAP
+
+//#define DEBUG_ATTACKS
+
 using Godot;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 public class UpdateScript : Node
 {
-	private const string FIRST_KEYBINDS_PATH = "user://keybinds.kbd";
-	private const string SECOND_KEYBINDS_PATH = "res://keybinds.kbd";
+	//private const string FIRST_KEYBINDS_PATH = "user://keybinds.kbd";
+	//private const string SECOND_KEYBINDS_PATH = "res://keybinds.kbd";
 	
-	public KeybindsParser Keybinds{get; set;} = new KeybindsParser();
+	//public KeybindsParser Keybinds{get; set;} = new KeybindsParser();
 	
 	public UpdateScript() {}
 	
 	public override void _Ready()
 	{
-		GlobalizeDevices();
-		LoadKeybinds();
+		//#if MULTI_KEYBOARD//no need to globalize them if there aren't gonna be multiple devices
+		//GlobalizeDevices();
+		//#endif
+		
+		//LoadKeybinds();
 	}
 	
 	public override void _Process(float delta)
 	{
 		if(Input.IsActionJustPressed("toggle_fullscreen"))
 			OS.WindowFullscreen = !OS.WindowFullscreen;
-		if(Input.IsActionJustPressed("reload_keybinds"))
-			LoadKeybinds();
 		if(Input.IsActionJustPressed("dump_orphans"))
-			PrintStrayNodes();
+			new Task(PrintStrayNodes).Start();//to not block game
 	}
 	
-	public void GlobalizeDevices()
+	/*public void GlobalizeDevices()
 	{
 		foreach(string action in InputMap.GetActions())
 		{
@@ -40,15 +49,5 @@ public class UpdateScript : Node
 				InputMap.ActionAddEvent(action, newInput);
 			}
 		}
-	}
-	
-	public void LoadKeybinds()
-	{
-		Keybinds.Load(new File().FileExists(FIRST_KEYBINDS_PATH)?FIRST_KEYBINDS_PATH:SECOND_KEYBINDS_PATH);
-		Keybinds.ApplyParsedData();
-		
-		#if DEBUG_INPUT_MAP
-		foreach(var h in InputMap.GetActions()) GD.Print(h);
-		#endif
-	}
+	}*/
 }

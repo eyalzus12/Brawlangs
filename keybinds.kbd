@@ -1,49 +1,49 @@
 0:
-Left = 2_K65
-Right = 2_K68
-Down = 2_K83
-Up = 2_K87
-Jump = 2_K32
-Light = 2_K74
+Left = 2_K65 ;1_K65
+Right = 2_K68 ;1_K68
+Down = 2_K83 ;1_K83
+Up = 2_K87 ;1_K87
+Jump = 2_K32 ;1_K32
+Light = 2_K74 ;1_K74
 ULight = 
 DLight = 
 LLight = 
 RLight = 
 NLight = 
-Special = 2_K75
-USpecial = 
-DSpecial = 
-LSpecial = 
-RSpecial = 
-NSpecial = 0_K61
-Taunt = 
-Dodge = 2_K76
-NDodge = 
-Run = 2_K16777237
-Strafe = 
-
-1:
-Left = 4_K65 ;2_K16777231
-Right = 4_K68 ;2_K16777233
-Down = 4_K83 ;2_K16777234
-Up = 4_K87 ;2_K16777232
-Jump = 4_K32 ;2_K90
-Light = 4_K74 ;2_K88
-ULight = 
-DLight = 
-LLight = 
-RLight = 
-NLight = 
-Special = 4_K75 ;2_K67
+Special = 2_K75 ;1_K75
 USpecial = 
 DSpecial = 
 LSpecial = 
 RSpecial = 
 NSpecial = 
 Taunt = 
-Dodge = 4_K76 ;2_K86
+Dodge = 2_K76 ;1+K76
 NDodge = 
-Run = 4_K16777237 ;2_K66
+Run = 2_K16777237 ;1_K16777237
+Strafe = 
+
+1:
+Left = 4_K65 ;1_K16777231
+Right = 4_K68 ;1_K16777233
+Down = 4_K83 ;1_K16777234
+Up = 4_K87 ;1_K16777232
+Jump = 4_K32 ;1_K90
+Light = 4_K74 ;1_K88
+ULight = 
+DLight = 
+LLight = 
+RLight = 
+NLight = 
+Special = 4_K75 ;1_K67
+USpecial = 
+DSpecial = 
+LSpecial = 
+RSpecial = 
+NSpecial = 
+Taunt = 
+Dodge = 4_K76 ;1_K86
+NDodge = 
+Run = 4_K16777237 ;1_K66
 Strafe = 
 
 2:

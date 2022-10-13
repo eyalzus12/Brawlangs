@@ -10,6 +10,11 @@ public class FallbackRespawnManager : Node2D, IRespawnManager
 	public IEnumerable<Vector2> RespawnPositions => RespawnPoints.Select(r => r.Position);
 	public Randomizer RNG{get; set;}
 	
+	public FallbackRespawnManager()
+	{
+		RNG = this.GetRootNode<Randomizer>("Randomizer");
+	}
+	
 	public FallbackRespawnManager(IEnumerable<Node2D> nodes, IEnumerable<RespawnPoint> points)
 	{
 		HandledNodes = new List<Node2D>(nodes);

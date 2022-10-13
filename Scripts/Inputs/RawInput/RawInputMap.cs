@@ -9,11 +9,16 @@ using RawInputDeviceHandle = Linearstar.Windows.RawInput.Native.RawInputDeviceHa
 
 public class RawInputMap : Node
 {
+	public RawInputMap() {}
+	
+	#if MULTI_KEYBOARD
 	public Dictionary<RawInputDeviceHandle, int> KeyboardDevices{get; set;} = new Dictionary<RawInputDeviceHandle, int>();
 	public Dictionary<int, uint> KeycodeDict{get; set;} = new Dictionary<int, uint>();
 	public HashSet<(int,uint)> HeldEvents{get; set;} = new HashSet<(int,uint)>();
 	
 	public RawInputReceiverForm InputForm{get; set;}
+	
+	public bool DebugInput{get; set;} = false;
 	
 	public override void _Ready()
 	{
@@ -32,12 +37,15 @@ public class RawInputMap : Node
 		InputForm.KeycodePress += (sender, t) => KeycodePress(t);
 		
 		RawInputDevice.RegisterDevice(HidUsageAndPage.Keyboard, RawInputDeviceFlags.ExInputSink | RawInputDeviceFlags.NoLegacy, InputForm.Window.Handle);
-		
+	
 		new Task(RunForm).Start();
 	}
 	
+	
 	public override void _Process(float delta)
 	{
+		if(Input.IsActionJustPressed("toggle_input_debug")) DebugInput = !DebugInput;
+		
 		if(Input.IsActionJustPressed("list_devices"))
 		{
 			int i = 0;
@@ -65,10 +73,16 @@ public class RawInputMap : Node
 	
 	public void KeycodePress(RawInputKeyEvent rawInput)
 	{
-		if(!KeycodeDict.ContainsKey(rawInput.Key) || !KeyboardDevices.ContainsKey(rawInput.Handle)) return;
+		var device = KeyboardDevices.GetValueOrDefault(rawInput.Handle, 0);
+		
+		if(!KeycodeDict.ContainsKey(rawInput.Key))
+		{
+			if(DebugInput) GD.PrintT("Unknwon raw input", $"Keycode: {rawInput.Key}", $"Pressed: {rawInput.Pressed}", $"Device: {device}");
+			return;
+		}
 		
 		var scancode = KeycodeDict[rawInput.Key];
-		var device = KeyboardDevices[rawInput.Handle];
+		
 		var data = (device, scancode);
 		if(rawInput.Pressed && HeldEvents.Contains(data)) return;//holding
 		
@@ -82,12 +96,12 @@ public class RawInputMap : Node
 		
 		if(input.Pressed) HeldEvents.Add(data);
 		
-		//GD.Print($"{input.AsText()} {input.Device} Pressed: {input.Pressed} Echo: {input.Echo}");
+		if(DebugInput) GD.PrintT($"Raw Input: {input.AsText()}", $"Keycode: {rawInput.Key}", $"Mapped to: {input.Scancode}", $"Pressed: {rawInput.Pressed}", $"Device: {input.Device}");
 		
 		Input.ParseInputEvent(input);
 	}
 	
-	private const string KEY_MAP_PATH = "res://Scripts/RawInput/KeyToScancode.keys";
+	private const string KEY_MAP_PATH = "res://Scripts/Inputs/RawInput/KeyToScancode.keys";
 	private void ReadKeyMap()
 	{
 		File f = new File();//create new file
@@ -106,4 +120,5 @@ public class RawInputMap : Node
 			.Select(s => s.Split(" "))
 			.ForEach(t => KeycodeDict.Add(int.Parse(t[0].Trim()), uint.Parse(t[1].Trim())));
 	}
+	#endif
 }

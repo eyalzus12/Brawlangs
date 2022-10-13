@@ -1,7 +1,7 @@
 [gd_scene load_steps=7 format=2]
 
-[ext_resource path="res://Scripts/Platforms/StaticPlatform2D.cs" type="Script" id=1]
-[ext_resource path="res://MapBase.cs" type="Script" id=2]
+[ext_resource path="res://Scripts/Maps/Platforms/StaticPlatform2D.cs" type="Script" id=1]
+[ext_resource path="res://Scripts/Maps/MapBase.cs" type="Script" id=2]
 [ext_resource path="res://MapArt/TestMap/AllSides.png" type="Texture" id=3]
 [ext_resource path="res://MapArt/TestMap/icon.png" type="Texture" id=4]
 

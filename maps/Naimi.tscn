@@ -2,7 +2,7 @@
 
 [ext_resource path="res://grass.jpg" type="Texture" id=1]
 [ext_resource path="res://MapArt/TestMap/NoSides.png" type="Texture" id=2]
-[ext_resource path="res://MapBase.cs" type="Script" id=3]
+[ext_resource path="res://Scripts/Maps/MapBase.cs" type="Script" id=3]
 [ext_resource path="res://MapArt/TestMap/AllSides.png" type="Texture" id=4]
 [ext_resource path="res://MapArt/TestMap/Connection.png" type="Texture" id=5]
 [ext_resource path="res://icon.png" type="Texture" id=6]
@@ -12,7 +12,7 @@
 [ext_resource path="res://MapArt/TestMap/AllSidesSlope.png" type="Texture" id=10]
 [ext_resource path="res://toki pona mage.png" type="Texture" id=11]
 [ext_resource path="res://Characters/Josh/JoshAnimations/DirectionalAirDodge_1_0.png" type="Texture" id=12]
-[ext_resource path="res://Scripts/Platforms/StaticPlatform2D.cs" type="Script" id=13]
+[ext_resource path="res://Scripts/Maps/Platforms/StaticPlatform2D.cs" type="Script" id=13]
 
 [sub_resource type="ConvexPolygonShape2D" id=1]
 points = PoolVector2Array( 64, 64, 0, 64, 0, 0, 64, 0 )

@@ -7,33 +7,33 @@ public class BufferInfo
 	//bufferTimeLeft = 0: the input has just stopped being buffered
 	//bufferTimeLeft < 0: the input isnt currently buffered
 
-	public int bufferTimeLeft = 0;
-	public int defaultBufferTime = 1;
-	public bool markedForDeletion = false;
+	public int BufferTimeLeft{get; set;} = 0;
+	public int DefaultBufferTime{get; set;} = 1;
+	public bool MarkedForDeletion{get; set;} = false;
 
 	public BufferInfo() {}
 
-	public BufferInfo(int buffer) {defaultBufferTime = buffer;}
+	public BufferInfo(int buffer) {DefaultBufferTime = buffer;}
 
 	public void Activate(int time = -1)
 	{
-		bufferTimeLeft = (time == -1)?defaultBufferTime:time;
-		bufferTimeLeft++;
+		BufferTimeLeft = (time == -1)?DefaultBufferTime:time;
+		BufferTimeLeft++;
 	}
 
 	public void Advance()
 	{
-		if(bufferTimeLeft > -1) --bufferTimeLeft;
+		if(BufferTimeLeft > -1) --BufferTimeLeft;
 	}
 
-	public void Disable() => bufferTimeLeft = -1;
+	public void Disable() => BufferTimeLeft = -1;
 
 	public void Delete()
 	{
 		Disable();
-		markedForDeletion = false;
+		MarkedForDeletion = false;
 	}
 
-	public bool IsActive() => bufferTimeLeft > 0;
-	public override string ToString() => $"{bufferTimeLeft}, {defaultBufferTime}, {markedForDeletion}";
+	public bool IsActive() => BufferTimeLeft > 0;
+	public override string ToString() => $"{BufferTimeLeft}, {DefaultBufferTime}, {MarkedForDeletion}";
 }

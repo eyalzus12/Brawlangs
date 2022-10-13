@@ -1,6 +1,6 @@
 [gd_scene load_steps=48 format=2]
 
-[ext_resource path="res://MapBase.cs" type="Script" id=1]
+[ext_resource path="res://Scripts/Maps/MapBase.cs" type="Script" id=1]
 [ext_resource path="res://MovingPlatformAnimations/TestMovingPlatform5Anm.tres" type="Animation" id=3]
 [ext_resource path="res://MovingPlatformAnimations/TestMovingSemiSolidPlatform2Anm.tres" type="Animation" id=4]
 [ext_resource path="res://MovingPlatformAnimations/TestMovingPlatform3Anm.tres" type="Animation" id=5]
@@ -17,8 +17,8 @@
 [ext_resource path="res://MovingPlatformAnimations/TestMovingPlatform2Anm.tres" type="Animation" id=17]
 [ext_resource path="res://MapArt/TestMap/AllSides.png" type="Texture" id=18]
 [ext_resource path="res://icon.png" type="Texture" id=19]
-[ext_resource path="res://Scripts/Platforms/StaticPlatform2D.cs" type="Script" id=20]
-[ext_resource path="res://Scripts/Platforms/KinematicPlatform2D.cs" type="Script" id=21]
+[ext_resource path="res://Scripts/Maps/Platforms/StaticPlatform2D.cs" type="Script" id=20]
+[ext_resource path="res://Scripts/Maps/Platforms/KinematicPlatform2D.cs" type="Script" id=21]
 
 [sub_resource type="ConvexPolygonShape2D" id=1]
 points = PoolVector2Array( 64, 64, 0, 64, 0, 0, 64, 0 )
