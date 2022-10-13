@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using Linearstar.Windows.RawInput;
 using System.Threading.Tasks;
@@ -20,6 +21,9 @@ public class RawInputMap : Node
 	
 	public bool DebugInput{get; set;} = false;
 	
+	public const string ACTION_WITH_PROFILE_PATTERN = @"^P(?:[0-9]+)_.*?$";
+	public static readonly Regex ACTION_WITH_PROFILE_REGEX = new Regex(ACTION_WITH_PROFILE_PATTERN, RegexOptions.Compiled);
+	
 	public override void _Ready()
 	{
 		ReadKeyMap();
@@ -30,14 +34,30 @@ public class RawInputMap : Node
 		foreach(var device in keyboards)
 		{
 			KeyboardDevices.Add(device.Handle, i);
+			foreach(string action in InputMap.GetActions())
+			{
+				if(ACTION_WITH_PROFILE_REGEX.IsMatch(action))
+					InputMap.AddAction($"D{i}_{action}");
+				else foreach(var e in InputMap.GetActionList(action).FilterType<InputEventKey>().ToList())
+				{
+					var newe = e.Copy();
+					newe.Device = i;
+					InputMap.ActionAddEvent(action, newe);
+				}
+			}
+			
 			++i;
 		}
+		
+		#if DEBUG_INPUT_MAP
+		foreach(var h in InputMap.GetActions()) GD.Print(h);
+		#endif
 		
 		InputForm = new RawInputReceiverForm();
 		InputForm.KeycodePress += (sender, t) => KeycodePress(t);
 		
 		RawInputDevice.RegisterDevice(HidUsageAndPage.Keyboard, RawInputDeviceFlags.ExInputSink | RawInputDeviceFlags.NoLegacy, InputForm.Window.Handle);
-	
+		
 		new Task(RunForm).Start();
 	}
 	

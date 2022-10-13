@@ -23,7 +23,7 @@ public class InvincibilityManager
 	public void Update()
 	{
 		if(Timers.Count == 0) return;
-		var keys = Timers.Keys.ToArray();
+		var keys = Timers.Keys.ToList();
 		foreach(var k in keys)
 		{
 			this[k]--;

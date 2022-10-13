@@ -18,13 +18,13 @@ config/windows_native_icon="res://brawlangs.ico"
 
 [autoload]
 
-PublicData="*res://Scripts/Autoloads/PublicData.cs"
 UpdateScript="*res://Scripts/Autoloads/UpdateScript.cs"
+PublicData="*res://Scripts/Autoloads/PublicData.cs"
 PauseHandeler="*res://Scripts/Autoloads/PauseHandeler.cs"
 Randomizer="*res://Scripts/Autoloads/Randomizer.cs"
-RawInputMap="*res://Scripts/Inputs/RawInput/RawInputMap.cs"
-BufferInputManager="*res://Scripts/Inputs/BufferInputManager.cs"
 KeybindsSetupHandler="*res://Scripts/Autoloads/KeybindsSetupHandler.cs"
+BufferInputManager="*res://Scripts/Inputs/BufferInputManager.cs"
+RawInputMap="*res://Scripts/Inputs/RawInput/RawInputMap.cs"
 
 [debug]
 

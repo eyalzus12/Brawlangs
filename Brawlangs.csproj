@@ -2,6 +2,7 @@
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
         <UseWindowsForms>true</UseWindowsForms>
+    <DefineConstants>MULTI_KEYBOARD</DefineConstants>
     <RootNamespace>Brawlangs</RootNamespace>
     <AssemblyName>Brawlangs</AssemblyName>
   </PropertyGroup>

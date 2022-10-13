@@ -15,7 +15,10 @@ public class BufferInputManager : InputManager
 	
 	private const string PROFILE_REMOVAL_PATTERN = @"^P[0-9]+_(?<action>.*?)$";
 	private static readonly Regex PROFILE_REMOVAL_REGEX = new Regex(PROFILE_REMOVAL_PATTERN, RegexOptions.Compiled);
-	public BufferInputManager(): base() 
+	public BufferInputManager(): base() {}
+	
+	//NOTE: must run after KeybindsSetupHandler
+	public override void _Ready()
 	{
 		//reads from buffer.ini
 		if(Config.Load(CONFIG_PATH) != Error.Ok)
@@ -32,24 +35,31 @@ public class BufferInputManager : InputManager
 			Buffer.Add(action, new BufferInfo(Config[baseAction, 1].i()));
 		}
 	}
-		
+	
 	public override void _UnhandledInput(InputEvent @event)
 	{
-		if(@event is InputEventMouseMotion || @event.IsEcho() || !@event.IsPressed()) return;
+		if(@event is InputEventMouseMotion || @event.IsEcho()) return;
 		
 		#if DEBUG_INPUT_EVENTS
 		GD.Print(@event.AsText());
 		#endif
 		
-		Buffer.Keys
-			.Where(action => @event.IsActionIgnoreDevice(action))//select matching actions
-			.ForEach(action =>
+		foreach(string action in InputMap.GetActions()) if(@event.IsActionIgnoreDevice(action))
+		{
+			if(@event.IsPressed()) Input.ActionPress($"D{@event.Device}_" + action);
+			else Input.ActionRelease($"D{@event.Device}_" + action);
+			
+			if(@event.IsPressed() && Buffer.ContainsKey(action))
 			{
 				var newName = $"D{@event.Device}_{action}";
 				Buffer.TryAdd(newName, new BufferInfo(Buffer[action].DefaultBufferTime));
 				Buffer[newName].Activate(-1);
 			}
-		);
+		}
+		
+		#if DEBUG_BUFFER
+		GD.Print(this);
+		#endif
 	}
 	
 	public override void MarkForDeletion(string action, bool now=false)

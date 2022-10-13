@@ -19,7 +19,7 @@ public class CooldownManager
 	public void Update()
 	{
 		if(Cooldowns.Count == 0) return;
-		var keys = Cooldowns.Keys.ToArray();
+		var keys = Cooldowns.Keys.ToList();
 		foreach(var k in keys)
 		{
 			Cooldowns[k]--;

@@ -181,16 +181,16 @@ public static class IterUtils
 	
 	public static IEnumerable<T> CircularTakeOrDefault<T>(this IEnumerable<T> e, int amount, T @default = default(T))
 	{
-		var a = e.ToArray<T>();//make sure not to generate it multiple times
-		if(a.Length == 0) return @default.RepeatListOf<T>(amount);
+		var a = e.ToList<T>();//make sure not to generate it multiple times
+		if(a.Count == 0) return @default.RepeatListOf<T>(amount);
 		else return a.CircularTake<T>(amount);
 	}
 	
 	public static T Choice<T>(this List<T> l, Randomizer RNG) => l[RNG.RNG.Next(l.Count)];
 	public static T Choice<T>(this T[] a, Randomizer RNG) => a[RNG.RNG.Next(a.Length)];
-	public static T Choice<T>(this IEnumerable<T> e, Randomizer RNG) => e.ToArray<T>().Choice<T>(RNG);
+	public static T Choice<T>(this IEnumerable<T> e, Randomizer RNG) => e.ToList<T>().Choice<T>(RNG);
 	
 	public static T ChoiceOrDefault<T>(this List<T> l, Randomizer RNG, T @default = default(T)) => (l.Count == 0)?@default:l.Choice<T>(RNG);
 	public static T ChoiceOrDefault<T>(this T[] a, Randomizer RNG, T @default = default(T)) => (a.Length == 0)?@default:a.Choice<T>(RNG);
-	public static T ChoiceOrDefault<T>(this IEnumerable<T> e, Randomizer RNG, T @default = default(T)) => e.ToArray<T>().ChoiceOrDefault(RNG, @default);
+	public static T ChoiceOrDefault<T>(this IEnumerable<T> e, Randomizer RNG, T @default = default(T)) => e.ToList<T>().ChoiceOrDefault(RNG, @default);
 }

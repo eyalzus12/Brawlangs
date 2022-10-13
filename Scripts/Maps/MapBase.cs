@@ -87,8 +87,7 @@ public class MapBase : Node2D
 		c.SpriteModulate = colorlist[i];
 		c.Respawn();
 		
-		//var im = new BufferInputManager(c.TeamNumber);
-		var im = new BufferInputManagerWrapper(c.TeamNumber, 0);
+		var im = new BufferInputManagerWrapper(c.TeamNumber+1, 0);
 		im.Name = "InputManager";
 		c.AddChild(im);
 		c.Inputs = im;

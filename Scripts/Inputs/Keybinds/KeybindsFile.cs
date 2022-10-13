@@ -8,6 +8,9 @@ using System.Linq;
 public class KeybindsFile
 {
 	public Dictionary<string, (float, List<InputEvent>)> Data{get; set;} = new Dictionary<string, (float, List<InputEvent>)>();
+	public int Profile{get; set;} = 0;
+	
+	public KeybindsFile() {}
 	
 	public void Clear() => Data.Clear();
 	
@@ -30,24 +33,30 @@ public class KeybindsFile
 	{
 		string content;
 		var er = Utils.ReadFile(path, out content);
-		if(er != Error.Ok) return er;
+		
+		if(er != Error.Ok)
+		{
+			GD.PushError($"[{nameof(KeybindsFile)}.cs]: Error {er} while trying to read file {path}");
+			return er;
+		}
+		
 		Parse(content);
 		return Error.Ok;
 	}
 	
 	public void Parse(string s) => ParseData(RemoveRedundantLines(s));
 	
-	public void ApplyParsedData(int profile)
+	public void ApplyParsedData()
 	{
 		foreach(var ae in Data)
 		{
-			var an = $"P{profile}_{ae.Key}";
+			var an = $"P{Profile}_{ae.Key}";
 			if(!InputMap.HasAction(an)) InputMap.AddAction(an, ae.Value.Item1);
 			foreach(var k in ae.Value.Item2) InputMap.ActionAddEvent(an, k);
 		}
 	}
 	
-	private const string IGNORE_LINE = @"^(?:;.*|[\s\n\r]*)";
+	private const string IGNORE_LINE = @"^(?:;.*)?[\s\n\r]*";
 	private static readonly Regex IGNORE_REGEX = new Regex(IGNORE_LINE, RegexOptions.Compiled | RegexOptions.Multiline);
 	private string RemoveRedundantLines(string s) => IGNORE_REGEX.Replace(s, "");
 	
@@ -56,22 +65,29 @@ public class KeybindsFile
 	private void ParseData(string s)
 	{
 		var matches = DATA_REGEX.Matches(s);
+		if(matches.Count == 0)
+		{
+			GD.PushError($"[{nameof(KeybindsFile)}.cs]: Failed match on string {s}");
+			return;
+		}
+		
 		foreach(Match match in matches)
 		{
 			var groups = match.Groups;
 			
 			var action = groups["action"].Value;
+			
+			Data.TryAdd(action, (0.5f, new List<InputEvent>()));
+			
 			var string_deadzone = groups["deadzone"].Value;
 			var deadzone = (string_deadzone == "")?0.5f:float.Parse(string_deadzone);
-			
-			Data.TryAdd(action, (deadzone, new List<InputEvent>()));
 			
 			var types = groups["type"].Captures.Cast<Capture>().Select(c=>c.Value[0]);
 			var datas = groups["data"].Captures.Cast<Capture>().Select(c=>int.Parse(c.Value));
 			var exdatas = groups["exdata"].Captures.Cast<Capture>().Select(c=>(c.Value=="")?1f:float.Parse(c.Value));
 			
 			var inputs = IterUtils.Zip(types, datas, exdatas).Select(CreateInput).ToList<InputEvent>();
-			Data.TryAdd(action, (deadzone, inputs));
+			Data[action] = (deadzone, inputs);
 		}
 	}
 	
