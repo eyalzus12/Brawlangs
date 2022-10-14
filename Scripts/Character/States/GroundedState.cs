@@ -42,7 +42,7 @@ public class GroundedState : State
 	{
 		if(!Actionable) return;
 		jump = true;
-		MarkForDeletion("Jump", true);
+		if(!ch.ShouldInitiateRun) MarkForDeletion("Jump", true);//prevent deleting jump input if going to run, so it is properly applied
 	}
 	
 	protected override void DoDodge()
@@ -53,11 +53,6 @@ public class GroundedState : State
 		{
 			if(ch.Cooldowns.InCooldown("Dodge")) return;
 			ch.States.Change("SpotGroundedDodge");
-		}
-		else
-		{
-			/*ch.TurnConditional();
-			ch.States.Change("RunStartup");*/
 		}
 		
 		MarkForDeletion("Dodge", true);
