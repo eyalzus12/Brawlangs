@@ -62,6 +62,8 @@ public class CharacterCreator
 		ch.ProjPool.ProjCreate = projCreator;
 		
 		ch.TeamNumber = teamNum;
+		ch.Inputs = new BufferInputManagerWrapper(2*(ch.TeamNumber+1), 0);
+		
 		n.AddChild(ch);
 		return ch;
 	}

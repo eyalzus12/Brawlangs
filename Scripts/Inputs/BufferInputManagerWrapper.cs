@@ -5,7 +5,7 @@ public class BufferInputManagerWrapper : InputManager
 {
 	public int Device{get; set;}
 	public int Profile{get; set;}
-	private string InputPrefix => $"D{Device}_P{Profile}_";
+	public override string InputPrefix => $"D{Device}_P{Profile}_";
 	public BufferInputManager BufferInput{get; set;}
 	
 	public BufferInputManagerWrapper() {}
@@ -17,6 +17,7 @@ public class BufferInputManagerWrapper : InputManager
 	
 	public override void _Ready()
 	{
+		base._Ready();
 		BufferInput = this.GetRootNode<BufferInputManager>("BufferInputManager");
 	}
 	

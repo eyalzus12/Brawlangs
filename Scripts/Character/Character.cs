@@ -342,10 +342,6 @@ public class Character : KinematicBody2D,
 	
 	public override void _Ready()
 	{
-		RelevantInputTags = InputMap.GetActions().ToEnumerable<string>().LeftQuotient($"{TeamNumber}_").ToArray();
-		
-		ProjPool.LoadInitialProjectiles();
-		
 		HitboxAnimator.PlaybackProcessMode = AnimationPlayer.AnimationProcessMode.Physics;
 		HitboxAnimator.Name = "HitboxAnimator";
 		AddChild(HitboxAnimator);
@@ -356,8 +352,15 @@ public class Character : KinematicBody2D,
 		Audio.Name = "AudioManager";
 		AddChild(Audio);
 		
+		Inputs.Name = "InputManager";
+		AddChild(Inputs);
+		
 		CollisionLayer = 0b100;
 		CollisionMask = 0b011;
+		
+		RelevantInputTags = InputMap.GetActions().ToEnumerable<string>().LeftQuotient(Inputs.InputPrefix).ToArray();
+		
+		ProjPool.LoadInitialProjectiles();
 	}
 	
 	private static readonly Color Black = new Color(1,1,1,1);

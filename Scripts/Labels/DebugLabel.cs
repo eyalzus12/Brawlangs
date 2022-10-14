@@ -2,11 +2,12 @@ using Godot;
 using System;
 using System.Text;
 using System.Linq;
+using System.Collections.Generic;
 
 public class DebugLabel : InfoLabel
 {
 	public DebugLabel() {}
-	public DebugLabel(Character[] characters){Characters = characters;}
+	public DebugLabel(IEnumerable<Character> characters){Characters = characters.ToArray();}
 	
 	private int whichlabel = 0;
 	private int currentCharacter = 0;

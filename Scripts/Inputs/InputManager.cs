@@ -5,6 +5,8 @@ public class InputManager : Node
 {
 	public InputManager(): base() {}
 	
+	public virtual string InputPrefix => "";
+	
 	public override void _Ready()
 	{
 		PauseMode = Node.PauseModeEnum.Process;

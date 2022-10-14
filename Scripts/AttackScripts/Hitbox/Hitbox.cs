@@ -193,7 +193,9 @@ public class Hitbox : Area2D
 	{
 		ZIndex = 4;
 		DrawSetTransform(CollisionPosition, CollisionRotation, Vector2.One);
-		this.DrawShape(HitboxShape.Shape, GetDrawColor());
+		var drawcolor = (OwnerObject.OwnerObject is Character c)?c.SpriteModulate:new Color(1,1,1);
+		drawcolor.a = 0.6f;
+		this.DrawShape(HitboxShape.Shape, drawcolor);
 	}
 	
 	public virtual void Loop() {}
@@ -254,39 +256,6 @@ public class Hitbox : Area2D
 			case AngleFlipper.Direction:
 			default:
 				return 1;
-		}
-	}
-	
-	private static readonly Color PaleWhite = new Color(0.9f, 0.9f, 0.9f, 0.5f);
-	private static readonly Color Orange = new Color(1, 0.3f, 0.1f, 0.5f);
-	private static readonly Color Yellowish = new Color(0.7f, 0.7f, 0.1f, 0.5f);
-	private static readonly Color DarkYellow = new Color(0.5f, 0.5f, 0, 0.5f);
-	private static readonly Color LightRed = new Color(1, 0.1f, 0.1f, 0.5f);
-	public virtual Color GetDrawColor()
-	{
-		if((SetStun == 0) && (VarStun == 0) && (SetHitPause == 0) && (VarHitPause == 0) && (SetHitLag == 0) && (VarHitLag == 0)) return PaleWhite;
-		switch(HorizontalAngleFlipper)
-		{
-			case AngleFlipper.AwayHitbox:
-			case AngleFlipper.AwayCharacter:
-			case AngleFlipper.Away:
-				return Orange;
-			case AngleFlipper.None:
-				switch(VerticalAngleFlipper)
-				{
-					case AngleFlipper.AwayHitbox:
-					case AngleFlipper.AwayCharacter:
-					case AngleFlipper.Away:
-						return Yellowish;
-					case AngleFlipper.None:
-					case AngleFlipper.Direction:
-					default:
-						return DarkYellow;
-				}
-				
-			case AngleFlipper.Direction:
-			default:
-				return LightRed;
 		}
 	}
 	

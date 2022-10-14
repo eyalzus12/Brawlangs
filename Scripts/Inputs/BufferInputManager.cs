@@ -20,6 +20,8 @@ public class BufferInputManager : InputManager
 	//NOTE: must run after KeybindsSetupHandler
 	public override void _Ready()
 	{
+		base._Ready();
+		
 		//reads from buffer.ini
 		if(Config.Load(CONFIG_PATH) != Error.Ok)
 		{

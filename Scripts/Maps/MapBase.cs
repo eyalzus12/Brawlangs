@@ -26,7 +26,7 @@ public class MapBase : Node2D
 	{
 		var chars = LoadCharacters();
 		
-		SetDamageLabelLocations(chars.ToArray());
+		SetDamageLabelLocations(chars);
 		
 		//death handler
 		var dh = new DeathHandeler(chars);
@@ -87,23 +87,19 @@ public class MapBase : Node2D
 		c.SpriteModulate = colorlist[i];
 		c.Respawn();
 		
-		var im = new BufferInputManagerWrapper(c.TeamNumber+1, 0);
-		im.Name = "InputManager";
-		c.AddChild(im);
-		c.Inputs = im;
 		return c;
 	}
 	
-	public void SetDamageLabelLocations(Character[] characters)
+	public void SetDamageLabelLocations(List<Character> characters)
 	{
-		var counts = new int[]{characters.Length};
+		var counts = new int[]{characters.Count};
 		var locations = GetDamageLabelLocations(counts);
 		var cl = new CanvasLayer();
 		cl.Name = "UI";
 		var lb = new DebugLabel(characters);
 		lb.Name = "DebugLabel";
 		cl.AddChild(lb);
-		for(int i = 0; i < characters.Length; ++i)
+		for(int i = 0; i < characters.Count; ++i)
 		{
 			var ch = characters[i];
 			var v = locations[i];
