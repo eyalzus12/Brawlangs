@@ -173,6 +173,7 @@ public static class Utils
 		
 		if(er != Error.Ok)//if error, return
 		{
+			GD.PushError($"Error {er} while trying to read file {path}");
 			content = "";
 			return er;
 		}
@@ -187,10 +188,33 @@ public static class Utils
 		var f = new File();
 		var er = f.Open(path, File.ModeFlags.Write);
 		
-		if(er != Error.Ok) return er;
+		if(er != Error.Ok)
+		{
+			GD.PushError($"Error {er} while trying to write to file {path}");
+			return er;
+		}
 		
 		f.StoreString(content);
 		f.Close();
+		return Error.Ok;
+	}
+	
+	public static Error ListDirectoryFiles(string path, out List<string> fileList)
+	{
+		fileList = new List<string>();
+		var dir = new Directory();
+		var er = dir.Open(path);
+		if(er != Error.Ok)
+		{
+			GD.PushError($"Error {er} while trying to open directory {path}");
+			return er;
+		}
+		
+		dir.ListDirBegin(true);
+		string file;
+		while((file = dir.GetNext()) != "") if(!dir.CurrentIsDir())
+			fileList.Add(file);
+		dir.ListDirEnd();
 		return Error.Ok;
 	}
 }

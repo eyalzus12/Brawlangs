@@ -33,13 +33,7 @@ public class KeybindsFile
 	{
 		string content;
 		var er = Utils.ReadFile(path, out content);
-		
-		if(er != Error.Ok)
-		{
-			GD.PushError($"[{nameof(KeybindsFile)}.cs]: Error {er} while trying to read file {path}");
-			return er;
-		}
-		
+		if(er != Error.Ok) return er;
 		Parse(content);
 		return Error.Ok;
 	}
@@ -76,8 +70,6 @@ public class KeybindsFile
 			var groups = match.Groups;
 			
 			var action = groups["action"].Value;
-			
-			Data.TryAdd(action, (0.5f, new List<InputEvent>()));
 			
 			var string_deadzone = groups["deadzone"].Value;
 			var deadzone = (string_deadzone == "")?0.5f:float.Parse(string_deadzone);

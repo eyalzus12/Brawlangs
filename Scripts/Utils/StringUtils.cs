@@ -132,4 +132,6 @@ public static class StringUtils
 	{
 		foreach(var s in e) if(s.EndsWith(q)) yield return s.Substring(0, s.Length-q.Length);
 	}
+	
+	public static bool EqualsIgnoreCase(this string s1, string s2) => string.Equals(s1, s2,  StringComparison.OrdinalIgnoreCase);
 }

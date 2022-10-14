@@ -28,10 +28,8 @@ public class KeybindsSetupHandler : Node
 		DefaultProfiles = LoadAllProfiles(DEFAULT_KEYBINDS_PATH);
 		Profiles = LoadAllProfiles(KEYBINDS_PATH);
 		
-		for(int i = 0; i < Profiles.Count; ++i)
-		{
-			Profiles[i].ApplyParsedData();
-		}
+		for(int i = 0; i < Profiles.Count; ++i) Profiles[i].ApplyParsedData();
+		
 		for(int i = Profiles.Count; i < DefaultProfiles.Count; ++i)//copy defaults if missing profiles
 		{
 			DefaultProfiles[i].ApplyParsedData();
@@ -50,36 +48,27 @@ public class KeybindsSetupHandler : Node
 	public List<KeybindsFile> LoadAllProfiles(string path)
 	{
 		var result = new List<KeybindsFile>();
+		List<string> files;
+		var er = Utils.ListDirectoryFiles(path, out files);
+		if(er != Error.Ok) return result;
 		
-		var dir = new Directory();
-		var er = dir.Open(path);
-		if(er != Error.Ok)
+		foreach(var file in files)
 		{
-			GD.PushError($"[{nameof(KeybindsSetupHandler)}.cs]: Error opening folder {path}. Error is {er}");
-			return result;
-		}
-		
-		dir.ListDirBegin();
-		string file;
-		while((file = dir.GetNext()) != "")
-		if(!dir.CurrentIsDir() && file[0] != '.')
-		{
-			var k = new KeybindsFile();
-			k.Load($"{path}/{file}");
 			var match = PROFILE_REGEX.Match(file);
 			
-			if(!match.Success)
+			int profile;
+			if(!int.TryParse(match.Groups["profile"].Value, out profile))
 			{
-				GD.PushError("Bad keybinds profile file name {file} found");
+				GD.PushError($"[{nameof(KeybindsSetupHandler)}.cs]: Bad keybinds profile file name {file} found");
 				continue;
 			}
 			
-			var profile = int.Parse(match.Groups["profile"].Value);
+			var k = new KeybindsFile();
 			k.Profile = profile;
+			k.Load($"{path}/{file}");
 			result.Add(k);
 		}
 		
-		dir.ListDirEnd();
 		return result;
 	}
 }
