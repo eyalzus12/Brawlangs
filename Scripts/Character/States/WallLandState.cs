@@ -25,7 +25,6 @@ public class WallLandState : WallState
 		ch.PlayAnimation("WallLand", true);
 		ch.QueueAnimation("Wall", false, false);
 		ch.ApplySettings("Wall");
-		ch.Tags["Walled"] = StateTag.Starting;
 		
 		ch.RestoreOptionsOnWallTouch();
 	}
@@ -36,6 +35,7 @@ public class WallLandState : WallState
 		{
 			ch.States.Change("Air");
 			ch.ApplySettings("Default");
+			ch.CharacterSprite.Stop();
 		}
 		else if(frameCount >= ch.WallLand) ch.States.Change("Wall");
 		else return false;

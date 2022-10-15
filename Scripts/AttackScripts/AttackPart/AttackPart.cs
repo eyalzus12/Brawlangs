@@ -31,7 +31,6 @@ public class AttackPart : Node2D, IHitter
 	public Vector2 MomentumPreservation{get; set;}
 	public Vector2 BurstMomentumPreservation{get; set;}
 	public int Cooldown{get; set;}
-	public int MissCooldown{get; set;}
 	public float GravityMultiplier{get; set;}
 	public string AttackAnimation{get; set;}
 	public string AttackSound{get; set;}
@@ -320,5 +319,5 @@ public class AttackPart : Node2D, IHitter
 		HitList.Clear();
 	}
 	
-	public virtual int FinalCooldown => Cooldown + (HasHit?0:MissCooldown);
+	public virtual int FinalCooldown => Cooldown;
 }

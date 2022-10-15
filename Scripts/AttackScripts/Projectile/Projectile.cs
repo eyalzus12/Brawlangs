@@ -196,7 +196,12 @@ public class Projectile : Node2D, IHitter, IHittable
 	
 	public virtual void HitEvent(Hitbox hitbox, Hurtbox hurtbox) {}
 	public virtual void DidHit() => Destruct();
-	public virtual void HandleGettingHit(HitData data) => Destruct();
+	
+	public virtual void HandleGettingHit(HitData data)
+	{
+		Audio.Play(data.Hitter.HitSound);
+		Destruct();
+	}
 	
 	public virtual bool CanGenerallyHit(IHittable hitObject) => OwnerObject.CanHit(hitObject) && !HitIgnoreList.Contains(hitObject);
 	public virtual bool CanGenerallyBeHitBy(IHitter hitter) => true;

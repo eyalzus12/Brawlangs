@@ -44,8 +44,10 @@ public class WallState : State
 	
 	protected override bool CalcStateChange()
 	{
-		if(ch.Grounded) ch.States.Change("Land");
-		else if(ch.TurnConditional() || !ch.Walled) ch.States.Change("Air");
+		if(ch.Grounded)
+			ch.States.Change("Land");
+		else if(ch.TurnConditional() || !ch.Walled)
+			ch.States.Change("Air");
 		else 
 		{
 			if(jump) ch.States.Change("WallJump");

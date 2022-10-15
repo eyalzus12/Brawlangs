@@ -186,6 +186,14 @@ public static class IterUtils
 		else return a.CircularTake<T>(amount);
 	}
 	
+	public static Dictionary<T,int> ToIndexedDictionary<T>(IEnumerable<T> e)
+	{
+		var result = new Dictionary<T,int>();
+		int i = 0;
+		foreach(var h in e) result.Add(h,i++);
+		return result;
+	}
+	
 	public static T Choice<T>(this List<T> l, Randomizer RNG) => l[RNG.RNG.Next(l.Count)];
 	public static T Choice<T>(this T[] a, Randomizer RNG) => a[RNG.RNG.Next(a.Length)];
 	public static T Choice<T>(this IEnumerable<T> e, Randomizer RNG) => e.ToList<T>().Choice<T>(RNG);

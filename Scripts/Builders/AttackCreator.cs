@@ -88,8 +88,6 @@ public class AttackCreator
 		ap.SlowOnWalls = ws;
 		var ffl = inif[section, "FastFallLocked", false].b();
 		ap.FastFallLocked = ffl;
-		var mc = inif[section, "MissCooldown", 0].i();
-		ap.MissCooldown = mc;
 		var gm = inif[section, "GravityMultiplier", 1f].f();
 		ap.GravityMultiplier = gm;
 		var dm = inif[section, "DamageDoneMult", 1f].f();
@@ -244,7 +242,6 @@ public class AttackCreator
 			var nextPart = inif[section, "Next", ""].s();
 			var addedTransition = new AttackPartTransition(frames, tagExpression, nextPart);
 			ap.TransitionManager.Add(addedTransition);
-			
 		}
 		catch(FormatException fe)
 		{
@@ -253,7 +250,7 @@ public class AttackCreator
 		}
 	}
 	
-	private static readonly char[] OPERATORS = new char[]{'!', '|', '&', '(', ')'};
+	private static readonly char[] OPERATORS = new char[]{'!', '|', '&', ')', '('};
 	public IEnumerable<object> ParseTagList(string s)
 	{
 		if(s == "") yield break;
@@ -266,30 +263,29 @@ public class AttackCreator
 		
 		foreach(var c in s)
 		{
-			if(OPERATORS.Contains(c))
+			if(c == '(') operators.Push(c);
+			else if(OPERATORS.Contains(c))
 			{
-				if(!doingTagValue) throw new FormatException($"Too few periods in attack part transition expression {s}");
-				
-				var _stateName = stateName.ToString();
-				var _tagValue = tagValue.ToString();
-				StateTag tag;
-				if(!Enum.TryParse<StateTag>(_tagValue, out tag)) throw new FormatException($"Unknown tag value {_tagValue} in attack part transition expression {s}");
-				yield return (_stateName, tag);
-				stateName.Clear(); tagValue.Clear(); doingTagValue = false;
-				
-				if(c == '(') operators.Push(c);
-				else if(c == ')')
+				if(stateName.Length > 0 && tagValue.Length > 0)
 				{
-					while(operators.Count > 0 && operators.Peek() != '(') yield return operators.Pop();
+					var _stateName = stateName.ToString();
+					var _tagValue = tagValue.ToString();
+					StateTag tag;
+					if(!Enum.TryParse<StateTag>(_tagValue, out tag)) throw new FormatException($"Unknown tag value {_tagValue} in attack part transition expression {s}");
+					yield return (_stateName, tag);
+					stateName.Clear(); tagValue.Clear(); doingTagValue = false;
+				}
+				else if(doingTagValue) throw new FormatException($"Operator or closing bracket immedietly after a period in attack part transition expression {s}");
+				
+				int pre = OPERATORS.FindIndex(c);
+				while(operators.Count > 0 && OPERATORS.FindIndex(operators.Peek()) <= pre) yield return operators.Pop();
+				
+				if(c == ')')
+				{
 					if(operators.Count == 0) throw new FormatException($"Attack part transition expression {s} has imbalanced brackets");
 					operators.Pop(); //remove the (
 				}
-				else
-				{
-					int pre = OPERATORS.FindIndex(c);
-					while(operators.Count > 0 && OPERATORS.FindIndex(operators.Peek()) <= pre) yield return operators.Pop();
-					operators.Push(c);
-				}
+				else operators.Push(c);
 			}
 			else if(c == '.')
 			{
@@ -312,9 +308,13 @@ public class AttackCreator
 			yield return (_stateName, tag);
 			stateName.Clear(); tagValue.Clear(); doingTagValue = false;
 		}
-		else if(stateName.Length != 0) throw new FormatException($"Too few periods in attack part transition expression {s}");
+		else if(stateName.Length != 0) throw new FormatException($"Period without tag value in attack part transition expression {s}");
 		
-		while(operators.Count > 0) yield return operators.Pop();
+		while(operators.Count > 0)
+		{
+			if(operators.Peek() == '(') throw new FormatException($"Attack part transition expression {s} has imbalanced brackets");
+			yield return operators.Pop();
+		}
 	}
 	
 	/*

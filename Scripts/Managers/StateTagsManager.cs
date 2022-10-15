@@ -10,9 +10,11 @@ public class StateTagsManager
 	
 	public StateTag this[string s]
 	{
-		get => Tags.GetValueOrDefault(s,StateTag.NotDefined);
+		get => Tags.GetValueOrDefault(s,StateTag.NotActive);
 		set => Tags[s] = value;
 	}
+	
+	public bool Active(string s) => this[s] == StateTag.Active || this[s] == StateTag.Starting;
 	
 	public void Update()
 	{
@@ -26,9 +28,7 @@ public class StateTagsManager
 			case StateTag.Starting:
 				return StateTag.Active;
 			case StateTag.Ending:
-			case StateTag.Instant:
 				return StateTag.NotActive;
-			case StateTag.NotDefined:
 			case StateTag.NotActive:
 			case StateTag.Active:
 			default:

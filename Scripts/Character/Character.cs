@@ -380,7 +380,7 @@ public class Character : KinematicBody2D,
 		IFrames.Update();
 		TimedActions.Update();
 		Tags.Update();
-		UpdateInputTags();
+		UpdateTags();
 		States.Update(delta);
 		
 		if(Input.IsActionJustPressed("reset")) Respawn();
@@ -465,13 +465,43 @@ public class Character : KinematicBody2D,
 	///////////////Misc////////////////////////
 	///////////////////////////////////////////
 	
-	public void UpdateInputTags()
+	public void UpdateTags()
 	{
 		foreach(var inputTag in RelevantInputTags)
 		{
 			if(Inputs.IsActionJustPressed(inputTag)) Tags[inputTag] = StateTag.Starting;
 			if(Inputs.IsActionJustReleased(inputTag)) Tags[inputTag] = StateTag.Ending;
 		}
+		
+		
+		UpdateTag("Aerial", Aerial);
+		UpdateTag("Grounded", Grounded);
+		UpdateTag("Walled", Walled);
+		UpdateTag("WallClinging", WallClinging);
+		UpdateTag("Ceilinged", Ceilinged);
+		UpdateTag("SemiSolid", OnSemiSolid);
+		UpdateTag("Slope", OnSlope);
+		
+		
+		UpdateTag("Turning", InputtingTurn);
+		
+		UpdateTag("LeftInput", LeftInput);
+		UpdateTag("RightInput", RightInput);
+		UpdateTag("DownInput", DownInput);
+		UpdateTag("UpInput", UpInput);
+		
+		UpdateTag("HorizontalInput", InputtingHorizontalDirection);
+		UpdateTag("VerticalInput", InputtingVerticalDirection);
+		UpdateTag("DirectionalInput", InputtingDirection);
+		
+		
+		UpdateTag("Fastfalling", Fastfalling);
+	}
+	
+	public void UpdateTag(string name, bool property)
+	{
+		if(property && !Tags.Active(name)) Tags[name] = StateTag.Starting;
+		if(!property && Tags.Active(name)) Tags[name] = StateTag.Ending;
 	}
 	
 	public void GiveTemporaryResource(string resource, int amount, int forFrames)
