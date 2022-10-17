@@ -14,7 +14,7 @@ public class CharacterCreator
 		this.path = path;
 	}
 	
-	public Character Build(Node2D n, int teamNum)
+	public Character Build(Node2D n, int profile, int device, int teamNum)
 	{
 		//create actual character
 		var ch = new Character();
@@ -38,6 +38,8 @@ public class CharacterCreator
 		//create animations
 		BuildAnimations(ch, $"{directoryPath}/{animationsFolder}");
 		
+		//attack audio manager
+		ch.Audio = n.GetRootNode<AudioManager>("AudioManager");
 		//find audio folder name
 		var audioFolder = charinif["Audio", ""].s();
 		//load sounds
@@ -62,7 +64,7 @@ public class CharacterCreator
 		ch.ProjPool.ProjCreate = projCreator;
 		
 		ch.TeamNumber = teamNum;
-		ch.Inputs = new BufferInputManagerWrapper(2*(ch.TeamNumber+1), 0);
+		ch.Inputs = new BufferInputManagerWrapper(device, profile);
 		
 		n.AddChild(ch);
 		return ch;
@@ -122,7 +124,7 @@ public class CharacterCreator
 			var audio = GenerateAudioFromPath(resourcePath, loop);
 			var noloopname = filename.Substring(0, filename.Length - "Loop".Length);
 			var normalizedFilename = (loop?noloopname:filename);
-			ch.Audio.AddSound(normalizedFilename, audio);
+			ch.Audio.AddSound(ch.Name, normalizedFilename, audio);
 		}
 	}
 	

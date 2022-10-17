@@ -71,13 +71,29 @@ public class RawInputMap : Node
 			int i = 0;
 			foreach(var device in RawInputDevice.GetDevices())
 			{
+				var type = device.DeviceType.ToString();
+				var handle = device.Handle.ToString();
+				var ids = $"{device.VendorId:X4}:{device.ProductId:X4}";
+				
+				string productName;
+				try{productName = device.ProductName;}
+				catch(InvalidOperationException){productName = "ERROR";}
+				
+				string manufacturerName;
+				try{manufacturerName = device.ManufacturerName;}
+				catch(InvalidOperationException){manufacturerName = "ERROR";}
+				
+				var path = device.DevicePath;
+				
 				if(device is RawInputKeyboard)
 				{
-					GD.PrintT(i.ToString(), device.DeviceType.ToString(), device.Handle.ToString(), $"{device.VendorId:X4}:{device.ProductId:X4}", device.ProductName, device.ManufacturerName);
+					GD.PrintT(i.ToString(), type, handle, ids, $"Product: {productName}", $"Manufacturer: {manufacturerName}");
 					++i;
 				}
 				else
-					GD.PrintT("", device.DeviceType.ToString(), "", device.Handle.ToString(), $"{device.VendorId:X4}:{device.ProductId:X4}", device.ProductName, device.ManufacturerName);
+					GD.PrintT("", type, "", handle, ids, $"Product: {productName}", $"Manufacturer: {manufacturerName}");
+				
+				GD.PrintT("", $"Path: {path}");
 			}
 		}
 	}
@@ -124,20 +140,17 @@ public class RawInputMap : Node
 	private const string KEY_MAP_PATH = "res://Scripts/Inputs/RawInput/KeyToScancode.keys";
 	private void ReadKeyMap()
 	{
-		File f = new File();//create new file
-		var er = f.Open(KEY_MAP_PATH, File.ModeFlags.Read);//open file
-		if(er != Error.Ok) return;//if error, return
-		string content = f.GetAsText();//read text
-		f.Close();//flush buffer
-		ParseKeyMap(content);//parse
+		string content;
+		var er = Utils.ReadFile(path, out content);
+		if(er != Error.Ok) return;
+		ParseKeyMap(content);
 	}
 	
 	private void ParseKeyMap(string str)
 	{
 		str
 			.Split("\n")
-			.Select(s => s.Substring(0,s.IndexOf(';')).Trim())
-			.Select(s => s.Split(" "))
+			.Select(s => s.Substring(0,s.IndexOf(';')).Trim().Split(" "))
 			.ForEach(t => KeycodeDict.Add(int.Parse(t[0].Trim()), uint.Parse(t[1].Trim())));
 	}
 	#endif

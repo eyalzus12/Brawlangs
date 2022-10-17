@@ -19,7 +19,7 @@ public class ChargePart : AttackPart
 	
 	public override void OnStart()
 	{
-		ch.PlaySound(ChargeSound);
+		ch.PlaySound(ChargeSound, Position);
 	}
 	
 	public override void Loop()

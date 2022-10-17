@@ -4,6 +4,8 @@ using System.Collections.Generic;
 
 public interface IHittable
 {
+	string Name{get; set;}
+	
 	Vector2 Position{get; set;}
 	int Direction{get; set;}
 	

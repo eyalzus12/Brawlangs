@@ -6,259 +6,269 @@
 [node name="Select" type="Control"]
 anchor_right = 1.0
 anchor_bottom = 1.0
+margin_right = 296.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="VSplitContainer" type="VBoxContainer" parent="."]
-margin_right = 1024.0
+[node name="LoadContainer" type="VBoxContainer" parent="."]
+margin_right = 1328.0
 margin_bottom = 600.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Load1" type="HSplitContainer" parent="VSplitContainer"]
-margin_right = 1024.0
+[node name="Load1" type="HSplitContainer" parent="LoadContainer"]
+margin_right = 1328.0
 margin_bottom = 24.0
-split_offset = 850
 dragger_visibility = 1
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="LineEdit" type="LineEdit" parent="VSplitContainer/Load1"]
-margin_right = 1024.0
+[node name="Load1Data" type="HSplitContainer" parent="LoadContainer/Load1"]
+margin_right = 128.0
 margin_bottom = 24.0
-text = "res://Characters/Josh"
-script = ExtResource( 1 )
+dragger_visibility = 1
 
-[node name="Label" type="Label" parent="VSplitContainer/Load1"]
-visible = false
-margin_left = 920.0
-margin_top = 5.0
-margin_right = 1024.0
-margin_bottom = 19.0
-text = "dummy"
-
-[node name="CheckBox" type="CheckBox" parent="VSplitContainer/Load1/Label"]
-margin_left = 72.0
-margin_right = 176.0
+[node name="Load1Profile" type="LineEdit" parent="LoadContainer/Load1/Load1Data"]
+margin_right = 58.0
 margin_bottom = 24.0
+text = "0"
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Load2" type="HSplitContainer" parent="VSplitContainer"]
+[node name="Load1Device" type="LineEdit" parent="LoadContainer/Load1/Load1Data"]
+margin_left = 70.0
+margin_right = 128.0
+margin_bottom = 24.0
+text = "3"
+
+[node name="Load1Path" type="LineEdit" parent="LoadContainer/Load1"]
+margin_left = 140.0
+margin_right = 1328.0
+margin_bottom = 24.0
+text = "res://Characters/Josh"
+script = ExtResource( 1 )
+
+[node name="Load2" type="HSplitContainer" parent="LoadContainer"]
 margin_top = 28.0
-margin_right = 1024.0
+margin_right = 1328.0
 margin_bottom = 52.0
-split_offset = 850
 dragger_visibility = 1
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="LineEdit" type="LineEdit" parent="VSplitContainer/Load2"]
-margin_right = 1024.0
+[node name="Load2Data" type="HSplitContainer" parent="LoadContainer/Load2"]
+margin_right = 128.0
+margin_bottom = 24.0
+dragger_visibility = 1
+
+[node name="Load2Profile" type="LineEdit" parent="LoadContainer/Load2/Load2Data"]
+margin_right = 58.0
+margin_bottom = 24.0
+text = "0"
+
+[node name="Load2Device" type="LineEdit" parent="LoadContainer/Load2/Load2Data"]
+margin_left = 70.0
+margin_right = 128.0
+margin_bottom = 24.0
+text = "5"
+
+[node name="Load2Path" type="LineEdit" parent="LoadContainer/Load2"]
+margin_left = 140.0
+margin_right = 1328.0
 margin_bottom = 24.0
 text = "res://Characters/Josh"
 script = ExtResource( 1 )
 
-[node name="Label" type="Label" parent="VSplitContainer/Load2"]
-visible = false
-margin_left = 920.0
-margin_top = 5.0
-margin_right = 1024.0
-margin_bottom = 19.0
-text = "dummy"
-
-[node name="CheckBox" type="CheckBox" parent="VSplitContainer/Load2/Label"]
-margin_left = 72.0
-margin_right = 96.0
-pressed = true
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Load3" type="HSplitContainer" parent="VSplitContainer"]
+[node name="Load3" type="HSplitContainer" parent="LoadContainer"]
 margin_top = 56.0
-margin_right = 1024.0
+margin_right = 1328.0
 margin_bottom = 80.0
-split_offset = 850
 dragger_visibility = 1
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="LineEdit" type="LineEdit" parent="VSplitContainer/Load3"]
-margin_right = 1024.0
+[node name="Load3Data" type="HSplitContainer" parent="LoadContainer/Load3"]
+margin_right = 128.0
+margin_bottom = 24.0
+dragger_visibility = 1
+
+[node name="Load3Profile" type="LineEdit" parent="LoadContainer/Load3/Load3Data"]
+margin_right = 58.0
+margin_bottom = 24.0
+text = "0"
+
+[node name="Load3Device" type="LineEdit" parent="LoadContainer/Load3/Load3Data"]
+margin_left = 70.0
+margin_right = 128.0
+margin_bottom = 24.0
+text = "0"
+
+[node name="Load3Path" type="LineEdit" parent="LoadContainer/Load3"]
+margin_left = 140.0
+margin_right = 1328.0
 margin_bottom = 24.0
 script = ExtResource( 1 )
 
-[node name="Label" type="Label" parent="VSplitContainer/Load3"]
-visible = false
-margin_left = 920.0
-margin_top = 5.0
-margin_right = 1024.0
-margin_bottom = 19.0
-text = "dummy"
-
-[node name="CheckBox" type="CheckBox" parent="VSplitContainer/Load3/Label"]
-margin_left = 72.0
-margin_right = 96.0
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Load4" type="HSplitContainer" parent="VSplitContainer"]
+[node name="Load4" type="HSplitContainer" parent="LoadContainer"]
 margin_top = 84.0
-margin_right = 1024.0
+margin_right = 1328.0
 margin_bottom = 108.0
-split_offset = 850
 dragger_visibility = 1
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="LineEdit" type="LineEdit" parent="VSplitContainer/Load4"]
-margin_right = 1024.0
+[node name="Load4Data" type="HSplitContainer" parent="LoadContainer/Load4"]
+margin_right = 128.0
+margin_bottom = 24.0
+dragger_visibility = 1
+
+[node name="Load4Profile" type="LineEdit" parent="LoadContainer/Load4/Load4Data"]
+margin_right = 58.0
+margin_bottom = 24.0
+text = "0"
+
+[node name="Load4Device" type="LineEdit" parent="LoadContainer/Load4/Load4Data"]
+margin_left = 70.0
+margin_right = 128.0
+margin_bottom = 24.0
+text = "0"
+
+[node name="Load4Path" type="LineEdit" parent="LoadContainer/Load4"]
+margin_left = 140.0
+margin_right = 1328.0
 margin_bottom = 24.0
 script = ExtResource( 1 )
 
-[node name="Label" type="Label" parent="VSplitContainer/Load4"]
-visible = false
-margin_left = 920.0
-margin_top = 5.0
-margin_right = 1024.0
-margin_bottom = 19.0
-text = "dummy"
-
-[node name="CheckBox" type="CheckBox" parent="VSplitContainer/Load4/Label"]
-margin_left = 72.0
-margin_right = 96.0
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Load5" type="HSplitContainer" parent="VSplitContainer"]
+[node name="Load5" type="HSplitContainer" parent="LoadContainer"]
 margin_top = 112.0
-margin_right = 1024.0
+margin_right = 1328.0
 margin_bottom = 136.0
-split_offset = 850
 dragger_visibility = 1
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="LineEdit" type="LineEdit" parent="VSplitContainer/Load5"]
-margin_right = 1024.0
+[node name="Load5Data" type="HSplitContainer" parent="LoadContainer/Load5"]
+margin_right = 128.0
+margin_bottom = 24.0
+dragger_visibility = 1
+
+[node name="Load5Profile" type="LineEdit" parent="LoadContainer/Load5/Load5Data"]
+margin_right = 58.0
+margin_bottom = 24.0
+text = "0"
+
+[node name="Load5Device" type="LineEdit" parent="LoadContainer/Load5/Load5Data"]
+margin_left = 70.0
+margin_right = 128.0
+margin_bottom = 24.0
+text = "0"
+
+[node name="Load5Path" type="LineEdit" parent="LoadContainer/Load5"]
+margin_left = 140.0
+margin_right = 1328.0
 margin_bottom = 24.0
 script = ExtResource( 1 )
 
-[node name="Label" type="Label" parent="VSplitContainer/Load5"]
-visible = false
-margin_left = 920.0
-margin_top = 5.0
-margin_right = 1024.0
-margin_bottom = 19.0
-text = "dummy"
-
-[node name="CheckBox" type="CheckBox" parent="VSplitContainer/Load5/Label"]
-margin_left = 72.0
-margin_right = 96.0
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Load6" type="HSplitContainer" parent="VSplitContainer"]
+[node name="Load6" type="HSplitContainer" parent="LoadContainer"]
 margin_top = 140.0
-margin_right = 1024.0
+margin_right = 1328.0
 margin_bottom = 164.0
-split_offset = 850
 dragger_visibility = 1
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="LineEdit" type="LineEdit" parent="VSplitContainer/Load6"]
-margin_right = 1024.0
+[node name="Load6Data" type="HSplitContainer" parent="LoadContainer/Load6"]
+margin_right = 128.0
+margin_bottom = 24.0
+dragger_visibility = 1
+
+[node name="Load6Profile" type="LineEdit" parent="LoadContainer/Load6/Load6Data"]
+margin_right = 58.0
+margin_bottom = 24.0
+text = "0"
+
+[node name="Load6Device" type="LineEdit" parent="LoadContainer/Load6/Load6Data"]
+margin_left = 70.0
+margin_right = 128.0
+margin_bottom = 24.0
+text = "0"
+
+[node name="Load6Path" type="LineEdit" parent="LoadContainer/Load6"]
+margin_left = 140.0
+margin_right = 1328.0
 margin_bottom = 24.0
 script = ExtResource( 1 )
 
-[node name="Label" type="Label" parent="VSplitContainer/Load6"]
-visible = false
-margin_left = 920.0
-margin_top = 5.0
-margin_right = 1024.0
-margin_bottom = 19.0
-text = "dummy"
-
-[node name="CheckBox" type="CheckBox" parent="VSplitContainer/Load6/Label"]
-margin_left = 72.0
-margin_right = 96.0
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Load7" type="HSplitContainer" parent="VSplitContainer"]
+[node name="Load7" type="HSplitContainer" parent="LoadContainer"]
 margin_top = 168.0
-margin_right = 1024.0
+margin_right = 1328.0
 margin_bottom = 192.0
-split_offset = 850
 dragger_visibility = 1
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="LineEdit" type="LineEdit" parent="VSplitContainer/Load7"]
-margin_right = 1024.0
+[node name="Load7Data" type="HSplitContainer" parent="LoadContainer/Load7"]
+margin_right = 128.0
+margin_bottom = 24.0
+dragger_visibility = 1
+
+[node name="Load7Profile" type="LineEdit" parent="LoadContainer/Load7/Load7Data"]
+margin_right = 58.0
+margin_bottom = 24.0
+text = "0"
+
+[node name="Load7Device" type="LineEdit" parent="LoadContainer/Load7/Load7Data"]
+margin_left = 70.0
+margin_right = 128.0
+margin_bottom = 24.0
+text = "0"
+
+[node name="Load7Path" type="LineEdit" parent="LoadContainer/Load7"]
+margin_left = 140.0
+margin_right = 1328.0
 margin_bottom = 24.0
 script = ExtResource( 1 )
 
-[node name="Label" type="Label" parent="VSplitContainer/Load7"]
-visible = false
-margin_left = 920.0
-margin_top = 5.0
-margin_right = 1024.0
-margin_bottom = 19.0
-text = "dummy"
-
-[node name="CheckBox" type="CheckBox" parent="VSplitContainer/Load7/Label"]
-margin_left = 72.0
-margin_right = 96.0
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Load8" type="HSplitContainer" parent="VSplitContainer"]
+[node name="Load8" type="HSplitContainer" parent="LoadContainer"]
 margin_top = 196.0
-margin_right = 1024.0
+margin_right = 1328.0
 margin_bottom = 220.0
-split_offset = 850
 dragger_visibility = 1
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="LineEdit" type="LineEdit" parent="VSplitContainer/Load8"]
-margin_right = 1024.0
+[node name="Load8Data" type="HSplitContainer" parent="LoadContainer/Load8"]
+margin_right = 128.0
+margin_bottom = 24.0
+dragger_visibility = 1
+
+[node name="Load8Profile" type="LineEdit" parent="LoadContainer/Load8/Load8Data"]
+margin_right = 58.0
+margin_bottom = 24.0
+text = "0"
+
+[node name="Load8Device" type="LineEdit" parent="LoadContainer/Load8/Load8Data"]
+margin_left = 70.0
+margin_right = 128.0
+margin_bottom = 24.0
+text = "0"
+
+[node name="Load8Path" type="LineEdit" parent="LoadContainer/Load8"]
+margin_left = 140.0
+margin_right = 1328.0
 margin_bottom = 24.0
 script = ExtResource( 1 )
-
-[node name="Label" type="Label" parent="VSplitContainer/Load8"]
-visible = false
-margin_left = 920.0
-margin_top = 5.0
-margin_right = 1024.0
-margin_bottom = 19.0
-text = "dummy"
-
-[node name="CheckBox" type="CheckBox" parent="VSplitContainer/Load8/Label"]
-margin_left = 72.0
-margin_right = 96.0
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [node name="ExitButton" type="Button" parent="."]
 margin_left = 448.0

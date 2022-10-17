@@ -7,7 +7,7 @@ public class AttackPart : Node2D, IHitter
 {
 	public long FrameCount{get; set;} = 0;
 	
-	public List<Hitbox> Hitboxes{get; set;}
+	public List<Hitbox> Hitboxes{get; set;} = new List<Hitbox>();
 	public HashSet<IHittable> HitIgnoreList{get; set;} = new HashSet<IHittable>();
 	public Dictionary<Hurtbox, Hitbox> HitList{get; set;} = new Dictionary<Hurtbox, Hitbox>();
 	
@@ -68,16 +68,10 @@ public class AttackPart : Node2D, IHitter
 		SetPhysicsProcess(false);
 		FrameCount = 0;
 		
-		//TOFIX: this is unsafe
-		Hitboxes = GetChildren().FilterType<Hitbox>().ToList();
-		ConnectSignals();
+		foreach(var h in Hitboxes) h.Connect("HitboxHit", this, nameof(HandleInitialHit));
+		
 		BuildHitboxAnimator();
 		Init();
-	}
-	
-	public void ConnectSignals()
-	{
-		Hitboxes.ForEach(h => h.Connect("HitboxHit", this, nameof(HandleInitialHit)));
 	}
 	
 	public void LoadExtraProperty<T>(string s, T @default = default(T))
@@ -100,7 +94,7 @@ public class AttackPart : Node2D, IHitter
 		OwnerObject.HitboxAnimator.Connect("animation_finished", this, "ChangeToNextOnEnd");
 		
 		ch.PlayAnimation(AttackAnimation, true);//overwrite animation
-		ch.PlaySound(AttackSound);
+		ch.PlaySound(AttackSound, Position);
 		
 		ch.vec *= MomentumPreservation;
 		ch.vec += Movement * new Vector2(ch.Direction, 1);
@@ -131,7 +125,7 @@ public class AttackPart : Node2D, IHitter
 	
 	public virtual void OnStartupFinish()
 	{
-		EmittedProjectiles?.ForEach(s=>ch.EmitProjectile(s));
+		foreach(var p in EmittedProjectiles) ch.EmitProjectile(p);
 	}
 	
 	const float FPS = 60f;
@@ -174,7 +168,9 @@ public class AttackPart : Node2D, IHitter
 		HandleHits();
 		OnEnd();
 		OwnerObject.HitboxAnimator.Stop(true);
-		Hitboxes.ForEach(h => h.Active = false);
+		
+		foreach(var h in Hitboxes) h.Active = false;
+		
 		ch.Tags["Hit"] = StateTag.Ending;
 		HitList.Clear();
 		HitIgnoreList.Clear();

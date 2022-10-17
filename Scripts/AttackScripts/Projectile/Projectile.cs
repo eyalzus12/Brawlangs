@@ -42,10 +42,8 @@ public class Projectile : Node2D, IHitter, IHittable
 	public float KnockbackDoneMult{get => OwnerObject.KnockbackDoneMult; set => OwnerObject.KnockbackDoneMult = value;}
 	public float StunDoneMult{get => OwnerObject.StunDoneMult; set => OwnerObject.StunDoneMult = value;}
 	
-	public const int AUDIO_PLAYERS = 2;
-	public AudioManager Audio{get; set;} = new AudioManager(AUDIO_PLAYERS);
-	public void PlaySound(string sound) => Audio.Play(sound);
-	public void PlaySound(AudioStream sound) => Audio.Play(sound);
+	public string AudioPrefix => OwnerObject.AudioPrefix;
+	public AudioManager Audio{get; set;}
 	
 	public Dictionary<string, ParamRequest> LoadExtraProperties{get; set;} = new Dictionary<string, ParamRequest>();
 	public virtual void LoadProperties() {}
@@ -71,23 +69,26 @@ public class Projectile : Node2D, IHitter, IHittable
 	public Projectile(IAttacker owner)
 	{
 		OwnerObject = owner;
-		
-		Audio.Sounds = OwnerObject.Audio.Sounds;
-		Audio.Name = "AudioManager";
-		AddChild(Audio);
+		Audio = OwnerObject.Audio;
 	}
 	
 	public override void _Ready()
 	{
 		FrameCount = 0;
 		Position = SpawningPosition + OwnerObject.Position;
-		ConnectSignals();
+		
+		foreach(var h in Hitboxes)
+		{
+			h.Active = true;
+			h.Connect("HitboxHit", this, nameof(HandleInitialHit));
+		}
+		
 		HasHit = false;
 		GettingHit = false;
 		Init();
 		Active = true;
-		Hitboxes.ForEach(h=>h.Active = true);
-		Hurtboxes.ForEach(h=>h.ChangeState("Default"));
+		
+		ApplySettings("Default");
 	}
 	
 	public override void _PhysicsProcess(float delta)
@@ -112,30 +113,17 @@ public class Projectile : Node2D, IHitter, IHittable
 	{
 		OnRemove();
 		GettingHit = false;
-		Hitboxes.ForEach(h => h.Active = false);
-		DisonnectSignals();
+		
+		foreach(var h in Hitboxes)
+		{
+			h.Active = false;
+			h.Disconnect("HitboxHit", this, nameof(HandleInitialHit));
+		}
+		
 		Active = false;
 		HitList.Clear();
 		HitIgnoreList.Clear();
 		EmitSignal(nameof(ProjectileDied), this);
-	}
-	
-	public virtual void Reset()
-	{
-		Hitboxes = GetChildren().FilterType<Hitbox>().ToList();
-		PostHitboxInit();
-	}
-	
-	public virtual void PostHitboxInit() {}
-	
-	public virtual void ConnectSignals()
-	{
-		Hitboxes.ForEach(h => h.Connect("HitboxHit", this, nameof(HandleInitialHit)));
-	}
-	
-	public virtual void DisonnectSignals()
-	{
-		Hitboxes.ForEach(h => h.Disconnect("HitboxHit", this, nameof(HandleInitialHit)));
 	}
 	
 	public void HandleInitialHit(Hitbox hitbox, Hurtbox hurtbox)
@@ -191,7 +179,7 @@ public class Projectile : Node2D, IHitter, IHittable
 	public void ApplySettings(string setting)
 	{
 		CurrentCollisionSetting = setting;
-		Hurtboxes.ForEach(h=>h.ChangeState(setting));
+		foreach(var h in Hurtboxes) h.ChangeState(setting);
 	}
 	
 	public virtual void HitEvent(Hitbox hitbox, Hurtbox hurtbox) {}
@@ -199,7 +187,7 @@ public class Projectile : Node2D, IHitter, IHittable
 	
 	public virtual void HandleGettingHit(HitData data)
 	{
-		Audio.Play(data.Hitter.HitSound);
+		Audio.Play(data.Hitter.HitSound, Position);
 		Destruct();
 	}
 	

@@ -25,6 +25,7 @@ Randomizer="*res://Scripts/Autoloads/Randomizer.cs"
 KeybindsSetupHandler="*res://Scripts/Autoloads/KeybindsSetupHandler.cs"
 BufferInputManager="*res://Scripts/Inputs/BufferInputManager.cs"
 RawInputMap="*res://Scripts/Inputs/RawInput/RawInputMap.cs"
+AudioManager="*res://Scripts/Audio/AudioManager.cs"
 
 [debug]
 

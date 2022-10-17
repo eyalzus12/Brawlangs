@@ -127,7 +127,7 @@ public class DebugLabel : InfoLabel
 		Add("Script", ch.GetType().Name);
 		Add("TeamNumber", ch.TeamNumber);
 		Newline();
-		Add("PlayedSounds", "\n"+ch.Audio);
+		Add("Sounds", "\n"+ch.Audio);
 		Newline();
 		Add("Buffer", "\n"+ch.Inputs);
 		Newline();

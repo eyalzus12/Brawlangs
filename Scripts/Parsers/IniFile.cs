@@ -14,31 +14,30 @@ using Strl = System.Collections.Generic.List<string>;
 
 public class IniFile
 {
-	public IniDictionary dict;
-	public string filePath;
-	public File file;
+	public IniDictionary Dict{get; set;} = new IniDictionary();
+	public string FilePath{get; set;}
 	
 	public IniFile() => Reset();
 	
 	public void Reset()
 	{
-		dict = new IniDictionary();
-		dict.Add("", new Dictionary<string,object>());
+		Dict = new IniDictionary();
+		Dict.Add("", new Dictionary<string,object>());
 	}
 	
-	public int Count => dict.Count;
-	public IniDictionary.KeyCollection Keys => dict.Keys;
-	public IniDictionary.ValueCollection Values => dict.Values;
+	public int Count => Dict.Count;
+	public IniDictionary.KeyCollection Keys => Dict.Keys;
+	public IniDictionary.ValueCollection Values => Dict.Values;
 	
-	public Dictionary<string, object> this[string section] => dict[section];
-	public object this[string section, string key] => dict[section][key];
+	public Dictionary<string, object> this[string section] => Dict[section];
+	public object this[string section, string key] => Dict[section][key];
 	
-	public object this[string section, string key, object @default] => dict.GetValueOrDefault(section,null)?.GetValueOrDefault(key,@default)??@default;
+	public object this[string section, string key, object @default] => Dict.GetValueOrDefault(section,null)?.GetValueOrDefault(key,@default)??@default;
 	
 	public override string ToString()
 	{
 		var res = new StringBuilder();
-		foreach(var section in dict)
+		foreach(var section in Dict)
 		{
 			res.Append($"[{section.Key}]\n");
 			foreach(var entry in section.Value) res.Append($"{entry.Key} = {entry.Value.ToString()}\n");
@@ -47,13 +46,14 @@ public class IniFile
 	}
 	
 	public object GetValue(string section, string key, object @default = null) => this[section, key, @default];
-	public bool HasSection(string section) => dict.ContainsKey(section);
+	public bool HasSection(string section) => Dict.ContainsKey(section);
 	
 	public Error Load(string path)
 	{
 		string content;
 		var er = Utils.ReadFile(path, out content);
 		if(er != Error.Ok) return er;//if error, return
+		FilePath = path;
 		Parse(content);//parse
 		return Error.Ok;
 	}
@@ -70,10 +70,10 @@ public class IniFile
 			if(s == "") continue;
 			if(s[0] == '[')
 			{
-				if(s[s.Length - 1] != ']') throw new FormatException($"File {filePath}: Opening [ without closing ] found in line {i}");
+				if(s[s.Length - 1] != ']') throw new FormatException($"File {FilePath}: Opening [ without closing ] found in line {i}");
 				section = s.Substring(1, s.Length-2);
-				if(dict.ContainsKey(section)) throw new FormatException($"File {filePath}: Duplicate section name {section} in line {i}");
-				dict.Add(section, new Dictionary<string, object>());
+				if(Dict.ContainsKey(section)) throw new FormatException($"File {FilePath}: Duplicate section name {section} in line {i}");
+				Dict.Add(section, new Dictionary<string, object>());
 			}
 			else
 			{
@@ -85,7 +85,7 @@ public class IniFile
 	private void Store(string key, string line, int lineCount)
 	{
 		var leftright = line.Split('=');//split to left side and right side
-		if(leftright.Length != 2) throw new FormatException($"File {filePath}: Improper amount of =s in line {lineCount}");
+		if(leftright.Length != 2) throw new FormatException($"File {FilePath}: Improper amount of =s in line {lineCount}");
 		var left = leftright[0].Trim();//left side
 		var right = leftright[1].Trim();//right side
 		var parts = right.Split(',');//split right side to parts by commas
@@ -106,7 +106,7 @@ public class IniFile
 					}
 					else
 					{
-						if(parts.Length <= 2) throw new FormatException($"File {filePath}: No closing ) found in line {lineCount}");
+						if(parts.Length <= 2) throw new FormatException($"File {FilePath}: No closing ) found in line {lineCount}");
 						var trim2 = parts[i+2].Trim();//get third element
 						if(trim2[trim2.Length-1] == ')')//is really a vector
 						{
@@ -115,7 +115,7 @@ public class IniFile
 						}
 						else
 						{
-							if(parts.Length <= 3) throw new FormatException($"File {filePath}: No closing ) found in line {lineCount}");
+							if(parts.Length <= 3) throw new FormatException($"File {FilePath}: No closing ) found in line {lineCount}");
 							var trim3 = parts[i+3].Trim();//get fourth element
 							if(trim3[trim3.Length-1] == ')')//is really a vector
 							{
@@ -124,7 +124,7 @@ public class IniFile
 							}
 							else
 							{
-								throw new FormatException($"File {filePath}: Too many arguments in vector in line {lineCount}");
+								throw new FormatException($"File {FilePath}: Too many arguments in vector in line {lineCount}");
 							}
 						}//end of Quat else
 					}//end of Vector3 else
@@ -134,8 +134,8 @@ public class IniFile
 		}//end of list check
 		else store.Add(right);
 		
-		if(dict[key].ContainsKey(left)) throw new FormatException($"File {filePath}: Duplicate property {left} in line {lineCount}");
-		dict[key].Add(left, Norm(store));
+		if(Dict[key].ContainsKey(left)) throw new FormatException($"File {FilePath}: Duplicate property {left} in line {lineCount}");
+		Dict[key].Add(left, Norm(store));
 	}
 	
 	private object Norm(Strl l)

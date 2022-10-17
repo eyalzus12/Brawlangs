@@ -7,47 +7,55 @@ using System.Linq;
 public class AudioManager : Node2D
 {
 	public Dictionary<string, AudioStream> Sounds{get; set;} = new Dictionary<string, AudioStream>();
-	public AudioStream this[string s] {get => Sounds[s]; set => Sounds[s] = value;}
-	public bool ContainsSound(string s) => Sounds.ContainsKey(s);
+	
+	public AudioStream this[string namePrefix, string s] {get => Sounds[$"{namePrefix}.{s}"]; set => Sounds[$"{namePrefix}.{s}"] = value;}
+	public bool ContainsSound(string namePrefix, string s) => Sounds.ContainsKey($"{namePrefix}.{s}");
+	public void AddSound(string namePrefix, string s, AudioStream stream) => Sounds.TryAdd($"{namePrefix}.{s}", stream);
+	
 	public List<AudioPlayer> Players{get; set;} = new List<AudioPlayer>();
 	public Queue<AudioPlayer> Available{get; set;} = new Queue<AudioPlayer>();
 	
-	public AudioManager() {}
-	
-	public AudioManager(int capacity)
+	public const int INITIAL_LOAD_AMOUNT = 5;
+	public AudioManager()
 	{
-		for(int i = 0; i < capacity; ++i)
+		LoadPlayers(INITIAL_LOAD_AMOUNT);
+	}
+	
+	public const int ADDITIONAL_LOAD_AMOUNT = 3;
+	public void Play(AudioStream stream, Vector2 pos = default)
+	{
+		if(stream is null) return;
+		
+		if(Available.Count <= 0) LoadPlayers(ADDITIONAL_LOAD_AMOUNT);
+		
+		var use = Available.Dequeue();
+		use.Position = pos;
+		use.Play(stream);
+	}
+	
+	public void Play(string namePrefix, string s, Vector2 pos = default)
+	{
+		if(s == "") return;
+		AudioStream audio;
+		if(Sounds.TryGetValue($"{namePrefix}.{s}", out audio)) Play(audio, pos);
+		else GD.PushError($"[{nameof(AudioManager)}.cs]: Unknown sound {namePrefix}.{s}");
+	}
+	
+	public void StreamFinished(AudioPlayer who, AudioStream what) => Available.Enqueue(who);
+	
+	public void LoadPlayers(int amount)
+	{
+		int start = Players.Count;
+		for(int i = 0; i < amount; ++i)
 		{
 			var player = new AudioPlayer();
-			player.Name = $"AudioPlayer{i}";
+			player.Name = $"AudioPlayer{i+start}";
+			player.Connect("FinishedPlaying", this, nameof(StreamFinished));
 			AddChild(player);
 			
 			Players.Add(player);
 			Available.Enqueue(player);
 		}
-	}
-	
-	public void Play(AudioStream stream)
-	{
-		if(stream is null || Available.Count <= 0) return;//TODO: add a waiting queue for sounds, that plays them at the fitting time
-		var use = Available.Dequeue();
-		use.Play(stream);
-		use.Connect("FinishedPlaying", this, nameof(StreamFinished));
-	}
-	
-	public void Play(string sound)
-	{
-		AudioStream audio;
-		if(Sounds.TryGetValue(sound, out audio)) Play(audio);
-		else if(sound != "") GD.PushError($"Could not play sound {sound} as it does not exist");
-	}
-	
-	public void AddSound(string name, AudioStream audio) => Sounds.Add(name, audio);
-	
-	public void StreamFinished(AudioPlayer who, AudioStream what)
-	{
-		Available.Enqueue(who);
-		who.Disconnect("FinishedPlaying", this, nameof(StreamFinished));
 	}
 	
 	public override string ToString()

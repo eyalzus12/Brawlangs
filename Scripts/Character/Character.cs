@@ -329,8 +329,8 @@ public class Character : KinematicBody2D,
 	public AnimationSprite CharacterSprite{get; set;} = new AnimationSprite();
 	public Color SpriteModulate{get; set;}
 	
-	public const int AUDIO_PLAYERS = 4;
-	public AudioManager Audio{get; set;} = new AudioManager(AUDIO_PLAYERS);
+	public string AudioPrefix => Name;
+	public AudioManager Audio{get; set;}
 	
 	public AnimationPlayer HitboxAnimator{get; set;} = new AnimationPlayer();
 	
@@ -348,9 +348,6 @@ public class Character : KinematicBody2D,
 		
 		CharacterSprite.Name = "CharacterSprite";
 		AddChild(CharacterSprite);
-		
-		Audio.Name = "AudioManager";
-		AddChild(Audio);
 		
 		Inputs.Name = "InputManager";
 		AddChild(Inputs);
@@ -408,8 +405,8 @@ public class Character : KinematicBody2D,
 	///////////////Sound///////////////////////
 	///////////////////////////////////////////
 	
-	public void PlaySound(string sound) => Audio.Play(sound);
-	public void PlaySound(AudioStream sound) => Audio.Play(sound);
+	public void PlaySound(string sound, Vector2 pos) => Audio.Play(AudioPrefix, sound, pos);
+	public void PlaySound(AudioStream sound, Vector2 pos) => Audio.Play(sound, pos);
 	
 	///////////////////////////////////////////
 	///////////////States//////////////////////
@@ -763,7 +760,7 @@ public class Character : KinematicBody2D,
 		
 		FramesSinceLastHit = 0;
 		
-		PlaySound(hitSound);
+		PlaySound(hitSound, Position);
 	}
 	
 	public virtual void HandleHitting(HitData data)

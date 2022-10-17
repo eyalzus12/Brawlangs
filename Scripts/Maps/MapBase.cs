@@ -66,10 +66,9 @@ public class MapBase : Node2D
 		for(int i = 0; i < 8 ; ++i)
 		{
 			object o = "";
-			if(data.TryGetValue($"LoadedCharacter{i}", out o))
+			if(data.TryGetValue($"LoadedCharacter{i}", out o) && o is ValueTuple<string, int, int> v)
 			{
-				var s = o.s();
-				var ch = PathToCharacter(s, i);
+				var ch = PathToCharacter(v.Item1, v.Item2, v.Item3, i);
 				chars.Add(ch);
 			}
 		}
@@ -77,12 +76,12 @@ public class MapBase : Node2D
 		return chars;
 	}
 	
-	public Character PathToCharacter(string path, int i)
+	public Character PathToCharacter(string path, int profile, int device, int i)
 	{
 		var charname = path.SplitByLast('/')[1];
 		path = $"{path}/{charname}.cfg";
 		var cr = new CharacterCreator(path);
-		var c = cr.Build(this, i);
+		var c = cr.Build(this, profile, device, i);
 		
 		c.SpriteModulate = colorlist[i];
 		c.Respawn();

@@ -4,6 +4,8 @@ using System.Collections.Generic;
 
 public interface IAttacker
 {
+	string Name{get; set;}
+	
 	Vector2 Position{get; set;}
 	int Direction{get; set;}
 	int TeamNumber{get; set;}
@@ -24,7 +26,9 @@ public interface IAttacker
 	Attack CurrentAttack{get; set;}
 	Dictionary<string, Attack> Attacks{get; set;}
 	
+	string AudioPrefix{get;}
 	AudioManager Audio{get; set;}
+	
 	AnimationPlayer HitboxAnimator{get; set;}
 	
 	void HandleHitting(HitData data);

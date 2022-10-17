@@ -4,6 +4,8 @@ using System.Collections.Generic;
 
 public interface IHitter
 {
+	string Name{get; set;}
+	
 	Vector2 Position{get; set;}
 	int Direction{get; set;}
 	int TeamNumber{get; set;}
@@ -21,7 +23,6 @@ public interface IHitter
 	
 	bool FriendlyFire{get; set;}
 	
-	void ConnectSignals();
 	void HandleInitialHit(Hitbox hitbox, Hurtbox hurtbox);
 	void HandleHits();
 	void HitEvent(Hitbox hitbox, Hurtbox hurtbox);
