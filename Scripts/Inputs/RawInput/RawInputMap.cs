@@ -141,7 +141,7 @@ public class RawInputMap : Node
 	private void ReadKeyMap()
 	{
 		string content;
-		var er = Utils.ReadFile(path, out content);
+		var er = Utils.ReadFile(KEY_MAP_PATH, out content);
 		if(er != Error.Ok) return;
 		ParseKeyMap(content);
 	}

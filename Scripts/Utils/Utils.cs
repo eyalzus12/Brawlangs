@@ -217,4 +217,8 @@ public static class Utils
 		dir.ListDirEnd();
 		return Error.Ok;
 	}
+	
+	public static Func<T,bool> And<T>(this Func<T,bool> f1, Func<T,bool> f2) => (T t) => f1(t)&&f2(t);
+	public static Func<T,bool> Or<T>(this Func<T,bool> f1, Func<T,bool> f2) => (T t) => f1(t)||f2(t);
+	public static Func<T,bool> Not<T>(this Func<T,bool> f) => (T t) => !f(t);
 }

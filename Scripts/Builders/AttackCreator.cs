@@ -111,10 +111,12 @@ public class AttackCreator
 		foreach(var s in transitionSections) BuildTransition(ap, s);
 		
 		var hitTransitionSection = inif[section, "HitTransition", ""].s();
-		if(hitTransitionSection != "") ap.TransitionManager.Add(new AttackPartTransition(Enumerable.Empty<Vector2>(), new AttackPartTransitionTagExpression(new object[]{("Hit",StateTag.Active),("Hit",StateTag.Starting),'|'}), hitTransitionSection));
+		var hitExpression = "Hit.Active|Hit.Starting";
+		if(hitTransitionSection != "") ap.TransitionManager.Add(new AttackPartTransition(Enumerable.Empty<Vector2>(), new AttackPartTransitionTagExpression(hitExpression), hitTransitionSection));
 		
 		var missTransitionSection = inif[section, "MissTransition", ""].s();
-		if(missTransitionSection != "") ap.TransitionManager.Add(new AttackPartTransition(Enumerable.Empty<Vector2>(), new AttackPartTransitionTagExpression(new object[]{("Hit",StateTag.NotActive)}), missTransitionSection));
+		var missExpression = "Hit.NotActive";
+		if(missTransitionSection != "") ap.TransitionManager.Add(new AttackPartTransition(Enumerable.Empty<Vector2>(), new AttackPartTransitionTagExpression(missExpression), missTransitionSection));
 		
 		var nextTransitionSection = inif[section, "NextTransition", ""].s();
 		if(nextTransitionSection != "") ap.TransitionManager.Add(new AttackPartTransition(Enumerable.Empty<Vector2>(), new AttackPartTransitionTagExpression(), nextTransitionSection));
@@ -238,8 +240,7 @@ public class AttackCreator
 		
 		try
 		{
-			var parsedTagList = ParseTagList(tags);
-			var tagExpression = new AttackPartTransitionTagExpression(parsedTagList);
+			var tagExpression = new AttackPartTransitionTagExpression(tags);
 			var frames = inif[section, "Frames", Enumerable.Empty<Vector2>()].lv2();
 			var nextPart = inif[section, "Next", ""].s();
 			var addedTransition = new AttackPartTransition(frames, tagExpression, nextPart);
@@ -249,73 +250,6 @@ public class AttackCreator
 		{
 			GD.PushError(fe.Message);
 			return;
-		}
-	}
-	
-	private static readonly char[] OPERATORS = new char[]{'!', '|', '&', ')', '('};
-	public IEnumerable<object> ParseTagList(string s)
-	{
-		if(s == "") yield break;
-		
-		var operators = new Stack<char>();
-		
-		var stateName = new StringBuilder();
-		var tagValue = new StringBuilder();
-		bool doingTagValue = false;
-		
-		foreach(var c in s)
-		{
-			if(c == '(') operators.Push(c);
-			else if(OPERATORS.Contains(c))
-			{
-				if(stateName.Length > 0 && tagValue.Length > 0)
-				{
-					var _stateName = stateName.ToString();
-					var _tagValue = tagValue.ToString();
-					StateTag tag;
-					if(!Enum.TryParse<StateTag>(_tagValue, out tag)) throw new FormatException($"Unknown tag value {_tagValue} in attack part transition expression {s}");
-					yield return (_stateName, tag);
-					stateName.Clear(); tagValue.Clear(); doingTagValue = false;
-				}
-				else if(doingTagValue) throw new FormatException($"Operator or closing bracket immedietly after a period in attack part transition expression {s}");
-				
-				int pre = OPERATORS.FindIndex(c);
-				while(operators.Count > 0 && OPERATORS.FindIndex(operators.Peek()) <= pre) yield return operators.Pop();
-				
-				if(c == ')')
-				{
-					if(operators.Count == 0) throw new FormatException($"Attack part transition expression {s} has imbalanced brackets");
-					operators.Pop(); //remove the (
-				}
-				else operators.Push(c);
-			}
-			else if(c == '.')
-			{
-				if(doingTagValue) throw new FormatException($"Too many periods in attack part transition expression {s}");
-				doingTagValue = true;
-			}
-			else
-			{
-				if(doingTagValue) tagValue.Append(c);
-				else stateName.Append(c);
-			}
-		}
-		
-		if(doingTagValue)
-		{
-			var _stateName = stateName.ToString();
-			var _tagValue = tagValue.ToString();
-			StateTag tag;
-			if(!Enum.TryParse<StateTag>(_tagValue, out tag)) throw new FormatException($"Unknown tag value {_tagValue} in attack part transition expression {s}");
-			yield return (_stateName, tag);
-			stateName.Clear(); tagValue.Clear(); doingTagValue = false;
-		}
-		else if(stateName.Length != 0) throw new FormatException($"Period without tag value in attack part transition expression {s}");
-		
-		while(operators.Count > 0)
-		{
-			if(operators.Peek() == '(') throw new FormatException($"Attack part transition expression {s} has imbalanced brackets");
-			yield return operators.Pop();
 		}
 	}
 	
