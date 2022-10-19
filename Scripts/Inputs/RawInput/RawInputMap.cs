@@ -56,7 +56,7 @@ public class RawInputMap : Node
 		InputForm = new RawInputReceiverForm();
 		InputForm.KeycodePress += (sender, t) => KeycodePress(t);
 		
-		RawInputDevice.RegisterDevice(HidUsageAndPage.Keyboard, RawInputDeviceFlags.ExInputSink | RawInputDeviceFlags.NoLegacy, InputForm.Window.Handle);
+		RawInputDevice.RegisterDevice(HidUsageAndPage.Keyboard, RawInputDeviceFlags.NoLegacy, InputForm.Window.Handle);
 		
 		new Task(RunForm).Start();
 	}
@@ -120,17 +120,22 @@ public class RawInputMap : Node
 		var scancode = KeycodeDict[rawInput.Key];
 		
 		var data = (device, scancode);
-		if(rawInput.Pressed && HeldEvents.Contains(data)) return;//holding
-		
-		HeldEvents.Remove(data);
 		
 		var input = new InputEventKey();
 		
 		input.Device = device;
 		input.Scancode = scancode;
 		input.Pressed = rawInput.Pressed;
+		input.Echo = rawInput.Pressed && HeldEvents.Contains(data);
+		
+		
+		
+		//hack to manually set the unicode for the input
+		var s = input.AsText();
+		if(s.Length == 1) input.Unicode = s[0];
 		
 		if(input.Pressed) HeldEvents.Add(data);
+		else HeldEvents.Remove(data);
 		
 		if(DebugInput) GD.PrintT($"Raw Input: {input.AsText()}", $"Keycode: {rawInput.Key}", $"Mapped to: {input.Scancode}", $"Pressed: {rawInput.Pressed}", $"Device: {input.Device}");
 		

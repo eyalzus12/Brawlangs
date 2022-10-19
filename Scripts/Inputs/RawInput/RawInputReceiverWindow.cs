@@ -23,6 +23,7 @@ public class RawInputReceiverWindow : NativeWindow
 	const int WM_INPUT = 0x00FF;
 	protected override void WndProc(ref Message m)
 	{
+		base.WndProc(ref m);
 		if(m.Msg == WM_INPUT)
 		{
 			var data = RawInputData.FromHandle(m.LParam);
@@ -37,10 +38,6 @@ public class RawInputReceiverWindow : NativeWindow
 				var input = new RawInputKeyEvent(key, pressed, handle);
 				KeycodePress?.Invoke(this, input);
 			}
-			
-			//GD.Print(data);
 		}
-		
-		base.WndProc(ref m);
 	}
 }
