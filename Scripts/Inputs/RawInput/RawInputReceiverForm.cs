@@ -1,12 +1,13 @@
 using Godot;
 using System;
 using System.Windows.Forms;
-using Linearstar.Windows.RawInput;
+using System.Collections.Generic;
+using RawInput_dll;
 
 public class RawInputReceiverForm : Form
 {
-	public event EventHandler<RawInputKeyEvent> KeycodePress;
-	public RawInputReceiverWindow Window{get; set;}
+	public event EventHandler<RawInputEventArg> KeyPressed;
+	public RawInput RawInputWindow{get; set;}
 	
 	public RawInputReceiverForm()
 	{
@@ -14,8 +15,11 @@ public class RawInputReceiverForm : Form
 		ShowInTaskbar = false;
 		Opacity = 0;
 		Size = new System.Drawing.Size(0, 0);
-		Window = new RawInputReceiverWindow(this);
-		Window.KeycodePress += (sender, t) => KeycodePress?.Invoke(this, t);
+		
+		//Window = new RawInputReceiverWindow(this);
+		RawInputWindow = new RawInput(this.Handle, false);
+		RawInputWindow.AddMessageFilter();
+		RawInputWindow.KeyPressed += (sender, e) => KeyPressed?.Invoke(sender, e);
 	}
 	
 	// hiding from Alt+TAB dialog

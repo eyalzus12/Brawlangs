@@ -43,7 +43,7 @@ __meta__ = {
 margin_left = 70.0
 margin_right = 128.0
 margin_bottom = 24.0
-text = "3"
+text = "1"
 
 [node name="Load1Path" type="LineEdit" parent="LoadContainer/Load1"]
 margin_left = 140.0
@@ -75,7 +75,7 @@ text = "0"
 margin_left = 70.0
 margin_right = 128.0
 margin_bottom = 24.0
-text = "5"
+text = "2"
 
 [node name="Load2Path" type="LineEdit" parent="LoadContainer/Load2"]
 margin_left = 140.0
