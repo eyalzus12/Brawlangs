@@ -6,7 +6,4 @@
     <RootNamespace>Brawlangs</RootNamespace>
     <AssemblyName>Brawlangs</AssemblyName>
   </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="RawInput.Sharp" Version="0.0.4" />
-  </ItemGroup>
 </Project>
