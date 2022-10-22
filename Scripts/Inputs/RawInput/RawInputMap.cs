@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using Linearstar.Windows.RawInput;
 using System.Threading.Tasks;
 using RawInput_dll;
 

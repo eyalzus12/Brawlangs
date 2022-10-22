@@ -3,12 +3,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-//using Conn = System.Collections.Generic.Dictionary<string, (string, Attack)>;
+using System.Text.RegularExpressions;
 
 public class AttackCreator
 {
 	public string path;
 	public IniFile inif = new IniFile();
+	
+	public Dictionary<string,TagExpression> TopLevelExpressions{get; set;} = new Dictionary<string,TagExpression>();
+	public Dictionary<string,TagExpression> AttackLevelExpressions{get; set;} = new Dictionary<string,TagExpression>();
+	public Dictionary<string,TagExpression> AttackPartLevelExpressions{get; set;} = new Dictionary<string,TagExpression>();
 	
 	public AttackCreator() {}
 	
@@ -18,8 +22,19 @@ public class AttackCreator
 		inif.Load(path);
 	}
 	
+	public const string TAG_EXPRESSION_PATTERN = @"^TagExpression_(?<name>.*?)$";
+	public static readonly Regex TAG_EXPRESSION_REGEX = new Regex(TAG_EXPRESSION_PATTERN, RegexOptions.Compiled);
 	public void Build(Node2D n)
 	{
+		foreach(var key in inif[""].Keys)
+		{
+			var match = TAG_EXPRESSION_REGEX.Match(key);
+			if(!match.Success) continue;
+			var name = match.Groups["name"].Value;
+			var expression = new TagExpression(inif["",key,""].s());
+			TopLevelExpressions.Add(name,expression);
+		}
+		
 		var attacks = inif["", "AttackSections", Enumerable.Empty<string>()].ls();
 		foreach(var s in attacks) BuildAttack(n, s);
 	}
@@ -27,6 +42,16 @@ public class AttackCreator
 	public void BuildAttack(Node n, string section)
 	{
 		if(!inif.HasSection(section)) {GD.PushError($"Can't generate attack {section} as it is not a real section"); return;}
+		
+		foreach(var key in inif[section].Keys)
+		{
+			var match = TAG_EXPRESSION_REGEX.Match(key);
+			if(!match.Success) continue;
+			var name = match.Groups["name"].Value;
+			var expression = new TagExpression(inif["",key,""].s());
+			AttackLevelExpressions.Add(name,expression);
+		}
+		
 		var AttackScript = inif[section, "Script", ""].s();
 		var baseFolder = path.SplitByLast('/')[0];
 		var a = TypeUtils.LoadScript<Attack>(AttackScript, new Attack(), baseFolder);
@@ -50,11 +75,27 @@ public class AttackCreator
 		n.AddChild(a);
 		a.Owner = n;//for scene packing
 		ch.Attacks.Add(a.Name, a);
+		
+		AttackLevelExpressions.Clear();
 	}
 	
+	public const string PROPERTY_FRAME_PATTERN = @"^PropertyFrame_(?<name>.*?)$";
+	public static readonly Regex PROPERTY_FRAME_REGEX = new Regex(PROPERTY_FRAME_PATTERN, RegexOptions.Compiled);
+	public const string CONDITION_PATTERN = @"^Condition_(?<type>Trans|Tag|State)_(?<expression>.*?)_(?<frames>.*?)$";
+	public static readonly Regex CONDITION_REGEX = new Regex(CONDITION_PATTERN, RegexOptions.Compiled);
 	public AttackPart BuildPart(Attack a, string section, string start)
 	{
 		if(!inif.HasSection(section)) {GD.PushError($"Can't generate attack part {section} as it is not a real section"); return null;}
+		
+		foreach(var key in inif[section].Keys)
+		{
+			var match = TAG_EXPRESSION_REGEX.Match(key);
+			if(!match.Success) continue;
+			var name = match.Groups["name"].Value;
+			var expression = new TagExpression(inif["",key,""].s());
+			AttackPartLevelExpressions.Add(name,expression);
+		}
+		
 		var PartScript = inif[section, "Script", ""].s();
 		var baseFolder = path.SplitByLast('/')[0];
 		var ap = TypeUtils.LoadScript<AttackPart>(PartScript, new AttackPart(), baseFolder);
@@ -63,6 +104,17 @@ public class AttackCreator
 		ap.Name = section;
 		a.Parts.Add(section, ap);
 		if(section == start) a.StartPart = ap;
+		
+		foreach(var key in inif[section].Keys)
+		{
+			var match = PROPERTY_FRAME_REGEX.Match(key);
+			if(match.Success) ApplyAttackPartPropertyFrame(ap, section, key, match);
+			else
+			{
+				match = CONDITION_REGEX.Match(key);
+				if(match.Success) ApplyAttackPartCondition(ap, section, key, match);
+			}
+		}
 		
 		var su = inif[section, "Startup", 0].i();
 		ap.Startup = su;
@@ -76,6 +128,10 @@ public class AttackCreator
 		ap.MomentumPreservation = mp;
 		var bmp = inif[section, "BurstMomentumPreservation", Vector2.One].v2();
 		ap.BurstMomentumPreservation = bmp;
+		var mmmd = inif[section, "MakeMomentumMatchDirection", false].b();
+		ap.MakeMomentumMatchDirection = mmmd;
+		var mbmmd = inif[section, "MakeBurstMomentumMatchDirection", false].b();
+		ap.MakeBurstMomentumMatchDirection = mbmmd;
 		var dfa = inif[section, "DriftForwardAcceleration", 0f].f();
 		ap.DriftForwardAcceleration = dfa;
 		var dfs = inif[section, "DriftForwardSpeed", 0f].f();
@@ -107,27 +163,57 @@ public class AttackCreator
 		var hitboxSections = inif[section, "Hitboxes", Enumerable.Empty<string>()].ls();
 		foreach(var s in hitboxSections) BuildHitbox(ap, s);
 		
-		var transitionSections = inif[section, "Transitions", Enumerable.Empty<string>()].ls();
-		foreach(var s in transitionSections) BuildTransition(ap, s);
-		
-		var hitTransitionSection = inif[section, "HitTransition", ""].s();
-		var hitExpression = "Hit.Active|Hit.Starting";
-		if(hitTransitionSection != "") ap.TransitionManager.Add(new AttackPartTransition(Enumerable.Empty<Vector2>(), new AttackPartTransitionTagExpression(hitExpression), hitTransitionSection));
-		
-		var missTransitionSection = inif[section, "MissTransition", ""].s();
-		var missExpression = "Hit.NotActive";
-		if(missTransitionSection != "") ap.TransitionManager.Add(new AttackPartTransition(Enumerable.Empty<Vector2>(), new AttackPartTransitionTagExpression(missExpression), missTransitionSection));
-		
-		var nextTransitionSection = inif[section, "NextTransition", ""].s();
-		if(nextTransitionSection != "") ap.TransitionManager.Add(new AttackPartTransition(Enumerable.Empty<Vector2>(), new AttackPartTransitionTagExpression(), nextTransitionSection));
-		
 		ap.LoadProperties();
 		LoadExtraProperties(ap, section);
 		
 		a.AddChild(ap);
 		ap.Owner = a;//for scene packing
 		
+		AttackPartLevelExpressions.Clear();
+		
 		return ap;
+	}
+	
+	public void ApplyAttackPartPropertyFrame(AttackPart ap, string section, string key, Match match)
+	{
+		var name = match.Groups["name"].Value;
+		var frames = inif[section, key, Enumerable.Empty<Vector2>()].lv2();
+		foreach(var frame in frames)
+			ap.FramePropertyManager.Add((long)frame.x, (long)frame.y, name);
+	}
+	
+	public void ApplyAttackPartCondition(AttackPart ap, string section, string key, Match match)
+	{
+		var groups = match.Groups;
+		var type = groups["type"].Value;
+		var expression = groups["expression"].Value;
+		var frames = groups["frames"].Value;
+		var result = inif[section, key, ""].s();
+		
+		TagExpression t;
+		if(
+			!AttackPartLevelExpressions.TryGetValue(expression, out t) &&
+			!AttackLevelExpressions.TryGetValue(expression, out t) &&
+			!TopLevelExpressions.TryGetValue(expression, out t)
+		) t = new TagExpression();
+		
+		var apc = new AttackPartCondition(frames, t, result);
+		
+		switch(type)
+		{
+			case "Tag":
+				ap.TagConditionManager.Add(apc);
+				break;
+			case "Trans":
+				ap.TransConditionManager.Add(apc);
+				break;
+			case "State":
+				ap.StateConditionManager.Add(apc);
+				break;
+			default:
+				GD.PushError($"Unkown condition type {type} in {inif.FilePath} section {section} key {key}");
+				break;
+		}
 	}
 	
 	public void BuildHitbox(AttackPart ap, string section)
@@ -232,7 +318,7 @@ public class AttackCreator
 		h.Owner = ap;//for scene packing
 	}
 	
-	public void BuildTransition(AttackPart ap, string section)
+	/*public void BuildTransition(AttackPart ap, string section)
 	{
 		if(!inif.HasSection(section)) {GD.PushError($"Can't generate transition {section} as it is not a real section"); return;}
 		
@@ -251,7 +337,7 @@ public class AttackCreator
 			GD.PushError(fe.Message);
 			return;
 		}
-	}
+	}*/
 	
 	/*
 	the following is a quick fix for being unable to get the load request dictionary

@@ -1,7 +1,7 @@
 public enum StateTag
 {
-	NotActive,
+	Ended,
+	Ending,
 	Starting,
-	Active,
-	Ending
+	Started
 }

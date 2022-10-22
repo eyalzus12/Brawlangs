@@ -15,8 +15,7 @@ public class DamageCalculator
 		(300, new Color(0.3f, 0, 0))// 74/255
 	};
 	
-	private static readonly FirstTupleItemComparer<float, Color> COMPARER = new FirstTupleItemComparer<float, Color>();
-	
+	private static readonly FloatColorTupleComparer COMPARER = new FloatColorTupleComparer();
 	public static Color DamageToColor(float damage)
 	{
 		if(damage <= VALUES[0].Item1) return VALUES[0].Item2;
@@ -35,5 +34,10 @@ public class DamageCalculator
 		var nextColor = VALUES[idx].Item2;
 		var weight = (damage-prevDamage)/(nextDamage-prevDamage);
 		return prevColor.LinearInterpolate(nextColor, weight);
+	}
+	
+	private class FloatColorTupleComparer : IComparer<(float,Color)>
+	{
+		public int Compare((float,Color) x, (float,Color) y) => x.Item1.CompareTo(y.Item1);
 	}
 }

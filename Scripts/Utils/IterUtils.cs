@@ -132,6 +132,12 @@ public static class IterUtils
 		while(ens.All(en => en.MoveNext())) yield return ens.Select(en => en.Current);
 	}
 	
+	public static T FirstOrDefault<T>(this IEnumerable<T> e, T @default = default)
+	{
+		foreach(var h in e) return h;
+		return @default;
+	}
+	
 	public static T FirstOrDefault<T>(this IEnumerable<T> e, Func<T, bool> predicate, T @default = default)
 	{
 		foreach(var h in e) if(predicate(h)) return h;

@@ -6,4 +6,7 @@
     <RootNamespace>Brawlangs</RootNamespace>
     <AssemblyName>Brawlangs</AssemblyName>
   </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="RangeTree" Version="3.0.1" />
+  </ItemGroup>
 </Project>

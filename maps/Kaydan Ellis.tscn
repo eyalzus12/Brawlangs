@@ -22,8 +22,8 @@ load_path = "res://.import/grass.jpg-4ca37d76c8b391a7e96ec05260cb4207.stex"
 [node name="MapBase" type="Node2D"]
 position = Vector2( 512, 300 )
 script = ExtResource( 1 )
-BlastZones = Vector2( 2300, 1400 )
-CameraLimits = Vector2( 2000, 1200 )
+BlastZones = Vector2( 1500, 1400 )
+CameraLimits = Vector2( 1300, 1200 )
 BackgroundTexture = ExtResource( 3 )
 
 [node name="MainPlatform" type="StaticBody2D" parent="."]

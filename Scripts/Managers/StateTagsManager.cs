@@ -10,11 +10,12 @@ public class StateTagsManager
 	
 	public StateTag this[string s]
 	{
-		get => Tags.GetValueOrDefault(s,StateTag.NotActive);
+		get => Tags.GetValueOrDefault(s,StateTag.Ended);
 		set => Tags[s] = value;
 	}
 	
-	public bool Active(string s) => this[s] == StateTag.Active || this[s] == StateTag.Starting;
+	public bool Active(string s) => this[s] == StateTag.Started || this[s] == StateTag.Starting;
+	public bool Inactive(string s) => this[s] == StateTag.Ended || this[s] == StateTag.Ending;
 	
 	public void Update()
 	{
@@ -26,11 +27,11 @@ public class StateTagsManager
 		switch(t)
 		{
 			case StateTag.Starting:
-				return StateTag.Active;
+				return StateTag.Started;
 			case StateTag.Ending:
-				return StateTag.NotActive;
-			case StateTag.NotActive:
-			case StateTag.Active:
+				return StateTag.Ended;
+			case StateTag.Ended:
+			case StateTag.Started:
 			default:
 				return t;
 		}
@@ -39,7 +40,7 @@ public class StateTagsManager
 	public override string ToString()
 	{
 		var result = new StringBuilder();
-		foreach(var entry in Tags) if(entry.Value != StateTag.NotActive) result.Append($"{entry.Key.ToString()} : {entry.Value.ToString()}\n");
+		foreach(var entry in Tags) if(entry.Value != StateTag.Ended) result.Append($"{entry.Key.ToString()} : {entry.Value.ToString()}\n");
 		return result.ToString();
 	}
 }

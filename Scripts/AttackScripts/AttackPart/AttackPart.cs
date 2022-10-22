@@ -26,10 +26,12 @@ public class AttackPart : Node2D, IHitter
 	}}
 	
 	public int Startup{get; set;}
-	public int Length{get; set;}
+	public long Length{get; set;}
 	public Vector2 Movement{get; set;}
 	public Vector2 MomentumPreservation{get; set;}
 	public Vector2 BurstMomentumPreservation{get; set;}
+	public bool MakeMomentumMatchDirection{get; set;}
+	public bool MakeBurstMomentumMatchDirection{get; set;}
 	public int Cooldown{get; set;}
 	public float GravityMultiplier{get; set;}
 	public string AttackAnimation{get; set;}
@@ -53,7 +55,11 @@ public class AttackPart : Node2D, IHitter
 	
 	public Attack OwnerAttack{get; set;}
 	
-	public AttackPartTransitionManager TransitionManager{get; set;} = new AttackPartTransitionManager();
+	public AttackPartFramePropertyManager FramePropertyManager{get; set;} = new AttackPartFramePropertyManager();
+	
+	public AttackPartConditionManager TagConditionManager{get; set;} = new AttackPartConditionManager();
+	public AttackPartConditionManager TransConditionManager{get; set;} = new AttackPartConditionManager();
+	public AttackPartConditionManager StateConditionManager{get; set;} = new AttackPartConditionManager();
 	
 	//needed for: animations, sound, velocity, projectiles, tags
 	protected Character ch;
@@ -69,6 +75,8 @@ public class AttackPart : Node2D, IHitter
 		FrameCount = 0;
 		
 		foreach(var h in Hitboxes) h.Connect("HitboxHit", this, nameof(HandleInitialHit));
+		
+		FramePropertyManager.Add(Length+Startup, long.MaxValue, "End");
 		
 		BuildHitboxAnimator();
 		Init();
@@ -86,8 +94,6 @@ public class AttackPart : Node2D, IHitter
 	
 	protected virtual void Activate()
 	{
-		if(Startup == 0) OnStartupFinish();
-		
 		HasHit = false;
 		FrameCount = 0;
 		
@@ -99,6 +105,8 @@ public class AttackPart : Node2D, IHitter
 		ch.vec *= MomentumPreservation;
 		ch.vec += Movement * new Vector2(ch.Direction, 1);
 		ch.vuc *= BurstMomentumPreservation;
+		if(MakeMomentumMatchDirection) ch.vec.x = ch.vec.x.CopySign(ch.Direction);
+		if(MakeBurstMomentumMatchDirection) ch.vuc.x = ch.vuc.x.CopySign(ch.Direction);
 		
 		OnStart();
 		
@@ -116,11 +124,24 @@ public class AttackPart : Node2D, IHitter
 		
 		if(!(ch.States.Current is HitLagState))
 		{
-			var next = NextPart();
-			if(next != "") ChangePart(next);
+			CheckConditions();
+			++FrameCount;
 		}
+	}
+	
+	public virtual void CheckConditions(bool end = false)
+	{
+		foreach(var result in TagConditionManager.Get(ch.Tags, FramePropertyManager, FrameCount))
+			ch.Tags[result.Item1] = ch.Tags[result.Item1].Apply(result.Item2?StateTag.Starting:StateTag.Ending);
 		
-		++FrameCount;
+		var trans = TransConditionManager.Get(ch.Tags, FramePropertyManager, FrameCount).Where(c => c.Item2).Select(c => c.Item1).FirstOrDefault("");
+		if(trans != "") ChangePart(trans);
+		else
+		{
+			var state = StateConditionManager.Get(ch.Tags, FramePropertyManager, FrameCount).Where(c => c.Item2).Select(c => c.Item1).FirstOrDefault("");
+			if(state != "") ch.States.Change(state);//Do state
+			else if(end) ChangePart("");
+		}
 	}
 	
 	public virtual void OnStartupFinish()
@@ -184,9 +205,9 @@ public class AttackPart : Node2D, IHitter
 	public virtual void OnEnd() {}
 	public virtual void HitEvent(Hitbox hitbox, Hurtbox hurtbox) {}
 	
-	public void ChangeToNextOnEnd(string dummy = "") => ChangeToNext(true);
-	public virtual void ChangeToNext(bool end = false) => ChangePart(NextPart(end));
-	public virtual string NextPart(bool end = false) => TransitionManager.NextAttackPart(ch.Tags, end?-1:FrameCount);
+	public void ChangeToNextOnEnd(string dummy = "") => CheckConditions(true);//ChangeToNext(true);
+	//public virtual void ChangeToNext(bool end = false) => ChangePart(NextPart(end));
+	//public virtual string NextPart(bool end = false) => TransitionManager.NextAttackPart(ch.Tags, end?-1:FrameCount);
 	public virtual void ChangePart(string part) => OwnerAttack.SetPart(part);
 	
 	public virtual bool CanGenerallyHit(IHittable hitObject) => OwnerObject.CanGenerallyHit(hitObject) && !HitIgnoreList.Contains(hitObject);

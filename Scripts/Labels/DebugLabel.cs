@@ -74,7 +74,7 @@ public class DebugLabel : InfoLabel
 		var part = ch.CurrentAttack?.CurrentPart;
 		Add("AttackPart", part?.Name??"None");
 		Add("AttackPartFrame", part?.FrameCount??0);
-		Add("NextPart", part?.NextPart()??"None");
+		//Add("NextPart", part?.NextPart()??"None");
 		Add("AttackPartScript", part?.GetType()?.Name??"None");
 		Add("AttackPartHit", part?.HasHit ?? false);
 		Add("LastAttackPart", ch.CurrentAttack?.LastUsedPart?.Name??"None");

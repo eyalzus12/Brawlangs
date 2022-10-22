@@ -121,7 +121,7 @@ public class AttackState : State
 		GD.Print($"{ch} is changing from Attack State");
 		#endif
 		
-		//got hit
-		if((newState is StunState || newState is HitPauseState) && ch.CurrentAttack != null) ch.CurrentAttack.Active = false;
+		//transitioning, not to hitlag.
+		if(!(newState is HitLagState) && ch.CurrentAttack != null) ch.CurrentAttack.Active = false;
 	}
 }

@@ -25,6 +25,7 @@ public class CameraFocus : Node2D
 		get => _limitOn;
 		set
 		{
+			_limitOn = value;
 			FollowingCamera.LimitLeft = -(int)(value?Limits.x:10000000);
 			FollowingCamera.LimitRight = (int)(value?Limits.x:10000000);
 			FollowingCamera.LimitTop = -(int)(value?Limits.y:10000000);
@@ -48,7 +49,7 @@ public class CameraFocus : Node2D
 	{
 		SetProcess(Followed.Count > 0);
 		
-		Followed.ForEach(c => c.Connect("Dead", this, nameof(CharacterGone)));
+		foreach(var followed in Followed) followed.Connect("Dead", this, nameof(CharacterGone));
 		
 		FollowingCamera = new Camera2D();
 		FollowingCamera.Name = "FollowingCamera";

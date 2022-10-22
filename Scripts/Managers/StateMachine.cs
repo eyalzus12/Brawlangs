@@ -20,6 +20,12 @@ public class StateMachine
 	
 	public State Change(string s)
 	{
+		if(!Contains(s))
+		{
+			GD.PushError($"Attempt to change to unknown state {s}");
+			return null;
+		}
+		
 		var tempState = this[s];
 		
 		Current?.OnChange(tempState);

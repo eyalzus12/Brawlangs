@@ -4,12 +4,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-public class AttackPartTransitionTagExpression
+public class TagExpression
 {
-	public Func<StateTagsManager,bool> TagExpression{get; set;}
-	public AttackPartTransitionTagExpression(){TagExpression = (StateTagsManager t) => true;}
-	public AttackPartTransitionTagExpression(string expression){TagExpression = ParsedExpressionToFunc(ParseExpression(expression));}
-	public bool Get(StateTagsManager tagsManager) => TagExpression(tagsManager);
+	public Func<StateTagsManager,bool> ExpressionFunc{get; set;}
+	
+	public TagExpression()
+	{ExpressionFunc = (t) => true;}
+	
+	public TagExpression(string expression)
+	{ExpressionFunc = (expression != "")?ParsedExpressionToFunc(ParseExpression(expression)):(t) => true;}
+	
+	public bool Get(StateTagsManager tagsManager) => ExpressionFunc(tagsManager);
 	
 	public static Func<StateTagsManager,bool> ParsedExpressionToFunc(IEnumerable<object> parsedExpression)
 	{
@@ -25,7 +30,7 @@ public class AttackPartTransitionTagExpression
 				{
 					if(estack.Count < 1)
 					{
-						GD.PushError($"Attempt to run operator {c} on zero tags in attack part transition expression {parts.ToArray().ToString()}");
+						GD.PushError($"Attempt to run operator {c} on zero tags in tag expression {parts.ToArray().ToString()}");
 						return (StateTagsManager t) => false;
 					}
 					
@@ -35,7 +40,7 @@ public class AttackPartTransitionTagExpression
 				{
 					if(estack.Count < 2)
 					{
-						GD.PushError($"Attempt to run operator {c} on one or zero tags in attack part transition expression {parts.ToArray().ToString()}");
+						GD.PushError($"Attempt to run operator {c} on one or zero tags in tag expression {parts.ToArray().ToString()}");
 						return (StateTagsManager t) => false;
 					}
 					
@@ -44,21 +49,21 @@ public class AttackPartTransitionTagExpression
 					else if(c == '|') estack.Push(value1.Or(value2));
 					else
 					{
-						GD.PushError($"Unknown operator {c} in attack part transition expression {parts.ToArray().ToString()}");
+						GD.PushError($"Unknown operator {c} in tag expression {parts.ToArray().ToString()}");
 						return (StateTagsManager t) => false;
 					}
 				}
 			}
 			else
 			{
-				GD.PushError($"Unkown object {part} with ToString {part?.ToString()} of type {part?.GetType()?.Name} found in attack part transition expression {parts.ToArray().ToString()}");
+				GD.PushError($"Unkown object {part} with ToString {part?.ToString()} of type {part?.GetType()?.Name} found in tag expression {parts.ToArray().ToString()}");
 				return (StateTagsManager t) => false;
 			}
 		}
 		
 		if(estack.Count != 1)
 		{
-			GD.PushError($"Not enough operators in attack part transition expression {parts.ToArray().ToString()}");
+			GD.PushError($"Not enough operators in tag expression {parts.ToArray().ToString()}");
 			return (StateTagsManager t) => false;
 		}
 		
@@ -68,8 +73,6 @@ public class AttackPartTransitionTagExpression
 	private static readonly char[] OPERATORS = new char[]{'!', '|', '&', ')', '('};
 	public static IEnumerable<object> ParseExpression(string s)
 	{
-		if(s == "") return Enumerable.Empty<object>();
-		
 		var result = new List<object>();
 		var operators = new Stack<char>();
 		
@@ -90,7 +93,7 @@ public class AttackPartTransitionTagExpression
 					
 					if(!Enum.TryParse<StateTag>(_tagValue, out tag))
 					{
-						GD.PushError($"Unknown tag value {_tagValue} in attack part transition expression {s}");
+						GD.PushError($"Unknown tag value {_tagValue} in tag expression {s}");
 						return Enumerable.Empty<object>();
 					}
 					
@@ -99,7 +102,7 @@ public class AttackPartTransitionTagExpression
 				}
 				else if(doingTagValue)
 				{
-					GD.PushError($"Operator or closing bracket immedietly after a period in attack part transition expression {s}");
+					GD.PushError($"Operator or closing bracket immedietly after a period in tag expression {s}");
 					return Enumerable.Empty<object>();
 				}
 				
@@ -110,7 +113,7 @@ public class AttackPartTransitionTagExpression
 				{
 					if(operators.Count == 0)
 					{
-						GD.PushError($"Attack part transition expression {s} has imbalanced brackets");
+						GD.PushError($"Tag expression {s} has imbalanced brackets");
 						return Enumerable.Empty<object>();
 					}
 					
@@ -122,7 +125,7 @@ public class AttackPartTransitionTagExpression
 			{
 				if(doingTagValue)
 				{
-					GD.PushError($"Too many periods in attack part transition expression {s}");
+					GD.PushError($"Too many periods in tag expression {s}");
 					return Enumerable.Empty<object>();
 				}
 				
@@ -140,13 +143,19 @@ public class AttackPartTransitionTagExpression
 			var _stateName = stateName.ToString();
 			var _tagValue = tagValue.ToString();
 			StateTag tag;
-			if(!Enum.TryParse<StateTag>(_tagValue, out tag)) throw new FormatException($"Unknown tag value {_tagValue} in attack part transition expression {s}");
+			
+			if(!Enum.TryParse<StateTag>(_tagValue, out tag))
+			{
+				GD.PushError($"Unknown tag value {_tagValue} in tag expression {s}");
+				return Enumerable.Empty<object>();
+			}
+			
 			result.Add((_stateName, tag));
 			stateName.Clear(); tagValue.Clear(); doingTagValue = false;
 		}
 		else if(stateName.Length != 0)
 		{
-			GD.PushError($"Period without tag value in attack part transition expression {s}");
+			GD.PushError($"Period without tag value in tag expression {s}");
 			return Enumerable.Empty<object>();
 		}
 		
@@ -154,7 +163,7 @@ public class AttackPartTransitionTagExpression
 		{
 			if(operators.Peek() == '(')
 			{
-				GD.PushError($"Attack part transition expression {s} has imbalanced brackets");
+				GD.PushError($"Tag expression {s} has imbalanced brackets");
 				return Enumerable.Empty<object>();
 			}
 			

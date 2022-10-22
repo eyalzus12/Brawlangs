@@ -221,4 +221,10 @@ public static class Utils
 	public static Func<T,bool> And<T>(this Func<T,bool> f1, Func<T,bool> f2) => (T t) => f1(t)&&f2(t);
 	public static Func<T,bool> Or<T>(this Func<T,bool> f1, Func<T,bool> f2) => (T t) => f1(t)||f2(t);
 	public static Func<T,bool> Not<T>(this Func<T,bool> f) => (T t) => !f(t);
+	
+	public static StateTag Apply(this StateTag s1, StateTag s2)
+	{
+		if((s1 == StateTag.Started && s2 == StateTag.Starting) || (s1 == StateTag.Ended && s2 == StateTag.Ending)) return s1;
+		else return s2;
+	}
 }
