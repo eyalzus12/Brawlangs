@@ -22,25 +22,25 @@ public class MapCreator
 		if(plats is string) BuildPlatform(plats.s(), n);
 		else foreach(var str in plats.ls()) BuildPlatform(str, n);
 		
-		var camera = new MatchCamera();
-		camera.Name = "Camera";
-		var cbounds = inif[BASE_SECTION, "CameraBounds", MatchCamera.DEFAULT_LIMITS].v2();
-		camera.limits = cbounds;
+		//var camera = new MatchCamera();
+		//camera.Name = "Camera";
+		//var cbounds = inif[BASE_SECTION, "CameraBounds", MatchCamera.DEFAULT_LIMITS].v2();
+		//camera.limits = cbounds;
 		var center = inif[BASE_SECTION, "Center", Vector2.Zero].v2();
-		camera.middle = center;
-		var zoom = inif[BASE_SECTION, "BaseZoom", 1.7f].f();
-		camera.baseZoom = zoom;
-		var zoff = inif[BASE_SECTION, "ZoomOffset", 0.1f].f();
-		camera.zoomOffset = zoff;
-		var inter = inif[BASE_SECTION, "Interpolation", 0.01f].f();
-		camera.interpolationWeight = inter;
+		//camera.middle = center;
+		//var zoom = inif[BASE_SECTION, "BaseZoom", 1.7f].f();
+		//camera.baseZoom = zoom;
+		//var zoff = inif[BASE_SECTION, "ZoomOffset", 0.1f].f();
+		//camera.zoomOffset = zoff;
+		//var inter = inif[BASE_SECTION, "Interpolation", 0.01f].f();
+		//camera.interpolationWeight = inter;
 		
-		camera.Current = true;
+		//camera.Current = true;
 		
 		var blast = inif[BASE_SECTION, "BlastZones", BlastZone.DEFAULT_SIZE].v2();
 		var bz = new BlastZone(center, blast);
 		
-		n.AddChild(camera);
+		//n.AddChild(camera);
 		n.AddChild(bz);
 		return true;
 	}

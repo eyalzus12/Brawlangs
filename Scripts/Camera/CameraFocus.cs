@@ -18,6 +18,12 @@ public class CameraFocus : Node2D
 	public bool Debug{get => _debug; set {if(_debug != value) {_debug = value; Update();}}}
 	
 	public Vector2 Limits{get; set;} = DEFAULT_LIMITS;
+	private Vector2 GlobalOffset => GlobalPosition-Position;
+	
+	private float PracticalLimitLeft => FollowingCamera.LimitLeft - GlobalOffset.x;
+	private float PracticalLimitRight => FollowingCamera.LimitRight - GlobalOffset.x;
+	private float PracticalLimitTop => FollowingCamera.LimitTop - GlobalOffset.y;
+	private float PracticalLimitBottom => FollowingCamera.LimitBottom - GlobalOffset.y;
 	
 	private bool _limitOn = true;
 	public bool LimitOn
@@ -26,10 +32,10 @@ public class CameraFocus : Node2D
 		set
 		{
 			_limitOn = value;
-			FollowingCamera.LimitLeft = -(int)(value?Limits.x:10000000);
-			FollowingCamera.LimitRight = (int)(value?Limits.x:10000000);
-			FollowingCamera.LimitTop = -(int)(value?Limits.y:10000000);
-			FollowingCamera.LimitBottom = (int)(value?Limits.y:10000000);
+			FollowingCamera.LimitLeft = (int)(GlobalOffset.x + (value?-Limits.x:-10000000));
+			FollowingCamera.LimitRight = (int)(GlobalOffset.x + (value?Limits.x:10000000));
+			FollowingCamera.LimitTop = (int)(GlobalOffset.y + (value?-Limits.y:-10000000));
+			FollowingCamera.LimitBottom = (int)(GlobalOffset.y + (value?Limits.y:10000000));
 		}
 	}
 	
@@ -56,10 +62,7 @@ public class CameraFocus : Node2D
 		FollowingCamera.SmoothingEnabled = true;
 		FollowingCamera.LimitSmoothed = true;
 		FollowingCamera.SmoothingSpeed = CAMERA_SPEED;
-		FollowingCamera.LimitLeft = -(int)Limits.x;
-		FollowingCamera.LimitRight = (int)Limits.x;
-		FollowingCamera.LimitTop = -(int)Limits.y;
-		FollowingCamera.LimitBottom = (int)Limits.y;
+		LimitOn = true;
 		FollowingCamera.Current = true;
 		AddChild(FollowingCamera);
 		
@@ -79,16 +82,22 @@ public class CameraFocus : Node2D
 		DesiredCameraRect = Followed
 			.Select(n=>n.Position
 				.Clamp(
-					FollowingCamera.LimitLeft,
-					FollowingCamera.LimitRight,
-					FollowingCamera.LimitTop,
-					FollowingCamera.LimitBottom
+					PracticalLimitLeft,
+					PracticalLimitRight,
+					PracticalLimitTop,
+					PracticalLimitBottom
 				)
 			)
 			.Append(Vector2.Zero)
 			.RectWithAll()
 			.GrowIndividual(GROW_H,GROW_V,GROW_H,GROW_V)
-			.Limit(FollowingCamera.LimitRight,FollowingCamera.LimitBottom);
+			.Limit(
+				PracticalLimitLeft,
+				PracticalLimitRight,
+				PracticalLimitTop,
+				PracticalLimitBottom
+			);
+		
 		Position = DesiredCameraRect.Center();
 		
 		var cameraZoomXY = DesiredCameraRect.Size/GetViewportRect().Size;
@@ -103,10 +112,20 @@ public class CameraFocus : Node2D
 	public override void _Draw()
 	{
 		if(!Debug) return;
+		DrawCircle(Vector2.Zero, 5, new Color(1,0,0));
 		DrawSetTransform(-Position,0f,Vector2.One);
-		DrawCircle(Position, 5, new Color(1,0,0));
 		DrawRect(DesiredCameraRect, new Color(0,1,0), false);
 		DrawRect(GeometryUtils.RectFrom(Vector2.Zero, Limits), new Color(0,0,1), false);
+		
+		Followed
+			.Select(n=>n.Position
+			.Clamp(
+				PracticalLimitLeft,
+				PracticalLimitRight,
+				PracticalLimitTop,
+				PracticalLimitBottom
+			))
+			.ForEach(p => DrawCircle(p, 5, new Color(0,0,0)));
 	}
 	
 	public void CharacterGone(Node2D who) => Followed.Remove(who);

@@ -63,19 +63,13 @@ public static class GeometryUtils
 	
 	public static Vector2 Center(this Rect2 rec) => rec.Position + rec.Size/2f;
 		
-	public static Rect2 Limit(this Rect2 rec, float maxH, float maxV)
+	public static Rect2 Limit(this Rect2 rec, float mx, float Mx, float my, float My)
 	{
-		//GD.Print(rec);
-		Vector2 pos = rec.Position.Clamp(-maxH, maxH, -maxV, maxV);
-		//keep top right cornet inside bounding box
-		
-		Vector2 end = rec.End.Clamp(-maxH, maxH, -maxV, maxV);
-		//keep bottom right corner inside bounding box
-		
-		Vector2 size = (end-pos).Abs();
-		//get size
-		
-		return new Rect2(pos, size);
+		var rpos = new Vector2(mx,my);
+		var rend = new Vector2(Mx,My);
+		var rsize = (rend-rpos).Abs();
+		var r = new Rect2(rpos,rsize);
+		return rec.Clip(r);
 	}
 	
 	public static Rect2 Zoomed(this Rect2 r, Vector2 zoom) => RectFrom(r.Center(), r.Size*zoom/2f).Abs();
