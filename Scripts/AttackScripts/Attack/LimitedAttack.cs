@@ -8,7 +8,7 @@ public class LimitedAttack : Attack
 	
 	public override void Init()
 	{
-		ch.Resources.Give(ResourceName, AmountCanUse);
+		if(OwnerObject is IResourceUser ru) ru.Resources.Give(ResourceName, AmountCanUse);
 	}
 	
 	public override void LoadProperties()
@@ -19,8 +19,8 @@ public class LimitedAttack : Attack
 	
 	public override void OnStart()
 	{
-		ch.Resources.Give(ResourceName, -1);
+		if(OwnerObject is IResourceUser ru) ru.Resources.Give(ResourceName, -1);
 	}
 	
-	public override bool CanActivate() => ch.Resources.Has(ResourceName);
+	public override bool CanActivate() => OwnerObject is IResourceUser ru && ru.Resources.Has(ResourceName);
 }

@@ -61,13 +61,7 @@ public class AttackPart : Node2D, IHitter
 	public AttackPartConditionManager TransConditionManager{get; set;} = new AttackPartConditionManager();
 	public AttackPartConditionManager StateConditionManager{get; set;} = new AttackPartConditionManager();
 	
-	//needed for: animations, sound, velocity, projectiles, tags
-	protected Character ch;
-	public IAttacker OwnerObject{get => ch; set
-		{
-			if(value is Character c) ch = c;
-		}
-	}
+	public IAttacker OwnerObject{get; set;}
 	
 	public override void _Ready()
 	{
@@ -99,14 +93,14 @@ public class AttackPart : Node2D, IHitter
 		
 		OwnerObject.HitboxAnimator.Connect("animation_finished", this, "ChangeToNextOnEnd");
 		
-		ch.PlayAnimation(AttackAnimation, true);//overwrite animation
-		ch.PlaySound(AttackSound, Position);
+		OwnerObject.CharacterSprite.Play(AttackAnimation, true);
+		OwnerObject.Audio.Play(OwnerObject.AudioPrefix, AttackSound, Position);
 		
-		ch.vec *= MomentumPreservation;
-		ch.vec += Movement * new Vector2(ch.Direction, 1);
-		ch.vuc *= BurstMomentumPreservation;
-		if(MakeMomentumMatchDirection) ch.vec.x = ch.vec.x.CopySign(ch.Direction);
-		if(MakeBurstMomentumMatchDirection) ch.vuc.x = ch.vuc.x.CopySign(ch.Direction);
+		OwnerObject.Momentum *= MomentumPreservation;
+		OwnerObject.Momentum += Movement * new Vector2(OwnerObject.Direction, 1);
+		OwnerObject.BurstMomentum *= BurstMomentumPreservation;
+		if(MakeMomentumMatchDirection) OwnerObject.Momentum = new Vector2(OwnerObject.Momentum.x.CopySign(OwnerObject.Direction), OwnerObject.Momentum.y);
+		if(MakeBurstMomentumMatchDirection) OwnerObject.BurstMomentum = new Vector2(OwnerObject.BurstMomentum.x.CopySign(OwnerObject.Direction), OwnerObject.BurstMomentum.y);
 		
 		OnStart();
 		
@@ -122,7 +116,7 @@ public class AttackPart : Node2D, IHitter
 		Loop();
 		HandleHits();
 		
-		if(!(ch.States.Current is HitLagState))
+		if(!(OwnerObject is Character sh && sh.States.Current is HitLagState))
 		{
 			CheckConditions();
 			++FrameCount;
@@ -131,22 +125,26 @@ public class AttackPart : Node2D, IHitter
 	
 	public virtual void CheckConditions(bool end = false)
 	{
-		foreach(var result in TagConditionManager.Get(ch.Tags, FramePropertyManager, FrameCount))
-			ch.Tags[result.Item1] = ch.Tags[result.Item1].Apply(result.Item2?StateTag.Starting:StateTag.Ending);
+		foreach(var result in TagConditionManager.Get(OwnerObject.Tags, FramePropertyManager, FrameCount))
+			OwnerObject.Tags[result.Item1] = OwnerObject.Tags[result.Item1].Apply(result.Item2?StateTag.Starting:StateTag.Ending);
 		
-		var trans = TransConditionManager.Get(ch.Tags, FramePropertyManager, FrameCount).Where(c => c.Item2).Select(c => c.Item1).FirstOrDefault("");
+		var trans = TransConditionManager.Get(OwnerObject.Tags, FramePropertyManager, FrameCount).Where(c => c.Item2).Select(c => c.Item1).FirstOrDefault("");
 		if(trans != "") ChangePart(trans);
 		else
 		{
-			var state = StateConditionManager.Get(ch.Tags, FramePropertyManager, FrameCount).Where(c => c.Item2).Select(c => c.Item1).FirstOrDefault("");
-			if(state != "") ch.States.Change(state);//Do state
+			if(OwnerObject is Character sh)
+			{
+				var state = StateConditionManager.Get(OwnerObject.Tags, FramePropertyManager, FrameCount).Where(c => c.Item2).Select(c => c.Item1).FirstOrDefault("");
+				if(state != "") sh.States.Change(state);
+				else if(end) ChangePart("");
+			}
 			else if(end) ChangePart("");
 		}
 	}
 	
 	public virtual void OnStartupFinish()
 	{
-		foreach(var p in EmittedProjectiles) ch.EmitProjectile(p);
+		if(OwnerObject is IProjectileEmitter pe) foreach(var p in EmittedProjectiles) pe.EmitProjectile(p);
 	}
 	
 	const float FPS = 60f;
@@ -192,22 +190,20 @@ public class AttackPart : Node2D, IHitter
 		
 		foreach(var h in Hitboxes) h.Active = false;
 		
-		ch.Tags["Hit"] = StateTag.Ending;
+		OwnerObject.Tags["Hit"] = StateTag.Ending;
 		HitList.Clear();
 		HitIgnoreList.Clear();
 		OwnerObject.HitboxAnimator.Disconnect("animation_finished", this, "ChangeToNextOnEnd");
 	}
 	
-	public virtual void Pause() {OwnerObject.HitboxAnimator.Stop(); ch.PauseAnimation();}
-	public virtual void Resume() {OwnerObject.HitboxAnimator.Play(); ch.ResumeAnimation();}
+	public virtual void Pause() {OwnerObject.HitboxAnimator.Stop(); OwnerObject.CharacterSprite.Pause();}
+	public virtual void Resume() {OwnerObject.HitboxAnimator.Play(); OwnerObject.CharacterSprite.Resume();}
 	public virtual void Loop() {}
 	public virtual void OnStart() {}
 	public virtual void OnEnd() {}
 	public virtual void HitEvent(Hitbox hitbox, Hurtbox hurtbox) {}
 	
-	public void ChangeToNextOnEnd(string dummy = "") => CheckConditions(true);//ChangeToNext(true);
-	//public virtual void ChangeToNext(bool end = false) => ChangePart(NextPart(end));
-	//public virtual string NextPart(bool end = false) => TransitionManager.NextAttackPart(ch.Tags, end?-1:FrameCount);
+	public void ChangeToNextOnEnd(string dummy = "") => CheckConditions(true);
 	public virtual void ChangePart(string part) => OwnerAttack.SetPart(part);
 	
 	public virtual bool CanGenerallyHit(IHittable hitObject) => OwnerObject.CanGenerallyHit(hitObject) && !HitIgnoreList.Contains(hitObject);
@@ -232,7 +228,7 @@ public class AttackPart : Node2D, IHitter
 		#endif
 		
 		OwnerObject.Hitting = true;
-		ch.Tags["Hit"] = StateTag.Starting;
+		OwnerObject.Tags["Hit"] = StateTag.Starting;
 		
 		#if DEBUG_ATTACKS
 		GD.Print($"{OwnerObject} Last Hitee = {hurtbox.OwnerObject}");
@@ -273,7 +269,7 @@ public class AttackPart : Node2D, IHitter
 		#endif
 		
 		if(!Active) return;
-		var velocity = ch.Velocity;
+		var velocity = OwnerObject.Velocity;
 		var copy = new Dictionary<Hurtbox, Hitbox>(HitList);//make copy to prevent this one crash
 		foreach(var entry in copy)
 		{

@@ -9,13 +9,7 @@ public class Attack : Node2D
 	public AttackPart LastUsedPart{get; set;}
 	public Dictionary<string, AttackPart> Parts{get; set;} = new Dictionary<string, AttackPart>();
 	
-	//states
-	protected Character ch;
-	public IAttacker OwnerObject{get => ch; set
-		{
-			if(value is Character c) ch = c;
-		}
-	}
+	public IAttacker OwnerObject{get; set;}
 	
 	public long FrameCount{get; set;} = 0;
 	

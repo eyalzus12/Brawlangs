@@ -21,6 +21,9 @@ public interface IHittable
 	InvincibilityManager IFrames{get; set;}
 	bool Invincible{get;}
 	
+	StateTagsManager Tags{get; set;}
+	void UpdateTags();
+	
 	void HandleGettingHit(HitData data);
 	
 	bool CanGenerallyBeHitBy(IHitter hitter);

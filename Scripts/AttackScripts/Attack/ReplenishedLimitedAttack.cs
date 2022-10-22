@@ -15,14 +15,17 @@ public class ReplenishedLimitedAttack : LimitedAttack
 		LoadExtraProperty<bool>("RestoreOnWall", false);
 		LoadExtraProperty<bool>("RestoreOnHitting", false);
 		LoadExtraProperty<bool>("RestoreOnGettingHit", false);
-		ch.Connect("OptionsRestoredFromGroundTouch", this, nameof(GroundTouch));
-		ch.Connect("OptionsRestoredFromWallTouch", this, nameof(WallTouch));
-		ch.Connect("OptionsRestoredFromHitting", this, nameof(Hitting));
-		ch.Connect("OptionsRestoredFromGettingHit", this, nameof(GettingHit));
+		if(OwnerObject is Node n)
+		{
+			n.Connect("OptionsRestoredFromGroundTouch", this, nameof(GroundTouch));
+			n.Connect("OptionsRestoredFromWallTouch", this, nameof(WallTouch));
+			n.Connect("OptionsRestoredFromHitting", this, nameof(Hitting));
+			n.Connect("OptionsRestoredFromGettingHit", this, nameof(GettingHit));
+		}
 	}
 	
-	public virtual void GroundTouch() {if(RestoreOnGround) ch.Resources[ResourceName] = AmountCanUse;}
-	public virtual void WallTouch() {if(RestoreOnWall) ch.Resources[ResourceName] = AmountCanUse;}
-	public virtual void Hitting() {if(RestoreOnHitting) ch.Resources[ResourceName] = AmountCanUse;}
-	public virtual void GettingHit() {if(RestoreOnGettingHit) ch.Resources[ResourceName] = AmountCanUse;}
+	public virtual void GroundTouch() {if(OwnerObject is IResourceUser ru && RestoreOnGround) ru.Resources[ResourceName] = AmountCanUse;}
+	public virtual void WallTouch() {if(OwnerObject is IResourceUser ru && RestoreOnWall) ru.Resources[ResourceName] = AmountCanUse;}
+	public virtual void Hitting() {if(OwnerObject is IResourceUser ru && RestoreOnHitting) ru.Resources[ResourceName] = AmountCanUse;}
+	public virtual void GettingHit() {if(OwnerObject is IResourceUser ru && RestoreOnGettingHit) ru.Resources[ResourceName] = AmountCanUse;}
 }

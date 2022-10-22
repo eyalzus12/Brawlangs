@@ -6,7 +6,8 @@ using System.Text;
 
 public class Character : KinematicBody2D,
 	IStunnable, IKnockable, IHitPausable, IDamagable,
-	IAttacker, IHitLaggable
+	IAttacker, IHitLaggable, IProjectileEmitter,
+	IResourceUser
 {
 	public const int DROP_THRU_BIT = 1;
 	protected const int CF = 30;
@@ -166,6 +167,9 @@ public class Character : KinematicBody2D,
 	public Vector2 vyc;
 	public Vector2 vwc;
 	public Vector2 vvc;
+	
+	public Vector2 Momentum{get => vec; set => vec = value;}
+	public Vector2 BurstMomentum{get => vuc; set => vuc = value;}
 	
 	public Vector2 Velocity => Velocities.Aggregate(Vector2.Zero, (a,v)=>a+v);
 	public Vector2 RoundedVelocity => Velocity.Round();

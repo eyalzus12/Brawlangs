@@ -31,8 +31,18 @@ public interface IAttacker
 	
 	AnimationPlayer HitboxAnimator{get; set;}
 	
+	StateTagsManager Tags{get; set;}
+	void UpdateTags();
+	
 	void HandleHitting(HitData data);
 	
 	bool CanGenerallyHit(IHittable hitObject);
 	bool CanHit(IHittable hitObject);
+	
+	AnimationSprite CharacterSprite{get; set;}
+	Color SpriteModulate{get; set;}
+	
+	Vector2 Momentum{get; set;}
+	Vector2 BurstMomentum{get; set;}
+	Vector2 Velocity{get;}
 }

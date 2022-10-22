@@ -45,6 +45,8 @@ public class Projectile : Node2D, IHitter, IHittable
 	public string AudioPrefix => OwnerObject.AudioPrefix;
 	public AudioManager Audio{get; set;}
 	
+	public StateTagsManager Tags{get; set;} = new StateTagsManager();
+	
 	public Dictionary<string, ParamRequest> LoadExtraProperties{get; set;} = new Dictionary<string, ParamRequest>();
 	public virtual void LoadProperties() {}
 	public void LoadExtraProperty<T>(string s, T @default = default(T))
@@ -108,6 +110,11 @@ public class Projectile : Node2D, IHitter, IHittable
 	public virtual void OnSpawn() {}
 	public virtual void Loop() {}
 	public virtual void OnRemove() {}
+	
+	public virtual void UpdateTags()
+	{
+		
+	}
 	
 	public void Destruct()
 	{
