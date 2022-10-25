@@ -199,7 +199,7 @@ public class Hitbox : Area2D
 	{
 		ZIndex = 4;
 		DrawSetTransform(CollisionPosition, CollisionRotation, Vector2.One);
-		var drawcolor = OwnerObject.SpriteModulate;
+		var drawcolor = OwnerObject.OwnerObject.SpriteModulate;
 		drawcolor.a = 0.6f;
 		this.DrawShape(HitboxShape.Shape, drawcolor);
 	}
