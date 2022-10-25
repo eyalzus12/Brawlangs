@@ -22,8 +22,8 @@ public class CooldownManager
 		var keys = Cooldowns.Keys.ToList();
 		foreach(var k in keys)
 		{
-			Cooldowns[k]--;
-			if(Cooldowns[k] <= 0) Cooldowns.Remove(k);
+			if(Cooldowns[k] <= 1) Cooldowns.Remove(k);
+			else Cooldowns[k]--;
 		}
 	}
 	

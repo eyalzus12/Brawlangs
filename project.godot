@@ -8,6 +8,28 @@
 
 config_version=4
 
+_global_script_classes=[ {
+"base": "Node",
+"class": "AttackComponent",
+"language": "GDScript",
+"path": "res://Scripts/AttackScripts/Attack/AttackComponent.gd"
+}, {
+"base": "Node",
+"class": "AttackPartComponent",
+"language": "GDScript",
+"path": "res://Scripts/AttackScripts/AttackPart/AttackPartComponent.gd"
+}, {
+"base": "Node",
+"class": "HitboxComponent",
+"language": "GDScript",
+"path": "res://Scripts/AttackScripts/Hitbox/HitboxComponent.gd"
+} ]
+_global_script_class_icons={
+"AttackComponent": "",
+"AttackPartComponent": "",
+"HitboxComponent": ""
+}
+
 [application]
 
 config/name="Brawlangs"

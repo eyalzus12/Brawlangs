@@ -10,6 +10,7 @@ namespace RawInput_dll
 	public sealed class RawKeyboard
 	{
 		private readonly Dictionary<IntPtr,KeyPressEvent> _deviceList = new Dictionary<IntPtr,KeyPressEvent>();
+		public IEnumerable<KeyPressEvent> DeviceList => _deviceList.Values;
 		public delegate void DeviceEventHandler(object sender, RawInputEventArg e);
 		public event DeviceEventHandler KeyPressed;
 		readonly object _padLock = new object();

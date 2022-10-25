@@ -61,7 +61,11 @@ public class Hitbox : Area2D
 			if(!_active && value)
 			{
 				FrameCount = 0;
-				Init();
+				OnActivate();
+			}
+			else if(_active && !value)
+			{
+				OnDeactivate();
 			}
 			
 			_active = value;
@@ -118,6 +122,8 @@ public class Hitbox : Area2D
 	}
 	
 	public virtual void Init() {}
+	public virtual void OnActivate() {}
+	public virtual void OnDeactivate() {}
 	
 	public virtual void LoadProperties() {}
 	
@@ -193,7 +199,7 @@ public class Hitbox : Area2D
 	{
 		ZIndex = 4;
 		DrawSetTransform(CollisionPosition, CollisionRotation, Vector2.One);
-		var drawcolor = (OwnerObject.OwnerObject is Character c)?c.SpriteModulate:new Color(1,1,1);
+		var drawcolor = OwnerObject.SpriteModulate;
 		drawcolor.a = 0.6f;
 		this.DrawShape(HitboxShape.Shape, drawcolor);
 	}

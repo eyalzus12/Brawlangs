@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
+using System.Collections.Generic;
 
 namespace RawInput_dll
 {
@@ -19,6 +20,7 @@ namespace RawInput_dll
 		}
 
 		public int NumberOfKeyboards => _keyboardDriver.NumberOfKeyboards;
+		public IEnumerable<KeyPressEvent> KeyboardList => _keyboardDriver.DeviceList;
 		
 		public void AddMessageFilter()
 		{

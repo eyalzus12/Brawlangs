@@ -318,27 +318,6 @@ public class AttackCreator
 		h.Owner = ap;//for scene packing
 	}
 	
-	/*public void BuildTransition(AttackPart ap, string section)
-	{
-		if(!inif.HasSection(section)) {GD.PushError($"Can't generate transition {section} as it is not a real section"); return;}
-		
-		var tags = inif[section, "Tag", ""].s();
-		
-		try
-		{
-			var tagExpression = new AttackPartTransitionTagExpression(tags);
-			var frames = inif[section, "Frames", Enumerable.Empty<Vector2>()].lv2();
-			var nextPart = inif[section, "Next", ""].s();
-			var addedTransition = new AttackPartTransition(frames, tagExpression, nextPart);
-			ap.TransitionManager.Add(addedTransition);
-		}
-		catch(FormatException fe)
-		{
-			GD.PushError(fe.Message);
-			return;
-		}
-	}*/
-	
 	/*
 	the following is a quick fix for being unable to get the load request dictionary
 	when using the Get method for godot objects, it refuses to be casted into the dictionary
