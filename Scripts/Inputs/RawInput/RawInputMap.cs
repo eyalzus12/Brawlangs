@@ -57,6 +57,16 @@ public class RawInputMap : Node
 	public override void _Process(float delta)
 	{
 		if(Input.IsActionJustPressed("toggle_input_debug")) DebugInput = !DebugInput;
+
+		if(Input.IsActionJustPressed("list_devices"))
+		{
+			int i = 1;
+			foreach(var keyboard in InputForm.RawInputWindow.KeyboardList)
+			{
+				GD.Print($"Device {i}\nDeviceName: {keyboard.DeviceName}\nDeviceType: {keyboard.DeviceType}\nDeviceHandle: {keyboard.DeviceHandle.ToInt64().ToString("X")}\nName: {keyboard.Name}\n");
+				++i;
+			}
+		}
 	}
 	
 	public void RunForm() => Application.Run(InputForm);

@@ -128,21 +128,9 @@ public static class GeometryUtils
 	
 	public static Rect2 RectWithAll(this IEnumerable<Vector2> ev)
 	{
-		float minX = float.PositiveInfinity;
-		float maxX = float.NegativeInfinity;
-		float minY = float.PositiveInfinity;
-		float maxY = float.NegativeInfinity;
-		
-		foreach(var v in ev)
-		{
-			if(v.x < minX) minX = v.x;
-			if(v.x > maxX) maxX = v.x;
-			if(v.y < minY) minY = v.y;
-			if(v.y > maxY) maxY = v.y;
-		}
-		
-		var pos = new Vector2(minX,minY);
-		var end = new Vector2(maxX,maxY);
+		var agg = ev.Aggregate<Vector2, (Vector2,Vector2)>((Vector2.Inf,-Vector2.Inf), (a,v) => (a.Item1.Min(v), a.Item2.Max(v)));
+		var pos = agg.Item1;
+		var end = agg.Item2;
 		var size = (end-pos).Abs();
 		return new Rect2(pos,size);
 	}

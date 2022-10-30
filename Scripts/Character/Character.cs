@@ -9,7 +9,7 @@ public class Character : KinematicBody2D,
 	IAttacker, IHitLaggable, IProjectileEmitter,
 	IResourceUser
 {
-	public const int DROP_THRU_BIT = 1;
+	public const int DROP_THRU_BIT = 0b1;
 	protected const int CF = 30;
 	
 	public string statConfigPath = "res://";
@@ -395,27 +395,22 @@ public class Character : KinematicBody2D,
 		ProjPool.Clear();
 	}
 	
-	///////////////////////////////////////////
-	///////////////Animation///////////////////
-	///////////////////////////////////////////
-	
+	#region Animation
 	public void PlayAnimation(string anm, bool overwriteQueue) => CharacterSprite.Play(anm, overwriteQueue);
 	public void QueueAnimation(string anm, bool goNext, bool overwriteQueue) => CharacterSprite.Queue(anm, goNext, overwriteQueue);
 	public bool AnimationLooping => CharacterSprite.Looping;
 	public void PauseAnimation() => CharacterSprite.Pause();
 	public void ResumeAnimation() => CharacterSprite.Resume();
+
+	#endregion
 	
-	///////////////////////////////////////////
-	///////////////Sound///////////////////////
-	///////////////////////////////////////////
-	
+	#region Sound
 	public void PlaySound(string sound, Vector2 pos) => Audio.Play(AudioPrefix, sound, pos);
 	public void PlaySound(AudioStream sound, Vector2 pos) => Audio.Play(sound, pos);
+
+	#endregion
 	
-	///////////////////////////////////////////
-	///////////////States//////////////////////
-	///////////////////////////////////////////
-	
+	#region States
 	private State[] CreateStates() => new State[]
 	{
 		new AirState(this),
@@ -461,11 +456,9 @@ public class Character : KinematicBody2D,
 		
 		new WavedashState(this)
 	};
-	
-	///////////////////////////////////////////
-	///////////////Misc////////////////////////
-	///////////////////////////////////////////
-	
+	#endregion
+
+	#region Tags
 	public void UpdateTags()
 	{
 		foreach(var inputTag in RelevantInputTags)
@@ -504,7 +497,19 @@ public class Character : KinematicBody2D,
 		if(property && !Tags.Active(name)) Tags[name] = StateTag.Starting;
 		if(!property && Tags.Active(name)) Tags[name] = StateTag.Ending;
 	}
+	#endregion
+
+	#region Misc	
+
+	public override string ToString() => Name;
 	
+	public void AttachEffect(Effect e)
+	{
+		AddChild(e);
+		//TODO: make the effect inserted into a list
+		//so that other scripts can reference it
+		//just make sure to remove
+	}
 	public void GiveTemporaryResource(string resource, int amount, int forFrames)
 	{
 		Resources.Give(resource, amount);
@@ -542,13 +547,47 @@ public class Character : KinematicBody2D,
 		ComboCount = 0;
 		DisableAllProjectiles();
 	}
+	#endregion
 	
+	#region Projectiles
 	public virtual void DisableAllProjectiles()
 	{
 		foreach(var activeProjectileSet in ActiveProjectiles.Values)
 			activeProjectileSet.ToList().ForEach(p => p.Destruct());
 	}
+	public virtual void EmitProjectile(string proj)
+	{
+		//get pooled projectile
+		var generatedProjectile = ProjPool.GetProjectile(proj);
+		if(generatedProjectile is null)
+		{
+			GD.PushError($"Failed to emit projectile {proj} because the object pool returned a null");
+			return;
+		}
+		
+		ActiveProjectiles.TryAdd(proj, new HashSet<Projectile>());
+		//set direction
+		generatedProjectile.Direction = Direction;
+		//connect destruction signal
+		generatedProjectile.Connect("ProjectileDied", this, nameof(HandleProjectileDestruction));
+		//store as active
+		ActiveProjectiles[proj].Add(generatedProjectile);
+		//request that _Ready will be called
+		generatedProjectile.RequestReady();
+		//add to scene
+		GetParent().AddChild(generatedProjectile);
+	}
 	
+	public virtual void HandleProjectileDestruction(Projectile who)
+	{
+		var identifier = who.Identifier;
+		ActiveProjectiles[identifier].Remove(who);
+		ProjPool.InsertProjectile(who);
+		who.Disconnect("ProjectileDied", this, nameof(HandleProjectileDestruction));
+	}
+	#endregion
+
+	#region Resources
 	public virtual void RestoreOptionsOnGroundTouch()
 	{
 		EmitSignal(nameof(OptionsRestoredFromGroundTouch));
@@ -594,7 +633,9 @@ public class Character : KinematicBody2D,
 			Resources.Give("OnGettingHitOptionRestoration", -1);
 		}
 	}
+	#endregion
 	
+	#region Velocity
 	public virtual void StoreVelocities()
 	{
 		Velocities[0] = vec; Velocities[1] = vac; Velocities[2] = vic; Velocities[3] = voc;
@@ -618,21 +659,10 @@ public class Character : KinematicBody2D,
 		for(int i = 0; i < Velocities.Length; ++i) Velocities[i].TruncateIfInsignificant();
 		LoadVelocities();
 	}
+	#endregion
 	
-	public override string ToString() => Name;
-	
-	public void AttachEffect(Effect e)
-	{
-		AddChild(e);
-		//TODO: make the effect inserted into a list
-		//so that other scripts can reference it
-		//just make sure to remove
-	}
-	
-	///////////////////////////////////////////
-	////////////////Collision//////////////////
-	///////////////////////////////////////////
-	
+	#region Collision
+
 	public void ApplySettings(string setting)
 	{
 		CurrentCollisionSetting = setting;
@@ -685,10 +715,10 @@ public class Character : KinematicBody2D,
 		ApplySettings("Default");
 		Crouching = false;
 	}
+
+	#endregion
 	
-	///////////////////////////////////////////
-	/////////////////Inputs////////////////////
-	///////////////////////////////////////////
+	#region Inputs
 	
 	public void Turn() => Direction *= -1;
 	
@@ -699,11 +729,10 @@ public class Character : KinematicBody2D,
 		
 		return true;
 	}
-	
-	///////////////////////////////////////////
-	////////////////Attacks////////////////////
-	///////////////////////////////////////////
-	
+
+	#endregion
+
+	#region Attacks	
 	public virtual bool CanGenerallyHit(IHittable hitObject) => !hitObject.Invincible;
 	public virtual bool CanGenerallyBeHitBy(IHitter hitter) => !Invincible;
 	public virtual bool CanGenerallyBeHitBy(IAttacker attacker) => !Invincible;
@@ -864,41 +893,11 @@ public class Character : KinematicBody2D,
 		if(!GettingHit) SetAttackCooldowns();
 		CurrentAttack = null;
 	}
-	
-	public virtual void EmitProjectile(string proj)
-	{
-		//get pooled projectile
-		var generatedProjectile = ProjPool.GetProjectile(proj);
-		if(generatedProjectile is null)
-		{
-			GD.PushError($"Failed to emit projectile {proj} because the object pool returned a null");
-			return;
-		}
-		
-		ActiveProjectiles.TryAdd(proj, new HashSet<Projectile>());
-		//set direction
-		generatedProjectile.Direction = Direction;
-		//connect destruction signal
-		generatedProjectile.Connect("ProjectileDied", this, nameof(HandleProjectileDestruction));
-		//store as active
-		ActiveProjectiles[proj].Add(generatedProjectile);
-		//request that _Ready will be called
-		generatedProjectile.RequestReady();
-		//add to scene
-		GetParent().AddChild(generatedProjectile);
-	}
-	
-	public virtual void HandleProjectileDestruction(Projectile who)
-	{
-		var identifier = who.Identifier;
-		ActiveProjectiles[identifier].Remove(who);
-		ProjPool.InsertProjectile(who);
-		who.Disconnect("ProjectileDied", this, nameof(HandleProjectileDestruction));
-	}
-	
 	public virtual void SetAttackCooldowns()
 	{
 		if(CurrentAttack is null) return;
 		Cooldowns[CurrentAttack.Name] = CurrentAttack.FinalCooldown;
 	}
+
+	#endregion
 }

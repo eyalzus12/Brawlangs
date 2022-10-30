@@ -150,6 +150,11 @@ toggle_input_debug={
 "events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":16777250,"physical_scancode":0,"unicode":0,"echo":false,"script":null)
  ]
 }
+list_devices={
+"deadzone": 0.5,
+"events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":16777253,"physical_scancode":0,"unicode":0,"echo":false,"script":null)
+ ]
+}
 
 [layer_names]
 
@@ -162,6 +167,10 @@ toggle_input_debug={
 [logging]
 
 file_logging/enable_file_logging=true
+
+[mono]
+
+project/assembly_name="Brawlangs"
 
 [node]
 
