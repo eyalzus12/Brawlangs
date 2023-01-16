@@ -7,16 +7,10 @@
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_right = 296.0
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [node name="LoadContainer" type="VBoxContainer" parent="."]
 margin_right = 1328.0
 margin_bottom = 600.0
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [node name="Load1" type="HSplitContainer" parent="LoadContainer"]
 margin_right = 1328.0
@@ -277,6 +271,23 @@ margin_right = 608.0
 margin_bottom = 322.0
 text = "exit"
 script = ExtResource( 2 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+margin_top = 232.0
+margin_right = 128.0
+margin_bottom = 272.0
+alignment = 1
+
+[node name="Label" type="Label" parent="HBoxContainer"]
+margin_left = 8.0
+margin_top = 13.0
+margin_right = 73.0
+margin_bottom = 27.0
+text = "profile      "
+
+[node name="Label 2" type="Label" parent="HBoxContainer"]
+margin_left = 77.0
+margin_top = 13.0
+margin_right = 119.0
+margin_bottom = 27.0
+text = "device"
